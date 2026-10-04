@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+<g id="08_Bolsa_Microinteracciones_Feedback">
+<rect width="1440" height="900" fill="#F8FAFC"/>
+<g id="Header_Navbar_Feedback">
+<rect x="0" y="0" width="1440" height="74" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+<rect x="0" y="0" width="1440" height="3" fill="#DC2626"/>
+<g id="Pokeball_48_38" pointer-events="none">
+  <circle cx="48" cy="38" r="17" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"/>
+  <path d="M 31 38 A 17 17 0 0 1 65 38 Z" fill="#EF4444"/>
+  <path d="M 31 38 A 17 17 0 0 0 65 38 Z" fill="#FFFFFF"/>
+  <line x1="31" y1="38" x2="65" y2="38" stroke="#0F172A" stroke-width="2.5"/>
+  <circle cx="48" cy="38" r="7.14" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"/>
+  <circle cx="48" cy="38" r="3.4000000000000004" fill="#0F172A"/>
+</g>
+<text x="76" y="44" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="900">GRADED &amp; SEALED</text>
+<text x="264" y="44" fill="#DC2626" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="900">TCG</text>
+<rect x="1270" y="16" width="138" height="42" fill="#DC2626" rx="8" ry="8"/>
+<text x="1325" y="42" fill="#FFFFFF" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="800" text-anchor="middle">Bolsa</text>
+<circle cx="1374" cy="22" r="12" fill="#FEF3C7" stroke="#DC2626" stroke-width="2"/>
+<text x="1374" y="27" fill="#B45309" font-family="Menlo, Monaco, Consolas, Courier New, monospace" font-size="11.5" font-weight="900" text-anchor="middle">3</text>
+<g id="Toast_Feedback_Navbar">
+<rect x="1080" y="16" width="180" height="42" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5" rx="8" ry="8"/>
+<text x="1170" y="41" fill="#065F46" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="800" text-anchor="middle">+1 Booster Pack añadido</text>
+</g>
+</g>
+<g id="Banner_Toast_Deshacer">
+<rect x="32" y="86" width="1376" height="54" fill="#0F172A" rx="10" ry="10"/>
+<circle cx="62" cy="113" r="12" fill="#16A34A"/>
+<text x="62" y="118" fill="#FFFFFF" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="900" text-anchor="middle">✓</text>
+<text x="86" y="119" fill="#FFFFFF" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="700">Ítem &quot;Gengar VMAX Secret Rare (PSA 10)&quot; eliminado de la bolsa de compras.</text>
+<rect x="1240" y="95" width="150" height="36" fill="#DC2626" rx="6" ry="6"/>
+<text x="1315" y="118" fill="#FFFFFF" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="800" text-anchor="middle">⟲ Deshacer acción</text>
+<rect x="1237" y="92" width="156" height="42" fill="none" stroke="#FFFFFF" stroke-width="3" rx="9" ry="9"/>
+<rect x="1240" y="66" width="145" height="18" fill="#FFFFFF" rx="3" ry="3"/>
+<text x="1312" y="79" fill="#0F172A" font-family="Menlo, Monaco, Consolas, Courier New, monospace" font-size="9.5" font-weight="800" text-anchor="middle">:focus-visible (3px)</text>
+</g>
+<g id="Anotacion_HCI_Feedback">
+<rect x="32" y="150" width="1376" height="42" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5" rx="8" ry="8"/>
+<text x="48" y="176" fill="#1D4ED8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="800">🧠 Justificación IHC &amp; WCAG 2.2:</text>
+<text x="260" y="176" fill="#1E3A8A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="12.5">Cumple Heurística #1 (Visibilidad del estado del sistema con microinteracción visual) y Heurística #3 (Control y libertad del usuario al permitir revertir la eliminación accidental sin recargar la página).</text>
+</g>
+<g id="Cart_Items_Remaining">
+<text x="32" y="228" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="900">Bolsa Actualizada (2 artículos restantes)</text>
+<g id="ActiveCartItem_1">
+<rect x="32" y="248" width="900" height="142" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" rx="10" ry="10"/>
+<g id="Media_CartThumb_1">
+<rect x="48" y="264" width="115" height="110" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5" rx="8" ry="8"/>
+<line x1="48" y1="264" x2="163" y2="374" stroke="#E2E8F0" stroke-width="1.2"/>
+<line x1="163" y1="264" x2="48" y2="374" stroke="#E2E8F0" stroke-width="1.2"/>
+<circle cx="105.5" cy="307.0" r="22" fill="#E2E8F0" opacity="0.8"/>
+<path d="M 83.5 307.0 A 22 22 0 0 1 127.5 307.0 Z" fill="#CBD5E1" opacity="0.6"/>
+<line x1="83.5" y1="307.0" x2="127.5" y2="307.0" stroke="#94A3B8" stroke-width="1.5"/>
+<circle cx="105.5" cy="307.0" r="7" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<rect x="58.0" y="346" width="95" height="20" fill="#0F172A" rx="4" ry="4"/>
+<text x="105.5" y="360" fill="#F8FAFC" font-family="Menlo, Monaco, Consolas, Courier New, monospace" font-size="10" font-weight="500" text-anchor="middle">alt: &quot;Charizard Base Set PSA 10&quot;</text>
+</g>
+<text x="180" y="294" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="800">Charizard Base Set 1999 #4/102</text>
+<text x="180" y="320" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">PSA 10 GEM MT • Cert #48291034</text>
+<text x="520" y="322" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">Cant:</text>
+<rect x="570" y="300" width="36" height="36" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5" rx="6" ry="6"/>
+<text x="588" y="323" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="800" text-anchor="middle">−</text>
+<rect x="614" y="300" width="44" height="36" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+<text x="636" y="323" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" text-anchor="middle">1</text>
+<rect x="666" y="300" width="36" height="36" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5" rx="6" ry="6"/>
+<text x="684" y="323" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="800" text-anchor="middle">+</text>
+<text x="730" y="324" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900">$18,500.00</text>
+<rect x="820" y="300" width="92" height="36" fill="#FFFFFF" stroke="#EF4444" stroke-width="1.5" rx="8" ry="8"/>
+<text x="866" y="323" fill="#EF4444" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle">Eliminar</text>
+</g>
+<g id="ActiveCartItem_2">
+<rect x="32" y="404" width="900" height="142" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" rx="10" ry="10"/>
+<g id="Media_CartThumb_2">
+<rect x="48" y="420" width="115" height="110" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5" rx="8" ry="8"/>
+<line x1="48" y1="420" x2="163" y2="530" stroke="#E2E8F0" stroke-width="1.2"/>
+<line x1="163" y1="420" x2="48" y2="530" stroke="#E2E8F0" stroke-width="1.2"/>
+<circle cx="105.5" cy="463.0" r="22" fill="#E2E8F0" opacity="0.8"/>
+<path d="M 83.5 463.0 A 22 22 0 0 1 127.5 463.0 Z" fill="#CBD5E1" opacity="0.6"/>
+<line x1="83.5" y1="463.0" x2="127.5" y2="463.0" stroke="#94A3B8" stroke-width="1.5"/>
+<circle cx="105.5" cy="463.0" r="7" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+<rect x="58.0" y="502" width="95" height="20" fill="#0F172A" rx="4" ry="4"/>
+<text x="105.5" y="516" fill="#F8FAFC" font-family="Menlo, Monaco, Consolas, Courier New, monospace" font-size="10" font-weight="500" text-anchor="middle">alt: &quot;Umbreon VMAX Raw&quot;</text>
+</g>
+<text x="180" y="450" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="800">Umbreon VMAX Moonbreon Alt Art</text>
+<text x="180" y="476" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">Sin Gradear / Raw (Near Mint)</text>
+<text x="520" y="478" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">Cant:</text>
+<rect x="570" y="456" width="36" height="36" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5" rx="6" ry="6"/>
+<text x="588" y="479" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="800" text-anchor="middle">−</text>
+<rect x="614" y="456" width="44" height="36" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+<text x="636" y="479" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" text-anchor="middle">1</text>
+<rect x="666" y="456" width="36" height="36" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5" rx="6" ry="6"/>
+<text x="684" y="479" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="800" text-anchor="middle">+</text>
+<text x="730" y="480" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900">$780.00</text>
+<rect x="820" y="456" width="92" height="36" fill="#FFFFFF" stroke="#EF4444" stroke-width="1.5" rx="8" ry="8"/>
+<text x="866" y="479" fill="#EF4444" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle">Eliminar</text>
+</g>
+<rect x="32" y="570" width="900" height="175" fill="#FEF2F2" stroke="#FECACA" stroke-width="1.5" rx="10" ry="10"/>
+<text x="56" y="605" fill="#991B1B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="800">Recuperación de Ítem en Memoria Temporal</text>
+<text x="56" y="635" fill="#7F1D1D" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">El ítem eliminado se almacena en caché durante 60 segundos antes de ser liberado al stock público general de la tienda. Puedes pulsar &quot;Deshacer acción&quot; para restaurarlo de inmediato.</text>
+<g id="Pokeball_70_685" pointer-events="none">
+  <circle cx="70" cy="685" r="20" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"/>
+  <path d="M 50 685 A 20 20 0 0 1 90 685 Z" fill="#EF4444"/>
+  <path d="M 50 685 A 20 20 0 0 0 90 685 Z" fill="#FFFFFF"/>
+  <line x1="50" y1="685" x2="90" y2="685" stroke="#0F172A" stroke-width="2.5"/>
+  <circle cx="70" cy="685" r="8.4" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"/>
+  <circle cx="70" cy="685" r="4.0" fill="#0F172A"/>
+</g>
+<text x="105" y="690" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="700">Stock preservado temporalmente para garantizar disponibilidad.</text>
+</g>
+<g id="Cart_Summary_Updated">
+<rect x="960" y="248" width="448" height="490" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" rx="12" ry="12"/>
+<text x="988" y="288" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="900">Resumen Actualizado</text>
+<line x1="988" y1="310" x2="1380" y2="310" stroke="#E2E8F0" stroke-width="1.5"/>
+<text x="988" y="348" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14">Subtotal (2 artículos)</text>
+<text x="1380" y="348" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="end">$19,280.00</text>
+<text x="988" y="386" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14">Envío Asegurado</text>
+<text x="1380" y="386" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="end">$25.00</text>
+<text x="988" y="424" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14">Impuestos (IVA 12%)</text>
+<text x="1380" y="424" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="end">$2,316.60</text>
+<text x="988" y="462" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14">Seguro de Custodia</text>
+<text x="1380" y="462" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="end">GRATIS</text>
+<line x1="988" y1="510" x2="1380" y2="510" stroke="#CBD5E1" stroke-width="1.5"/>
+<text x="988" y="548" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="900">Total a Pagar:</text>
+<text x="1380" y="548" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="26" font-weight="900" text-anchor="end">$21,621.60</text>
+<rect x="988" y="604" width="392" height="58" fill="#DC2626" rx="10" ry="10"/>
+<text x="1184.0" y="640" fill="#FFFFFF" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="800" text-anchor="middle">Proceder al Checkout ➔</text>
+</g>
+</g>
+</svg>

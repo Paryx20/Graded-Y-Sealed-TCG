@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graded & Sealed Poké-TCG • Sistema Completo 9 Marcos (WCAG 2.2 & IHC)</title>
+  <style>
+    :root {
+      --bg: #0F172A;
+      --card-bg: #1E293B;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border: #334155;
+      --poke-red: #DC2626;
+      --poke-gold: #F59E0B;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    header {
+      padding: 18px 32px;
+      background: #020617;
+      border-bottom: 2px solid var(--poke-red);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 6px;
+      background: rgba(220, 38, 38, 0.2);
+      color: #F87171;
+      border: 1px solid rgba(220, 38, 38, 0.4);
+      text-transform: uppercase;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+    a.btn {
+      background: var(--poke-red);
+      color: #FFFFFF;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    a.btn:hover {
+      background: #B91C1C;
+    }
+    a.btn-secondary {
+      background: #1E293B;
+      color: #F8FAFC;
+      border: 1px solid #475569;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    a.btn-secondary:hover {
+      background: #334155;
+    }
+    .container {
+      padding: 30px;
+      max-width: 100%;
+    }
+    .viewer-box {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow-x: auto;
+      padding: 24px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.7);
+    }
+    .viewer-box img {
+      display: block;
+      min-width: 3840px;
+      width: 100%;
+      height: auto;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #F8FAFC;
+      margin: 28px 0 14px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .frames-nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .spec-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .spec-card h3 {
+      margin-top: 0;
+      font-size: 16px;
+      color: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .spec-card ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .focus-callout {
+      background: rgba(220, 38, 38, 0.15);
+      border-left: 3px solid var(--poke-red);
+      padding: 10px;
+      margin-top: 14px;
+      font-size: 12px;
+      font-family: monospace;
+      color: #FECACA;
+      border-radius: 0 6px 6px 0;
+    }
+    .nielsen-tag {
+      display: inline-block;
+      background: rgba(59, 130, 246, 0.2);
+      color: #93C5FD;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>🔴 GRADED &amp; SEALED POKÉ-TCG <span class="badge">Sistema Completo (9 Marcos)</span></h1>
+    </div>
+    <div class="actions">
+      <a href="graded_and_sealed_tcg_complete_9_frames.svg" download class="btn">📥 Descargar Master 9 Marcos (2 Filas SVG)</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="viewer-box">
+      <img src="graded_and_sealed_tcg_complete_9_frames.svg" alt="Lienzo Maestro de 9 Marcos organizados en 2 filas con espaciado de 80px y resolución 1440x900 cada uno" />
+    </div>
+
+    <div class="section-title">📂 Descargas Rápidas de Marcos Individuales (1440 x 900 px cada uno)</div>
+    <div class="frames-nav">
+      <a href="01_Home_Catalogo.svg" download class="btn-secondary">01: Home Catálogo</a>
+      <a href="02_Detalle_Producto.svg" download class="btn-secondary">02: Detalle Producto</a>
+      <a href="03_Bolsa_Compras.svg" download class="btn-secondary">03: Bolsa de Compras</a>
+      <a href="04_Checkout_Bifurcado.svg" download class="btn-secondary">04: Checkout Bifurcado</a>
+      <a href="05_Confirmacion_Orden.svg" download class="btn-secondary">05: Confirmación de Orden</a>
+      <a href="06_Autenticacion_Login_Registro.svg" download class="btn-secondary" style="border-color: var(--poke-gold); color: #FDE047;">★ 06: Login &amp; Registro</a>
+      <a href="07_Mis_Pedidos_Tracking.svg" download class="btn-secondary" style="border-color: var(--poke-gold); color: #FDE047;">★ 07: Mis Pedidos &amp; Tracking</a>
+      <a href="08_Bolsa_Microinteracciones_Feedback.svg" download class="btn-secondary" style="border-color: var(--poke-gold); color: #FDE047;">★ 08: Microinteracciones &amp; Feedback</a>
+      <a href="09_Checkout_Error_Pago.svg" download class="btn-secondary" style="border-color: var(--poke-gold); color: #FDE047;">★ 09: Error de Pago &amp; Diagnóstico</a>
+    </div>
+
+    <div class="section-title">✨ Especificaciones de los 4 Nuevos Marcos Complementarios (IHC &amp; WCAG 2.2)</div>
+    <div class="specs-grid">
+      <div class="spec-card">
+        <span class="nielsen-tag">Accesibilidad &amp; Reconocimiento</span>
+        <h3>06_Autenticacion_Login_Registro <span>1440x900</span></h3>
+        <ul>
+          <li><strong>Estructura Paralela:</strong> 2 columnas independientes (Iniciar Sesión vs Crear Cuenta).</li>
+          <li><strong>Etiquetas Visibles:</strong> Todos los campos tienen etiquetas persistentes encima de los inputs (cumple WCAG 3.3.2).</li>
+          <li><strong>Registro Completo:</strong> Nombre, Cédula/RUC, Correo, Contraseña, Confirmación y Términos.</li>
+        </ul>
+        <div class="focus-callout">🔍 :focus-visible activo en Input [Contraseña] (borde 3px negro).</div>
+      </div>
+
+      <div class="spec-card">
+        <span class="nielsen-tag">Heurística #1: Estado del Sistema</span>
+        <h3>07_Mis_Pedidos_Tracking <span>1440x900</span></h3>
+        <ul>
+          <li><strong>Header Autenticado:</strong> Avatar con iniciales "Patrick M." y menú de cuenta.</li>
+          <li><strong>Stepper de Custodia:</strong> 4 pasos accesibles (Orden Recibida ➔ En Preparación ➔ En Camino ➔ Entregado).</li>
+          <li><strong>Acciones Rápidas:</strong> Botones accesibles para descargar factura electrónica y solicitar devolución.</li>
+        </ul>
+        <div class="focus-callout">🔍 :focus-visible activo en Paso [2. En Preparación].</div>
+      </div>
+
+      <div class="spec-card">
+        <span class="nielsen-tag">Heurística #1 &amp; #3: Feedback &amp; Control</span>
+        <h3>08_Bolsa_Microinteracciones_Feedback <span>1440x900</span></h3>
+        <ul>
+          <li><strong>Banner Toast Accesible:</strong> "✓ Ítem 'Gengar VMAX' eliminado de la bolsa" con botón inmediato <code>[Deshacer acción]</code>.</li>
+          <li><strong>Navbar Feedback:</strong> Toast flotante con microinteracción "+1 Booster Pack añadido a la bolsa".</li>
+          <li><strong>Retención Temporal:</strong> El stock se reserva durante 60 segundos permitiendo revertir errores accidentales.</li>
+        </ul>
+        <div class="focus-callout">🔍 :focus-visible activo en Botón [⟲ Deshacer acción].</div>
+      </div>
+
+      <div class="spec-card">
+        <span class="nielsen-tag">Heurística #9: Diagnóstico y Recuperación</span>
+        <h3>09_Checkout_Error_Pago <span>1440x900</span></h3>
+        <ul>
+          <li><strong>Diagnóstico Inequívoco:</strong> Ícono de advertencia rojo (#DC2626) y código de respuesta bancaria sin tecnicismos.</li>
+          <li><strong>Tranquilidad:</strong> Aclaración explícita de que NO se realizó ningún cobro a la tarjeta.</li>
+          <li><strong>Rutas de Recuperación:</strong> Botón primario para reintentar con otro método, opción de cambio a efectivo y WhatsApp.</li>
+        </ul>
+        <div class="focus-callout">🔍 :focus-visible activo en Botón [Reintentar con otro método].</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

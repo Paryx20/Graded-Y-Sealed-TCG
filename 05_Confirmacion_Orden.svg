@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+<g id="05_Confirmacion_Orden">
+<rect width="1440" height="900" fill="#F8FAFC"/>
+<rect x="0" y="0" width="1440" height="74" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+<rect x="0" y="0" width="1440" height="3" fill="#DC2626"/>
+<g id="Pokeball_48_38" pointer-events="none">
+  <!-- Outer circle border -->
+  <circle cx="48" cy="38" r="17" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"/>
+  <!-- Top half red clip -->
+  <path d="M 31 38 A 17 17 0 0 1 65 38 Z" fill="#EF4444"/>
+  <!-- Bottom half white -->
+  <path d="M 31 38 A 17 17 0 0 0 65 38 Z" fill="#FFFFFF"/>
+  <!-- Center band -->
+  <line x1="31" y1="38" x2="65" y2="38" stroke="#0F172A" stroke-width="2.5"/>
+  <!-- Center button -->
+  <circle cx="48" cy="38" r="7.14" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"/>
+  <circle cx="48" cy="38" r="3.4000000000000004" fill="#0F172A"/>
+</g>
+<text x="76" y="44" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="900">GRADED &amp; SEALED</text>
+<text x="264" y="44" fill="#DC2626" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="900">TCG</text>
+<text x="1240" y="44" fill="#16A34A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="800">✓ Pago Confirmado</text>
+<g id="Order_Confirmation_Card">
+<rect x="240" y="88" width="960" height="782" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" rx="16" ry="16"/>
+<g id="Pokeball_720_142" pointer-events="none">
+  <!-- Outer circle border -->
+  <circle cx="720.0" cy="142" r="26" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"/>
+  <!-- Top half red clip -->
+  <path d="M 694.0 142 A 26 26 0 0 1 746.0 142 Z" fill="#EF4444"/>
+  <!-- Bottom half white -->
+  <path d="M 694.0 142 A 26 26 0 0 0 746.0 142 Z" fill="#FFFFFF"/>
+  <!-- Center band -->
+  <line x1="694.0" y1="142" x2="746.0" y2="142" stroke="#0F172A" stroke-width="2.5"/>
+  <!-- Center button -->
+  <circle cx="720.0" cy="142" r="10.92" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"/>
+  <circle cx="720.0" cy="142" r="5.2" fill="#0F172A"/>
+</g>
+<text x="720.0" y="200" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">¡Compra confirmada con éxito!</text>
+<rect x="580.0" y="214" width="280" height="30" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5" rx="6" ry="6"/>
+<text x="720.0" y="234" fill="#B45309" font-family="Menlo, Monaco, Consolas, Courier New, monospace" font-size="15" font-weight="900" text-anchor="middle">Orden #PKM-2026-88941</text>
+<text x="720.0" y="272" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14" text-anchor="middle">Hemos enviado el comprobante oficial y el tracking a: patrick.mora@puce.edu.ec</text>
+<rect x="288" y="296" width="864" height="225" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" rx="10" ry="10"/>
+<text x="312" y="328" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="800">Resumen de la Transacción:</text>
+<line x1="312" y1="342" x2="1128" y2="342" stroke="#E2E8F0" stroke-width="1.5"/>
+<text x="312" y="370" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">• 1x Charizard Base Set 1st Ed. PSA 10 GEM MT</text>
+<text x="1128" y="370" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="end">$18,500.00</text>
+<text x="312" y="398" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">• 1x Umbreon VMAX Moonbreon Alt Art (Raw NM)</text>
+<text x="1128" y="398" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="end">$780.00</text>
+<text x="312" y="426" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">• 1x Booster Pack Team Rocket 1999 Sellado</text>
+<text x="1128" y="426" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="end">$350.00</text>
+<text x="312" y="454" fill="#64748B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">• Costo de Envío Courier Blindado + Impuestos</text>
+<text x="1128" y="454" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="end">$2,383.60</text>
+<line x1="312" y1="482" x2="1128" y2="482" stroke="#CBD5E1" stroke-width="1.5"/>
+<text x="312" y="508" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="900">Total Pagado con Tarjeta (•••• 4129):</text>
+<text x="1128" y="508" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900" text-anchor="end">$22,013.60 USD</text>
+<rect x="288" y="540" width="864" height="185" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5" stroke-dasharray="6,4" rx="10" ry="10"/>
+<text x="316" y="576" fill="#991B1B" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="900">✨ Registro Progresivo Opcional</text>
+<text x="316" y="600" fill="#7F1D1D" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13.5">¿Deseas guardar tus datos y dirección para futuras compras en 1 solo clic?</text>
+<rect x="316" y="622" width="490" height="44" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" rx="8" ry="8"/>
+<text x="330" y="650" fill="#94A3B8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">Ingresa una contraseña segura (mínimo 8 caracteres)</text>
+<rect x="826" y="622" width="200" height="44" fill="#DC2626" rx="8" ry="8"/>
+<text x="926.0" y="650" fill="#FFFFFF" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14.5" font-weight="800" text-anchor="middle">Guardar Cuenta</text>
+<rect x="822" y="618" width="208" height="52" fill="none" stroke="#0F172A" stroke-width="3" rx="11" ry="11"/>
+<rect x="851" y="597" width="150" height="19" fill="#0F172A" rx="3" ry="3"/>
+<text x="926.0" y="610" fill="#FFFFFF" font-family="Menlo, Monaco, Consolas, Courier New, monospace" font-size="9.5" font-weight="700" text-anchor="middle">:focus-visible (3px)</text>
+<text x="316" y="694" fill="#7F1D1D" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="12">🔒 Tus datos nunca se comparten en texto plano. Cumplimiento PCI-DSS y GDPR.</text>
+<rect x="560.0" y="796" width="320" height="48" fill="#FFFFFF" stroke="#0F172A" stroke-width="1.5" rx="8" ry="8"/>
+<text x="720.0" y="826" fill="#0F172A" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="14.5" font-weight="800" text-anchor="middle">Volver a la tienda</text>
+</g>
+</g>
+</svg>
