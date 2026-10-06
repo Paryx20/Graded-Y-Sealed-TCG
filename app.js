@@ -195,6 +195,8 @@ const app = {
     this.updateCartBadge();
     this.setupSearchSpotlight();
     this.setupPDPChartInteractions();
+    this.setupPhoneInput();
+    this.setupIdValidation();
     lucide.createIcons();
   },
 
@@ -443,16 +445,43 @@ const app = {
     );
   },
 
-  // 12-Month Historical Chart Generator scaled to current product price
+  // 12-Month Historical Chart Generator scaled to current product price and condition variability
   drawPDPChart() {
     const product = this.state.currentPdpProduct || PRODUCTS[0];
     const condition = this.state.pdpSelectedCondition || 'psa10';
     const basePrice = product.precios[condition] || 1000;
 
+    // REQUERIMIENTO 2: Variabilidad Realista en Historial de Mercado (Tendencias Negativas)
+    let trendBadge = '+21.7%';
+    let isPositive = true;
+    let multipliers = [];
+
+    if (condition === 'raw') {
+      trendBadge = '-12.3%';
+      isPositive = false;
+      // Trayectoria descendente: inicia 14% más alto y cae al precio actual
+      multipliers = [1.14, 1.13, 1.12, 1.10, 1.08, 1.07, 1.05, 1.04, 1.03, 1.02, 1.01, 1.00];
+    } else if (condition === 'psa8') {
+      trendBadge = '-4.8%';
+      isPositive = false;
+      // Trayectoria con caída hacia el final
+      multipliers = [1.05, 1.05, 1.04, 1.04, 1.03, 1.03, 1.02, 1.02, 1.01, 1.01, 1.00, 1.00];
+    } else if (condition === 'psa9') {
+      trendBadge = '+6.5%';
+      isPositive = true;
+      multipliers = [0.94, 0.94, 0.95, 0.95, 0.96, 0.97, 0.97, 0.98, 0.98, 0.99, 0.99, 1.00];
+    } else { // psa10
+      trendBadge = '+21.7%';
+      isPositive = true;
+      multipliers = [0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00];
+    }
+
     const trendPill = document.getElementById('market-trend-pill');
     if (trendPill) {
-      trendPill.innerText = product.tendencia12m;
-      trendPill.className = 'text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded';
+      trendPill.innerText = trendBadge;
+      trendPill.className = isPositive 
+        ? 'text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded' 
+        : 'text-[11px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded';
     }
 
     const svg = document.getElementById('pdp-interactive-chart');
@@ -460,15 +489,15 @@ const app = {
 
     // Generate 12 months data scaled around current price
     const months = ['Oct 2025', 'Nov 2025', 'Dic 2025', 'Ene 2026', 'Feb 2026', 'Mar 2026', 'Abr 2026', 'May 2026', 'Jun 2026', 'Jul 2026', 'Ago 2026', 'Sep 2026 (Hoy)'];
-    const multipliers = [0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00];
 
     const points = months.map((m, idx) => {
       const p = Math.round(basePrice * multipliers[idx]);
       const diff = ((multipliers[idx] - multipliers[0]) / multipliers[0]) * 100;
+      const sign = diff >= 0 ? '+' : '';
       return {
         month: m,
         price: p,
-        trend: idx === 0 ? '+0.0%' : `+${diff.toFixed(1)}%`
+        trend: idx === 0 ? '+0.0%' : `${sign}${diff.toFixed(1)}%`
       };
     });
 
@@ -494,7 +523,7 @@ const app = {
     const polylineEl = document.getElementById('chart-polyline');
     if (polylineEl) {
       polylineEl.setAttribute('points', pointsStr);
-      polylineEl.setAttribute('stroke', '#16A34A');
+      polylineEl.setAttribute('stroke', isPositive ? '#16A34A' : '#DC2626');
     }
 
     const lastCoord = coords[coords.length - 1];
@@ -502,7 +531,7 @@ const app = {
     if (activeDot) {
       activeDot.setAttribute('cx', lastCoord.x);
       activeDot.setAttribute('cy', lastCoord.y);
-      activeDot.setAttribute('fill', '#16A34A');
+      activeDot.setAttribute('fill', isPositive ? '#16A34A' : '#DC2626');
     }
 
     svg._chartCoords = coords;
@@ -561,13 +590,14 @@ const app = {
       tooltip.style.top = `${pixelY - 12}px`;
       tooltip.style.opacity = '1';
 
+      const isUp = !nearest.pt.trend.startsWith('-');
       tooltip.innerHTML = `
         <div class="px-2.5 py-1.5 bg-brand-charcoal text-white rounded-lg shadow-xl text-[11px] border border-slate-700 whitespace-nowrap">
           <div class="text-[10px] text-slate-400 font-bold">${nearest.pt.month}</div>
           <div class="font-black text-xs text-white mt-0.5">$${nearest.pt.price.toLocaleString('en-US')} USD</div>
-          <div class="text-[10px] font-bold text-emerald-400 flex items-center gap-1 mt-0.5">
+          <div class="text-[10px] font-bold ${isUp ? 'text-emerald-400' : 'text-red-400'} flex items-center gap-1 mt-0.5">
             <span>${nearest.pt.trend}</span>
-            <span>▲</span>
+            <span>${isUp ? '▲' : '▼'}</span>
           </div>
         </div>
       `;
@@ -1092,10 +1122,15 @@ const app = {
   },
 
   // =========================================================================
-  // REQUERIMIENTO 3 & 5: CHECKOUT SIMPLIFICADO & ENTREGA ADAPTATIVA
+  // REQUERIMIENTO 3 & 5 & 1: CHECKOUT SIMPLIFICADO & ENTREGA ADAPTATIVA
   // =========================================================================
   handleDeliveryChange(method) {
     this.state.deliveryMethod = method;
+    const courierContainer = document.getElementById('delivery-courier-container');
+    const pickupContainer = document.getElementById('delivery-pickup-container');
+    const courierInput = document.getElementById('delivery-courier-input');
+    const pickupInput = document.getElementById('delivery-pickup-input');
+
     const cashContainer = document.getElementById('payment-cash-container');
     const cashInput = document.getElementById('payment-cash-input');
     const cashTitle = document.getElementById('payment-cash-title');
@@ -1103,6 +1138,15 @@ const app = {
 
     if (method === 'pickup') {
       this.state.shippingFee = APP_CONFIG.PICKUP_SHIPPING_FEE;
+      // REQUERIMIENTO 1: Sincronización reactiva de contenedores de entrega
+      if (courierContainer) {
+        courierContainer.className = 'delivery-option p-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 cursor-pointer flex items-start gap-3 transition';
+      }
+      if (pickupContainer) {
+        pickupContainer.className = 'delivery-option p-4 rounded-xl border-2 border-brand-red bg-red-50/40 cursor-pointer flex items-start gap-3 transition';
+      }
+      if (pickupInput) pickupInput.checked = true;
+
       if (cashContainer) {
         cashContainer.className = 'payment-option p-3.5 rounded-xl border border-slate-300 bg-white flex items-center justify-between cursor-pointer hover:bg-slate-50 transition';
       }
@@ -1113,6 +1157,15 @@ const app = {
     } else {
       // REQUERIMIENTO 3: Envío a domicilio exactamente a $5.00 USD
       this.state.shippingFee = APP_CONFIG.COURIER_SHIPPING_FEE;
+      // REQUERIMIENTO 1: Sincronización reactiva de contenedores de entrega
+      if (courierContainer) {
+        courierContainer.className = 'delivery-option p-4 rounded-xl border-2 border-brand-red bg-red-50/40 cursor-pointer flex items-start gap-3 transition';
+      }
+      if (pickupContainer) {
+        pickupContainer.className = 'delivery-option p-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 cursor-pointer flex items-start gap-3 transition';
+      }
+      if (courierInput) courierInput.checked = true;
+
       if (cashContainer) {
         cashContainer.className = 'payment-option p-3.5 rounded-xl border border-slate-200 bg-slate-100 opacity-60 cursor-not-allowed flex items-center justify-between';
       }
@@ -1141,9 +1194,18 @@ const app = {
     }
 
     const nameInput = document.getElementById('guest-name');
+    const idInput = document.getElementById('guest-id');
     const emailInput = document.getElementById('guest-email');
     if (!nameInput || !nameInput.value.trim() || !emailInput || !emailInput.value.trim()) {
       this.showToast('Por favor completa tus datos de facturación.', 'error');
+      return;
+    }
+
+    // REQUERIMIENTO 5: Validación Algorítmica de Cédula Ecuatoriana (Módulo 10)
+    if (!idInput || !this.isValidEcuadorianId(idInput.value)) {
+      this.updateIdValidationUI(false);
+      if (idInput) idInput.focus();
+      this.showToast('Cédula ecuatoriana inválida (debe contener 10 dígitos válidos).', 'error');
       return;
     }
 
@@ -1168,10 +1230,10 @@ const app = {
     }
 
     // CASO B: Pago con Tarjeta -> MODAL CON ANIMACIÓN DE SPINNER Y 3D SECURE (2.5s)
+    // REQUERIMIENTO 3: Gobernado estrictamente por terminación en '0000'
     const cardNumInput = document.getElementById('card-number');
     const cardNum = (cardNumInput ? cardNumInput.value : '').replace(/\s+/g, '');
-    const simulateFailureCheckbox = document.getElementById('test-simulate-failure');
-    const isSimulatedFailure = (simulateFailureCheckbox && simulateFailureCheckbox.checked) || cardNum.endsWith('0000');
+    const isSimulatedFailure = cardNum.endsWith('0000');
 
     const modal = document.getElementById('payment-modal');
     const modalText = document.getElementById('payment-modal-text');
@@ -1492,6 +1554,111 @@ const app = {
 
     this.navigateTo('checkout');
     this.showToast('Método actualizado a Retiro en Tienda y Pago en Efectivo ($0.00 envío).', 'success');
+  },
+
+  // =========================================================================
+  // REQUERIMIENTO 4: FORMATO DE TELÉFONO ECUATORIANO (+593)
+  // =========================================================================
+  setupPhoneInput() {
+    const phoneInput = document.getElementById('guest-phone');
+    if (phoneInput) {
+      phoneInput.addEventListener('input', (e) => {
+        // Bloquear caracteres no numéricos y limitar a 10 dígitos
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+      });
+    }
+  },
+
+  // =========================================================================
+  // REQUERIMIENTO 5: VALIDACIÓN ALGORÍTMICA DE CÉDULA ECUATORIANA (MÓDULO 10)
+  // =========================================================================
+  isValidEcuadorianId(cedula) {
+    if (!cedula || typeof cedula !== 'string') return false;
+    const clean = cedula.trim().replace(/\D/g, '');
+    if (clean.length !== 10) return false;
+
+    // 1. Código de provincia: 01 a 24
+    const provincia = parseInt(clean.substring(0, 2), 10);
+    if (provincia < 1 || provincia > 24) return false;
+
+    // 2. Tercer dígito menor a 6 (personas naturales)
+    const tercerDigito = parseInt(clean.charAt(2), 10);
+    if (tercerDigito >= 6) return false;
+
+    // 3. Algoritmo Módulo 10
+    const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+    let suma = 0;
+    for (let i = 0; i < 9; i++) {
+      let valor = parseInt(clean.charAt(i), 10) * coeficientes[i];
+      if (valor >= 10) valor -= 9;
+      suma += valor;
+    }
+
+    const residuo = suma % 10;
+    const digitoVerificador = residuo === 0 ? 0 : 10 - residuo;
+    const digitoValidar = parseInt(clean.charAt(9), 10);
+
+    return digitoVerificador === digitoValidar;
+  },
+
+  setupIdValidation() {
+    const idInput = document.getElementById('guest-id');
+    if (!idInput) return;
+
+    const validateAndRender = () => {
+      const val = idInput.value.trim();
+      if (val.length === 0) {
+        this.clearIdValidationUI();
+        return;
+      }
+      if (val.length === 10) {
+        const isValid = this.isValidEcuadorianId(val);
+        this.updateIdValidationUI(isValid);
+      } else {
+        this.updateIdValidationUI(false);
+      }
+    };
+
+    idInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+      validateAndRender();
+    });
+
+    idInput.addEventListener('blur', () => {
+      validateAndRender();
+    });
+
+    // Validar también el campo de registro si existe
+    const regId = document.getElementById('reg-id');
+    if (regId) {
+      regId.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+      });
+    }
+  },
+
+  updateIdValidationUI(isValid) {
+    const idInput = document.getElementById('guest-id');
+    const errorMsg = document.getElementById('guest-id-error');
+    if (!idInput || !errorMsg) return;
+
+    if (isValid) {
+      idInput.classList.remove('border-red-500', 'bg-red-50/20');
+      idInput.classList.add('border-emerald-500');
+      errorMsg.classList.add('hidden');
+    } else {
+      idInput.classList.remove('border-emerald-500');
+      idInput.classList.add('border-red-500', 'bg-red-50/20');
+      errorMsg.classList.remove('hidden');
+    }
+  },
+
+  clearIdValidationUI() {
+    const idInput = document.getElementById('guest-id');
+    const errorMsg = document.getElementById('guest-id-error');
+    if (!idInput || !errorMsg) return;
+    idInput.classList.remove('border-red-500', 'bg-red-50/20', 'border-emerald-500');
+    errorMsg.classList.add('hidden');
   },
 
   // Accessible Toast Feedback Provider

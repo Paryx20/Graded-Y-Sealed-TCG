@@ -1,37 +1,26 @@
-Actúa como Lead Frontend Developer y Especialista en UI/UX. Refactoriza y ajusta la aplicación de "Graded & Sealed TCG" resolviendo de forma estricta los siguientes 7 puntos funcionales y de interacción:
+Actúa como Senior Frontend Developer. Aplica las siguientes 5 correcciones técnicas de usabilidad y validación en la aplicación web de "Graded & Sealed TCG":
 
-1. Limpieza de Formularios y Estados de Selección:
-   - Limpia todos los inputs (Nombre, Correo, Contraseña, Cédula) tras completar el registro o login; no dejes datos precargados en duro.
-   - Si el usuario cambia entre la pestaña de "Iniciar Sesión" y "Crear Cuenta", resetea los campos de texto correspondientes.
-   - Retira cualquier atributo 'checked' por defecto en opciones secundarias para que el usuario elija conscientemente sus preferencias.
+1. Sincronización Reactiva de Contenedores de Entrega (Radio Buttons):
+   - Corrige el error de estilos donde el contenedor de "Envío a Domicilio" mantiene el borde rojo/activo a pesar de haber seleccionado "Retiro en Local Físico".
+   - Al cambiar la selección entre los radios de entrega, ejecuta una función que limpie las clases de borde activo (`border-red-600`, `border-2`, `bg-red-50/20`) de todos los contenedores padre y aplique el borde activo exclusivamente al contenedor cuyo input esté `:checked`. El contenedor deseleccionado debe volver a su borde neutro (`border-gray-200`).
 
-2. Catálogo Centralizado y Ficha Dinámica (PDP) para Todos los Productos:
-   - Crea un arreglo maestro en JavaScript (`const PRODUCTS = [...]`) donde cada objeto contenga: id, nombre, set, rareza, imagenLocal, imagenFallbackUrl, y precios por condición (raw, psa8, psa9, psa10).
-   - Enrutamiento dinámico en PDP: Al pulsar "Ver detalle" en Umbreon, Gengar, Lugia o cualquier producto, la vista PDP (#pdp) debe renderizar dinámicamente la información, foto, historial de precios y selector de esa carta específica, permitiendo añadirla a la bolsa con su grado seleccionado.
-   - Gestión de imágenes: Configura las etiquetas <img> para buscar primero en la carpeta local `img/[id].png` y añade un fallback automático en `onerror` hacia imágenes oficiales de PokemonTCG API si el archivo local no existe.
+2. Variabilidad Realista en Historial de Mercado (Tendencias Negativas):
+   - Modifica el dataset del módulo "Historial de Mercado Actual" para que refleje caídas de precio reales según la condición:
+     * Para 'Raw / NM' o 'PSA 8': Muestra un porcentaje negativo (ej. "-4.8%" o "-12.3%"), asigna clases semánticas de color rojo (`text-red-700 bg-red-100`) al badge y renderiza la curva SVG en color rojo (#DC2626) con trayectoria descendente hacia el final.
+     * Para 'PSA 10 GEM MT': Mantén la tendencia positiva alcista ("+21.7%") en verde (#16A34A).
 
-3. Corrección de Sombreados (:focus) y Ajuste del Envío a $5.00:
-   - Corrige el problema de sombreados atascados: asegúrate de aplicar estilos de foco únicamente bajo la pseudo-clase `:focus-visible` (y no `:focus`), o remueve clases de outline persistentes al disparar eventos de clic con ratón para que no se quede el marco sombreado.
-   - Ajusta la tarifa plana de envío a domicilio: cambia el valor de $25.00 a exactamente $5.00 USD. Actualiza las constantes de cálculo de la bolsa y el checkout.
+3. Eliminación del Checkbox de Simulación Manual:
+   - Remueve completamente del DOM del Checkout el checkbox y la etiqueta "Simular fallo bancario".
+   - Mantén la simulación de contingencia bancaria (#DECLINED-SEC-054) gobernada estrictamente por lógica en JavaScript: si el número de tarjeta ingresado termina en '0000', dispara la vista de error tras la animación de carga; de lo contrario, procede a la confirmación exitosa.
 
-4. Buscador con Efecto Spotlight (Fondo Atenuado) y Vista de Resultados:
-   - Al hacer foco (`focus`) en la barra de búsqueda superior, oscurece el fondo de la pantalla mediante un overlay semitransparente (backdrop gris/negro con opacidad) para centrar la atención visual exclusivamente en la barra.
-   - Al presionar 'Escape' o hacer clic fuera del buscador, desactiva el backdrop.
-   - Al presionar Enter o buscar, navega a una vista filtrada `#search-results` o renderiza un contenedor de resultados directos con las cartas coincidentes.
+4. Formato de Teléfono Ecuatoriano (+593):
+   - Limpia cualquier número quemado en duro en el campo de teléfono.
+   - Implementa un grupo de entrada con prefijo visual fijo no editable "+593" a la izquierda y un input numérico a la derecha con placeholder limpio "099 123 4567".
+   - Limita la entrada a un máximo de 9 o 10 dígitos numéricos (`maxlength="10"`), bloqueando caracteres no numéricos en el evento `input`.
 
-5. Métodos de Pago Simplificados (Solo Tarjeta y Efectivo en Tienda):
-   - Elimina definitivamente la opción de "Transferencia Bancaria Directa".
-   - Deja únicamente dos métodos:
-     1) "Tarjeta de Crédito / Débito"
-     2) "Efectivo al retirar en tienda (Cash)" (disponible solo si la entrega es retiro en local).
-   - Lógica de confirmación diferenciada:
-     * Si paga con Tarjeta: ejecuta la animación modal de pasarela segura (Spinner + 3D Secure) durante 2.5 segundos antes de redirigir a la orden confirmada.
-     * Si selecciona Efectivo (Cash): NO ejecutes la animación de pasarela de tarjetas ni 3D Secure; redirige de inmediato a la confirmación indicando: "Orden reservada con éxito. Recuerda realizar el pago en caja al retirar en el local central".
-
-6. Historial de Tracking Dinámico (Última Orden Real):
-   - Al finalizar cualquier compra exitosa, guarda los datos de la orden en `localStorage` (número de orden aleatorio, fecha/hora actual, lista de productos comprados y total pagado).
-   - La vista `#tracking` debe leer este objeto de la última compra y pintar los productos reales adquiridos en esa sesión, en lugar de datos estáticos quemados.
-
-7. Estado Inicial del Carrito en Cero:
-   - Inicializa la bolsa de compras vacía (`cart = []`, badge numérico en 0).
-   - Si el carrito está vacío, la vista `#cart` debe mostrar un estado limpio ("Tu bolsa de compras está vacía") con un botón visible: [Explorar Catálogo].
+5. Validación Algorítmica de Cédula Ecuatoriana (Módulo 10):
+   - Agrega validación en tiempo real para el campo Cédula/RUC:
+     * Restringe el campo para admitir únicamente números y una longitud exacta de 10 dígitos.
+     * Implementa el algoritmo de validación ecuatoriano (código de provincia entre 01 y 24, tercer dígito menor a 6, y verificación de dígito verificador mediante Módulo 10).
+     * Si el usuario ingresa menos de 10 dígitos, excede el límite o el algoritmo falla, despliega un mensaje accesible en rojo debajo del campo: "Cédula ecuatoriana inválida (debe contener 10 dígitos válidos)" y resalta el borde en rojo.
+     * Bloquea el envío del formulario de checkout si la cédula no es válida.
