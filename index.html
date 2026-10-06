@@ -41,18 +41,23 @@
   <!-- Lucide Icons via CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="min-h-full flex flex-col text-brand-charcoal font-sans antialiased bg-slate-50 selection:bg-brand-red selection:text-white overflow-x-hidden">
+<body class="min-h-full flex flex-col text-brand-charcoal font-sans antialiased bg-slate-50 selection:bg-brand-red selection:text-white overflow-x-hidden relative">
+
+  <!-- ========================================================================= -->
+  <!-- REQUERIMIENTO 4: SPOTLIGHT SEARCH OVERLAY BACKDROP -->
+  <!-- ========================================================================= -->
+  <div id="search-spotlight-backdrop" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-30 opacity-0 pointer-events-none transition-opacity duration-300" aria-hidden="true"></div>
 
   <!-- ========================================================================= -->
   <!-- MAIN HEADER / NAVBAR COMERCIAL -->
   <!-- ========================================================================= -->
   <header class="bg-white border-b border-brand-border sticky top-0 z-40 shadow-sm">
     <div class="h-1 bg-brand-red w-full"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3 sm:gap-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3 sm:gap-4 relative">
       
       <!-- Brand Logo & Name -->
-      <a href="#home" class="flex items-center gap-2.5 sm:gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-charcoal rounded-lg p-1" aria-label="Ir a inicio de Graded and Sealed TCG">
-        <img src="Logo del e-commerce 1.png" alt="Logo Graded &amp; Sealed TCG" class="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105" onerror="this.src='https://placehold.co/120x60/DC2626/FFFFFF?text=G%26S+TCG'" />
+      <a href="#home" class="flex items-center gap-2.5 sm:gap-3 group focus-visible:ring-2 focus-visible:ring-brand-charcoal rounded-lg p-1" aria-label="Ir a inicio de Graded and Sealed TCG">
+        <img src="Logo del e-commerce 1.png" alt="Logo Graded &amp; Sealed TCG" class="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105" onerror="this.onerror=null; this.src='https://placehold.co/120x60/DC2626/FFFFFF?text=G%26S+TCG'" />
         <div class="flex flex-col">
           <div class="flex items-center gap-1">
             <span class="font-black text-lg sm:text-xl tracking-tight text-brand-charcoal">GRADED &amp; SEALED</span>
@@ -62,23 +67,29 @@
         </div>
       </a>
 
-      <!-- Search Bar with Accessible Label -->
-      <form role="search" onsubmit="event.preventDefault();" class="flex-1 max-w-md lg:max-w-lg mx-2 hidden md:block">
-        <label for="global-search" class="sr-only">Buscar cartas, expansiones o grados PSA</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brand-muted">
-            <i data-lucide="search" class="w-4 h-4"></i>
+      <!-- REQUERIMIENTO 4: Search Bar con Efecto Spotlight & Dropdown de Resultados -->
+      <div id="search-container" class="search-container-spotlight relative flex-1 max-w-md lg:max-w-lg mx-2 hidden md:block z-40">
+        <form role="search" onsubmit="event.preventDefault();" class="relative">
+          <label for="global-search" class="sr-only">Buscar cartas, expansiones o grados PSA</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brand-muted">
+              <i data-lucide="search" class="w-4 h-4"></i>
+            </div>
+            <input 
+              type="search" 
+              id="global-search" 
+              name="q"
+              autocomplete="off"
+              placeholder="Buscar cartas, expansiones o grados PSA... (ej. Charizard, Gengar)"
+              class="w-full pl-10 pr-4 py-2 bg-brand-surface border border-brand-border rounded-lg text-sm text-brand-charcoal placeholder-brand-muted focus:bg-white focus:border-brand-charcoal transition"
+              aria-label="Buscar cartas, expansiones o grados PSA"
+            />
           </div>
-          <input 
-            type="search" 
-            id="global-search" 
-            name="q"
-            placeholder="Buscar cartas, expansiones o grados PSA... (ej. Charizard, PSA 10)"
-            class="w-full pl-10 pr-4 py-2 bg-brand-surface border border-brand-border rounded-lg text-sm text-brand-charcoal placeholder-brand-muted focus:bg-white focus:border-brand-charcoal focus:outline-none transition"
-            aria-label="Buscar cartas, expansiones o grados PSA"
-          />
-        </div>
-      </form>
+        </form>
+
+        <!-- Live Search Dropdown -->
+        <div id="search-live-dropdown" class="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden hidden z-50"></div>
+      </div>
 
       <!-- Utility Navigation Items -->
       <nav aria-label="Navegación principal" class="flex items-center gap-2 sm:gap-3">
@@ -116,7 +127,7 @@
           <i data-lucide="log-out" class="w-4 h-4"></i>
         </button>
 
-        <!-- Bolsa de Compras con Badge Reactivo -->
+        <!-- Bolsa de Compras con Badge Reactivo (REQUERIMIENTO 7: Estado Inicial en 0) -->
         <a 
           href="#cart"
           class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold text-white bg-brand-red hover:bg-brand-darkred rounded-lg transition shadow-sm relative touch-target flex items-center justify-center"
@@ -129,7 +140,7 @@
             aria-live="polite" 
             class="inline-flex items-center justify-center w-5 h-5 text-[11px] font-black bg-brand-lightgold text-brand-darkgold border border-brand-red rounded-full"
           >
-            3
+            0
           </span>
         </a>
       </nav>
@@ -155,7 +166,7 @@
         <button 
           type="button" 
           onclick="app.undoLastDeletion()" 
-          class="px-4 py-1.5 bg-brand-red hover:bg-brand-darkred text-white text-xs font-bold rounded-md transition flex items-center gap-1.5 focus:outline-none"
+          class="px-4 py-1.5 bg-brand-red hover:bg-brand-darkred text-white text-xs font-bold rounded-md transition flex items-center gap-1.5"
           aria-label="Deshacer la eliminación del ítem"
         >
           <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
@@ -183,7 +194,7 @@
     <!-- ===================================================================== -->
     <section id="view-home" class="view-section active max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
-      <!-- Bloque de Descubrimiento (Modular Amazon Style - Responsive Carousel / Grid) -->
+      <!-- Bloque de Descubrimiento (Modular Amazon Style) -->
       <section aria-labelledby="discovery-heading" class="mb-8">
         <h2 id="discovery-heading" class="sr-only">Secciones destacadas de la bóveda</h2>
         
@@ -195,7 +206,7 @@
               <h3 class="font-extrabold text-base text-brand-charcoal">Starter Packs &amp; Cajas</h3>
               <p class="text-xs text-brand-muted mt-0.5">Packs Sellados de Fábrica</p>
               <div class="my-3 aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center relative">
-                <img src="https://images.pokemontcg.io/base1/logo.png" alt="Caja sellada Base Set 1999" class="object-contain p-2 max-h-full max-w-full" onerror="this.src='https://placehold.co/400x300/F1F5F9/64748B?text=Booster+Box+Sellada'" />
+                <img src="img/booster-team-rocket.png" alt="Caja sellada Base Set 1999" class="object-contain p-2 max-h-full max-w-full" onerror="this.onerror=null; this.src='https://images.pokemontcg.io/base1/logo.png'" />
               </div>
             </div>
             <button type="button" onclick="app.filterCategory('Booster Packs')" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1 text-left">
@@ -213,7 +224,7 @@
               </div>
               <p class="text-xs text-brand-muted mt-0.5">Slabs de Grado Inversión</p>
               <div class="my-3 aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center relative">
-                <img src="https://images.pokemontcg.io/base1/4_hires.png" alt="Slab oficial Charizard Base Set PSA 9" class="object-contain p-2 max-h-full max-w-full" onerror="this.src='https://placehold.co/400x300/F1F5F9/64748B?text=Slab+PSA+10'" />
+                <img src="img/charizard-base.png" alt="Slab oficial Charizard Base Set PSA 9" class="object-contain p-2 max-h-full max-w-full" onerror="this.onerror=null; this.src='https://images.pokemontcg.io/base1/4_hires.png'" />
               </div>
             </div>
             <button type="button" onclick="app.filterCategory('Solo PSA')" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1 text-left">
@@ -228,7 +239,7 @@
               <h3 class="font-extrabold text-base text-brand-charcoal">Singles Destacadas</h3>
               <p class="text-xs text-brand-muted mt-0.5">Top Meta &amp; Alt Arts</p>
               <div class="my-3 aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center relative">
-                <img src="https://images.pokemontcg.io/swsh7/215_hires.png" alt="Carta Umbreon VMAX Moonbreon Arte Alternativo" class="object-contain p-2 max-h-full max-w-full" onerror="this.src='https://placehold.co/400x300/F1F5F9/64748B?text=Umbreon+VMAX+Alt+Art'" />
+                <img src="img/umbreon-vmax.png" alt="Carta Umbreon VMAX Moonbreon Arte Alternativo" class="object-contain p-2 max-h-full max-w-full" onerror="this.onerror=null; this.src='https://images.pokemontcg.io/swsh7/215_hires.png'" />
               </div>
             </div>
             <button type="button" onclick="app.filterCategory('Cartas Sueltas')" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1 text-left">
@@ -246,7 +257,7 @@
               </div>
               <p class="text-xs text-brand-muted mt-0.5">Sucursal Central</p>
               <div class="my-3 aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center relative">
-                <img src="Logo del e-commerce 1.png" alt="Bolsa oficial en tienda física" class="object-contain p-4 max-h-full max-w-full" onerror="this.src='https://placehold.co/400x300/F1F5F9/64748B?text=Tienda+Fisica'" />
+                <img src="Logo del e-commerce 1.png" alt="Bolsa oficial en tienda física" class="object-contain p-4 max-h-full max-w-full" onerror="this.onerror=null; this.src='https://placehold.co/400x300/F1F5F9/64748B?text=Tienda+Fisica'" />
               </div>
             </div>
             <a href="#checkout" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1">
@@ -258,7 +269,7 @@
         </div>
       </section>
 
-      <!-- Barra de Filtros Híbrida & Búsqueda Móvil -->
+      <!-- Barra de Filtros Híbrida -->
       <section aria-labelledby="filter-heading" class="bg-white border border-brand-border rounded-xl p-3.5 mb-6 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <h2 id="filter-heading" class="sr-only">Filtros de catálogo</h2>
         
@@ -316,7 +327,7 @@
       <section aria-labelledby="products-heading">
         <h2 id="products-heading" class="sr-only">Listado de productos</h2>
         <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          <!-- Rendered dynamically by JavaScript -->
+          <!-- Rendered dynamically by app.renderCatalog() -->
         </div>
       </section>
 
@@ -327,17 +338,17 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 02: FICHA DE DETALLE / PDP (#pdp) -->
+    <!-- VIEW 02: FICHA DE DETALLE DINÁMICA / PDP (#pdp) -->
     <!-- ===================================================================== -->
     <section id="view-pdp" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
-      <!-- Breadcrumb Accesible -->
+      <!-- Breadcrumb Accesible Dinámico -->
       <nav aria-label="Ruta de navegación" class="flex items-center gap-2 text-xs text-brand-muted mb-6">
         <a href="#home" class="hover:text-brand-charcoal font-medium">Catálogo</a>
         <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-        <span>Base Set 1999</span>
+        <span id="pdp-breadcrumb-set">Base Set 1999</span>
         <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-        <span class="text-brand-charcoal font-bold" aria-current="page">Charizard Holo #4/102</span>
+        <span id="pdp-breadcrumb-name" class="text-brand-charcoal font-bold" aria-current="page">Charizard Holo #4/102</span>
       </nav>
 
       <!-- Layout 60% / 40% -->
@@ -345,18 +356,18 @@
         
         <!-- Left: Gallery (7 Cols / approx 60%) -->
         <div class="lg:col-span-7 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 shadow-sm">
-          <!-- Main Image Viewer -->
+          <!-- Main Image Viewer Dinámico -->
           <div class="w-full aspect-[4/5] bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-center relative p-6 overflow-hidden">
             <img 
               id="pdp-main-image"
-              src="https://images.pokemontcg.io/base1/4_hires.png" 
-              alt="Carta Charizard Base Set 1999 1st Edition PSA 10 frontal con holograma"
+              src="img/charizard-base.png" 
+              alt="Carta Pokemon"
               class="max-h-full max-w-full object-contain filter drop-shadow-xl transition-all duration-300"
-              onerror="this.src='https://placehold.co/600x800/F1F5F9/64748B?text=Charizard+Holo+1999'"
+              onerror="this.onerror=null; this.src='https://images.pokemontcg.io/base1/4_hires.png'"
             />
             <div class="absolute top-4 left-4 bg-white/90 backdrop-blur border border-slate-300 px-3 py-1 rounded-md text-xs font-black text-brand-charcoal shadow-sm flex items-center gap-1.5">
               <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
-              <span id="pdp-cert-badge">PSA 10 GEM MT #48291034</span>
+              <span id="pdp-cert-badge">PSA 10 GEM MT #CERT-OFFICIAL</span>
             </div>
           </div>
 
@@ -364,8 +375,8 @@
           <div class="grid grid-cols-3 gap-3 mt-4" role="tablist" aria-label="Vistas fotográficas de la carta">
             <button 
               type="button" 
-              onclick="app.selectPDPThumbnail('https://images.pokemontcg.io/base1/4_hires.png', 'Frontal Completo')" 
-              class="thumb-btn p-2 rounded-lg border-2 border-brand-red bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1"
+              onclick="document.getElementById('pdp-main-image').classList.remove('rotate-180')" 
+              class="p-2 rounded-lg border-2 border-brand-red bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1"
               aria-label="Ver cara frontal en alta resolución"
             >
               <span class="text-xs font-bold text-brand-charcoal">Frontal Completo</span>
@@ -374,8 +385,8 @@
 
             <button 
               type="button" 
-              onclick="app.selectPDPThumbnail('https://images.pokemontcg.io/base1/4_hires.png', 'Reverso Certificado')" 
-              class="thumb-btn p-2 rounded-lg border border-slate-200 bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1 hover:border-slate-400"
+              onclick="document.getElementById('pdp-main-image').classList.add('rotate-180')" 
+              class="p-2 rounded-lg border border-slate-200 bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1 hover:border-slate-400"
               aria-label="Ver reverso de la carta y esquinas"
             >
               <span class="text-xs font-bold text-brand-charcoal">Reverso y Bordes</span>
@@ -384,8 +395,8 @@
 
             <button 
               type="button" 
-              onclick="app.selectPDPThumbnail('Logo del e-commerce 1.png', 'Empaque y Certificado')" 
-              class="thumb-btn p-2 rounded-lg border border-slate-200 bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1 hover:border-slate-400"
+              onclick="app.showToast('Estuche magnético sellado UV con precinto oficial.', 'info')" 
+              class="p-2 rounded-lg border border-slate-200 bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1 hover:border-slate-400"
               aria-label="Ver empaque de seguridad y estuche acrílico"
             >
               <span class="text-xs font-bold text-brand-charcoal">Slab &amp; Empaque</span>
@@ -401,11 +412,11 @@
               <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-500 text-amber-500"></i>
               <span>GRADO INVERSIÓN • OFICIAL PSA</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-brand-charcoal mt-2 tracking-tight">Charizard Base Set 1999 #4/102</h1>
-            <p class="text-xs sm:text-sm text-brand-muted mt-1">Holo Rare 1st Edition • Idioma: Inglés • Certificación Bóveda PSA</p>
+            <h1 id="pdp-title" class="text-2xl sm:text-3xl font-black text-brand-charcoal mt-2 tracking-tight">Charizard Base Set 1999 #4/102</h1>
+            <p id="pdp-desc" class="text-xs sm:text-sm text-brand-muted mt-1">Holo Rare 1st Edition • Idioma: Inglés • Certificación Bóveda PSA</p>
           </div>
 
-          <!-- Segmented Condition Selector -->
+          <!-- REQUERIMIENTO 2: Segmented Condition Selector para Todos los Productos -->
           <div>
             <label class="block text-xs font-extrabold text-brand-charcoal uppercase tracking-wider mb-2">
               Seleccionar Condición / Grado PSA:
@@ -414,38 +425,37 @@
               
               <button 
                 type="button" 
-                onclick="app.setCondition('raw', 750, 'Sin Gradear / Raw (NM)')" 
+                onclick="app.selectPDPCondition('raw')" 
                 id="cond-raw"
                 class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition bg-white"
               >
                 <div class="cond-title text-xs font-bold text-brand-charcoal">Raw / NM</div>
-                <div class="cond-price text-sm font-black text-brand-muted">$750.00</div>
+                <div id="cond-price-raw" class="cond-price text-sm font-black text-brand-muted">$750.00</div>
               </button>
 
               <button 
                 type="button" 
-                onclick="app.setCondition('psa8', 1800, 'PSA 8 NM-MT')" 
+                onclick="app.selectPDPCondition('psa8')" 
                 id="cond-psa8"
                 class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition bg-white"
               >
                 <div class="cond-title text-xs font-bold text-brand-charcoal">PSA 8 NM-MT</div>
-                <div class="cond-price text-sm font-black text-brand-muted">$1,800.00</div>
+                <div id="cond-price-psa8" class="cond-price text-sm font-black text-brand-muted">$1,800.00</div>
               </button>
 
               <button 
                 type="button" 
-                onclick="app.setCondition('psa9', 4850, 'PSA 9 MINT')" 
+                onclick="app.selectPDPCondition('psa9')" 
                 id="cond-psa9"
                 class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition bg-white"
               >
                 <div class="cond-title text-xs font-bold text-brand-charcoal">PSA 9 MINT</div>
-                <div class="cond-price text-sm font-black text-brand-muted">$4,850.00</div>
+                <div id="cond-price-psa9" class="cond-price text-sm font-black text-brand-muted">$4,850.00</div>
               </button>
 
-              <!-- Selected Active Condition -->
               <button 
                 type="button" 
-                onclick="app.setCondition('psa10', 18500, 'PSA 10 GEM MT')" 
+                onclick="app.selectPDPCondition('psa10')" 
                 id="cond-psa10"
                 class="cond-btn p-3 rounded-xl bg-brand-charcoal text-white text-left shadow transition"
               >
@@ -453,7 +463,7 @@
                   <span>PSA 10 GEM MT</span>
                   <i data-lucide="check" class="check-indicator w-3.5 h-3.5 text-emerald-400"></i>
                 </div>
-                <div class="cond-price text-sm font-black text-amber-400">$18,500.00</div>
+                <div id="cond-price-psa10" class="cond-price text-sm font-black text-amber-400">$18,500.00</div>
               </button>
 
             </div>
@@ -473,7 +483,6 @@
             <!-- SVG Interactive Chart Container with Floating Tooltip -->
             <div id="pdp-chart-container" class="w-full h-36 mt-3 relative select-none">
               <svg id="pdp-interactive-chart" viewBox="0 0 400 130" class="w-full h-full overflow-visible" aria-label="Gráfica interactiva de tendencia de precio a 12 meses">
-                <!-- Grid background lines -->
                 <line x1="20" y1="105" x2="380" y2="105" stroke="#E2E8F0" stroke-width="1.5" />
                 <line x1="20" y1="65" x2="380" y2="65" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="4,4" />
                 <line x1="20" y1="25" x2="380" y2="25" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="4,4" />
@@ -520,12 +529,12 @@
             </div>
             <p class="text-xs text-brand-muted mt-1 flex items-center gap-1.5">
               <i data-lucide="shield" class="w-3.5 h-3.5 text-brand-muted"></i>
-              <span>Envío blindado con seguro de valor total incluido</span>
+              <span>Envío seguro con garantía de autenticidad total</span>
             </p>
 
             <button 
               type="button" 
-              onclick="app.addToCartCurrentPdp()" 
+              onclick="app.addCurrentPDPToCart()" 
               class="w-full mt-4 py-3.5 px-6 bg-brand-red hover:bg-brand-darkred text-white text-base font-extrabold rounded-xl transition shadow-md flex items-center justify-center gap-2 touch-target"
               aria-label="Añadir esta carta a la bolsa de compras"
             >
@@ -566,46 +575,46 @@
             <!-- Rendered reactively via app.renderCart() -->
           </div>
 
-          <!-- Collector Packaging Notice -->
+          <!-- Packaging Notice -->
           <div class="bg-white border border-brand-border rounded-xl p-4 flex items-start gap-4 shadow-sm">
             <div class="w-12 h-12 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0">
               <i data-lucide="package" class="w-6 h-6 text-amber-700"></i>
             </div>
             <div>
               <h3 class="text-sm font-bold text-brand-charcoal">Empaque de Coleccionista Especial Gratuito</h3>
-              <p class="text-xs text-brand-muted mt-0.5">Todas las cartas graduadas se despachan en bolsa kraft reforzada, sellos inviolables y estuches magnéticos con filtro ultravioleta (UV).</p>
+              <p class="text-xs text-brand-muted mt-0.5">Todas las cartas se despachan en bolsa kraft reforzada, precintos de seguridad y estuches magnéticos con filtro ultravioleta (UV).</p>
             </div>
           </div>
         </div>
 
-        <!-- Order Summary with 15% IVA (4 Cols) -->
+        <!-- REQUERIMIENTO 3: Order Summary con Envío a $5.00 e IVA (15%) (4 Cols) -->
         <div class="lg:col-span-4 bg-white border border-brand-border rounded-2xl p-6 shadow-sm sticky top-28">
           <h2 class="text-lg font-black text-brand-charcoal tracking-tight">Resumen del Pedido</h2>
           
           <div class="mt-4 space-y-3 text-sm border-t border-brand-border pt-4">
             <div class="flex justify-between text-brand-muted">
               <span>Subtotal:</span>
-              <span id="summary-subtotal" class="font-bold text-brand-charcoal">$19,630.00</span>
+              <span id="summary-subtotal" class="font-bold text-brand-charcoal">$0.00</span>
             </div>
             
             <div class="flex justify-between text-brand-muted">
-              <span>Envío estimado:</span>
-              <span id="summary-shipping" class="font-bold text-brand-charcoal">$25.00</span>
+              <span>Envío a domicilio:</span>
+              <span id="summary-shipping" class="font-bold text-brand-charcoal">$5.00</span>
             </div>
 
             <div class="flex justify-between text-brand-muted">
               <span>IVA (15%):</span>
-              <span id="summary-tax" class="font-bold text-brand-charcoal">$2,944.50</span>
+              <span id="summary-tax" class="font-bold text-brand-charcoal">$0.00</span>
             </div>
 
             <div class="flex justify-between text-emerald-700 text-xs font-semibold">
-              <span>Seguro de custodia blindado:</span>
+              <span>Seguro de custodia y bóveda:</span>
               <span>GRATIS</span>
             </div>
 
             <div class="border-t border-brand-border pt-3 flex justify-between items-baseline">
               <span class="text-base font-extrabold text-brand-charcoal">Total a Pagar:</span>
-              <span id="summary-total" class="text-2xl font-black text-brand-charcoal">$22,599.50 USD</span>
+              <span id="summary-total" class="text-2xl font-black text-brand-charcoal">$0.00 USD</span>
             </div>
           </div>
 
@@ -620,7 +629,7 @@
 
           <p class="text-[11px] text-brand-muted text-center mt-3 flex items-center justify-center gap-1">
             <i data-lucide="lock" class="w-3 h-3"></i>
-            <span>Transacción encriptada con certificación SSL</span>
+            <span>Transacción encriptada TLS 256-bit</span>
           </p>
         </div>
 
@@ -628,7 +637,7 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 04: CHECKOUT COMERCIAL (#checkout) -->
+    <!-- VIEW 04: CHECKOUT SIMPLIFICADO (#checkout) -->
     <!-- ===================================================================== -->
     <section id="view-checkout" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
@@ -646,10 +655,10 @@
         <!-- Col A: Usuario Frecuente (4 Cols) -->
         <div class="lg:col-span-4 bg-white border border-brand-border rounded-2xl p-6 shadow-sm">
           <div class="flex items-center justify-between pb-3 border-b border-brand-border">
-            <h2 class="text-base font-black text-brand-charcoal">Usuario Frecuente</h2>
+            <h2 class="text-base font-black text-brand-charcoal">Usuario Registrado</h2>
             <span class="text-[10px] font-bold text-brand-red bg-red-50 border border-red-200 px-2 py-0.5 rounded">Opción A</span>
           </div>
-          <p class="text-xs text-brand-muted mt-2">Inicia sesión para autocompletar tus direcciones guardadas.</p>
+          <p class="text-xs text-brand-muted mt-2">Inicia sesión para autocompletar tus datos de envío.</p>
 
           <form onsubmit="event.preventDefault(); app.handleLogin(document.getElementById('login-email-checkout').value, document.getElementById('login-pass-checkout').value);" class="mt-4 space-y-3.5">
             <div>
@@ -680,7 +689,7 @@
           </form>
         </div>
 
-        <!-- Col B: Compra Rápida o Finalización (8 Cols) -->
+        <!-- Col B: Datos y Pago (8 Cols) -->
         <div class="lg:col-span-8 bg-white border border-brand-border rounded-2xl p-6 shadow-sm space-y-6">
           <div class="flex items-center justify-between pb-3 border-b border-brand-border">
             <div>
@@ -690,7 +699,7 @@
             <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">Opción B</span>
           </div>
 
-          <!-- Step 1: Contacto y Facturacion -->
+          <!-- REQUERIMIENTO 1: Inputs Limpios con Placeholders (Sin Hardcodeos) -->
           <fieldset class="space-y-4">
             <legend class="text-sm font-extrabold text-brand-charcoal">1. Datos Personales y Facturación</legend>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -705,8 +714,8 @@
               </div>
 
               <div>
-                <label for="guest-email" class="block text-xs font-bold text-brand-charcoal mb-1">Correo Electrónico (para tracking): *</label>
-                <input type="email" id="guest-email" placeholder="carlos@correo.com" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white focus-ring-accessible" required />
+                <label for="guest-email" class="block text-xs font-bold text-brand-charcoal mb-1">Correo Electrónico: *</label>
+                <input type="email" id="guest-email" placeholder="carlos@correo.com" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white" required />
               </div>
 
               <div>
@@ -716,21 +725,21 @@
             </div>
           </fieldset>
 
-          <!-- Step 2: Método de Entrega -->
+          <!-- REQUERIMIENTO 3: Envío a Domicilio exactamente a $5.00 -->
           <fieldset class="space-y-3">
             <legend class="text-sm font-extrabold text-brand-charcoal">2. Método de Entrega</legend>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               
               <label class="delivery-option p-4 rounded-xl border-2 border-brand-red bg-red-50/40 cursor-pointer flex items-start gap-3 transition">
-                <input type="radio" name="delivery-method" value="courier" checked onchange="app.handleDeliveryChange('courier')" class="mt-1 text-brand-red focus:ring-brand-red" />
+                <input type="radio" name="delivery-method" value="courier" checked onchange="app.handleDeliveryChange('courier')" class="mt-1 text-brand-red" />
                 <div>
-                  <div class="text-sm font-bold text-brand-charcoal">Envío a Domicilio ($25.00)</div>
-                  <p class="text-xs text-brand-muted mt-0.5">Courier blindado asegurado (24 - 48h hábiles en todo el país).</p>
+                  <div class="text-sm font-bold text-brand-charcoal">Envío a Domicilio ($5.00)</div>
+                  <p class="text-xs text-brand-muted mt-0.5">Entrega express asegurada en 24-48h.</p>
                 </div>
               </label>
 
               <label class="delivery-option p-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 cursor-pointer flex items-start gap-3 transition">
-                <input type="radio" name="delivery-method" value="pickup" onchange="app.handleDeliveryChange('pickup')" class="mt-1 text-brand-red focus:ring-brand-red" />
+                <input type="radio" name="delivery-method" value="pickup" onchange="app.handleDeliveryChange('pickup')" class="mt-1 text-brand-red" />
                 <div>
                   <div class="text-sm font-bold text-brand-charcoal">Retiro en Local Físico (Gratis)</div>
                   <p class="text-xs text-brand-muted mt-0.5">Sucursal Central (Listo en 2 horas).</p>
@@ -740,19 +749,19 @@
             </div>
           </fieldset>
 
-          <!-- Step 3: Método de Pago Condicional con Inputs Comerciales -->
+          <!-- REQUERIMIENTO 5: Métodos de Pago Simplificados (Solo Tarjeta y Efectivo en Tienda) -->
           <fieldset class="space-y-3">
-            <legend class="text-sm font-extrabold text-brand-charcoal">3. Método de Pago (Adaptativo según entrega)</legend>
+            <legend class="text-sm font-extrabold text-brand-charcoal">3. Método de Pago</legend>
             
             <div class="space-y-3">
-              <!-- Opción 1: Tarjeta con campos de entrada -->
+              <!-- Método 1: Tarjeta de Crédito / Débito -->
               <div class="payment-option p-4 rounded-xl border border-brand-charcoal bg-slate-50 space-y-3">
                 <label class="flex items-center justify-between cursor-pointer">
                   <div class="flex items-center gap-3">
-                    <input type="radio" name="payment-method" value="card" checked class="text-brand-red focus:ring-brand-red" />
+                    <input type="radio" name="payment-method" value="card" checked class="text-brand-red" />
                     <div>
                       <span class="text-sm font-bold text-brand-charcoal">Tarjeta de Crédito / Débito</span>
-                      <span class="text-xs text-brand-muted block">Visa, Mastercard, Diners Club</span>
+                      <span class="text-xs text-brand-muted block">Visa, Mastercard, Diners Club (3D Secure)</span>
                     </div>
                   </div>
                   <i data-lucide="credit-card" class="w-5 h-5 text-brand-muted"></i>
@@ -780,31 +789,20 @@
                   </div>
                   <div class="flex items-center pt-5">
                     <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
-                      <input type="checkbox" id="test-simulate-failure" class="rounded text-brand-red focus:ring-brand-red" />
+                      <!-- REQUERIMIENTO 1: Sin checked por defecto -->
+                      <input type="checkbox" id="test-simulate-failure" class="rounded text-brand-red" />
                       <span>Simular fallo bancario</span>
                     </label>
                   </div>
                 </div>
               </div>
 
-              <!-- Opción 2: Transferencia -->
-              <label class="payment-option p-3.5 rounded-xl border border-slate-300 bg-white flex items-center justify-between cursor-pointer hover:bg-slate-50">
-                <div class="flex items-center gap-3">
-                  <input type="radio" name="payment-method" value="bank" class="text-brand-red focus:ring-brand-red" />
-                  <div>
-                    <span class="text-sm font-bold text-brand-charcoal">Transferencia Bancaria Directa</span>
-                    <span class="text-xs text-brand-muted block">Banco Pichincha / Produbanco</span>
-                  </div>
-                </div>
-                <i data-lucide="building-2" class="w-5 h-5 text-brand-muted"></i>
-              </label>
-
-              <!-- Opción 3: Efectivo (Condicionado) -->
+              <!-- Método 2: Efectivo al retirar en tienda (Cash) -->
               <label id="payment-cash-container" class="payment-option p-3.5 rounded-xl border border-slate-200 bg-slate-100 opacity-60 cursor-not-allowed flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                  <input type="radio" name="payment-method" id="payment-cash-input" value="cash" disabled class="text-brand-red focus:ring-brand-red" />
+                  <input type="radio" name="payment-method" id="payment-cash-input" value="cash" disabled class="text-brand-red" />
                   <div>
-                    <span id="payment-cash-title" class="text-sm font-bold text-slate-500">Efectivo al retirar en tienda</span>
+                    <span id="payment-cash-title" class="text-sm font-bold text-slate-500">Efectivo al retirar en tienda (Cash)</span>
                     <span id="payment-cash-desc" class="text-xs text-slate-400 block">Solo disponible si seleccionas "Retiro en Local Físico"</span>
                   </div>
                 </div>
@@ -822,10 +820,10 @@
               class="w-full py-4 bg-brand-red hover:bg-brand-darkred text-white text-base font-extrabold rounded-xl transition shadow-lg flex items-center justify-center gap-2 touch-target"
             >
               <i data-lucide="lock" class="w-5 h-5"></i>
-              <span>Finalizar Compra y Pagar ($22,599.50 USD)</span>
+              <span>Finalizar Compra y Pagar</span>
             </button>
             <p class="text-[11px] text-brand-muted text-center mt-2.5">
-              Al hacer clic autorizas el débito bajo los términos de venta protegida y custodia de Graded &amp; Sealed TCG.
+              Al confirmar autorizas la transacción protegida bajo la política de custodia de Graded &amp; Sealed TCG.
             </p>
           </div>
 
@@ -845,49 +843,24 @@
           <i data-lucide="check-circle-2" class="w-10 h-10"></i>
         </div>
 
-        <h1 class="text-2xl sm:text-3xl font-black text-brand-charcoal tracking-tight">¡Compra confirmada con éxito!</h1>
+        <h1 class="text-2xl sm:text-3xl font-black text-brand-charcoal tracking-tight">¡Orden confirmada con éxito!</h1>
         <div id="confirm-order-id" class="inline-block px-3 py-1 bg-brand-lightgold text-brand-darkgold font-mono font-bold text-sm rounded-md mt-2">
-          Número de Orden: #PKM-2026-88941
+          Número de Orden: #PKM-2026-PENDING
         </div>
         
+        <!-- REQUERIMIENTO 5: Aviso diferenciado para pago en efectivo al retirar -->
+        <div id="confirm-cash-notice" class="hidden my-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2">
+          <i data-lucide="store" class="w-5 h-5 text-amber-600 flex-shrink-0"></i>
+          <span>Orden reservada con éxito. Recuerda realizar el pago en caja al retirar en el local central.</span>
+        </div>
+
         <p class="text-sm text-brand-muted mt-3 max-w-lg mx-auto">
           Hemos enviado el comprobante oficial y el código de seguimiento de custodia a tu correo: 
           <span id="confirm-email-recipient" class="font-bold text-brand-charcoal">usuario@ejemplo.com</span>
         </p>
 
-        <!-- Brief Breakdown with 15% Tax -->
-        <div id="confirm-breakdown-container" class="mt-6 text-left bg-brand-surface border border-brand-border rounded-xl p-5 max-w-2xl mx-auto space-y-2.5 text-xs sm:text-sm">
-          <!-- Populated dynamically via app.buildConfirmationView() -->
-        </div>
-
-        <!-- Módulo de Registro Progresivo Opcional -->
-        <div class="mt-8 max-w-2xl mx-auto bg-red-50/60 border-2 border-dashed border-red-300 rounded-xl p-5 text-left">
-          <div class="flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full bg-brand-red text-white flex items-center justify-center text-xs font-bold">
-              <i data-lucide="star" class="w-3 h-3"></i>
-            </span>
-            <h3 class="font-black text-sm text-brand-charcoal">Registro Progresivo Opcional (1 Clic)</h3>
-          </div>
-          <p class="text-xs text-brand-muted mt-1">¿Deseas guardar tus datos y dirección para futuras compras en un solo clic?</p>
-          
-          <form onsubmit="event.preventDefault(); app.showToast('Cuenta guardada en 1 solo clic.', 'success');" class="mt-3 flex flex-col sm:flex-row gap-2">
-            <label for="progressive-password" class="sr-only">Define tu contraseña</label>
-            <input 
-              type="password" 
-              id="progressive-password" 
-              placeholder="Define una contraseña segura (mínimo 8 caracteres)" 
-              class="flex-1 px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none"
-              required
-            />
-            <button 
-              type="submit" 
-              class="px-5 py-2 bg-brand-red hover:bg-brand-darkred text-white text-xs font-bold rounded-lg transition whitespace-nowrap touch-target"
-            >
-              Guardar Cuenta
-            </button>
-          </form>
-          <span class="text-[10px] text-slate-500 mt-1.5 block">Tus datos nunca se comparten en texto plano. Cumplimiento con PCI-DSS y GDPR.</span>
-        </div>
+        <!-- Dynamic Breakdown Container with 15% Tax -->
+        <div id="confirm-breakdown-container" class="mt-6 text-left bg-brand-surface border border-brand-border rounded-xl p-5 max-w-2xl mx-auto space-y-2.5 text-xs sm:text-sm"></div>
 
         <!-- Navigation Buttons -->
         <div class="mt-8 flex flex-wrap justify-center gap-3">
@@ -912,22 +885,38 @@
     <!-- ===================================================================== -->
     <!-- VIEW 06: PORTAL DE AUTENTICACIÓN (#auth) -->
     <!-- ===================================================================== -->
-    <section id="view-login" class="view-section max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <section id="view-login" class="view-section max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
       <div class="text-center mb-6">
         <h1 class="text-2xl sm:text-3xl font-black text-brand-charcoal tracking-tight">Acceso a Graded &amp; Sealed TCG</h1>
-        <p class="text-xs sm:text-sm text-brand-muted mt-1">Inicia sesión o crea una cuenta para gestionar tus certificados y compras</p>
+        <p class="text-xs sm:text-sm text-brand-muted mt-1">Inicia sesión o crea una cuenta para gestionar tus pedidos y bóveda</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+      <!-- REQUERIMIENTO 1: Pestañas con Limpieza de Estados y Formulario Desacoplado -->
+      <div class="bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-sm max-w-lg mx-auto">
         
-        <!-- Col A: Iniciar Sesión -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6 shadow-sm">
-          <div class="inline-block px-2.5 py-0.5 text-[10px] font-black bg-red-100 text-brand-red rounded uppercase mb-2">Cliente Existente</div>
-          <h2 class="text-xl font-black text-brand-charcoal">Iniciar Sesión</h2>
-          <p class="text-xs text-brand-muted mt-0.5">Accede a tus pedidos y bóveda guardada</p>
+        <div class="flex border-b border-brand-border mb-6">
+          <button 
+            type="button" 
+            id="auth-tab-login"
+            onclick="app.switchAuthTab('login')" 
+            class="flex-1 py-2.5 text-xs font-bold border-b-2 border-brand-red text-brand-charcoal"
+          >
+            Iniciar Sesión
+          </button>
+          <button 
+            type="button" 
+            id="auth-tab-register"
+            onclick="app.switchAuthTab('register')" 
+            class="flex-1 py-2.5 text-xs font-bold border-b-2 border-transparent text-brand-muted hover:text-brand-charcoal"
+          >
+            Crear Cuenta
+          </button>
+        </div>
 
-          <form onsubmit="event.preventDefault(); app.handleLogin(document.getElementById('auth-email').value, document.getElementById('auth-password').value);" class="mt-5 space-y-4">
+        <!-- Formulario Iniciar Sesión -->
+        <div id="auth-section-login">
+          <form onsubmit="event.preventDefault(); app.handleLogin(document.getElementById('auth-email').value, document.getElementById('auth-password').value);" class="space-y-4">
             <div>
               <label for="auth-email" class="block text-xs font-bold text-brand-charcoal mb-1">Correo Electrónico: *</label>
               <input type="email" id="auth-email" placeholder="tu.correo@ejemplo.com" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-lg" required />
@@ -935,12 +924,13 @@
 
             <div>
               <label for="auth-password" class="block text-xs font-bold text-brand-charcoal mb-1">Contraseña: *</label>
-              <input type="password" id="auth-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-lg focus-ring-accessible" required />
+              <input type="password" id="auth-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-lg" required />
             </div>
 
             <div class="flex items-center justify-between text-xs">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked class="rounded text-brand-red focus:ring-brand-red" />
+                <!-- REQUERIMIENTO 1: Sin checked por defecto -->
+                <input type="checkbox" id="auth-remember" class="rounded text-brand-red" />
                 <span class="text-brand-charcoal">Recordar mis datos</span>
               </label>
               <a href="javascript:void(0)" onclick="app.showToast('Enlace de recuperación enviado al correo.', 'info')" class="font-bold text-brand-red hover:underline">¿Olvidaste tu contraseña?</a>
@@ -952,13 +942,9 @@
           </form>
         </div>
 
-        <!-- Col B: Crear Cuenta -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6 shadow-sm">
-          <div class="inline-block px-2.5 py-0.5 text-[10px] font-black bg-blue-100 text-blue-700 rounded uppercase mb-2">Nuevo Cliente</div>
-          <h2 class="text-xl font-black text-brand-charcoal">Crear Cuenta</h2>
-          <p class="text-xs text-brand-muted mt-0.5">Regístrate para comprar en 1 clic y recibir alertas</p>
-
-          <form onsubmit="event.preventDefault(); app.handleRegister(document.getElementById('reg-name').value, document.getElementById('reg-id').value, document.getElementById('reg-email').value, document.getElementById('reg-pass').value);" class="mt-5 space-y-3.5">
+        <!-- Formulario Crear Cuenta -->
+        <div id="auth-section-register" class="hidden">
+          <form onsubmit="event.preventDefault(); app.handleRegister(document.getElementById('reg-name').value, document.getElementById('reg-id').value, document.getElementById('reg-email').value, document.getElementById('reg-pass').value);" class="space-y-3.5">
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label for="reg-name" class="block text-xs font-bold text-brand-charcoal mb-1">Nombre: *</label>
@@ -987,7 +973,8 @@
             </div>
 
             <label class="flex items-start gap-2 text-xs text-brand-muted cursor-pointer pt-1">
-              <input type="checkbox" required checked class="mt-0.5 rounded text-brand-red focus:ring-brand-red" />
+              <!-- REQUERIMIENTO 1: Sin checked por defecto -->
+              <input type="checkbox" id="reg-terms" required class="mt-0.5 rounded text-brand-red" />
               <span>Acepto los Términos de Servicio y la Política de Privacidad de Graded &amp; Sealed TCG</span>
             </label>
 
@@ -1001,18 +988,32 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 07: SEGUIMIENTO Y TRACKING (#tracking) -->
+    <!-- VIEW 07: SEGUIMIENTO Y TRACKING DINÁMICO (#tracking) -->
     <!-- ===================================================================== -->
     <section id="view-tracking" class="view-section max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
-      <div class="bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-sm">
+      <!-- Estado vacío si no hay órdenes en localStorage -->
+      <div id="tracking-empty-state" class="bg-white border border-brand-border rounded-2xl p-10 text-center shadow-sm">
+        <i data-lucide="package-search" class="w-16 h-16 mx-auto mb-3 text-slate-300"></i>
+        <h2 class="text-xl font-black text-brand-charcoal">No tienes pedidos activos en curso</h2>
+        <p class="text-xs text-brand-muted mt-1 max-w-md mx-auto">
+          Cuando realices una compra en la tienda, podrás consultar aquí en tiempo real la línea de tiempo de custodia y despacho.
+        </p>
+        <a href="#home" class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-brand-red hover:bg-brand-darkred text-white text-xs font-bold rounded-lg shadow-sm transition">
+          <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+          <span>Explorar Cartas Disponibles</span>
+        </a>
+      </div>
+
+      <!-- REQUERIMIENTO 6: Tarjeta de Pedido Real Dinámica -->
+      <div id="tracking-active-order-box" class="bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-sm hidden">
         
         <!-- Header con datos de orden y botones de acción -->
         <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-brand-border">
           <div>
-            <span class="text-xs font-mono font-bold text-brand-muted">ORDEN #PKM-2026-88941</span>
+            <span id="tracking-order-id" class="text-xs font-mono font-bold text-brand-muted">ORDEN #PKM-2026-PENDING</span>
             <h1 class="text-2xl font-black text-brand-charcoal tracking-tight mt-0.5">Seguimiento y Estado de Custodia</h1>
-            <p class="text-xs text-brand-muted">Fecha de compra: 03 Octubre 2026 • Envío Blindado Asegurado</p>
+            <p id="tracking-order-date" class="text-xs text-brand-muted">Fecha de compra reciente</p>
           </div>
 
           <div class="flex items-center gap-2">
@@ -1036,87 +1037,59 @@
           </div>
         </div>
 
-        <!-- Stepper Interactivo y Accesible de 4 Etapas (Heurística #1 de Nielsen) -->
+        <!-- Stepper Interactivo y Accesible de 4 Etapas -->
         <div class="py-8" role="region" aria-label="Línea de tiempo de entrega del pedido">
           <h2 class="text-xs font-extrabold text-brand-charcoal uppercase tracking-wider mb-6">Etapas del Pedido</h2>
           
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 relative">
             
-            <!-- Step 1: Orden Recibida -->
             <div class="flex sm:flex-col items-center sm:text-center gap-3">
               <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow">
                 <i data-lucide="check" class="w-5 h-5"></i>
               </div>
               <div>
                 <span class="text-xs font-extrabold text-brand-charcoal block">1. Orden Recibida</span>
-                <span class="text-[11px] text-brand-muted">03 Oct, 10:45 AM</span>
+                <span class="text-[11px] text-brand-muted">Validada</span>
               </div>
             </div>
 
-            <!-- Step 2: En Preparación (Active) -->
             <div class="flex sm:flex-col items-center sm:text-center gap-3">
               <div class="w-10 h-10 rounded-full bg-brand-red text-white flex items-center justify-center font-bold text-sm shadow ring-4 ring-red-100">
                 <i data-lucide="package" class="w-5 h-5"></i>
               </div>
               <div>
                 <span class="text-xs font-extrabold text-brand-red block">2. En Preparación</span>
-                <span class="text-[11px] text-brand-muted">Verificación en Bóveda</span>
+                <span class="text-[11px] text-brand-muted">Bóveda de Seguridad</span>
               </div>
             </div>
 
-            <!-- Step 3: En Camino -->
             <div class="flex sm:flex-col items-center sm:text-center gap-3">
               <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm">
                 3
               </div>
               <div>
                 <span class="text-xs font-bold text-slate-400 block">3. En Camino / Listo</span>
-                <span class="text-[11px] text-slate-400">Estimado: 04 Oct</span>
+                <span class="text-[11px] text-slate-400">Próximamente</span>
               </div>
             </div>
 
-            <!-- Step 4: Entregado -->
             <div class="flex sm:flex-col items-center sm:text-center gap-3">
               <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm">
                 4
               </div>
               <div>
                 <span class="text-xs font-bold text-slate-400 block">4. Entregado</span>
-                <span class="text-[11px] text-slate-400">Firma requerida</span>
+                <span class="text-[11px] text-slate-400">Custodia final</span>
               </div>
             </div>
 
           </div>
         </div>
 
-        <!-- Artículos Comprados en esta Entrega -->
+        <!-- REQUERIMIENTO 6: Artículos Reales de la Compra -->
         <div class="border-t border-brand-border pt-6">
-          <h2 class="text-sm font-extrabold text-brand-charcoal uppercase tracking-wider mb-4">Artículos en Custodia</h2>
-          <div class="space-y-3">
-            
-            <div class="flex items-center justify-between p-3.5 bg-brand-surface border border-brand-border rounded-xl">
-              <div class="flex items-center gap-3">
-                <img src="https://images.pokemontcg.io/base1/4_hires.png" alt="Miniatura Charizard" class="w-12 h-16 object-contain bg-white rounded border border-slate-200" />
-                <div>
-                  <h3 class="text-sm font-bold text-brand-charcoal">Charizard Base Set 1999 #4/102</h3>
-                  <span class="text-xs text-brand-muted">PSA 10 GEM MT • Cert #48291034 • Cantidad: 1</span>
-                </div>
-              </div>
-              <span class="text-sm font-black text-brand-charcoal">$18,500.00</span>
-            </div>
-
-            <div class="flex items-center justify-between p-3.5 bg-brand-surface border border-brand-border rounded-xl">
-              <div class="flex items-center gap-3">
-                <img src="https://images.pokemontcg.io/swsh7/215_hires.png" alt="Miniatura Umbreon" class="w-12 h-16 object-contain bg-white rounded border border-slate-200" />
-                <div>
-                  <h3 class="text-sm font-bold text-brand-charcoal">Umbreon VMAX Moonbreon Alt Art</h3>
-                  <span class="text-xs text-brand-muted">Raw NM • Funda UltraPro • Cantidad: 1</span>
-                </div>
-              </div>
-              <span class="text-sm font-black text-brand-charcoal">$780.00</span>
-            </div>
-
-          </div>
+          <h2 class="text-sm font-extrabold text-brand-charcoal uppercase tracking-wider mb-4">Artículos en esta Orden</h2>
+          <div id="tracking-items-container" class="space-y-3"></div>
         </div>
 
       </div>
@@ -1129,7 +1102,6 @@
       
       <div class="bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-sm text-center">
         
-        <!-- Error Warning Badge -->
         <div class="w-16 h-16 rounded-full bg-red-100 text-brand-red flex items-center justify-center mx-auto mb-4">
           <i data-lucide="alert-triangle" class="w-10 h-10"></i>
         </div>
@@ -1143,7 +1115,7 @@
         <div class="mt-6 text-left bg-red-50/70 border border-red-200 rounded-xl p-5 space-y-2">
           <h2 class="text-xs font-black text-red-900 uppercase tracking-wider">Diagnóstico de la Operación</h2>
           <p class="text-xs sm:text-sm text-red-800 leading-relaxed">
-            La transacción fue rechazada por la entidad emisora de tu tarjeta. Esto suele ocurrir por límites diarios de compra en línea o requerimiento de validación telefónica por alta cuantía.
+            La transacción fue rechazada por la entidad emisora de tu tarjeta. Esto suele ocurrir por límites de seguridad diarios o requerimiento de validación 3D Secure.
           </p>
           <div class="flex items-center gap-1.5 text-emerald-800 text-xs font-bold pt-1">
             <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
@@ -1151,10 +1123,9 @@
           </div>
         </div>
 
-        <!-- Preserved State Reassurance -->
         <div class="mt-4 text-left bg-brand-surface border border-brand-border rounded-xl p-4 text-xs text-brand-muted">
           <span class="font-bold text-brand-charcoal block mb-1">Tus Datos y Carrito Permanecen Guardados:</span>
-          <span>Hemos preservado tus artículos seleccionados y tus datos de entrega para que no tengas que ingresar todo nuevamente.</span>
+          <span>Hemos preservado tus artículos y tus datos de facturación para que puedas reintentar fácilmente.</span>
         </div>
 
         <!-- Recovery Action Buttons -->
@@ -1177,36 +1148,27 @@
           </button>
         </div>
 
-        <!-- Direct Support Link -->
-        <p class="text-xs text-brand-muted mt-6">
-          ¿El problema persiste? Comunícate con nuestra central: 
-          <a href="tel:+593998765432" class="font-bold text-brand-charcoal underline">+593 99 876 5432</a>
-        </p>
-
       </div>
     </section>
 
   </main>
 
   <!-- ========================================================================= -->
-  <!-- MODAL INTERACTIVO DE PROCESAMIENTO DE PAGO CON SPINNER -->
+  <!-- MODAL DE PROCESAMIENTO DE PAGO CON SPINNER -->
   <!-- ========================================================================= -->
   <div id="payment-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modal-payment-title">
     <div class="modal-content bg-white border border-slate-200 rounded-2xl max-w-md w-full p-8 text-center shadow-2xl">
       
-      <!-- Security Badge -->
       <div class="w-16 h-16 rounded-full bg-red-50 text-brand-red border border-red-100 flex items-center justify-center mx-auto mb-4">
         <i data-lucide="shield-check" class="w-8 h-8 text-brand-red"></i>
       </div>
 
       <h2 id="modal-payment-title" class="text-xl font-black text-brand-charcoal tracking-tight">Procesando Transacción Segura</h2>
       
-      <!-- Dynamic Sequential Message -->
       <p id="payment-modal-text" class="text-sm font-semibold text-slate-600 mt-2 min-h-[40px] flex items-center justify-center" aria-live="polite">
         Conectando con la pasarela bancaria segura...
       </p>
 
-      <!-- Smooth Animated Spinner & Progress -->
       <div class="mt-6 flex flex-col items-center gap-4">
         <div class="w-10 h-10 border-4 border-slate-200 border-t-brand-red rounded-full animate-spin-smooth"></div>
         
@@ -1311,7 +1273,7 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- FOOTER COMERCIAL LIMPIO -->
+  <!-- FOOTER COMERCIAL -->
   <!-- ========================================================================= -->
   <footer class="bg-white border-t border-brand-border mt-auto py-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1320,7 +1282,7 @@
         
         <div class="md:col-span-1 flex flex-col gap-3">
           <div class="flex items-center gap-2">
-            <img src="Logo del e-commerce 1.png" alt="Graded and Sealed TCG" class="h-9 w-auto object-contain" onerror="this.src='https://placehold.co/100x40/DC2626/FFFFFF?text=G%26S'" />
+            <img src="Logo del e-commerce 1.png" alt="Graded and Sealed TCG" class="h-9 w-auto object-contain" onerror="this.onerror=null; this.src='https://placehold.co/100x40/DC2626/FFFFFF?text=G%26S'" />
             <span class="font-black text-base text-brand-charcoal">GRADED &amp; SEALED</span>
           </div>
           <p class="text-xs text-brand-muted leading-relaxed">
@@ -1333,7 +1295,7 @@
           <ul class="text-xs text-brand-muted space-y-2">
             <li><a href="#pdp" class="hover:text-brand-charcoal transition">Autenticidad PSA Certificada</a></li>
             <li><a href="#pdp" class="hover:text-brand-charcoal transition">Custodia en Bóveda Blindada</a></li>
-            <li><a href="#tracking" class="hover:text-brand-charcoal transition">Envíos Asegurados a Valor Real</a></li>
+            <li><a href="#tracking" class="hover:text-brand-charcoal transition">Envíos Asegurados a Domicilio ($5.00)</a></li>
             <li><a href="#home" class="hover:text-brand-charcoal transition">Inspección Holográfica</a></li>
           </ul>
         </div>

@@ -3,13 +3,13 @@
    Accesibilidad WCAG 2.2 AAA & Diseño Comercial
    ========================================================================= */
 
-/* Strict WCAG 2.2 Focus Visible */
-:focus-visible {
-  outline: 3px solid #0F172A !important;
-  outline-offset: 2px !important;
+/* Strict WCAG 2.2 Focus Visible: NO sticky focus outlines on mouse click */
+:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-.focus-ring-accessible {
+:focus-visible {
   outline: 3px solid #0F172A !important;
   outline-offset: 2px !important;
 }
@@ -55,6 +55,28 @@ html, body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Search Spotlight Overlay */
+#search-spotlight-backdrop {
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#search-spotlight-backdrop.active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.search-container-spotlight {
+  transition: all 0.25s ease;
+}
+.search-container-spotlight.focused {
+  z-index: 50 !important;
+}
+
+/* Search Results Live Dropdown */
+#search-live-dropdown {
+  transform-origin: top center;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 /* Interactive SVG Chart Tooltip */

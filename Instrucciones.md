@@ -1,56 +1,37 @@
-Actúa como Senior Full-Stack Frontend Engineer y Diseñador UI/UX enfocado en aplicaciones web comerciales e Interacción Humano-Computador. Refactoriza y optimiza por completo el código de la aplicación "Graded & Sealed TCG" para convertirla en una aplicación web interactiva de nivel de producción lista para demostración técnica.
+Actúa como Lead Frontend Developer y Especialista en UI/UX. Refactoriza y ajusta la aplicación de "Graded & Sealed TCG" resolviendo de forma estricta los siguientes 7 puntos funcionales y de interacción:
 
-Estructura el código de forma limpia y mantenible (actualiza `index.html`, y si es necesario genera `styles.css` y `app.js` enlazados).
+1. Limpieza de Formularios y Estados de Selección:
+   - Limpia todos los inputs (Nombre, Correo, Contraseña, Cédula) tras completar el registro o login; no dejes datos precargados en duro.
+   - Si el usuario cambia entre la pestaña de "Iniciar Sesión" y "Crear Cuenta", resetea los campos de texto correspondientes.
+   - Retira cualquier atributo 'checked' por defecto en opciones secundarias para que el usuario elija conscientemente sus preferencias.
 
-Requerimientos y Correcciones Obligatorias:
+2. Catálogo Centralizado y Ficha Dinámica (PDP) para Todos los Productos:
+   - Crea un arreglo maestro en JavaScript (`const PRODUCTS = [...]`) donde cada objeto contenga: id, nombre, set, rareza, imagenLocal, imagenFallbackUrl, y precios por condición (raw, psa8, psa9, psa10).
+   - Enrutamiento dinámico en PDP: Al pulsar "Ver detalle" en Umbreon, Gengar, Lugia o cualquier producto, la vista PDP (#pdp) debe renderizar dinámicamente la información, foto, historial de precios y selector de esa carta específica, permitiendo añadirla a la bolsa con su grado seleccionado.
+   - Gestión de imágenes: Configura las etiquetas <img> para buscar primero en la carpeta local `img/[id].png` y añade un fallback automático en `onerror` hacia imágenes oficiales de PokemonTCG API si el archivo local no existe.
 
-1. Limpieza de Modo Evaluativo / Debug a Producto Comercial:
-   - Elimina por completo la barra superior negra de depuración ("WCAG 2.2 AAA", "Acceso directo a vistas: 01 Home...", etc.).
-   - En el pie de página, elimina los textos de "Cumplimiento WCAG Evaluadas / Pontificia Universidad Católica del Ecuador". Deja un pie de página comercial limpio: términos legales, políticas de garantía, envíos seguros y copyright © 2026 Graded & Sealed TCG.
-   - En la vista de Checkout, elimina el recuadro amarillo/rojo de debug ("Evaluación de Prototipo IHC & Heurísticas" con los botones manuales de simular). 
-   - Retira las etiquetas flotantes de debug (como los recuadros negros 'alt: "..."' visibles sobre las fotos); los atributos alt deben existir en el código HTML de las etiquetas <img>, pero NO como cajas flotantes sobre el diseño.
+3. Corrección de Sombreados (:focus) y Ajuste del Envío a $5.00:
+   - Corrige el problema de sombreados atascados: asegúrate de aplicar estilos de foco únicamente bajo la pseudo-clase `:focus-visible` (y no `:focus`), o remueve clases de outline persistentes al disparar eventos de clic con ratón para que no se quede el marco sombreado.
+   - Ajusta la tarifa plana de envío a domicilio: cambia el valor de $25.00 a exactamente $5.00 USD. Actualiza las constantes de cálculo de la bolsa y el checkout.
 
-2. Navegación Nativa y Soporte de Botón Atrás del Navegador (Hash Router):
-   - Implementa un sistema de enrutamiento basado en URL Hash (#home, #pdp, #cart, #checkout, #confirmation, #tracking, #auth, #error).
-   - Escucha el evento `window.addEventListener('hashchange', ...)` y `window.addEventListener('popstate', ...)`. Cuando el usuario presione el botón de "Atrás" o "Adelante" del navegador, la página debe cambiar de vista y cargar el estado correcto sin recargar todo el sitio ni perder el contexto.
+4. Buscador con Efecto Spotlight (Fondo Atenuado) y Vista de Resultados:
+   - Al hacer foco (`focus`) en la barra de búsqueda superior, oscurece el fondo de la pantalla mediante un overlay semitransparente (backdrop gris/negro con opacidad) para centrar la atención visual exclusivamente en la barra.
+   - Al presionar 'Escape' o hacer clic fuera del buscador, desactiva el backdrop.
+   - Al presionar Enter o buscar, navega a una vista filtrada `#search-results` o renderiza un contenedor de resultados directos con las cartas coincidentes.
 
-3. Simulación Realista de Procesamiento de Pago:
-   - Al hacer clic en "Finalizar Compra y Pagar" en el Checkout:
-     * No saltes de golpe a la pantalla final.
-     * Despliega un Modal interactivo de alta calidad con animación de Spinner de carga y textos secuenciales: "Conectando con la pasarela bancaria segura...", "Validando fondos y autenticación 3D Secure..." (duración total: 2.5 a 3 segundos).
-     * Lógica de resolución: Si el número de tarjeta ingresado termina en '0000' o el usuario marca una casilla sutil de test 'Simular fallo', redirige a la vista de `#error` bancario (#DECLINED-SEC-054) reteniendo todos los datos del formulario. De lo contrario, redirige a `#confirmation` con número de orden generado aleatoriamente.
+5. Métodos de Pago Simplificados (Solo Tarjeta y Efectivo en Tienda):
+   - Elimina definitivamente la opción de "Transferencia Bancaria Directa".
+   - Deja únicamente dos métodos:
+     1) "Tarjeta de Crédito / Débito"
+     2) "Efectivo al retirar en tienda (Cash)" (disponible solo si la entrega es retiro en local).
+   - Lógica de confirmación diferenciada:
+     * Si paga con Tarjeta: ejecuta la animación modal de pasarela segura (Spinner + 3D Secure) durante 2.5 segundos antes de redirigir a la orden confirmada.
+     * Si selecciona Efectivo (Cash): NO ejecutes la animación de pasarela de tarjetas ni 3D Secure; redirige de inmediato a la confirmación indicando: "Orden reservada con éxito. Recuerda realizar el pago en caja al retirar en el local central".
 
-4. Corrección Fiscal del IVA (15%):
-   - Actualiza la constante de impuestos a 15% (tasa ecuatoriana actual).
-   - En la bolsa de compras y en el checkout:
-     * Subtotal = suma de ítems.
-     * IVA (15%) = Subtotal * 0.15 (mostrado explícitamente como "IVA (15%)").
-     * Envío = $25.00 si es courier, $0.00 si es retiro en local.
-     * Total a pagar = Subtotal + IVA + Envío.
+6. Historial de Tracking Dinámico (Última Orden Real):
+   - Al finalizar cualquier compra exitosa, guarda los datos de la orden en `localStorage` (número de orden aleatorio, fecha/hora actual, lista de productos comprados y total pagado).
+   - La vista `#tracking` debe leer este objeto de la última compra y pintar los productos reales adquiridos en esa sesión, en lugar de datos estáticos quemados.
 
-5. Ficha de Detalle (PDP) y Gráfica Interactiva con Mouse Hover:
-   - En la sección "Historial de Mercado Actual", implementa una gráfica interactiva (con SVG o Canvas) que renderice la curva de precios de los últimos 12 meses.
-   - Evento de Mouse Hover / Touch: Al pasar el cursor o dedo por encima de la curva, debe mostrarse una línea vertical guía con un punto activo y un Tooltip dinámico flotante indicando la fecha y el precio en ese punto exacto (ej. "Nov 2025: $16,800 USD", con indicador de subida/bajada en verde o rojo).
-   - Al alternar entre los botones segmentados [Raw / NM], [PSA 8], [PSA 9] y [PSA 10 GEM MT], la gráfica y el precio principal deben redibujarse reactivamente reflejando las cifras de esa condición.
-
-6. Sistema de Sesión y Usuarios con LocalStorage:
-   - Desacopla los datos estáticos predeterminados. Los campos de Nombre, Correo y Cédula en el Checkout no deben venir prellenados con "Patrick Mora". Deben mostrar placeholders limpios y permitir entrada de cualquier usuario.
-   - En la vista de Autenticación (#auth): Permite registrar un usuario (Nombre, Email, Contraseña) y guardarlo en `localStorage`. Si el usuario inicia sesión, actualiza el Navbar con su nombre real en lugar de "Mi Cuenta", y autocompleta sus datos únicamente cuando haya una sesión iniciada. Incluye la opción de "Cerrar Sesión".
-
-7. Filtros Interactivos y Paginación Funcional:
-   - Los botones de filtro superior ([Todas], [Cartas Sueltas], [Booster Packs], [Solo PSA]) deben filtrar de verdad la lista de productos mostrada en el catálogo.
-   - La barra de búsqueda debe filtrar en tiempo real por nombre de carta (ej. 'Charizard', 'Umbreon', 'Gengar', 'Lugia').
-   - El botón [+ Filtros Avanzados] debe abrir un panel lateral deslizable (drawer) con opciones por Tipo (Fuego, Psíquico, Oscuridad), Rareza y Rango de Precio.
-   - Paginación: Haz que los botones de paginación [1], [2], [Siguiente] funcionen mostrando al menos 2 páginas distintas con productos de prueba.
-
-8. Responsive Design Estricto para Dispositivos Móviles:
-   - Soluciona los desbordamientos en celulares:
-     * Usa clases fluidas de Tailwind (w-full, max-w-full, overflow-x-hidden en el contenedor principal).
-     * En móvil (< 640px), la grilla de productos debe mostrarse en 1 columna o 2 columnas compactas.
-     * La sección de descubrimiento superior (las 4 tarjetas modulares de packs y PSA) debe pasar a un slider horizontal táctil o una grilla de 2x2 para que los botones y textos no se corten.
-     * En el Checkout y la Bolsa, las columnas paralelas deben apilarse verticalmente (flex-col lg:flex-row).
-     * Asegura tamaños táctiles mínimos de 44x44px para botones e inputs sin desbordar el viewport horizontal.
-
-9. Gestión de Imágenes e Íconos:
-   - Configura rutas seguras para imágenes: si existen imágenes locales en una carpeta `img/` o `assets/`, enlázalas; si alguna falla al cargar, agrega un manejador de fallback `onerror` que cargue imágenes de alta resolución desde URLs de CDN confiables de Pokemon TCG API.
-   - Íconos coherentes: Asegúrate de que todos los íconos de Lucide Icons carguen con dimensiones consistentes (w-5 h-5).
+7. Estado Inicial del Carrito en Cero:
+   - Inicializa la bolsa de compras vacía (`cart = []`, badge numérico en 0).
+   - Si el carrito está vacío, la vista `#cart` debe mostrar un estado limpio ("Tu bolsa de compras está vacía") con un botón visible: [Explorar Catálogo].
