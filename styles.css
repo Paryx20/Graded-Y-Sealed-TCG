@@ -1,0 +1,119 @@
+/* =========================================================================
+   Graded & Sealed TCG - Production Stylesheet
+   Accesibilidad WCAG 2.2 AAA & Diseño Comercial
+   ========================================================================= */
+
+/* Strict WCAG 2.2 Focus Visible */
+:focus-visible {
+  outline: 3px solid #0F172A !important;
+  outline-offset: 2px !important;
+}
+
+.focus-ring-accessible {
+  outline: 3px solid #0F172A !important;
+  outline-offset: 2px !important;
+}
+
+/* Base resets & overflow containment */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* SPA Views Transitions */
+.view-section {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.view-section.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Hide scrollbar for touch carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Interactive SVG Chart Tooltip */
+.chart-tooltip {
+  pointer-events: none;
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  transform: translate(-50%, -100%);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+}
+
+/* Modal Payment Backdrop Animation */
+.modal-backdrop {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
+.modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  transform: scale(0.95);
+  transition: transform 0.3s ease-out;
+}
+.modal-backdrop.active .modal-content {
+  transform: scale(1);
+}
+
+/* Drawer Filter Slide-over */
+.drawer-backdrop {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
+.drawer-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer-panel {
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.drawer-backdrop.active .drawer-panel {
+  transform: translateX(0);
+}
+
+/* Spinner Animation */
+@keyframes spin-smooth {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-spin-smooth {
+  animation: spin-smooth 1s linear infinite;
+}
+
+/* Responsive Touch Target Minimums (WCAG 2.5.5 / 2.5.8) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}

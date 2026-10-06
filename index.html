@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Graded &amp; Sealed TCG • Prototipo Web E-commerce Accesible</title>
+  <title>Graded &amp; Sealed TCG • Bóveda Oficial de Cartas y Slabs PSA</title>
   
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -35,160 +35,110 @@
     }
   </script>
 
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
   <!-- Lucide Icons via CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Strict WCAG 2.2 Focus Visible & Custom Enhancements -->
-  <style>
-    :focus-visible {
-      outline: 3px solid #0F172A !important;
-      outline-offset: 2px !important;
-    }
-    .focus-ring-demo {
-      outline: 3px solid #0F172A !important;
-      outline-offset: 2px !important;
-    }
-    /* Smooth transitions between views */
-    .view-section {
-      display: none;
-      opacity: 0;
-      transition: opacity 0.2s ease-in-out;
-    }
-    .view-section.active {
-      display: block;
-      opacity: 1;
-    }
-    /* Custom scrollbar for clean desktop presentation */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #F1F5F9;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #CBD5E1;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #94A3B8;
-    }
-  </style>
 </head>
-<body class="min-h-full flex flex-col text-brand-charcoal font-sans antialiased bg-slate-50 selection:bg-brand-red selection:text-white">
+<body class="min-h-full flex flex-col text-brand-charcoal font-sans antialiased bg-slate-50 selection:bg-brand-red selection:text-white overflow-x-hidden">
 
   <!-- ========================================================================= -->
-  <!-- TOP ANNOUNCEMENT BAR & WCAG QUICK SWITCHER -->
-  <!-- ========================================================================= -->
-  <aside aria-label="Barra de información del prototipo" class="bg-brand-charcoal text-white text-xs py-2 px-4 border-b border-slate-700">
-    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
-      <div class="flex items-center gap-2">
-        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold bg-brand-red text-white uppercase tracking-wider">WCAG 2.2 AAA</span>
-        <span>Prototipo Web Funcional • Graded &amp; Sealed TCG • Interacción Humano-Computador</span>
-      </div>
-      <div class="flex items-center gap-3 text-slate-300">
-        <span class="hidden md:inline">Acceso directo a vistas:</span>
-        <div class="flex items-center gap-1.5 flex-wrap" id="quick-view-switcher">
-          <button onclick="app.navigateTo('view-home')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 transition">01 Home</button>
-          <button onclick="app.navigateTo('view-pdp')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 transition">02 PDP</button>
-          <button onclick="app.navigateTo('view-cart')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 transition">03 Bolsa</button>
-          <button onclick="app.navigateTo('view-checkout')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 transition">04 Checkout</button>
-          <button onclick="app.navigateTo('view-confirmation')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 transition">05 Éxito</button>
-          <button onclick="app.navigateTo('view-login')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 transition">06 Auth</button>
-          <button onclick="app.navigateTo('view-tracking')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 transition">07 Tracking</button>
-          <button onclick="app.navigateTo('view-payment-error')" class="px-2 py-0.5 bg-red-950 hover:bg-red-900 text-red-200 rounded transition">09 Error</button>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ========================================================================= -->
-  <!-- MAIN HEADER / NAVBAR -->
+  <!-- MAIN HEADER / NAVBAR COMERCIAL -->
   <!-- ========================================================================= -->
   <header class="bg-white border-b border-brand-border sticky top-0 z-40 shadow-sm">
     <div class="h-1 bg-brand-red w-full"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3 sm:gap-4">
       
       <!-- Brand Logo & Name -->
-      <a href="javascript:void(0)" onclick="app.navigateTo('view-home')" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-charcoal rounded-lg p-1" aria-label="Ir al inicio de Graded and Sealed TCG">
-        <img src="Logo del e-commerce 1.png" alt="Logo Graded &amp; Sealed TCG" class="h-12 w-auto object-contain transition-transform group-hover:scale-105" />
+      <a href="#home" class="flex items-center gap-2.5 sm:gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-charcoal rounded-lg p-1" aria-label="Ir a inicio de Graded and Sealed TCG">
+        <img src="Logo del e-commerce 1.png" alt="Logo Graded &amp; Sealed TCG" class="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105" onerror="this.src='https://placehold.co/120x60/DC2626/FFFFFF?text=G%26S+TCG'" />
         <div class="flex flex-col">
-          <div class="flex items-center gap-1.5">
-            <span class="font-black text-xl tracking-tight text-brand-charcoal">GRADED &amp; SEALED</span>
-            <span class="font-black text-xl text-brand-red tracking-tight">TCG</span>
+          <div class="flex items-center gap-1">
+            <span class="font-black text-lg sm:text-xl tracking-tight text-brand-charcoal">GRADED &amp; SEALED</span>
+            <span class="font-black text-lg sm:text-xl text-brand-red tracking-tight">TCG</span>
           </div>
-          <span class="text-[10px] font-bold tracking-widest uppercase text-brand-muted">Bóveda de Coleccionismo y Slabs PSA</span>
+          <span class="text-[9px] sm:text-[10px] font-bold tracking-widest uppercase text-brand-muted hidden xs:inline">Bóveda de Coleccionismo y Slabs PSA</span>
         </div>
       </a>
 
-      <!-- Search Bar with accessible label -->
-      <form role="search" onsubmit="event.preventDefault(); app.handleSearch();" class="flex-1 max-w-xl mx-2 hidden md:block">
+      <!-- Search Bar with Accessible Label -->
+      <form role="search" onsubmit="event.preventDefault();" class="flex-1 max-w-md lg:max-w-lg mx-2 hidden md:block">
         <label for="global-search" class="sr-only">Buscar cartas, expansiones o grados PSA</label>
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brand-muted">
-            <i data-lucide="search" class="w-5 h-5"></i>
+            <i data-lucide="search" class="w-4 h-4"></i>
           </div>
           <input 
             type="search" 
             id="global-search" 
             name="q"
             placeholder="Buscar cartas, expansiones o grados PSA... (ej. Charizard, PSA 10)"
-            class="w-full pl-10 pr-4 py-2.5 bg-brand-surface border border-brand-border rounded-lg text-sm text-brand-charcoal placeholder-brand-muted focus:bg-white focus:border-brand-charcoal focus:outline-none transition"
+            class="w-full pl-10 pr-4 py-2 bg-brand-surface border border-brand-border rounded-lg text-sm text-brand-charcoal placeholder-brand-muted focus:bg-white focus:border-brand-charcoal focus:outline-none transition"
             aria-label="Buscar cartas, expansiones o grados PSA"
           />
         </div>
       </form>
 
       <!-- Utility Navigation Items -->
-      <nav aria-label="Navegación principal" class="flex items-center gap-3">
+      <nav aria-label="Navegación principal" class="flex items-center gap-2 sm:gap-3">
         
-        <!-- Mis Pedidos -->
-        <button 
-          type="button"
-          onclick="app.navigateTo('view-tracking')"
-          class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-brand-slate hover:text-brand-charcoal hover:bg-slate-100 rounded-lg transition"
+        <!-- Mis Pedidos / Tracking -->
+        <a 
+          href="#tracking"
+          class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-semibold text-brand-slate hover:text-brand-charcoal hover:bg-slate-100 rounded-lg transition"
           aria-label="Ver historial y seguimiento de pedidos"
         >
           <i data-lucide="truck" class="w-4 h-4 text-brand-muted"></i>
-          <span>Tracking</span>
-        </button>
+          <span class="hidden sm:inline">Tracking</span>
+        </a>
 
-        <!-- Mi Cuenta -->
-        <button 
-          type="button" 
-          onclick="app.navigateTo('view-login')"
+        <!-- Mi Cuenta / Usuario Autenticado -->
+        <a 
+          href="#auth"
           id="btn-nav-account"
-          class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-semibold text-brand-charcoal border border-slate-300 hover:bg-slate-100 rounded-lg transition"
+          class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-2 text-xs sm:text-sm font-semibold text-brand-charcoal border border-slate-300 hover:bg-slate-100 rounded-lg transition"
           aria-label="Acceder a mi cuenta de usuario"
         >
           <i data-lucide="user" class="w-4 h-4 text-brand-charcoal"></i>
           <span id="nav-user-label">Mi Cuenta</span>
+        </a>
+
+        <!-- Botón Cerrar Sesión (Dinámico) -->
+        <button 
+          type="button"
+          onclick="app.logoutUser()"
+          id="btn-nav-logout"
+          class="hidden px-2 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg transition"
+          title="Cerrar sesión actual"
+          aria-label="Cerrar sesión actual"
+        >
+          <i data-lucide="log-out" class="w-4 h-4"></i>
         </button>
 
         <!-- Bolsa de Compras con Badge Reactivo -->
-        <button 
-          type="button"
-          onclick="app.navigateTo('view-cart')"
-          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-brand-red hover:bg-brand-darkred rounded-lg transition shadow-sm relative"
+        <a 
+          href="#cart"
+          class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold text-white bg-brand-red hover:bg-brand-darkred rounded-lg transition shadow-sm relative touch-target flex items-center justify-center"
           aria-label="Ver bolsa de compras"
         >
           <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-          <span>Bolsa</span>
+          <span class="hidden xs:inline">Bolsa</span>
           <span 
             id="cart-badge" 
             aria-live="polite" 
-            class="inline-flex items-center justify-center w-5 h-5 text-xs font-black bg-brand-lightgold text-brand-darkgold border border-brand-red rounded-full"
+            class="inline-flex items-center justify-center w-5 h-5 text-[11px] font-black bg-brand-lightgold text-brand-darkgold border border-brand-red rounded-full"
           >
             3
           </span>
-        </button>
+        </a>
       </nav>
 
     </div>
   </header>
 
   <!-- ========================================================================= -->
-  <!-- ACCESSIBLE TOAST FEEDBACK NOTIFICATIONS (ARIA-LIVE) -->
+  <!-- ACCESSIBLE TOAST NOTIFICATIONS (ARIA-LIVE) -->
   <!-- ========================================================================= -->
   <div id="toast-container" class="fixed top-24 right-4 z-50 flex flex-col gap-2 max-w-md pointer-events-none" aria-live="polite"></div>
 
@@ -229,14 +179,15 @@
   <main class="flex-1 pb-16">
 
     <!-- ===================================================================== -->
-    <!-- VIEW 01: HOME / CATÁLOGO -->
+    <!-- VIEW 01: HOME / CATÁLOGO (#home) -->
     <!-- ===================================================================== -->
     <section id="view-home" class="view-section active max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
-      <!-- Bloque de Descubrimiento (Modular Estilo Amazon - 4 Columnas) -->
+      <!-- Bloque de Descubrimiento (Modular Amazon Style - Responsive Carousel / Grid) -->
       <section aria-labelledby="discovery-heading" class="mb-8">
         <h2 id="discovery-heading" class="sr-only">Secciones destacadas de la bóveda</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           
           <!-- Card 1: Starter Packs -->
           <article class="bg-white border border-brand-border rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
@@ -245,13 +196,12 @@
               <p class="text-xs text-brand-muted mt-0.5">Packs Sellados de Fábrica</p>
               <div class="my-3 aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center relative">
                 <img src="https://images.pokemontcg.io/base1/logo.png" alt="Caja sellada Base Set 1999" class="object-contain p-2 max-h-full max-w-full" onerror="this.src='https://placehold.co/400x300/F1F5F9/64748B?text=Booster+Box+Sellada'" />
-                <span class="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-brand-charcoal text-white text-[10px] font-mono rounded">alt: "Caja booster sellada"</span>
               </div>
             </div>
-            <a href="javascript:void(0)" onclick="app.filterProducts('Booster Packs')" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1">
+            <button type="button" onclick="app.filterCategory('Booster Packs')" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1 text-left">
               <span>Ver packs</span>
               <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-            </a>
+            </button>
           </article>
 
           <!-- Card 2: Mercado Grados PSA -->
@@ -264,13 +214,12 @@
               <p class="text-xs text-brand-muted mt-0.5">Slabs de Grado Inversión</p>
               <div class="my-3 aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center relative">
                 <img src="https://images.pokemontcg.io/base1/4_hires.png" alt="Slab oficial Charizard Base Set PSA 9" class="object-contain p-2 max-h-full max-w-full" onerror="this.src='https://placehold.co/400x300/F1F5F9/64748B?text=Slab+PSA+10'" />
-                <span class="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-brand-charcoal text-white text-[10px] font-mono rounded">alt: "Slab PSA certificado"</span>
               </div>
             </div>
-            <a href="javascript:void(0)" onclick="app.filterProducts('Solo PSA')" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1">
+            <button type="button" onclick="app.filterCategory('Solo PSA')" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1 text-left">
               <span>Inversión &amp; Slabs</span>
               <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-            </a>
+            </button>
           </article>
 
           <!-- Card 3: Singles Destacadas -->
@@ -280,13 +229,12 @@
               <p class="text-xs text-brand-muted mt-0.5">Top Meta &amp; Alt Arts</p>
               <div class="my-3 aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center relative">
                 <img src="https://images.pokemontcg.io/swsh7/215_hires.png" alt="Carta Umbreon VMAX Moonbreon Arte Alternativo" class="object-contain p-2 max-h-full max-w-full" onerror="this.src='https://placehold.co/400x300/F1F5F9/64748B?text=Umbreon+VMAX+Alt+Art'" />
-                <span class="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-brand-charcoal text-white text-[10px] font-mono rounded">alt: "Carta Umbreon VMAX"</span>
               </div>
             </div>
-            <a href="javascript:void(0)" onclick="app.filterProducts('Cartas Sueltas')" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1">
+            <button type="button" onclick="app.filterCategory('Cartas Sueltas')" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1 text-left">
               <span>Explorar catálogo</span>
               <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-            </a>
+            </button>
           </article>
 
           <!-- Card 4: Retiro Inmediato en Local -->
@@ -296,13 +244,12 @@
                 <h3 class="font-extrabold text-base text-brand-charcoal">Retiro Inmediato</h3>
                 <span class="px-2 py-0.5 text-[10px] font-black bg-emerald-100 text-emerald-800 rounded">Quito</span>
               </div>
-              <p class="text-xs text-brand-muted mt-0.5">Sucursal Central PUCE</p>
+              <p class="text-xs text-brand-muted mt-0.5">Sucursal Central</p>
               <div class="my-3 aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center relative">
-                <img src="Logo del e-commerce 1.png" alt="Bolsa de compras oficial y tienda física" class="object-contain p-4 max-h-full max-w-full" />
-                <span class="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-brand-charcoal text-white text-[10px] font-mono rounded">alt: "Bolsa oficial en tienda"</span>
+                <img src="Logo del e-commerce 1.png" alt="Bolsa oficial en tienda física" class="object-contain p-4 max-h-full max-w-full" onerror="this.src='https://placehold.co/400x300/F1F5F9/64748B?text=Tienda+Fisica'" />
               </div>
             </div>
-            <a href="javascript:void(0)" onclick="app.navigateTo('view-checkout')" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1">
+            <a href="#checkout" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-red hover:text-brand-darkred mt-1">
               <span>Stock en tienda</span>
               <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
             </a>
@@ -311,39 +258,42 @@
         </div>
       </section>
 
-      <!-- Barra de Filtros Híbrida -->
+      <!-- Barra de Filtros Híbrida & Búsqueda Móvil -->
       <section aria-labelledby="filter-heading" class="bg-white border border-brand-border rounded-xl p-3.5 mb-6 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <h2 id="filter-heading" class="sr-only">Filtros de catálogo</h2>
         
         <div class="flex items-center gap-2 flex-wrap" role="toolbar" aria-label="Filtros rápidos de categoría">
           <button 
             type="button" 
-            onclick="app.filterProducts('Todas')" 
-            class="filter-chip px-4 py-2 text-xs font-bold rounded-full border border-slate-300 text-brand-charcoal hover:bg-slate-100 transition"
+            onclick="app.filterCategory('Todas')" 
+            data-cat="Todas"
+            class="filter-chip px-4 py-2 text-xs font-bold rounded-full bg-brand-red text-white transition shadow-sm"
           >
             Todas (1,240)
           </button>
           
           <button 
             type="button" 
-            onclick="app.filterProducts('Cartas Sueltas')" 
-            class="filter-chip px-4 py-2 text-xs font-bold rounded-full bg-brand-red text-white transition"
+            onclick="app.filterCategory('Cartas Sueltas')" 
+            data-cat="Cartas Sueltas"
+            class="filter-chip px-4 py-2 text-xs font-bold rounded-full border border-slate-300 text-brand-charcoal hover:bg-slate-100 transition"
           >
             Cartas Sueltas (890)
           </button>
           
           <button 
             type="button" 
-            onclick="app.filterProducts('Booster Packs')" 
+            onclick="app.filterCategory('Booster Packs')" 
+            data-cat="Booster Packs"
             class="filter-chip px-4 py-2 text-xs font-bold rounded-full border border-slate-300 text-brand-charcoal hover:bg-slate-100 transition"
           >
             Booster Packs (120)
           </button>
           
-          <!-- Elemento con demostración de Foco Accesible (:focus-visible 3px) -->
           <button 
             type="button" 
-            onclick="app.filterProducts('Solo PSA')" 
+            onclick="app.filterCategory('Solo PSA')" 
+            data-cat="Solo PSA"
             id="chip-solo-psa"
             class="filter-chip px-4 py-2 text-xs font-bold rounded-full border border-slate-300 text-brand-charcoal hover:bg-slate-100 transition relative"
             aria-label="Filtrar únicamente cartas con graduación oficial PSA"
@@ -354,7 +304,7 @@
 
         <button 
           type="button"
-          onclick="app.showToast('Panel de filtros avanzados desplegado.', 'info')" 
+          onclick="app.openAdvancedFilters()" 
           class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold border border-brand-charcoal text-brand-charcoal hover:bg-brand-charcoal hover:text-white rounded-lg transition"
         >
           <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
@@ -362,40 +312,28 @@
         </button>
       </section>
 
-      <!-- Grilla de Productos (4 Columnas) -->
+      <!-- Grilla de Productos Dinámica -->
       <section aria-labelledby="products-heading">
         <h2 id="products-heading" class="sr-only">Listado de productos</h2>
-        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           <!-- Rendered dynamically by JavaScript -->
         </div>
       </section>
 
-      <!-- Footer Paginación -->
-      <nav aria-label="Paginación del catálogo" class="mt-8 bg-white border border-brand-border rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm text-sm">
-        <span class="text-brand-muted text-xs sm:text-sm">Mostrando 1 - 4 de 1,240 productos verificados</span>
-        <div class="flex items-center gap-1 font-bold text-xs sm:text-sm">
-          <button class="px-3 py-1.5 rounded border border-slate-200 text-slate-400 cursor-not-allowed" disabled>Anterior</button>
-          <button class="px-3 py-1.5 rounded bg-brand-charcoal text-white font-bold" aria-current="page">1</button>
-          <button class="px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-100">2</button>
-          <button class="px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-100">3</button>
-          <span class="px-2">...</span>
-          <button class="px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-100">18</button>
-          <button class="px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-100">Siguiente</button>
-        </div>
+      <!-- Footer Paginación Funcional -->
+      <nav id="catalog-pagination" aria-label="Paginación del catálogo" class="mt-8 bg-white border border-brand-border rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm text-sm">
+        <!-- Rendered dynamically by app.renderPagination() -->
       </nav>
-
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 02: DETALLE DE PRODUCTO (PDP) -->
+    <!-- VIEW 02: FICHA DE DETALLE / PDP (#pdp) -->
     <!-- ===================================================================== -->
     <section id="view-pdp" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
-      <!-- Breadcrumbs -->
-      <nav aria-label="Miga de pan" class="text-xs text-brand-muted mb-4 flex items-center gap-1.5">
-        <a href="javascript:void(0)" onclick="app.navigateTo('view-home')" class="hover:text-brand-charcoal">Inicio</a>
-        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-        <a href="javascript:void(0)" onclick="app.filterProducts('Cartas Sueltas')" class="hover:text-brand-charcoal">Cartas Sueltas</a>
+      <!-- Breadcrumb Accesible -->
+      <nav aria-label="Ruta de navegación" class="flex items-center gap-2 text-xs text-brand-muted mb-6">
+        <a href="#home" class="hover:text-brand-charcoal font-medium">Catálogo</a>
         <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
         <span>Base Set 1999</span>
         <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
@@ -403,10 +341,10 @@
       </nav>
 
       <!-- Layout 60% / 40% -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         
         <!-- Left: Gallery (7 Cols / approx 60%) -->
-        <div class="lg:col-span-7 bg-white border border-brand-border rounded-2xl p-6 shadow-sm">
+        <div class="lg:col-span-7 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 shadow-sm">
           <!-- Main Image Viewer -->
           <div class="w-full aspect-[4/5] bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-center relative p-6 overflow-hidden">
             <img 
@@ -420,16 +358,13 @@
               <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
               <span id="pdp-cert-badge">PSA 10 GEM MT #48291034</span>
             </div>
-            <div class="absolute bottom-3 left-3 bg-brand-charcoal text-white text-[11px] font-mono px-2 py-0.5 rounded opacity-90">
-              alt: "Charizard 1a Edición Base Set PSA 10"
-            </div>
           </div>
 
           <!-- Thumbnails -->
           <div class="grid grid-cols-3 gap-3 mt-4" role="tablist" aria-label="Vistas fotográficas de la carta">
             <button 
               type="button" 
-              onclick="app.selectThumbnail('https://images.pokemontcg.io/base1/4_hires.png', 'Frontal Completo')" 
+              onclick="app.selectPDPThumbnail('https://images.pokemontcg.io/base1/4_hires.png', 'Frontal Completo')" 
               class="thumb-btn p-2 rounded-lg border-2 border-brand-red bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1"
               aria-label="Ver cara frontal en alta resolución"
             >
@@ -439,7 +374,7 @@
 
             <button 
               type="button" 
-              onclick="app.selectThumbnail('https://images.pokemontcg.io/base1/4_hires.png', 'Reverso Certificado')" 
+              onclick="app.selectPDPThumbnail('https://images.pokemontcg.io/base1/4_hires.png', 'Reverso Certificado')" 
               class="thumb-btn p-2 rounded-lg border border-slate-200 bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1 hover:border-slate-400"
               aria-label="Ver reverso de la carta y esquinas"
             >
@@ -449,7 +384,7 @@
 
             <button 
               type="button" 
-              onclick="app.selectThumbnail('Logo del e-commerce 1.png', 'Empaque y Certificado')" 
+              onclick="app.selectPDPThumbnail('Logo del e-commerce 1.png', 'Empaque y Certificado')" 
               class="thumb-btn p-2 rounded-lg border border-slate-200 bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1 hover:border-slate-400"
               aria-label="Ver empaque de seguridad y estuche acrílico"
             >
@@ -459,8 +394,8 @@
           </div>
         </div>
 
-        <!-- Right: Decision & Purchase Panel (5 Cols / approx 40%) -->
-        <div class="lg:col-span-5 bg-white border border-brand-border rounded-2xl p-6 shadow-sm flex flex-col gap-5">
+        <!-- Right: Purchase Panel & Dynamic Market Chart (5 Cols) -->
+        <div class="lg:col-span-5 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col gap-5">
           <div>
             <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-extrabold bg-brand-lightgold text-brand-darkgold border border-amber-300">
               <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-500 text-amber-500"></i>
@@ -479,85 +414,99 @@
               
               <button 
                 type="button" 
-                onclick="app.setCondition('raw', 750, 'Sin Gradear / Raw (NM)', 'raw')" 
+                onclick="app.setCondition('raw', 750, 'Sin Gradear / Raw (NM)')" 
                 id="cond-raw"
-                class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition"
+                class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition bg-white"
               >
-                <div class="text-xs font-bold text-brand-charcoal">Raw / NM</div>
-                <div class="text-sm font-black text-brand-muted">$750.00</div>
+                <div class="cond-title text-xs font-bold text-brand-charcoal">Raw / NM</div>
+                <div class="cond-price text-sm font-black text-brand-muted">$750.00</div>
               </button>
 
               <button 
                 type="button" 
-                onclick="app.setCondition('psa8', 1800, 'PSA 8 NM-MT', 'psa8')" 
+                onclick="app.setCondition('psa8', 1800, 'PSA 8 NM-MT')" 
                 id="cond-psa8"
-                class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition"
+                class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition bg-white"
               >
-                <div class="text-xs font-bold text-brand-charcoal">PSA 8 NM-MT</div>
-                <div class="text-sm font-black text-brand-muted">$1,800.00</div>
+                <div class="cond-title text-xs font-bold text-brand-charcoal">PSA 8 NM-MT</div>
+                <div class="cond-price text-sm font-black text-brand-muted">$1,800.00</div>
               </button>
 
               <button 
                 type="button" 
-                onclick="app.setCondition('psa9', 4850, 'PSA 9 MINT', 'psa9')" 
+                onclick="app.setCondition('psa9', 4850, 'PSA 9 MINT')" 
                 id="cond-psa9"
-                class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition"
+                class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition bg-white"
               >
-                <div class="text-xs font-bold text-brand-charcoal">PSA 9 MINT</div>
-                <div class="text-sm font-black text-brand-muted">$4,850.00</div>
+                <div class="cond-title text-xs font-bold text-brand-charcoal">PSA 9 MINT</div>
+                <div class="cond-price text-sm font-black text-brand-muted">$4,850.00</div>
               </button>
 
               <!-- Selected Active Condition -->
               <button 
                 type="button" 
-                onclick="app.setCondition('psa10', 18500, 'PSA 10 GEM MT', 'psa10')" 
+                onclick="app.setCondition('psa10', 18500, 'PSA 10 GEM MT')" 
                 id="cond-psa10"
                 class="cond-btn p-3 rounded-xl bg-brand-charcoal text-white text-left shadow transition"
               >
-                <div class="text-xs font-bold text-white flex items-center justify-between">
+                <div class="cond-title text-xs font-bold text-white flex items-center justify-between">
                   <span>PSA 10 GEM MT</span>
-                  <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                  <i data-lucide="check" class="check-indicator w-3.5 h-3.5 text-emerald-400"></i>
                 </div>
-                <div class="text-sm font-black text-amber-400">$18,500.00</div>
+                <div class="cond-price text-sm font-black text-amber-400">$18,500.00</div>
               </button>
 
             </div>
           </div>
 
-          <!-- Market Analysis Module (SVG Chart) -->
+          <!-- Market Analysis Module with Interactive Mouse Hover / Touch Chart -->
           <div class="bg-brand-surface border border-brand-border rounded-xl p-4">
             <div class="flex items-center justify-between">
               <span class="text-xs font-black text-brand-charcoal flex items-center gap-1.5">
                 <i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i>
-                <span>Historial de Valor de Mercado (12 meses)</span>
+                <span>Historial de Mercado Actual (12 meses)</span>
               </span>
               <span id="market-trend-pill" class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">+21.7%</span>
             </div>
-            <p class="text-[11px] text-brand-muted mt-0.5">Subastas oficiales verificadas de ventas concluidas</p>
+            <p class="text-[11px] text-brand-muted mt-0.5">Pasa el cursor por la curva para inspeccionar precios históricos mes a mes</p>
             
-            <!-- SVG Interactive Chart -->
-            <div class="w-full h-32 mt-3">
-              <svg viewBox="0 0 400 120" class="w-full h-full overflow-visible" aria-label="Gráfica de tendencia de precio a 12 meses">
-                <line x1="20" y1="100" x2="380" y2="100" stroke="#CBD5E1" stroke-width="1.5" />
-                <line x1="20" y1="20" x2="20" y2="100" stroke="#CBD5E1" stroke-width="1.5" />
-                <!-- Trend line -->
+            <!-- SVG Interactive Chart Container with Floating Tooltip -->
+            <div id="pdp-chart-container" class="w-full h-36 mt-3 relative select-none">
+              <svg id="pdp-interactive-chart" viewBox="0 0 400 130" class="w-full h-full overflow-visible" aria-label="Gráfica interactiva de tendencia de precio a 12 meses">
+                <!-- Grid background lines -->
+                <line x1="20" y1="105" x2="380" y2="105" stroke="#E2E8F0" stroke-width="1.5" />
+                <line x1="20" y1="65" x2="380" y2="65" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="4,4" />
+                <line x1="20" y1="25" x2="380" y2="25" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="4,4" />
+
+                <!-- Vertical Hover Guide Line -->
+                <line id="chart-guide-line" x1="0" y1="15" x2="0" y2="115" stroke="#0F172A" stroke-width="1.5" stroke-dasharray="3,3" style="display:none;" />
+
+                <!-- Price Curve Polyline -->
                 <polyline 
                   id="chart-polyline"
-                  points="30,85 110,75 190,80 270,50 360,25" 
+                  points="30,85 110,75 190,80 270,50 370,25" 
                   fill="none" 
-                  stroke="#DC2626" 
+                  stroke="#16A34A" 
                   stroke-width="3" 
                   stroke-linecap="round"
+                  stroke-linejoin="round"
                 />
-                <!-- Interactive Dots -->
-                <circle cx="30" cy="85" r="4" fill="#0F172A" />
-                <circle cx="190" cy="80" r="4" fill="#0F172A" />
-                <circle id="chart-active-dot" cx="360" cy="25" r="6" fill="#DC2626" stroke="#FFFFFF" stroke-width="2" />
-                <!-- Labels -->
-                <text x="30" y="115" fill="#64748B" font-size="9" text-anchor="middle">Oct 2025</text>
-                <text x="190" y="115" fill="#64748B" font-size="9" text-anchor="middle">Feb 2026</text>
-                <text x="360" y="115" fill="#0F172A" font-size="9" font-weight="bold" text-anchor="middle">Hoy (Actual)</text>
+
+                <!-- Dynamic Hover Dot -->
+                <circle id="chart-hover-dot" cx="0" cy="0" r="5" fill="#0F172A" stroke="#FFFFFF" stroke-width="2" style="display:none;" />
+
+                <!-- Current Active Dot -->
+                <circle id="chart-active-dot" cx="370" cy="25" r="5.5" fill="#16A34A" stroke="#FFFFFF" stroke-width="2" />
+
+                <!-- X Axis Labels -->
+                <text x="30" y="122" fill="#94A3B8" font-size="9" text-anchor="middle">Oct 2025</text>
+                <text x="143" y="122" fill="#94A3B8" font-size="9" text-anchor="middle">Feb 2026</text>
+                <text x="256" y="122" fill="#94A3B8" font-size="9" text-anchor="middle">Jun 2026</text>
+                <text x="370" y="122" fill="#0F172A" font-size="9" font-weight="bold" text-anchor="middle">Hoy</text>
               </svg>
+
+              <!-- Dynamic HTML Floating Tooltip -->
+              <div id="chart-hover-tooltip" class="chart-tooltip absolute z-20 opacity-0"></div>
             </div>
           </div>
 
@@ -577,7 +526,7 @@
             <button 
               type="button" 
               onclick="app.addToCartCurrentPdp()" 
-              class="w-full mt-4 py-3.5 px-6 bg-brand-red hover:bg-brand-darkred text-white text-base font-extrabold rounded-xl transition shadow-md flex items-center justify-center gap-2"
+              class="w-full mt-4 py-3.5 px-6 bg-brand-red hover:bg-brand-darkred text-white text-base font-extrabold rounded-xl transition shadow-md flex items-center justify-center gap-2 touch-target"
               aria-label="Añadir esta carta a la bolsa de compras"
             >
               <i data-lucide="shopping-bag" class="w-5 h-5"></i>
@@ -591,7 +540,7 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 03: BOLSA DE COMPRAS -->
+    <!-- VIEW 03: BOLSA DE COMPRAS (#cart) -->
     <!-- ===================================================================== -->
     <section id="view-cart" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
@@ -600,19 +549,18 @@
           <h1 class="text-2xl font-black text-brand-charcoal tracking-tight">Tu Bolsa de Compras</h1>
           <p class="text-xs text-brand-muted mt-0.5">Revisa tus artículos seleccionados antes de proceder al checkout</p>
         </div>
-        <button 
-          type="button" 
-          onclick="app.navigateTo('view-home')" 
+        <a 
+          href="#home" 
           class="text-xs font-bold text-brand-red hover:text-brand-darkred flex items-center gap-1"
         >
           <i data-lucide="arrow-left" class="w-4 h-4"></i>
           <span>Continuar explorando</span>
-        </button>
+        </a>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-6">
         
-        <!-- Items List (8 Cols / approx 70%) -->
+        <!-- Items List (8 Cols) -->
         <div class="lg:col-span-8 flex flex-col gap-4">
           <div id="cart-items-container" class="flex flex-col gap-3">
             <!-- Rendered reactively via app.renderCart() -->
@@ -630,7 +578,7 @@
           </div>
         </div>
 
-        <!-- Sticky Order Summary (4 Cols / approx 30%) -->
+        <!-- Order Summary with 15% IVA (4 Cols) -->
         <div class="lg:col-span-4 bg-white border border-brand-border rounded-2xl p-6 shadow-sm sticky top-28">
           <h2 class="text-lg font-black text-brand-charcoal tracking-tight">Resumen del Pedido</h2>
           
@@ -646,8 +594,8 @@
             </div>
 
             <div class="flex justify-between text-brand-muted">
-              <span>IVA Estimado (12%):</span>
-              <span id="summary-tax" class="font-bold text-brand-charcoal">$2,358.60</span>
+              <span>IVA (15%):</span>
+              <span id="summary-tax" class="font-bold text-brand-charcoal">$2,944.50</span>
             </div>
 
             <div class="flex justify-between text-emerald-700 text-xs font-semibold">
@@ -657,19 +605,18 @@
 
             <div class="border-t border-brand-border pt-3 flex justify-between items-baseline">
               <span class="text-base font-extrabold text-brand-charcoal">Total a Pagar:</span>
-              <span id="summary-total" class="text-2xl font-black text-brand-charcoal">$22,013.60 USD</span>
+              <span id="summary-total" class="text-2xl font-black text-brand-charcoal">$22,599.50 USD</span>
             </div>
           </div>
 
-          <button 
-            type="button" 
-            onclick="app.navigateTo('view-checkout')" 
-            class="w-full mt-6 py-3.5 bg-brand-red hover:bg-brand-darkred text-white text-sm font-extrabold rounded-xl transition shadow flex items-center justify-center gap-2"
+          <a 
+            href="#checkout" 
+            class="w-full mt-6 py-3.5 bg-brand-red hover:bg-brand-darkred text-white text-sm font-extrabold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
             aria-label="Proceder al checkout con los artículos seleccionados"
           >
             <span>Proceder al Checkout</span>
             <i data-lucide="arrow-right" class="w-4 h-4"></i>
-          </button>
+          </a>
 
           <p class="text-[11px] text-brand-muted text-center mt-3 flex items-center justify-center gap-1">
             <i data-lucide="lock" class="w-3 h-3"></i>
@@ -681,7 +628,7 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 04: CHECKOUT BIFURCADO -->
+    <!-- VIEW 04: CHECKOUT COMERCIAL (#checkout) -->
     <!-- ===================================================================== -->
     <section id="view-checkout" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
@@ -702,15 +649,15 @@
             <h2 class="text-base font-black text-brand-charcoal">Usuario Frecuente</h2>
             <span class="text-[10px] font-bold text-brand-red bg-red-50 border border-red-200 px-2 py-0.5 rounded">Opción A</span>
           </div>
-          <p class="text-xs text-brand-muted mt-2">Inicia sesión para autocompletar tus direcciones guardadas y puntos.</p>
+          <p class="text-xs text-brand-muted mt-2">Inicia sesión para autocompletar tus direcciones guardadas.</p>
 
-          <form onsubmit="event.preventDefault(); app.handleQuickLogin();" class="mt-4 space-y-3.5">
+          <form onsubmit="event.preventDefault(); app.handleLogin(document.getElementById('login-email-checkout').value, document.getElementById('login-pass-checkout').value);" class="mt-4 space-y-3.5">
             <div>
               <label for="login-email-checkout" class="block text-xs font-bold text-brand-charcoal mb-1">Correo Electrónico:</label>
               <input 
                 type="email" 
                 id="login-email-checkout" 
-                value="patrick.mora@puce.edu.ec" 
+                placeholder="tu.correo@ejemplo.com" 
                 class="w-full px-3 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white"
                 required
               />
@@ -721,24 +668,24 @@
               <input 
                 type="password" 
                 id="login-pass-checkout" 
-                value="secret1234" 
+                placeholder="••••••••" 
                 class="w-full px-3 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white"
                 required
               />
             </div>
 
-            <button type="submit" class="w-full py-2.5 bg-brand-charcoal hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition">
+            <button type="submit" class="w-full py-2.5 bg-brand-charcoal hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition touch-target">
               Iniciar Sesión y Aplicar
             </button>
           </form>
         </div>
 
-        <!-- Col B: Compra Rápida como Invitado (8 Cols) -->
+        <!-- Col B: Compra Rápida o Finalización (8 Cols) -->
         <div class="lg:col-span-8 bg-white border border-brand-border rounded-2xl p-6 shadow-sm space-y-6">
           <div class="flex items-center justify-between pb-3 border-b border-brand-border">
             <div>
-              <h2 class="text-lg font-black text-brand-charcoal">Compra Rápida como Invitado</h2>
-              <p class="text-xs text-brand-muted mt-0.5">Completa tu orden sin crear una cuenta obligatoria</p>
+              <h2 class="text-lg font-black text-brand-charcoal">Datos de Facturación y Entrega</h2>
+              <p class="text-xs text-brand-muted mt-0.5">Ingresa tus datos para generar tu orden certificada</p>
             </div>
             <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">Opción B</span>
           </div>
@@ -749,22 +696,22 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label for="guest-name" class="block text-xs font-bold text-brand-charcoal mb-1">Nombre Completo: *</label>
-                <input type="text" id="guest-name" value="Patrick Mora" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white" required />
+                <input type="text" id="guest-name" placeholder="Ej. Carlos Mendoza" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white" required />
               </div>
 
               <div>
                 <label for="guest-id" class="block text-xs font-bold text-brand-charcoal mb-1">Cédula o RUC: *</label>
-                <input type="text" id="guest-id" value="1724589201" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white" required />
+                <input type="text" id="guest-id" placeholder="Ej. 1723456789" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white" required />
               </div>
 
               <div>
                 <label for="guest-email" class="block text-xs font-bold text-brand-charcoal mb-1">Correo Electrónico (para tracking): *</label>
-                <input type="email" id="guest-email" value="patrick.mora@puce.edu.ec" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white focus-ring-demo" required />
+                <input type="email" id="guest-email" placeholder="carlos@correo.com" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white focus-ring-accessible" required />
               </div>
 
               <div>
                 <label for="guest-phone" class="block text-xs font-bold text-brand-charcoal mb-1">Teléfono Celular: *</label>
-                <input type="tel" id="guest-phone" value="+593 99 876 5432" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white" required />
+                <input type="tel" id="guest-phone" placeholder="+593 99 123 4567" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white" required />
               </div>
             </div>
           </fieldset>
@@ -786,29 +733,59 @@
                 <input type="radio" name="delivery-method" value="pickup" onchange="app.handleDeliveryChange('pickup')" class="mt-1 text-brand-red focus:ring-brand-red" />
                 <div>
                   <div class="text-sm font-bold text-brand-charcoal">Retiro en Local Físico (Gratis)</div>
-                  <p class="text-xs text-brand-muted mt-0.5">Sucursal Central PUCE Quito (Listo en 2 horas).</p>
+                  <p class="text-xs text-brand-muted mt-0.5">Sucursal Central (Listo en 2 horas).</p>
                 </div>
               </label>
 
             </div>
           </fieldset>
 
-          <!-- Step 3: Método de Pago Condicional -->
+          <!-- Step 3: Método de Pago Condicional con Inputs Comerciales -->
           <fieldset class="space-y-3">
             <legend class="text-sm font-extrabold text-brand-charcoal">3. Método de Pago (Adaptativo según entrega)</legend>
             
-            <div class="space-y-2.5">
-              <!-- Opción 1: Tarjeta -->
-              <label class="payment-option p-3.5 rounded-xl border border-brand-charcoal bg-slate-50 flex items-center justify-between cursor-pointer">
-                <div class="flex items-center gap-3">
-                  <input type="radio" name="payment-method" value="card" checked class="text-brand-red focus:ring-brand-red" />
+            <div class="space-y-3">
+              <!-- Opción 1: Tarjeta con campos de entrada -->
+              <div class="payment-option p-4 rounded-xl border border-brand-charcoal bg-slate-50 space-y-3">
+                <label class="flex items-center justify-between cursor-pointer">
+                  <div class="flex items-center gap-3">
+                    <input type="radio" name="payment-method" value="card" checked class="text-brand-red focus:ring-brand-red" />
+                    <div>
+                      <span class="text-sm font-bold text-brand-charcoal">Tarjeta de Crédito / Débito</span>
+                      <span class="text-xs text-brand-muted block">Visa, Mastercard, Diners Club</span>
+                    </div>
+                  </div>
+                  <i data-lucide="credit-card" class="w-5 h-5 text-brand-muted"></i>
+                </label>
+
+                <!-- Inputs de Tarjeta -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200">
+                  <div class="sm:col-span-3">
+                    <label for="card-number" class="block text-xs font-bold text-slate-700 mb-1">Número de Tarjeta:</label>
+                    <input 
+                      type="text" 
+                      id="card-number" 
+                      placeholder="•••• •••• •••• 4129" 
+                      class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none"
+                    />
+                    <span class="text-[10px] text-slate-400 mt-0.5 block">Para probar fallo de banco ingresa una tarjeta terminada en 0000</span>
+                  </div>
                   <div>
-                    <span class="text-sm font-bold text-brand-charcoal">Tarjeta de Crédito / Débito</span>
-                    <span class="text-xs text-brand-muted block">Visa, Mastercard, Diners Club</span>
+                    <label for="card-exp" class="block text-xs font-bold text-slate-700 mb-1">Expiración:</label>
+                    <input type="text" id="card-exp" placeholder="MM/AA" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
+                  </div>
+                  <div>
+                    <label for="card-cvv" class="block text-xs font-bold text-slate-700 mb-1">CVV/CVC:</label>
+                    <input type="password" id="card-cvv" placeholder="•••" maxlength="4" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
+                  </div>
+                  <div class="flex items-center pt-5">
+                    <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                      <input type="checkbox" id="test-simulate-failure" class="rounded text-brand-red focus:ring-brand-red" />
+                      <span>Simular fallo bancario</span>
+                    </label>
                   </div>
                 </div>
-                <i data-lucide="credit-card" class="w-5 h-5 text-brand-muted"></i>
-              </label>
+              </div>
 
               <!-- Opción 2: Transferencia -->
               <label class="payment-option p-3.5 rounded-xl border border-slate-300 bg-white flex items-center justify-between cursor-pointer hover:bg-slate-50">
@@ -836,32 +813,20 @@
             </div>
           </fieldset>
 
-          <!-- Simulation Bar for Prototypes (Success vs Bank Error) -->
-          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="text-xs text-amber-900">
-              <span class="font-extrabold block">Evaluación de Prototipo IHC &amp; Heurísticas:</span>
-              <span>Prueba la respuesta exitosa o simula un fallo bancario (Nielsen #9).</span>
-            </div>
-            
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-              <!-- Simulate Success -->
-              <button 
-                type="button" 
-                onclick="app.submitCheckout(true)" 
-                class="flex-1 sm:flex-initial px-5 py-2.5 bg-brand-red hover:bg-brand-darkred text-white text-xs font-black rounded-lg transition shadow"
-              >
-                Simular Pago Exitoso
-              </button>
-
-              <!-- Simulate Error -->
-              <button 
-                type="button" 
-                onclick="app.submitCheckout(false)" 
-                class="flex-1 sm:flex-initial px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-slate-100 text-xs font-bold rounded-lg transition"
-              >
-                Simular Error Bancario
-              </button>
-            </div>
+          <!-- Primary Commercial Checkout CTA -->
+          <div class="pt-4 border-t border-brand-border">
+            <button 
+              type="button" 
+              id="checkout-pay-button"
+              onclick="app.startPaymentProcessing()" 
+              class="w-full py-4 bg-brand-red hover:bg-brand-darkred text-white text-base font-extrabold rounded-xl transition shadow-lg flex items-center justify-center gap-2 touch-target"
+            >
+              <i data-lucide="lock" class="w-5 h-5"></i>
+              <span>Finalizar Compra y Pagar ($22,599.50 USD)</span>
+            </button>
+            <p class="text-[11px] text-brand-muted text-center mt-2.5">
+              Al hacer clic autorizas el débito bajo los términos de venta protegida y custodia de Graded &amp; Sealed TCG.
+            </p>
           </div>
 
         </div>
@@ -870,49 +835,29 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 05: CONFIRMACIÓN DE ORDEN -->
+    <!-- VIEW 05: CONFIRMACIÓN DE ORDEN (#confirmation) -->
     <!-- ===================================================================== -->
     <section id="view-confirmation" class="view-section max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
-      <div class="bg-white border border-brand-border rounded-2xl p-8 shadow-sm text-center">
+      <div class="bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-sm text-center">
         
         <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
           <i data-lucide="check-circle-2" class="w-10 h-10"></i>
         </div>
 
         <h1 class="text-2xl sm:text-3xl font-black text-brand-charcoal tracking-tight">¡Compra confirmada con éxito!</h1>
-        <div class="inline-block px-3 py-1 bg-brand-lightgold text-brand-darkgold font-mono font-bold text-sm rounded-md mt-2">
+        <div id="confirm-order-id" class="inline-block px-3 py-1 bg-brand-lightgold text-brand-darkgold font-mono font-bold text-sm rounded-md mt-2">
           Número de Orden: #PKM-2026-88941
         </div>
         
         <p class="text-sm text-brand-muted mt-3 max-w-lg mx-auto">
           Hemos enviado el comprobante oficial y el código de seguimiento de custodia a tu correo: 
-          <span class="font-bold text-brand-charcoal">patrick.mora@puce.edu.ec</span>
+          <span id="confirm-email-recipient" class="font-bold text-brand-charcoal">usuario@ejemplo.com</span>
         </p>
 
-        <!-- Brief Breakdown -->
-        <div class="mt-6 text-left bg-brand-surface border border-brand-border rounded-xl p-5 max-w-2xl mx-auto space-y-2.5 text-xs sm:text-sm">
-          <h2 class="font-black text-brand-charcoal text-sm uppercase tracking-wider mb-2">Desglose de la Transacción</h2>
-          <div class="flex justify-between text-brand-muted">
-            <span>1x Charizard Base Set 1st Ed. PSA 10 GEM MT</span>
-            <span class="font-bold text-brand-charcoal">$18,500.00</span>
-          </div>
-          <div class="flex justify-between text-brand-muted">
-            <span>1x Umbreon VMAX Moonbreon Alt Art (Raw NM)</span>
-            <span class="font-bold text-brand-charcoal">$780.00</span>
-          </div>
-          <div class="flex justify-between text-brand-muted">
-            <span>1x Booster Pack Team Rocket 1999 Sellado</span>
-            <span class="font-bold text-brand-charcoal">$350.00</span>
-          </div>
-          <div class="flex justify-between text-brand-muted border-t border-slate-200 pt-2">
-            <span>Envío Courier Blindado + Impuestos (IVA 12%):</span>
-            <span class="font-bold text-brand-charcoal">$2,383.60</span>
-          </div>
-          <div class="flex justify-between font-black text-base text-brand-charcoal border-t border-slate-300 pt-2">
-            <span>Total Pagado con Tarjeta (•••• 4129):</span>
-            <span class="text-brand-red">$22,013.60 USD</span>
-          </div>
+        <!-- Brief Breakdown with 15% Tax -->
+        <div id="confirm-breakdown-container" class="mt-6 text-left bg-brand-surface border border-brand-border rounded-xl p-5 max-w-2xl mx-auto space-y-2.5 text-xs sm:text-sm">
+          <!-- Populated dynamically via app.buildConfirmationView() -->
         </div>
 
         <!-- Módulo de Registro Progresivo Opcional -->
@@ -925,7 +870,7 @@
           </div>
           <p class="text-xs text-brand-muted mt-1">¿Deseas guardar tus datos y dirección para futuras compras en un solo clic?</p>
           
-          <form onsubmit="event.preventDefault(); app.handleProgressiveRegister();" class="mt-3 flex flex-col sm:flex-row gap-2">
+          <form onsubmit="event.preventDefault(); app.showToast('Cuenta guardada en 1 solo clic.', 'success');" class="mt-3 flex flex-col sm:flex-row gap-2">
             <label for="progressive-password" class="sr-only">Define tu contraseña</label>
             <input 
               type="password" 
@@ -936,7 +881,7 @@
             />
             <button 
               type="submit" 
-              class="px-5 py-2 bg-brand-red hover:bg-brand-darkred text-white text-xs font-bold rounded-lg transition whitespace-nowrap"
+              class="px-5 py-2 bg-brand-red hover:bg-brand-darkred text-white text-xs font-bold rounded-lg transition whitespace-nowrap touch-target"
             >
               Guardar Cuenta
             </button>
@@ -946,28 +891,26 @@
 
         <!-- Navigation Buttons -->
         <div class="mt-8 flex flex-wrap justify-center gap-3">
-          <button 
-            type="button" 
-            onclick="app.navigateTo('view-tracking')" 
-            class="px-6 py-3 bg-brand-charcoal hover:bg-slate-800 text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center gap-2"
+          <a 
+            href="#tracking" 
+            class="px-6 py-3 bg-brand-charcoal hover:bg-slate-800 text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center gap-2 touch-target"
           >
             <i data-lucide="truck" class="w-4 h-4"></i>
             <span>Ver Seguimiento del Pedido</span>
-          </button>
-          <button 
-            type="button" 
-            onclick="app.navigateTo('view-home')" 
-            class="px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-brand-charcoal text-xs sm:text-sm font-bold rounded-xl transition"
+          </a>
+          <a 
+            href="#home" 
+            class="px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-brand-charcoal text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center touch-target"
           >
             Volver a la tienda
-          </button>
+          </a>
         </div>
 
       </div>
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 06: PORTAL DE AUTENTICACIÓN (LOGIN / REGISTRO) -->
+    <!-- VIEW 06: PORTAL DE AUTENTICACIÓN (#auth) -->
     <!-- ===================================================================== -->
     <section id="view-login" class="view-section max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
@@ -984,15 +927,15 @@
           <h2 class="text-xl font-black text-brand-charcoal">Iniciar Sesión</h2>
           <p class="text-xs text-brand-muted mt-0.5">Accede a tus pedidos y bóveda guardada</p>
 
-          <form onsubmit="event.preventDefault(); app.handleFullLogin();" class="mt-5 space-y-4">
+          <form onsubmit="event.preventDefault(); app.handleLogin(document.getElementById('auth-email').value, document.getElementById('auth-password').value);" class="mt-5 space-y-4">
             <div>
               <label for="auth-email" class="block text-xs font-bold text-brand-charcoal mb-1">Correo Electrónico: *</label>
-              <input type="email" id="auth-email" value="patrick.mora@puce.edu.ec" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-lg" required />
+              <input type="email" id="auth-email" placeholder="tu.correo@ejemplo.com" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-lg" required />
             </div>
 
             <div>
               <label for="auth-password" class="block text-xs font-bold text-brand-charcoal mb-1">Contraseña: *</label>
-              <input type="password" id="auth-password" value="secret1234" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-lg focus-ring-demo" required />
+              <input type="password" id="auth-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-lg focus-ring-accessible" required />
             </div>
 
             <div class="flex items-center justify-between text-xs">
@@ -1003,7 +946,7 @@
               <a href="javascript:void(0)" onclick="app.showToast('Enlace de recuperación enviado al correo.', 'info')" class="font-bold text-brand-red hover:underline">¿Olvidaste tu contraseña?</a>
             </div>
 
-            <button type="submit" class="w-full py-3 bg-brand-red hover:bg-brand-darkred text-white text-sm font-bold rounded-xl transition shadow">
+            <button type="submit" class="w-full py-3 bg-brand-red hover:bg-brand-darkred text-white text-sm font-bold rounded-xl transition shadow touch-target">
               Acceder a mi Cuenta
             </button>
           </form>
@@ -1015,15 +958,15 @@
           <h2 class="text-xl font-black text-brand-charcoal">Crear Cuenta</h2>
           <p class="text-xs text-brand-muted mt-0.5">Regístrate para comprar en 1 clic y recibir alertas</p>
 
-          <form onsubmit="event.preventDefault(); app.handleRegister();" class="mt-5 space-y-3.5">
+          <form onsubmit="event.preventDefault(); app.handleRegister(document.getElementById('reg-name').value, document.getElementById('reg-id').value, document.getElementById('reg-email').value, document.getElementById('reg-pass').value);" class="mt-5 space-y-3.5">
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label for="reg-name" class="block text-xs font-bold text-brand-charcoal mb-1">Nombre: *</label>
-                <input type="text" id="reg-name" placeholder="Patrick Mora" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg" required />
+                <input type="text" id="reg-name" placeholder="Ej. Ana Lucía" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg" required />
               </div>
               <div>
                 <label for="reg-id" class="block text-xs font-bold text-brand-charcoal mb-1">Cédula/RUC: *</label>
-                <input type="text" id="reg-id" placeholder="1724589201" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg" required />
+                <input type="text" id="reg-id" placeholder="1720000000" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg" required />
               </div>
             </div>
 
@@ -1048,7 +991,7 @@
               <span>Acepto los Términos de Servicio y la Política de Privacidad de Graded &amp; Sealed TCG</span>
             </label>
 
-            <button type="submit" class="w-full py-3 bg-brand-charcoal hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition shadow">
+            <button type="submit" class="w-full py-3 bg-brand-charcoal hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition shadow touch-target">
               Registrar mi Cuenta
             </button>
           </form>
@@ -1058,7 +1001,7 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 07: SEGUIMIENTO Y TRACKING (STEPPER ACCESIBLE) -->
+    <!-- VIEW 07: SEGUIMIENTO Y TRACKING (#tracking) -->
     <!-- ===================================================================== -->
     <section id="view-tracking" class="view-section max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
@@ -1069,14 +1012,14 @@
           <div>
             <span class="text-xs font-mono font-bold text-brand-muted">ORDEN #PKM-2026-88941</span>
             <h1 class="text-2xl font-black text-brand-charcoal tracking-tight mt-0.5">Seguimiento y Estado de Custodia</h1>
-            <p class="text-xs text-brand-muted">Fecha de compra: 03 Octubre 2026 • Titular: Patrick Mora</p>
+            <p class="text-xs text-brand-muted">Fecha de compra: 03 Octubre 2026 • Envío Blindado Asegurado</p>
           </div>
 
           <div class="flex items-center gap-2">
             <button 
               type="button" 
-              onclick="app.showToast('Descargando factura electrónica (PDF)...', 'success')" 
-              class="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-brand-charcoal rounded-lg transition flex items-center gap-1.5"
+              onclick="app.showToast('Descargando factura electrónica autorizada...', 'success')" 
+              class="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-brand-charcoal rounded-lg transition flex items-center gap-1.5 touch-target"
             >
               <i data-lucide="file-text" class="w-4 h-4"></i>
               <span>Descargar Factura</span>
@@ -1084,11 +1027,11 @@
 
             <button 
               type="button" 
-              onclick="app.showToast('Solicitud de soporte abierta (#TICK-8841).', 'info')" 
-              class="px-3.5 py-2 text-xs font-bold border border-red-300 text-brand-red hover:bg-red-50 rounded-lg transition flex items-center gap-1.5"
+              onclick="app.showToast('Ticket de soporte abierto (#TICK-8841).', 'info')" 
+              class="px-3.5 py-2 text-xs font-bold border border-red-300 text-brand-red hover:bg-red-50 rounded-lg transition flex items-center gap-1.5 touch-target"
             >
               <i data-lucide="life-buoy" class="w-4 h-4"></i>
-              <span>Soporte / Devolución</span>
+              <span>Soporte</span>
             </button>
           </div>
         </div>
@@ -1180,11 +1123,11 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 09: PANTALLA DE ERROR DE PAGO (HEURÍSTICA NIELSEN #9) -->
+    <!-- VIEW 09: PANTALLA DE ERROR DE PAGO (#error) -->
     <!-- ===================================================================== -->
     <section id="view-payment-error" class="view-section max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       
-      <div class="bg-white border border-brand-border rounded-2xl p-8 shadow-sm text-center">
+      <div class="bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-sm text-center">
         
         <!-- Error Warning Badge -->
         <div class="w-16 h-16 rounded-full bg-red-100 text-brand-red flex items-center justify-center mx-auto mb-4">
@@ -1200,7 +1143,7 @@
         <div class="mt-6 text-left bg-red-50/70 border border-red-200 rounded-xl p-5 space-y-2">
           <h2 class="text-xs font-black text-red-900 uppercase tracking-wider">Diagnóstico de la Operación</h2>
           <p class="text-xs sm:text-sm text-red-800 leading-relaxed">
-            La transacción fue rechazada por la entidad emisora de tu tarjeta terminada en <span class="font-bold">4129</span>. Esto suele ocurrir por límites diarios de compra en línea o requerimiento de validación telefónica por alta cuantía.
+            La transacción fue rechazada por la entidad emisora de tu tarjeta. Esto suele ocurrir por límites diarios de compra en línea o requerimiento de validación telefónica por alta cuantía.
           </p>
           <div class="flex items-center gap-1.5 text-emerald-800 text-xs font-bold pt-1">
             <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
@@ -1211,36 +1154,33 @@
         <!-- Preserved State Reassurance -->
         <div class="mt-4 text-left bg-brand-surface border border-brand-border rounded-xl p-4 text-xs text-brand-muted">
           <span class="font-bold text-brand-charcoal block mb-1">Tus Datos y Carrito Permanecen Guardados:</span>
-          <span>Hemos preservado tus artículos seleccionados y tu dirección de envío en Quito para que no tengas que ingresar tus datos de nuevo.</span>
+          <span>Hemos preservado tus artículos seleccionados y tus datos de entrega para que no tengas que ingresar todo nuevamente.</span>
         </div>
 
         <!-- Recovery Action Buttons -->
         <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-          <!-- Primary Recovery: Return to Checkout -->
-          <button 
-            type="button" 
-            onclick="app.navigateTo('view-checkout')" 
-            class="px-6 py-3.5 bg-brand-red hover:bg-brand-darkred text-white text-xs sm:text-sm font-bold rounded-xl transition shadow flex items-center justify-center gap-2"
+          <a 
+            href="#checkout" 
+            class="px-6 py-3.5 bg-brand-red hover:bg-brand-darkred text-white text-xs sm:text-sm font-bold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
           >
             <i data-lucide="credit-card" class="w-4 h-4"></i>
             <span>Reintentar con otro método de pago</span>
-          </button>
+          </a>
 
-          <!-- Secondary Recovery: Change to Cash on Pickup -->
           <button 
             type="button" 
             onclick="app.switchToCashPickup()" 
-            class="px-6 py-3.5 bg-white border border-slate-300 hover:bg-slate-50 text-brand-charcoal text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-2"
+            class="px-6 py-3.5 bg-white border border-slate-300 hover:bg-slate-50 text-brand-charcoal text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 touch-target"
           >
             <i data-lucide="store" class="w-4 h-4"></i>
-            <span>Cambiar a Retiro en Tienda y Pagar en Efectivo</span>
+            <span>Cambiar a Retiro en Tienda y Efectivo</span>
           </button>
         </div>
 
         <!-- Direct Support Link -->
         <p class="text-xs text-brand-muted mt-6">
           ¿El problema persiste? Comunícate con nuestra central: 
-          <a href="tel:+593998765432" class="font-bold text-brand-charcoal underline">+593 99 876 5432</a> o escríbenos por WhatsApp.
+          <a href="tel:+593998765432" class="font-bold text-brand-charcoal underline">+593 99 876 5432</a>
         </p>
 
       </div>
@@ -1249,616 +1189,193 @@
   </main>
 
   <!-- ========================================================================= -->
-  <!-- FOOTER -->
+  <!-- MODAL INTERACTIVO DE PROCESAMIENTO DE PAGO CON SPINNER -->
   <!-- ========================================================================= -->
-  <footer class="bg-white border-t border-brand-border mt-auto py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-brand-muted">
-      <div class="flex items-center gap-3">
-        <img src="Logo del e-commerce 1.png" alt="Graded and Sealed TCG" class="h-8 w-auto object-contain" />
-        <span>© 2026 Graded &amp; Sealed TCG. Todos los derechos reservados.</span>
+  <div id="payment-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modal-payment-title">
+    <div class="modal-content bg-white border border-slate-200 rounded-2xl max-w-md w-full p-8 text-center shadow-2xl">
+      
+      <!-- Security Badge -->
+      <div class="w-16 h-16 rounded-full bg-red-50 text-brand-red border border-red-100 flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="shield-check" class="w-8 h-8 text-brand-red"></i>
       </div>
-      <div class="flex items-center gap-4 font-semibold text-brand-charcoal">
-        <span>Cumplimiento WCAG 2.2 AAA</span>
-        <span>Heurísticas de Nielsen Evaluadas</span>
-        <span>Pontificia Universidad Católica del Ecuador</span>
+
+      <h2 id="modal-payment-title" class="text-xl font-black text-brand-charcoal tracking-tight">Procesando Transacción Segura</h2>
+      
+      <!-- Dynamic Sequential Message -->
+      <p id="payment-modal-text" class="text-sm font-semibold text-slate-600 mt-2 min-h-[40px] flex items-center justify-center" aria-live="polite">
+        Conectando con la pasarela bancaria segura...
+      </p>
+
+      <!-- Smooth Animated Spinner & Progress -->
+      <div class="mt-6 flex flex-col items-center gap-4">
+        <div class="w-10 h-10 border-4 border-slate-200 border-t-brand-red rounded-full animate-spin-smooth"></div>
+        
+        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
+          <div id="payment-progress-bar" class="bg-brand-red h-full rounded-full transition-all duration-700 ease-out" style="width: 20%;"></div>
+        </div>
       </div>
+
+      <p class="text-[11px] text-slate-400 mt-5 flex items-center justify-center gap-1">
+        <i data-lucide="lock" class="w-3 h-3"></i>
+        <span>Encriptación TLS de 256 bits • No cierres esta ventana</span>
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- DRAWER DESLIZABLE DE FILTROS AVANZADOS -->
+  <!-- ========================================================================= -->
+  <div id="advanced-filters-drawer" class="drawer-backdrop fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex justify-end" role="dialog" aria-modal="true" aria-labelledby="drawer-filters-title">
+    <div class="drawer-panel bg-white w-full max-w-sm h-full flex flex-col justify-between p-6 shadow-2xl overflow-y-auto">
+      
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-brand-border">
+          <div class="flex items-center gap-2">
+            <i data-lucide="sliders-horizontal" class="w-5 h-5 text-brand-red"></i>
+            <h2 id="drawer-filters-title" class="text-lg font-black text-brand-charcoal">Filtros Avanzados</h2>
+          </div>
+          <button type="button" onclick="app.closeAdvancedFilters()" class="p-1.5 text-slate-400 hover:text-brand-charcoal rounded-lg hover:bg-slate-100 transition" aria-label="Cerrar filtros">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="mt-6 space-y-5">
+          <!-- Filter: Type -->
+          <div>
+            <label for="filter-type" class="block text-xs font-extrabold text-brand-charcoal uppercase tracking-wider mb-1.5">
+              Tipo Elemental:
+            </label>
+            <select id="filter-type" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-charcoal">
+              <option value="all">Todos los Tipos</option>
+              <option value="Fuego">Fuego</option>
+              <option value="Psíquico">Psíquico</option>
+              <option value="Oscuridad">Oscuridad</option>
+              <option value="Eléctrico">Eléctrico</option>
+              <option value="Agua">Agua</option>
+            </select>
+          </div>
+
+          <!-- Filter: Rarity -->
+          <div>
+            <label for="filter-rarity" class="block text-xs font-extrabold text-brand-charcoal uppercase tracking-wider mb-1.5">
+              Rareza / Categoría:
+            </label>
+            <select id="filter-rarity" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-charcoal">
+              <option value="all">Todas las Rarezas</option>
+              <option value="Holo Rare">Holo Rare</option>
+              <option value="Secret Rare">Secret Rare</option>
+              <option value="Gold Star">Gold Star</option>
+              <option value="Promo">Promo</option>
+            </select>
+          </div>
+
+          <!-- Filter: Price Range -->
+          <div>
+            <label class="block text-xs font-extrabold text-brand-charcoal uppercase tracking-wider mb-1.5">
+              Rango de Precio (USD):
+            </label>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <span class="text-[10px] text-brand-muted block mb-0.5">Mínimo:</span>
+                <input type="number" id="filter-min-price" placeholder="0" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg focus:outline-none" />
+              </div>
+              <div>
+                <span class="text-[10px] text-brand-muted block mb-0.5">Máximo:</span>
+                <input type="number" id="filter-max-price" placeholder="100000" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg focus:outline-none" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="pt-6 border-t border-brand-border flex items-center gap-3">
+        <button 
+          type="button" 
+          onclick="app.resetAdvancedFilters()" 
+          class="flex-1 py-3 border border-slate-300 text-brand-charcoal hover:bg-slate-100 text-xs font-bold rounded-xl transition"
+        >
+          Limpiar
+        </button>
+        <button 
+          type="button" 
+          onclick="app.applyAdvancedFilters()" 
+          class="flex-1 py-3 bg-brand-red hover:bg-brand-darkred text-white text-xs font-extrabold rounded-xl transition shadow"
+        >
+          Aplicar Filtros
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- FOOTER COMERCIAL LIMPIO -->
+  <!-- ========================================================================= -->
+  <footer class="bg-white border-t border-brand-border mt-auto py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-brand-border">
+        
+        <div class="md:col-span-1 flex flex-col gap-3">
+          <div class="flex items-center gap-2">
+            <img src="Logo del e-commerce 1.png" alt="Graded and Sealed TCG" class="h-9 w-auto object-contain" onerror="this.src='https://placehold.co/100x40/DC2626/FFFFFF?text=G%26S'" />
+            <span class="font-black text-base text-brand-charcoal">GRADED &amp; SEALED</span>
+          </div>
+          <p class="text-xs text-brand-muted leading-relaxed">
+            Plataforma especializada en compra, venta y custodia de cartas coleccionables de grado inversión y sellados de fábrica.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-black text-brand-charcoal uppercase tracking-wider mb-3">Garantía y Bóveda</h4>
+          <ul class="text-xs text-brand-muted space-y-2">
+            <li><a href="#pdp" class="hover:text-brand-charcoal transition">Autenticidad PSA Certificada</a></li>
+            <li><a href="#pdp" class="hover:text-brand-charcoal transition">Custodia en Bóveda Blindada</a></li>
+            <li><a href="#tracking" class="hover:text-brand-charcoal transition">Envíos Asegurados a Valor Real</a></li>
+            <li><a href="#home" class="hover:text-brand-charcoal transition">Inspección Holográfica</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-black text-brand-charcoal uppercase tracking-wider mb-3">Atención al Cliente</h4>
+          <ul class="text-xs text-brand-muted space-y-2">
+            <li><a href="#tracking" class="hover:text-brand-charcoal transition">Rastreo de Pedidos</a></li>
+            <li><a href="#cart" class="hover:text-brand-charcoal transition">Políticas de Devolución</a></li>
+            <li><a href="#checkout" class="hover:text-brand-charcoal transition">Métodos de Pago y Facturación</a></li>
+            <li><a href="#auth" class="hover:text-brand-charcoal transition">Portal de Coleccionista</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-black text-brand-charcoal uppercase tracking-wider mb-3">Seguridad y Legal</h4>
+          <ul class="text-xs text-brand-muted space-y-2">
+            <li><span class="text-emerald-700 font-semibold flex items-center gap-1"><i data-lucide="shield" class="w-3.5 h-3.5"></i> Transacciones TLS 256-Bit</span></li>
+            <li><span class="text-slate-500">Cumplimiento con Estándares PCI-DSS</span></li>
+            <li><a href="#home" class="hover:text-brand-charcoal transition">Términos del Servicio</a></li>
+            <li><a href="#home" class="hover:text-brand-charcoal transition">Política de Privacidad</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-brand-muted">
+        <div>
+          <span>© 2026 Graded &amp; Sealed TCG. Todos los derechos reservados.</span>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-medium">
+          <span>Quito, Ecuador</span>
+          <span>•</span>
+          <span>Soporte: info@gradedandsealed.com</span>
+        </div>
+      </div>
+
     </div>
   </footer>
 
-  <!-- ========================================================================= -->
-  <!-- MODULAR VANILLA JAVASCRIPT APPLICATION CORE -->
-  <!-- ========================================================================= -->
-  <script>
-    /**
-     * Graded & Sealed TCG - Modular SPA Application State & Router
-     */
-    const app = {
-      // Current application state
-      state: {
-        currentView: 'view-home',
-        activeFilter: 'Todas',
-        cart: [
-          {
-            id: 'charizard-psa10',
-            name: 'Charizard Base Set 1999 #4/102',
-            condition: 'PSA 10 GEM MT • Cert #48291034',
-            price: 18500.00,
-            quantity: 1,
-            image: 'https://images.pokemontcg.io/base1/4_hires.png'
-          },
-          {
-            id: 'umbreon-raw',
-            name: 'Umbreon VMAX Moonbreon Alt Art',
-            condition: 'Sin Gradear / Raw (Near Mint)',
-            price: 780.00,
-            quantity: 1,
-            image: 'https://images.pokemontcg.io/swsh7/215_hires.png'
-          },
-          {
-            id: 'booster-rocket',
-            name: 'Booster Pack Team Rocket 1999',
-            condition: 'Sellado de Fábrica (21.2g Heavy Pack)',
-            price: 350.00,
-            quantity: 1,
-            image: 'https://images.pokemontcg.io/base1/logo.png'
-          }
-        ],
-        lastDeletedItem: null,
-        deliveryMethod: 'courier', // 'courier' or 'pickup'
-        shippingFee: 25.00,
-        userAuthenticated: false,
-        userName: 'Patrick Mora',
-        // PDP dynamic condition state
-        pdpCondition: {
-          id: 'psa10',
-          price: 18500.00,
-          label: 'PSA 10 GEM MT',
-          trend: '+21.7%'
-        }
-      },
+  <!-- Modular Application Engine -->
+  <script src="app.js"></script>
 
-      // Catalog database
-      catalog: [
-        {
-          id: 'charizard-1st',
-          name: 'Charizard Base Set 1st Ed.',
-          grade: 'PSA 9 MINT • Holo 1999',
-          category: 'Solo PSA',
-          price: 4850.00,
-          image: 'https://images.pokemontcg.io/base1/4_hires.png',
-          alt: 'Charizard 1st Edition Base Set PSA 9'
-        },
-        {
-          id: 'gengar-vmax',
-          name: 'Gengar VMAX Secret Rare',
-          grade: 'PSA 10 GEM MT • Fusion Strike',
-          category: 'Solo PSA',
-          price: 620.00,
-          image: 'https://images.pokemontcg.io/swsh8/271_hires.png',
-          alt: 'Gengar VMAX Alt Art PSA 10'
-        },
-        {
-          id: 'umbreon-vmax',
-          name: 'Umbreon VMAX Moonbreon',
-          grade: 'Sin Gradear / Raw (Near Mint)',
-          category: 'Cartas Sueltas',
-          price: 780.00,
-          image: 'https://images.pokemontcg.io/swsh7/215_hires.png',
-          alt: 'Umbreon VMAX Evolving Skies Raw'
-        },
-        {
-          id: 'lugia-neo',
-          name: 'Lugia 1st Edition Neo Gen',
-          grade: 'PSA 8 NM-MT • Holo 2000',
-          category: 'Solo PSA',
-          price: 1450.00,
-          image: 'https://images.pokemontcg.io/neo1/9_hires.png',
-          alt: 'Lugia Neo Genesis 1st Edition PSA 8'
-        },
-        {
-          id: 'booster-team-rocket',
-          name: 'Booster Pack Team Rocket 1999',
-          grade: 'Sellado de Fábrica (Heavy 21.2g)',
-          category: 'Booster Packs',
-          price: 350.00,
-          image: 'https://images.pokemontcg.io/base1/logo.png',
-          alt: 'Sobre sellado Team Rocket 1999'
-        },
-        {
-          id: 'pikachu-illustrator',
-          name: 'Pikachu Illustrator CoroCoro',
-          grade: 'PSA 7 NR-MT • Promo Japonesa',
-          category: 'Solo PSA',
-          price: 85000.00,
-          image: 'https://images.pokemontcg.io/base1/4_hires.png',
-          alt: 'Pikachu Illustrator Promo'
-        },
-        {
-          id: 'rayquaza-gold-star',
-          name: 'Rayquaza Gold Star EX',
-          grade: 'Sin Gradear / Lightly Played',
-          category: 'Cartas Sueltas',
-          price: 2100.00,
-          image: 'https://images.pokemontcg.io/swsh7/215_hires.png',
-          alt: 'Rayquaza Gold Star EX Deoxys'
-        },
-        {
-          id: 'blastoise-shadowless',
-          name: 'Blastoise Shadowless Base',
-          grade: 'PSA 8.5 NM-MT+ • 1999',
-          category: 'Solo PSA',
-          price: 950.00,
-          image: 'https://images.pokemontcg.io/base1/4_hires.png',
-          alt: 'Blastoise Shadowless Base Set'
-        }
-      ],
-
-      // Initialize Application
-      init() {
-        this.renderCatalog();
-        this.renderCart();
-        this.updateBadge();
-        lucide.createIcons();
-      },
-
-      // Navigation Router (SPA without page reloads)
-      navigateTo(viewId) {
-        document.querySelectorAll('.view-section').forEach(section => {
-          section.classList.remove('active');
-        });
-
-        const target = document.getElementById(viewId);
-        if (target) {
-          target.classList.add('active');
-          this.state.currentView = viewId;
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          lucide.createIcons();
-        }
-      },
-
-      // Catalog Filtering
-      filterProducts(category) {
-        this.state.activeFilter = category;
-        this.navigateTo('view-home');
-
-        // Update active chip styles
-        document.querySelectorAll('.filter-chip').forEach(btn => {
-          if (btn.innerText.includes(category)) {
-            btn.className = 'filter-chip px-4 py-2 text-xs font-bold rounded-full bg-brand-red text-white transition';
-          } else {
-            btn.className = 'filter-chip px-4 py-2 text-xs font-bold rounded-full border border-slate-300 text-brand-charcoal hover:bg-slate-100 transition';
-          }
-        });
-
-        this.renderCatalog();
-      },
-
-      renderCatalog() {
-        const grid = document.getElementById('products-grid');
-        if (!grid) return;
-
-        const filtered = this.state.activeFilter === 'Todas' 
-          ? this.catalog 
-          : this.catalog.filter(item => item.category === this.state.activeFilter);
-
-        grid.innerHTML = filtered.map(card => `
-          <article class="bg-white border border-brand-border rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between group">
-            <div>
-              <div class="aspect-[3/4] bg-slate-50 rounded-lg border border-slate-200 overflow-hidden flex items-center justify-center p-3 relative">
-                <img 
-                  src="${card.image}" 
-                  alt="${card.alt}" 
-                  class="max-h-full max-w-full object-contain transition-transform group-hover:scale-105" 
-                  onerror="this.src='https://placehold.co/400x550/F1F5F9/64748B?text=Carta+Pokemon'"
-                />
-                <span class="absolute bottom-1.5 left-1.5 bg-brand-charcoal/90 text-white text-[9px] font-mono px-1.5 py-0.5 rounded">
-                  alt: "${card.alt.substring(0, 22)}"
-                </span>
-              </div>
-
-              <h3 class="font-extrabold text-sm sm:text-base text-brand-charcoal mt-3">${card.name}</h3>
-              <p class="text-xs text-brand-muted mt-0.5">${card.grade}</p>
-            </div>
-
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-              <span class="text-base font-black text-brand-charcoal">$${card.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-              <button 
-                type="button" 
-                onclick="app.handleCardClick('${card.id}')"
-                class="px-3.5 py-1.5 text-xs font-extrabold text-brand-red border border-brand-red hover:bg-brand-red hover:text-white rounded-lg transition"
-                aria-label="Ver detalles y opciones de ${card.name}"
-              >
-                Ver detalle
-              </button>
-            </div>
-          </article>
-        `).join('');
-
-        lucide.createIcons();
-      },
-
-      handleCardClick(cardId) {
-        // Navigates directly to PDP for Charizard or adds item
-        if (cardId === 'charizard-1st' || cardId === 'charizard-psa10') {
-          this.navigateTo('view-pdp');
-        } else {
-          const found = this.catalog.find(c => c.id === cardId);
-          if (found) {
-            this.addToCart(found.id, found.name, found.grade, found.price, found.image);
-          }
-        }
-      },
-
-      // PDP Interactive Thumbnail Selection
-      selectThumbnail(imgSrc, label) {
-        const mainImg = document.getElementById('pdp-main-image');
-        if (mainImg) {
-          mainImg.src = imgSrc;
-          this.showToast(`Visualizando vista: ${label}`, 'info');
-        }
-      },
-
-      // PDP Dynamic Condition Selector
-      setCondition(condId, price, label, key) {
-        this.state.pdpCondition = { id: condId, price, label };
-
-        // Update button states
-        document.querySelectorAll('.cond-btn').forEach(btn => {
-          btn.className = 'cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition';
-          const priceDiv = btn.querySelector('.text-sm');
-          if (priceDiv) priceDiv.className = 'text-sm font-black text-brand-muted';
-          const titleDiv = btn.querySelector('.text-xs');
-          if (titleDiv) titleDiv.className = 'text-xs font-bold text-brand-charcoal';
-        });
-
-        const activeBtn = document.getElementById(`cond-${condId}`);
-        if (activeBtn) {
-          activeBtn.className = 'cond-btn p-3 rounded-xl bg-brand-charcoal text-white text-left shadow transition';
-          const priceDiv = activeBtn.querySelector('.text-sm');
-          if (priceDiv) priceDiv.className = 'text-sm font-black text-amber-400';
-          const titleDiv = activeBtn.querySelector('.text-xs');
-          if (titleDiv) titleDiv.className = 'text-xs font-bold text-white';
-        }
-
-        // Update price display
-        const priceEl = document.getElementById('pdp-price');
-        if (priceEl) {
-          priceEl.innerText = `$${price.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD`;
-        }
-
-        // Update cert badge
-        const badgeEl = document.getElementById('pdp-cert-badge');
-        if (badgeEl) {
-          badgeEl.innerText = label;
-        }
-
-        // Update SVG Chart points reactively
-        const poly = document.getElementById('chart-polyline');
-        const dot = document.getElementById('chart-active-dot');
-        if (poly && dot) {
-          if (condId === 'psa10') {
-            poly.setAttribute('points', '30,85 110,75 190,80 270,50 360,25');
-            dot.setAttribute('cy', '25');
-            document.getElementById('market-trend-pill').innerText = '+21.7%';
-          } else if (condId === 'psa9') {
-            poly.setAttribute('points', '30,80 110,75 190,70 270,60 360,45');
-            dot.setAttribute('cy', '45');
-            document.getElementById('market-trend-pill').innerText = '+8.5%';
-          } else if (condId === 'psa8') {
-            poly.setAttribute('points', '30,70 110,65 190,65 270,60 360,60');
-            dot.setAttribute('cy', '60');
-            document.getElementById('market-trend-pill').innerText = '+3.2%';
-          } else {
-            poly.setAttribute('points', '30,60 110,65 190,60 270,70 360,75');
-            dot.setAttribute('cy', '75');
-            document.getElementById('market-trend-pill').innerText = '-1.8%';
-          }
-        }
-
-        this.showToast(`Condición actualizada a: ${label} ($${price.toLocaleString('en-US')})`, 'info');
-      },
-
-      addToCartCurrentPdp() {
-        const item = this.state.pdpCondition;
-        this.addToCart('charizard-pdp', 'Charizard Base Set 1999 #4/102', item.label, item.price, 'https://images.pokemontcg.io/base1/4_hires.png');
-      },
-
-      // Reactive Cart Operations
-      addToCart(id, name, condition, price, image) {
-        const existing = this.state.cart.find(c => c.id === id);
-        if (existing) {
-          existing.quantity += 1;
-        } else {
-          this.state.cart.push({ id, name, condition, price, quantity: 1, image });
-        }
-
-        this.updateBadge();
-        this.renderCart();
-        this.showToast(` "+1 ${name}" añadido a la bolsa`, 'success');
-      },
-
-      updateQuantity(id, delta) {
-        const item = this.state.cart.find(c => c.id === id);
-        if (!item) return;
-
-        item.quantity += delta;
-        if (item.quantity <= 0) {
-          this.removeItem(id);
-          return;
-        }
-
-        this.updateBadge();
-        this.renderCart();
-      },
-
-      removeItem(id) {
-        const itemIndex = this.state.cart.findIndex(c => c.id === id);
-        if (itemIndex === -1) return;
-
-        const removed = this.state.cart[itemIndex];
-        this.state.lastDeletedItem = { item: removed, index: itemIndex };
-        this.state.cart.splice(itemIndex, 1);
-
-        this.updateBadge();
-        this.renderCart();
-
-        // Show Accessible Undo Banner
-        const banner = document.getElementById('undo-banner');
-        const text = document.getElementById('undo-text');
-        if (banner && text) {
-          text.innerText = `Ítem "${removed.name}" eliminado de la bolsa.`;
-          banner.classList.remove('hidden');
-          lucide.createIcons();
-        }
-      },
-
-      undoLastDeletion() {
-        if (!this.state.lastDeletedItem) return;
-        const { item, index } = this.state.lastDeletedItem;
-        this.state.cart.splice(index, 0, item);
-        this.state.lastDeletedItem = null;
-
-        document.getElementById('undo-banner').classList.add('hidden');
-        this.updateBadge();
-        this.renderCart();
-        this.showToast(` Ítem "${item.name}" restaurado exitosamente`, 'success');
-      },
-
-      renderCart() {
-        const container = document.getElementById('cart-items-container');
-        if (!container) return;
-
-        if (this.state.cart.length === 0) {
-          container.innerHTML = `
-            <div class="bg-white border border-brand-border rounded-xl p-8 text-center text-brand-muted">
-              <i data-lucide="shopping-bag" class="w-12 h-12 mx-auto mb-2 text-slate-300"></i>
-              <p class="font-bold text-sm text-brand-charcoal">Tu bolsa de compras está vacía</p>
-              <button onclick="app.navigateTo('view-home')" class="mt-3 px-4 py-2 bg-brand-red text-white text-xs font-bold rounded-lg">
-                Explorar Cartas y Packs
-              </button>
-            </div>
-          `;
-          this.calculateTotals(0);
-          lucide.createIcons();
-          return;
-        }
-
-        container.innerHTML = this.state.cart.map(item => `
-          <div class="bg-white border border-brand-border rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
-            <div class="flex items-center gap-3 flex-1">
-              <img 
-                src="${item.image}" 
-                alt="${item.name}" 
-                class="w-16 h-20 object-contain bg-slate-50 border border-slate-200 rounded-lg p-1" 
-                onerror="this.src='https://placehold.co/100x120/F1F5F9/64748B?text=Pokemon'"
-              />
-              <div>
-                <h3 class="font-bold text-sm text-brand-charcoal">${item.name}</h3>
-                <span class="text-xs text-brand-muted block">${item.condition}</span>
-                <span class="text-xs font-bold text-brand-charcoal block sm:hidden mt-1">$${(item.price * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-              </div>
-            </div>
-
-            <!-- Quantity Stepper -->
-            <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-              <div class="flex items-center border border-slate-300 rounded-lg bg-slate-50">
-                <button 
-                  type="button" 
-                  onclick="app.updateQuantity('${item.id}', -1)" 
-                  class="px-2.5 py-1 text-slate-600 hover:text-brand-charcoal font-black text-sm"
-                  aria-label="Disminuir cantidad de ${item.name}"
-                >−</button>
-                <span class="px-3 py-1 text-xs font-black text-brand-charcoal bg-white">${item.quantity}</span>
-                <button 
-                  type="button" 
-                  onclick="app.updateQuantity('${item.id}', 1)" 
-                  class="px-2.5 py-1 text-slate-600 hover:text-brand-charcoal font-black text-sm"
-                  aria-label="Aumentar cantidad de ${item.name}"
-                >+</button>
-              </div>
-
-              <span class="font-black text-base text-brand-charcoal hidden sm:inline w-28 text-right">
-                $${(item.price * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-              </span>
-
-              <button 
-                type="button" 
-                onclick="app.removeItem('${item.id}')" 
-                class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
-                aria-label="Eliminar ${item.name} de la bolsa"
-              >
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-        `).join('');
-
-        const subtotal = this.state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        this.calculateTotals(subtotal);
-        lucide.createIcons();
-      },
-
-      calculateTotals(subtotal) {
-        const shipping = this.state.cart.length > 0 ? this.state.shippingFee : 0;
-        const tax = subtotal * 0.12; // 12% IVA
-        const total = subtotal + shipping + tax;
-
-        const setTxt = (id, val) => {
-          const el = document.getElementById(id);
-          if (el) el.innerText = `$${val.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-        };
-
-        setTxt('summary-subtotal', subtotal);
-        setTxt('summary-shipping', shipping);
-        setTxt('summary-tax', tax);
-        setTxt('summary-total', total);
-      },
-
-      updateBadge() {
-        const badge = document.getElementById('cart-badge');
-        if (badge) {
-          const count = this.state.cart.reduce((sum, item) => sum + item.quantity, 0);
-          badge.innerText = count;
-        }
-      },
-
-      // Checkout Conditional Delivery & Payment Handling
-      handleDeliveryChange(method) {
-        this.state.deliveryMethod = method;
-        const cashContainer = document.getElementById('payment-cash-container');
-        const cashInput = document.getElementById('payment-cash-input');
-        const cashTitle = document.getElementById('payment-cash-title');
-        const cashDesc = document.getElementById('payment-cash-desc');
-
-        if (method === 'pickup') {
-          this.state.shippingFee = 0.00;
-          // Enable Cash
-          if (cashContainer) {
-            cashContainer.className = 'payment-option p-3.5 rounded-xl border border-slate-300 bg-white flex items-center justify-between cursor-pointer hover:bg-slate-50';
-          }
-          if (cashInput) cashInput.disabled = false;
-          if (cashTitle) cashTitle.className = 'text-sm font-bold text-brand-charcoal';
-          if (cashDesc) cashDesc.innerText = 'Paga al retirar tu compra en la sucursal';
-          this.showToast('Entrega actualizada a Retiro en Tienda ($0.00). Pago en efectivo habilitado.', 'info');
-        } else {
-          this.state.shippingFee = 25.00;
-          // Disable Cash
-          if (cashContainer) {
-            cashContainer.className = 'payment-option p-3.5 rounded-xl border border-slate-200 bg-slate-100 opacity-60 cursor-not-allowed flex items-center justify-between';
-          }
-          if (cashInput) {
-            cashInput.disabled = true;
-            if (cashInput.checked) {
-              document.querySelector('input[name="payment-method"][value="card"]').checked = true;
-            }
-          }
-          if (cashTitle) cashTitle.className = 'text-sm font-bold text-slate-500';
-          if (cashDesc) cashDesc.innerText = 'Solo disponible si seleccionas "Retiro en Local Físico"';
-          this.showToast('Entrega por Courier ($25.00). Efectivo inhabilitado por seguridad.', 'info');
-        }
-
-        const subtotal = this.state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        this.calculateTotals(subtotal);
-      },
-
-      submitCheckout(isSuccess) {
-        if (this.state.cart.length === 0) {
-          this.showToast('Tu bolsa está vacía. Añade cartas antes de pagar.', 'error');
-          return;
-        }
-
-        if (isSuccess) {
-          this.showToast('Transacción aprobada por entidad bancaria.', 'success');
-          this.navigateTo('view-confirmation');
-        } else {
-          this.showToast('Error bancario #DECLINED-SEC-054 simulado.', 'error');
-          this.navigateTo('view-payment-error');
-        }
-      },
-
-      switchToCashPickup() {
-        this.handleDeliveryChange('pickup');
-        document.querySelector('input[name="delivery-method"][value="pickup"]').checked = true;
-        document.getElementById('payment-cash-input').checked = true;
-        this.navigateTo('view-checkout');
-        this.showToast('Método cambiado a Retiro en Local y Pago en Efectivo ($0.00 envío).', 'success');
-      },
-
-      // Auth & Forms
-      handleQuickLogin() {
-        this.state.userAuthenticated = true;
-        document.getElementById('nav-user-label').innerText = 'Patrick M.';
-        this.showToast('Sesión iniciada. Direcciones autocompletadas.', 'success');
-      },
-
-      handleFullLogin() {
-        this.state.userAuthenticated = true;
-        document.getElementById('nav-user-label').innerText = 'Patrick M.';
-        this.showToast('Bienvenido, Patrick. Accediendo a tu bóveda.', 'success');
-        this.navigateTo('view-tracking');
-      },
-
-      handleRegister() {
-        this.state.userAuthenticated = true;
-        document.getElementById('nav-user-label').innerText = 'Patrick M.';
-        this.showToast('Cuenta de coleccionista creada con éxito.', 'success');
-        this.navigateTo('view-home');
-      },
-
-      handleProgressiveRegister() {
-        this.showToast(' Contraseña guardada. Cuenta creada en 1 solo clic.', 'success');
-      },
-
-      handleSearch() {
-        const query = document.getElementById('global-search').value;
-        this.showToast(`Búsqueda ejecutada para: "${query}"`, 'info');
-      },
-
-      // Accessible Toast Notification Provider
-      showToast(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-
-        const toast = document.createElement('div');
-        toast.className = 'pointer-events-auto bg-brand-charcoal text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl border-l-4 flex items-center gap-2.5 transition-all transform translate-y-2 opacity-0';
-        
-        let icon = 'info';
-        if (type === 'success') {
-          toast.classList.add('border-emerald-500');
-          icon = 'check-circle';
-        } else if (type === 'error') {
-          toast.classList.add('border-brand-red');
-          icon = 'alert-circle';
-        } else {
-          toast.classList.add('border-blue-500');
-        }
-
-        toast.innerHTML = `
-          <i data-lucide="${icon}" class="w-4 h-4 flex-shrink-0"></i>
-          <span>${message}</span>
-        `;
-
-        container.appendChild(toast);
-        lucide.createIcons();
-
-        // Animate in
-        requestAnimationFrame(() => {
-          toast.classList.remove('translate-y-2', 'opacity-0');
-          toast.classList.add('translate-y-0', 'opacity-100');
-        });
-
-        // Auto remove
-        setTimeout(() => {
-          toast.classList.add('opacity-0', 'translate-y-2');
-          setTimeout(() => toast.remove(), 250);
-        }, 4000);
-      }
-    };
-
-    // Bootstrap app on DOM load
-    document.addEventListener('DOMContentLoaded', () => {
-      app.init();
-    });
-  </script>
 </body>
 </html>
