@@ -157,6 +157,24 @@ const PRODUCTS = [
     },
     descripcion: 'Holo Shadowless 1999 • Sin sombra de recuadro • Sello PSA oficial',
     tendencia12m: '+8.3%'
+  },
+  {
+    id: 'booster-base-set-1999',
+    nombre: 'Booster Pack Base Set 1999 1st Edition',
+    set: 'Base Set 1999',
+    rareza: 'Promo',
+    tipo: 'Fuego',
+    categoria: 'Booster Packs',
+    imagenLocal: 'img/booster-team-rocket.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/base1/4_hires.png',
+    precios: {
+      raw: 890.00,
+      psa8: 1150.00,
+      psa9: 1490.00,
+      psa10: 2250.00
+    },
+    descripcion: 'Sobre sellado original 1999 1st Edition • Acrílico protector UV incluido',
+    tendencia12m: '+15.4%'
   }
 ];
 
@@ -176,12 +194,14 @@ const app = {
     // REQUERIMIENTO 7: Carrito inicializado estrictamente en cero
     cart: [],
     lastDeletedItem: null,
+    pendingDeleteItemId: null,
     deliveryMethod: 'courier', // 'courier' ($5.00) or 'pickup' ($0.00)
     shippingFee: APP_CONFIG.COURIER_SHIPPING_FEE,
     currentUser: null,
     // REQUERIMIENTO 2: Ficha dinámica actual seleccionada
     currentPdpProduct: PRODUCTS[0],
-    pdpSelectedCondition: 'psa10'
+    pdpSelectedCondition: 'psa10',
+    pdpQuantity: 1
   },
 
   // =========================================================================
@@ -190,6 +210,7 @@ const app = {
   init() {
     this.initSessionFromStorage();
     this.initRouter();
+    this.renderCuratedShowcases();
     this.renderCatalog();
     this.renderCart();
     this.updateCartBadge();
@@ -228,6 +249,7 @@ const app = {
         if (found) {
           this.state.currentPdpProduct = found;
           this.state.pdpSelectedCondition = 'psa10';
+          this.state.pdpQuantity = 1;
         }
       }
       this.activateView('view-pdp', false);
@@ -333,7 +355,13 @@ const app = {
     if (found) {
       this.state.currentPdpProduct = found;
       this.state.pdpSelectedCondition = 'psa10';
-      window.location.hash = `#pdp?id=${found.id}`;
+      this.state.pdpQuantity = 1;
+      if (window.location.hash === `#pdp?id=${found.id}`) {
+        this.activateView('view-pdp', false);
+        this.renderDynamicPDP();
+      } else {
+        window.location.hash = `#pdp?id=${found.id}`;
+      }
     }
   },
 
@@ -341,6 +369,10 @@ const app = {
     const product = this.state.currentPdpProduct || PRODUCTS[0];
     const condition = this.state.pdpSelectedCondition || 'psa10';
     const currentPrice = product.precios[condition] || product.precios.psa10;
+
+    // Sync PDP quantity display
+    const qtyEl = document.getElementById('pdp-quantity-value');
+    if (qtyEl) qtyEl.innerText = this.state.pdpQuantity || 1;
 
     // Breadcrumbs
     const bcSet = document.getElementById('pdp-breadcrumb-set');
@@ -424,9 +456,33 @@ const app = {
     this.showToast(`Condición: ${condId.toUpperCase()} ($${price.toLocaleString('en-US')})`, 'info');
   },
 
+  // 3.2 Selector de Cantidad en Ficha de Producto (PDP)
+  updatePDPQuantity(delta) {
+    const nextQty = (this.state.pdpQuantity || 1) + delta;
+    if (nextQty < 1 || nextQty > 10) return;
+    this.state.pdpQuantity = nextQty;
+    const qtyEl = document.getElementById('pdp-quantity-value');
+    if (qtyEl) qtyEl.innerText = this.state.pdpQuantity;
+  },
+
+  // 3.3 Modal Informativo: "¿Qué es un Grado PSA?"
+  openPSAGuideModal() {
+    const modal = document.getElementById('psa-guide-modal');
+    if (modal) {
+      modal.classList.add('active');
+      lucide.createIcons();
+    }
+  },
+
+  closePSAGuideModal() {
+    const modal = document.getElementById('psa-guide-modal');
+    if (modal) modal.classList.remove('active');
+  },
+
   addCurrentPDPToCart() {
     const product = this.state.currentPdpProduct || PRODUCTS[0];
     const condition = this.state.pdpSelectedCondition || 'psa10';
+    const qty = this.state.pdpQuantity || 1;
     const conditionLabels = {
       raw: 'Sin Gradear (Raw NM)',
       psa8: 'PSA 8 NM-MT',
@@ -441,8 +497,14 @@ const app = {
       conditionLabels[condition],
       price,
       product.imagenLocal,
-      product.imagenFallbackUrl
+      product.imagenFallbackUrl,
+      qty
     );
+
+    // Reset quantity selector back to 1 after adding
+    this.state.pdpQuantity = 1;
+    const qtyEl = document.getElementById('pdp-quantity-value');
+    if (qtyEl) qtyEl.innerText = '1';
   },
 
   // 12-Month Historical Chart Generator scaled to current product price and condition variability
@@ -737,8 +799,130 @@ const app = {
     this.state.searchQuery = (query || '').toLowerCase().trim();
     this.state.currentPage = 1;
     this.renderCatalog();
-    this.navigateTo('home');
+    if (this.state.currentView !== 'view-home') {
+      this.navigateTo('home');
+    }
+    const catalogSec = document.getElementById('catalog-complete-section');
+    if (catalogSec) {
+      catalogSec.scrollIntoView({ behavior: 'smooth' });
+    }
     this.showToast(`Búsqueda ejecutada: "${query}"`, 'info');
+  },
+
+  // =========================================================================
+  // 1.1 & 1.3 HERO CTAs & VITRINAS CURADAS DEL HOME
+  // =========================================================================
+  exploreVaultPSA() {
+    this.filterCategory('Solo PSA');
+    const vaultSection = document.getElementById('vault-highlights-section');
+    if (vaultSection) {
+      vaultSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  },
+
+  exploreSealedBoxes() {
+    this.filterCategory('Booster Packs');
+    const catalogSection = document.getElementById('catalog-complete-section');
+    if (catalogSection) {
+      catalogSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    this.showToast('Mostrando Cajas y Sobres Sellados (Booster Packs)', 'info');
+  },
+
+  renderCuratedShowcases() {
+    // Bloque A: Tesoros Destacados de la Bóveda (Charizard, Umbreon, Lugia, Gengar)
+    const vaultGrid = document.getElementById('curated-vault-grid');
+    if (vaultGrid) {
+      const featuredIds = ['charizard-base', 'umbreon-vmax', 'lugia-neo', 'gengar-vmax'];
+      const featuredCards = featuredIds
+        .map(id => PRODUCTS.find(p => p.id === id))
+        .filter(Boolean);
+
+      vaultGrid.innerHTML = featuredCards.map(card => `
+        <article 
+          onclick="app.openProductPDP('${card.id}')" 
+          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();app.openProductPDP('${card.id}');}"
+          role="button"
+          tabindex="0"
+          aria-label="Ver detalles de ${card.nombre}"
+          class="cursor-pointer bg-white border border-brand-border rounded-2xl p-4 shadow-sm hover:shadow-lg hover:border-brand-red/50 transition-all flex flex-col justify-between group"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 text-[10px] font-black bg-amber-100 text-amber-900 rounded">
+                PSA 10 GEM MT
+              </span>
+              <span class="text-[11px] font-bold text-emerald-700">${card.tendencia12m}</span>
+            </div>
+            <div class="aspect-[3/4] bg-slate-50 rounded-xl border border-slate-200 overflow-hidden flex items-center justify-center p-3 relative">
+              <img 
+                src="${card.imagenLocal}" 
+                alt="${card.nombre}" 
+                class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" 
+                onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
+              />
+            </div>
+            <div class="mt-3">
+              <span class="inline-block text-[10px] font-bold text-brand-muted uppercase tracking-wider">${card.set} • ${card.rareza}</span>
+              <h3 class="font-extrabold text-sm sm:text-base text-brand-charcoal group-hover:text-brand-red transition mt-0.5 line-clamp-1">${card.nombre}</h3>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-brand-muted block">Valor PSA 10</span>
+              <span class="text-base font-black text-brand-charcoal">$${card.precios.psa10.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+            </div>
+            <span class="px-3 py-1.5 text-xs font-extrabold text-brand-red bg-red-50 group-hover:bg-brand-red group-hover:text-white rounded-lg transition inline-flex items-center gap-1">
+              <span>Inspeccionar</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </span>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // Bloque B: Cajas y Sobres Vintage Sellados (Booster Packs 1999)
+    const sealedGrid = document.getElementById('curated-sealed-grid');
+    if (sealedGrid) {
+      const sealedPacks = PRODUCTS.filter(p => p.categoria === 'Booster Packs');
+      sealedGrid.innerHTML = sealedPacks.map(pack => `
+        <article 
+          onclick="app.openProductPDP('${pack.id}')" 
+          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();app.openProductPDP('${pack.id}');}"
+          role="button"
+          tabindex="0"
+          aria-label="Ver sobre sellado ${pack.nombre}"
+          class="cursor-pointer bg-slate-800/90 hover:bg-slate-800 border border-slate-700 hover:border-amber-400/60 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-5 transition-all group shadow-md"
+        >
+          <div class="w-28 h-36 sm:w-32 sm:h-40 bg-slate-900 rounded-xl border border-slate-700 flex items-center justify-center p-2.5 flex-shrink-0 overflow-hidden">
+            <img 
+              src="${pack.imagenLocal}" 
+              alt="${pack.nombre}" 
+              class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" 
+              onerror="this.onerror=null; this.src='${pack.imagenFallbackUrl}'"
+            />
+          </div>
+          <div class="flex-1 text-center sm:text-left space-y-2">
+            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span>SELLADO DE FÁBRICA • 1999</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-black text-white group-hover:text-amber-300 transition">${pack.nombre}</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">${pack.descripcion}</p>
+            <div class="pt-2 flex items-center justify-center sm:justify-between gap-4 border-t border-slate-700/80">
+              <div>
+                <span class="text-[10px] text-slate-400 block">Desde (Sellado Raw)</span>
+                <span class="text-lg font-black text-amber-400">$${pack.precios.raw.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
+              </div>
+              <span class="px-3.5 py-2 rounded-xl bg-white/10 group-hover:bg-amber-400 group-hover:text-slate-950 text-white text-xs font-extrabold transition inline-flex items-center gap-1">
+                <span>Ver Ficha</span>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </span>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
   },
 
   // =========================================================================
@@ -758,7 +942,9 @@ const app = {
     });
 
     this.renderCatalog();
-    this.navigateTo('home');
+    if (this.state.currentView !== 'view-home') {
+      this.navigateTo('home');
+    }
   },
 
   openAdvancedFilters() {
@@ -806,7 +992,10 @@ const app = {
   setPage(page) {
     this.state.currentPage = page;
     this.renderCatalog();
-    window.scrollTo({ top: 350, behavior: 'smooth' });
+    const catalogSec = document.getElementById('catalog-complete-section');
+    if (catalogSec) {
+      catalogSec.scrollIntoView({ behavior: 'smooth' });
+    }
   },
 
   getFilteredCatalog() {
@@ -858,8 +1047,16 @@ const app = {
       return;
     }
 
+    // 3.1 Tarjeta Clickeable Unificada (Ley de Fitts): Todo el contenedor <article> redirige a #pdp
     grid.innerHTML = pagedItems.map(card => `
-      <article class="bg-white border border-brand-border rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between group">
+      <article 
+        onclick="app.openProductPDP('${card.id}')" 
+        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();app.openProductPDP('${card.id}');}"
+        role="button"
+        tabindex="0"
+        aria-label="Ver detalles de ${card.nombre}"
+        class="cursor-pointer bg-white border border-brand-border rounded-xl p-4 shadow-sm hover:shadow-md hover:border-brand-red/50 transition flex flex-col justify-between group"
+      >
         <div>
           <div class="aspect-[3/4] bg-slate-50 rounded-lg border border-slate-200 overflow-hidden flex items-center justify-center p-3 relative">
             <img 
@@ -872,7 +1069,7 @@ const app = {
 
           <div class="mt-3">
             <span class="inline-block text-[10px] font-bold text-brand-muted uppercase tracking-wider">${card.tipo} • ${card.rareza}</span>
-            <h3 class="font-extrabold text-sm sm:text-base text-brand-charcoal mt-0.5 line-clamp-1">${card.nombre}</h3>
+            <h3 class="font-extrabold text-sm sm:text-base text-brand-charcoal group-hover:text-brand-red transition mt-0.5 line-clamp-1">${card.nombre}</h3>
             <p class="text-xs text-brand-muted mt-0.5">${card.set}</p>
           </div>
         </div>
@@ -882,14 +1079,11 @@ const app = {
             <span class="text-xs text-brand-muted block">Desde</span>
             <span class="text-base font-black text-brand-charcoal">$${card.precios.raw.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
           </div>
-          <button 
-            type="button" 
-            onclick="app.openProductPDP('${card.id}')"
-            class="px-3.5 py-1.5 text-xs font-extrabold text-brand-red border border-brand-red hover:bg-brand-red hover:text-white rounded-lg transition"
-            aria-label="Ver detalles de ${card.nombre}"
+          <span 
+            class="px-3.5 py-1.5 text-xs font-extrabold text-brand-red border border-brand-red group-hover:bg-brand-red group-hover:text-white rounded-lg transition"
           >
             Ver detalle
-          </button>
+          </span>
         </div>
       </article>
     `).join('');
@@ -944,19 +1138,20 @@ const app = {
   },
 
   // =========================================================================
-  // REQUERIMIENTO 7 & 3: BOLSA DE COMPRAS & ENVÍO A $5.00 CON IVA (15%)
+  // REQUERIMIENTO 7 & 3 & 3.2 & 3.4: BOLSA DE COMPRAS & CONFIRMACIÓN DE BORRADO
   // =========================================================================
-  addToCart(id, name, condition, price, imageLocal, imageFallback) {
+  addToCart(id, name, condition, price, imageLocal, imageFallback, qty = 1) {
+    const units = Math.max(1, parseInt(qty, 10) || 1);
     const existing = this.state.cart.find(c => c.id === id);
     if (existing) {
-      existing.quantity += 1;
+      existing.quantity += units;
     } else {
       this.state.cart.push({
         id,
         name,
         condition,
         price,
-        quantity: 1,
+        quantity: units,
         imageLocal: imageLocal || 'img/charizard-base.png',
         imageFallback: imageFallback || 'https://images.pokemontcg.io/base1/4_hires.png'
       });
@@ -964,21 +1159,55 @@ const app = {
 
     this.updateCartBadge();
     this.renderCart();
-    this.showToast(`+1 "${name}" añadido a la bolsa`, 'success');
+    this.showToast(`+${units} "${name}" añadido a la bolsa`, 'success');
   },
 
   updateQuantity(id, delta) {
     const item = this.state.cart.find(c => c.id === id);
     if (!item) return;
 
-    item.quantity += delta;
-    if (item.quantity <= 0) {
-      this.removeItem(id);
+    if (item.quantity + delta <= 0) {
+      // 3.4 Confirmación antes de eliminar cuando baja de 1
+      this.requestRemoveItem(id);
       return;
     }
 
+    item.quantity += delta;
     this.updateCartBadge();
     this.renderCart();
+  },
+
+  // 3.4 Confirmación de Eliminación en Carrito
+  requestRemoveItem(id) {
+    const item = this.state.cart.find(c => c.id === id);
+    if (!item) return;
+
+    this.state.pendingDeleteItemId = id;
+    const modal = document.getElementById('delete-confirm-modal');
+    const nameEl = document.getElementById('delete-confirm-item-name');
+    if (nameEl) {
+      nameEl.innerText = `Se eliminará "${item.name} (${item.condition})" de tu bolsa.`;
+    }
+    if (modal) {
+      modal.classList.add('active');
+      lucide.createIcons();
+    }
+  },
+
+  cancelRemoveItem() {
+    this.state.pendingDeleteItemId = null;
+    const modal = document.getElementById('delete-confirm-modal');
+    if (modal) modal.classList.remove('active');
+  },
+
+  confirmRemoveItem() {
+    const id = this.state.pendingDeleteItemId;
+    this.state.pendingDeleteItemId = null;
+    const modal = document.getElementById('delete-confirm-modal');
+    if (modal) modal.classList.remove('active');
+    if (id) {
+      this.removeItem(id);
+    }
   },
 
   removeItem(id) {
@@ -1076,7 +1305,7 @@ const app = {
 
           <button 
             type="button" 
-            onclick="app.removeItem('${item.id}')" 
+            onclick="app.requestRemoveItem('${item.id}')" 
             class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
             aria-label="Eliminar ${item.name} de la bolsa"
           >
