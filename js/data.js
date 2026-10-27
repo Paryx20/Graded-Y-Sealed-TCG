@@ -1,0 +1,285 @@
+const APP_CONFIG = {
+  TAX_RATE: 0.15,
+  COURIER_SHIPPING_FEE: 5.00,
+  PICKUP_SHIPPING_FEE: 0.00
+};
+
+const PRODUCTS = [
+  {
+    id: 'charizard-base',
+    nombre: 'Charizard Base Set 1999 #4/102',
+    set: 'Base Set 1999',
+    rareza: 'Holo Rare',
+    tipo: 'Fuego',
+    categoria: 'psa',
+    era: 'vintage',
+    condicionPrincipal: 'psa10',
+    certNumber: '48291034',
+    imagenLocal: 'img/charizard-base.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/base1/4_hires.png',
+    precios: {
+      raw: 750.00,
+      psa8: 1800.00,
+      psa9: 4850.00,
+      psa10: 18500.00
+    },
+    descripcion: 'Holo Rare 1st Edition • Idioma: Inglés • Certificación Bóveda PSA',
+    tendencia12m: '+21.7%',
+    rendimientoAnual: 21.7,
+    historialBase: [0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'umbreon-vmax',
+    nombre: 'Umbreon VMAX Moonbreon Alt Art #215',
+    set: 'Evolving Skies 2021',
+    rareza: 'Secret Rare',
+    tipo: 'Oscuridad',
+    categoria: 'raw',
+    era: 'modern',
+    condicionPrincipal: 'raw',
+    certNumber: '61948201',
+    imagenLocal: 'img/umbreon-vmax.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/swsh7/215_hires.png',
+    precios: {
+      raw: 650.00,
+      psa8: 720.00,
+      psa9: 890.00,
+      psa10: 1350.00
+    },
+    descripcion: 'Alt Art Secret Rare #215/203 • Funda UltraPro • Autenticidad Garantizada',
+    tendencia12m: '+18.9%',
+    rendimientoAnual: 18.9,
+    historialBase: [0.84, 0.85, 0.87, 0.89, 0.90, 0.92, 0.93, 0.95, 0.96, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'lugia-neo',
+    nombre: 'Lugia 1st Edition Holo #9/111',
+    set: 'Neo Genesis 2000',
+    rareza: 'Holo Rare',
+    tipo: 'Incoloro',
+    categoria: 'psa',
+    era: 'vintage',
+    condicionPrincipal: 'psa10',
+    certNumber: '48291088',
+    imagenLocal: 'img/lugia-neo.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/neo1/9_hires.png',
+    precios: {
+      raw: 420.00,
+      psa8: 980.00,
+      psa9: 1450.00,
+      psa10: 4200.00
+    },
+    descripcion: 'Holo Rare Neo Genesis • Grado Inversión • Bóveda PSA',
+    tendencia12m: '+15.4%',
+    rendimientoAnual: 15.4,
+    historialBase: [0.86, 0.87, 0.89, 0.90, 0.91, 0.93, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'gengar-vmax',
+    nombre: 'Gengar VMAX Secret Rare Alt Art #271',
+    set: 'Fusion Strike 2021',
+    rareza: 'Secret Rare',
+    tipo: 'Psíquico',
+    categoria: 'psa',
+    era: 'modern',
+    condicionPrincipal: 'psa10',
+    certNumber: '59302145',
+    imagenLocal: 'img/gengar-vmax.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/swsh8/271_hires.png',
+    precios: {
+      raw: 240.00,
+      psa8: 340.00,
+      psa9: 460.00,
+      psa10: 620.00
+    },
+    descripcion: 'Alt Art Secret Rare #271/264 • Idioma: Inglés • Bóveda PSA',
+    tendencia12m: '+14.2%',
+    rendimientoAnual: 14.2,
+    historialBase: [0.87, 0.88, 0.89, 0.91, 0.92, 0.93, 0.94, 0.96, 0.97, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'booster-team-rocket',
+    nombre: 'Booster Pack Team Rocket 1999 Heavy',
+    set: 'Team Rocket 1999',
+    rareza: 'Sellado de Fábrica',
+    tipo: 'Oscuridad',
+    categoria: 'sealed',
+    era: 'vintage',
+    condicionPrincipal: 'sealed',
+    certNumber: '48291901',
+    imagenLocal: 'img/booster-team-rocket.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/base5/3_hires.png',
+    precios: {
+      raw: 320.00,
+      psa8: 350.00,
+      psa9: 410.00,
+      psa10: 540.00
+    },
+    descripcion: 'Sobre sellado de fábrica 21.2g Heavy Pack • Conservación térmica',
+    tendencia12m: '+11.2%',
+    rendimientoAnual: 11.2,
+    historialBase: [0.89, 0.90, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'blastoise-shadowless',
+    nombre: 'Blastoise Shadowless Base Set 1999 #2/102',
+    set: 'Base Set 1999',
+    rareza: 'Holo Rare',
+    tipo: 'Agua',
+    categoria: 'psa',
+    era: 'vintage',
+    condicionPrincipal: 'psa9',
+    certNumber: '48291102',
+    imagenLocal: 'img/blastoise-shadowless.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/base1/2_hires.png',
+    precios: {
+      raw: 380.00,
+      psa8: 620.00,
+      psa9: 950.00,
+      psa10: 2400.00
+    },
+    descripcion: 'Holo Shadowless 1999 • Sin sombra de recuadro • Sello PSA oficial',
+    tendencia12m: '+12.8%',
+    rendimientoAnual: 12.8,
+    historialBase: [0.88, 0.89, 0.90, 0.91, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'rayquaza-vmax-alt',
+    nombre: 'Rayquaza VMAX Alt Art #218/203',
+    set: 'Evolving Skies 2021',
+    rareza: 'Secret Rare',
+    tipo: 'Incoloro',
+    categoria: 'raw',
+    era: 'modern',
+    condicionPrincipal: 'raw',
+    certNumber: '74019283',
+    imagenLocal: 'img/rayquaza-gold-star.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/swsh7/218_hires.png',
+    precios: {
+      raw: 390.00,
+      psa8: 440.00,
+      psa9: 520.00,
+      psa10: 840.00
+    },
+    descripcion: 'Arte Alternativo Evolving Skies • Centrado verificado 50/50 • Near Mint',
+    tendencia12m: '+16.5%',
+    rendimientoAnual: 16.5,
+    historialBase: [0.85, 0.86, 0.88, 0.89, 0.91, 0.92, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'mewtwo-base-1999',
+    nombre: 'Mewtwo Holo Base Set 1999 #10/102',
+    set: 'Base Set 1999',
+    rareza: 'Holo Rare',
+    tipo: 'Psíquico',
+    categoria: 'psa',
+    era: 'vintage',
+    condicionPrincipal: 'psa9',
+    certNumber: '48291409',
+    imagenLocal: 'img/mewtwo-base.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/base1/10_hires.png',
+    precios: {
+      raw: 140.00,
+      psa8: 290.00,
+      psa9: 580.00,
+      psa10: 1950.00
+    },
+    descripcion: 'Clásico WotC 1999 • Superficie holográfica prístina • Bóveda PSA',
+    tendencia12m: '+9.8%',
+    rendimientoAnual: 9.8,
+    historialBase: [0.91, 0.92, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'booster-box-fossil-1999',
+    nombre: 'Caja Sellada Booster Box Fossil 1999 (36 Packs)',
+    set: 'Fossil WotC 1999',
+    rareza: 'Sellado de Fábrica',
+    tipo: 'Incoloro',
+    categoria: 'sealed',
+    era: 'vintage',
+    condicionPrincipal: 'sealed',
+    certNumber: '48291955',
+    imagenLocal: 'img/booster-team-rocket.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/base3/1_hires.png',
+    precios: {
+      raw: 8400.00,
+      psa8: 8900.00,
+      psa9: 9600.00,
+      psa10: 12500.00
+    },
+    descripcion: 'Display original de 36 sobres con celofán de fábrica Wizards of the Coast',
+    tendencia12m: '+24.1%',
+    rendimientoAnual: 24.1,
+    historialBase: [0.80, 0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96, 0.97, 0.99, 1.00]
+  },
+  {
+    id: 'tyranitar-aquapolis',
+    nombre: 'Shining Tyranitar Neo Destiny #113/105',
+    set: 'Neo Destiny 2002',
+    rareza: 'Secret Rare',
+    tipo: 'Oscuridad',
+    categoria: 'raw',
+    era: 'vintage',
+    condicionPrincipal: 'raw',
+    certNumber: '48291612',
+    imagenLocal: 'img/tyranitar-neo.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/neo4/113_hires.png',
+    precios: {
+      raw: 490.00,
+      psa8: 680.00,
+      psa9: 990.00,
+      psa10: 2300.00
+    },
+    descripcion: 'Triple Estrella Shining • Era Clásica WotC 2002 • Estado Near Mint',
+    tendencia12m: '+13.6%',
+    rendimientoAnual: 13.6,
+    historialBase: [0.88, 0.89, 0.90, 0.91, 0.92, 0.93, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'giratina-v-alt',
+    nombre: 'Giratina V Alt Art Lost Origin #186/196',
+    set: 'Lost Origin 2022',
+    rareza: 'Secret Rare',
+    tipo: 'Psíquico',
+    categoria: 'psa',
+    era: 'modern',
+    condicionPrincipal: 'psa10',
+    certNumber: '83910422',
+    imagenLocal: 'img/giratina-v.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/swsh11/186_hires.png',
+    precios: {
+      raw: 360.00,
+      psa8: 410.00,
+      psa9: 490.00,
+      psa10: 780.00
+    },
+    descripcion: 'Ilustración de Shinji Kanda • Certificación Oficial PSA 10 Gem Mint',
+    tendencia12m: '+17.3%',
+    rendimientoAnual: 17.3,
+    historialBase: [0.85, 0.86, 0.87, 0.89, 0.91, 0.92, 0.94, 0.95, 0.96, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'booster-pack-base-1999',
+    nombre: 'Booster Pack Base Set 1999 1st Edition',
+    set: 'Base Set 1999',
+    rareza: 'Sellado de Fábrica',
+    tipo: 'Fuego',
+    categoria: 'sealed',
+    era: 'vintage',
+    condicionPrincipal: 'sealed',
+    certNumber: '48291999',
+    imagenLocal: 'img/booster-team-rocket.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/base1/4_hires.png',
+    precios: {
+      raw: 1450.00,
+      psa8: 1750.00,
+      psa9: 2200.00,
+      psa10: 3600.00
+    },
+    descripcion: 'Sobre individual 1999 1st Edition • Estuche magnético UV incluido',
+    tendencia12m: '+19.5%',
+    rendimientoAnual: 19.5,
+    historialBase: [0.83, 0.85, 0.87, 0.88, 0.90, 0.91, 0.93, 0.95, 0.96, 0.98, 0.99, 1.00]
+  }
+];
+

@@ -1,182 +1,264 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-slate-50">
+<html lang="es" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Graded &amp; Sealed TCG • Bóveda Oficial de Cartas y Slabs PSA</title>
-  
-  <!-- Tailwind CSS via CDN -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graded &amp; Sealed TCG — Bóveda de Coleccionismo Certificado &amp; Slabs PSA</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          },
           colors: {
             brand: {
-              red: '#DC2626',
-              darkred: '#B91C1C',
-              lightred: '#FEF2F2',
-              gold: '#F59E0B',
-              lightgold: '#FEF3C7',
-              darkgold: '#B45309',
               charcoal: '#0F172A',
               slate: '#1E293B',
-              muted: '#64748B',
+              surface: '#F8FAFC',
               border: '#E2E8F0',
-              surface: '#F8FAFC'
+              red: '#E11D48',
+              darkred: '#BE123C',
+              gold: '#D97706',
+              lightgold: '#FEF3C7',
+              emerald: '#059669',
+              lightemerald: '#D1FAE5'
             }
-          },
-          fontFamily: {
-            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-            mono: ['Menlo', 'Monaco', 'Consolas', 'monospace']
           }
         }
       }
-    }
+    };
   </script>
-
-  <!-- External Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
-
-  <!-- Lucide Icons via CDN -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body class="min-h-full flex flex-col text-brand-charcoal font-sans antialiased bg-slate-50 selection:bg-brand-red selection:text-white overflow-x-hidden relative">
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased selection:bg-[#E11D48] selection:text-white min-h-screen flex flex-col">
 
-  <!-- ========================================================================= -->
-  <!-- REQUERIMIENTO 4: SPOTLIGHT SEARCH OVERLAY BACKDROP -->
-  <!-- ========================================================================= -->
-  <div id="search-spotlight-backdrop" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-30 opacity-0 pointer-events-none transition-opacity duration-300" aria-hidden="true"></div>
+  <div id="search-spotlight-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 opacity-0 pointer-events-none" aria-hidden="true"></div>
 
-  <!-- ========================================================================= -->
-  <!-- MAIN HEADER / NAVBAR COMERCIAL -->
-  <!-- ========================================================================= -->
-  <header class="bg-white border-b border-brand-border sticky top-0 z-40 shadow-sm">
-    <div class="h-1 bg-brand-red w-full"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3 sm:gap-4 relative">
-      
-      <!-- Brand Logo & Name -->
-      <a href="#home" class="flex items-center gap-2.5 sm:gap-3 group focus-visible:ring-2 focus-visible:ring-brand-charcoal rounded-lg p-1" aria-label="Ir a inicio de Graded and Sealed TCG">
-        <img src="Logo del e-commerce 1.png" alt="Logo Graded &amp; Sealed TCG" class="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105" onerror="this.onerror=null; this.src='https://placehold.co/120x60/DC2626/FFFFFF?text=G%26S+TCG'" />
-        <div class="flex flex-col">
-          <div class="flex items-center gap-1">
-            <span class="font-black text-lg sm:text-xl tracking-tight text-brand-charcoal">GRADED &amp; SEALED</span>
-            <span class="font-black text-lg sm:text-xl text-brand-red tracking-tight">TCG</span>
-          </div>
-          <span class="text-[9px] sm:text-[10px] font-bold tracking-widest uppercase text-brand-muted hidden xs:inline">Bóveda de Coleccionismo y Slabs PSA</span>
-        </div>
-      </a>
+  <div id="toast-container" aria-live="polite" aria-atomic="true" class="fixed top-20 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
-      <!-- REQUERIMIENTO 4: Search Bar con Efecto Spotlight & Dropdown de Resultados -->
-      <div id="search-container" class="search-container-spotlight relative flex-1 max-w-md lg:max-w-lg mx-2 hidden md:block z-40">
-        <form role="search" onsubmit="event.preventDefault();" class="relative">
-          <label for="global-search" class="sr-only">Buscar cartas, expansiones o grados PSA</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brand-muted">
-              <i data-lucide="search" class="w-4 h-4"></i>
-            </div>
-            <input 
-              type="search" 
-              id="global-search" 
-              name="q"
-              autocomplete="off"
-              placeholder="Buscar cartas, expansiones o grados PSA... (ej. Charizard, Gengar)"
-              class="w-full pl-10 pr-4 py-2 bg-brand-surface border border-brand-border rounded-lg text-sm text-brand-charcoal placeholder-brand-muted focus:bg-white focus:border-brand-charcoal transition"
-              aria-label="Buscar cartas, expansiones o grados PSA"
-            />
-          </div>
-        </form>
-
-        <!-- Live Search Dropdown -->
-        <div id="search-live-dropdown" class="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden hidden z-50"></div>
-      </div>
-
-      <!-- Utility Navigation Items -->
-      <nav aria-label="Navegación principal" class="flex items-center gap-2 sm:gap-3">
-        
-        <!-- Mis Pedidos / Tracking -->
-        <a 
-          href="#tracking"
-          class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-semibold text-brand-slate hover:text-brand-charcoal hover:bg-slate-100 rounded-lg transition"
-          aria-label="Ver historial y seguimiento de pedidos"
-        >
-          <i data-lucide="truck" class="w-4 h-4 text-brand-muted"></i>
-          <span class="hidden sm:inline">Tracking</span>
-        </a>
-
-        <!-- Mi Cuenta / Usuario Autenticado -->
-        <a 
-          href="#auth"
-          id="btn-nav-account"
-          class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-2 text-xs sm:text-sm font-semibold text-brand-charcoal border border-slate-300 hover:bg-slate-100 rounded-lg transition"
-          aria-label="Acceder a mi cuenta de usuario"
-        >
-          <i data-lucide="user" class="w-4 h-4 text-brand-charcoal"></i>
-          <span id="nav-user-label">Mi Cuenta</span>
-        </a>
-
-        <!-- Botón Cerrar Sesión (Dinámico) -->
+  <header class="sticky top-0 z-40 bg-[#0F172A] text-white border-b border-slate-800 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
         <button 
-          type="button"
-          onclick="app.logoutUser()"
-          id="btn-nav-logout"
-          class="hidden px-2 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg transition"
-          title="Cerrar sesión actual"
-          aria-label="Cerrar sesión actual"
+          type="button" 
+          onclick="app.openCategoriesDrawer()" 
+          class="px-3 py-2 rounded-xl bg-[#1E293B] hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-white flex items-center gap-2 transition touch-target"
+          aria-label="Abrir menú de categorías"
         >
-          <i data-lucide="log-out" class="w-4 h-4"></i>
+          <i data-lucide="menu" class="w-4 h-4 text-[#FEF3C7]"></i>
+          <span>Categorías</span>
         </button>
 
-        <!-- Bolsa de Compras con Badge Reactivo (REQUERIMIENTO 7: Estado Inicial en 0) -->
+        <a href="#home" class="flex items-center gap-2.5 flex-shrink-0 group" aria-label="Ir al inicio de Graded and Sealed TCG">
+          <img 
+            src="Logo del e-commerce 1.png" 
+            alt="Logo Graded & Sealed TCG" 
+            class="h-10 w-auto object-contain rounded bg-white/95 p-0.5"
+            onerror="this.onerror=null; this.src='https://placehold.co/120x44/E11D48/FFFFFF?text=G%26S+TCG'"
+          />
+          <div class="hidden sm:block">
+            <span class="font-black text-sm tracking-tight text-white block leading-none">GRADED &amp; SEALED</span>
+            <span class="text-[10px] font-bold text-[#FEF3C7] tracking-widest uppercase">BÓVEDA TCG • PSA</span>
+          </div>
+        </a>
+      </div>
+
+      <div id="search-container" class="search-container-spotlight flex-1 max-w-xl mx-2 relative">
+        <form onsubmit="event.preventDefault(); app.executeGlobalSearch(document.getElementById('global-search').value);" class="relative flex items-center w-full" role="search">
+          <label for="global-search" class="sr-only">Buscar por carta, expansión o grado PSA</label>
+          <input 
+            id="global-search" 
+            type="search" 
+            autocomplete="off"
+            placeholder="Buscar Charizard, Moonbreon, Lugia, Base Set 1999..." 
+            class="w-full pl-4 pr-11 py-2 text-xs sm:text-sm bg-[#1E293B] border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:bg-white focus:text-[#0F172A] focus:border-[#D97706] transition"
+          />
+          <button 
+            type="submit" 
+            class="absolute right-1.5 p-1.5 bg-[#E11D48] hover:bg-[#BE123C] text-white rounded-lg transition"
+            aria-label="Ejecutar búsqueda"
+          >
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </button>
+        </form>
+
+        <div id="search-live-dropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white text-[#0F172A] border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50 p-2"></div>
+      </div>
+
+      <nav class="flex items-center gap-2" aria-label="Herramientas de usuario">
         <a 
-          href="#cart"
-          class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold text-white bg-brand-red hover:bg-brand-darkred rounded-lg transition shadow-sm relative touch-target flex items-center justify-center"
+          href="#catalog" 
+          class="hidden md:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-200 hover:text-white hover:bg-[#1E293B] rounded-xl transition touch-target"
+        >
+          <i data-lucide="layout-grid" class="w-4 h-4 text-[#FEF3C7]"></i>
+          <span>Catálogo</span>
+        </a>
+
+        <a 
+          href="#tracking" 
+          class="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-200 hover:text-white hover:bg-[#1E293B] rounded-xl transition touch-target"
+        >
+          <i data-lucide="package-check" class="w-4 h-4 text-[#059669]"></i>
+          <span>Tracking</span>
+        </a>
+
+        <button 
+          type="button"
+          id="btn-nav-account"
+          onclick="app.handleNavAccountClick()"
+          class="flex items-center gap-1.5 px-3 py-2 text-xs font-extrabold text-white bg-[#1E293B] hover:bg-slate-700 border border-slate-700 rounded-xl transition touch-target"
+          aria-label="Ir a Mi Perfil o Iniciar Sesión"
+        >
+          <i data-lucide="user" class="w-4 h-4 text-[#FEF3C7]"></i>
+          <span id="nav-user-label" class="hidden sm:inline">Mi Cuenta</span>
+        </button>
+
+        <a 
+          href="#cart" 
+          class="relative flex items-center gap-2 px-3.5 py-2 text-xs font-extrabold text-white bg-[#E11D48] hover:bg-[#BE123C] rounded-xl transition shadow touch-target"
           aria-label="Ver bolsa de compras"
         >
           <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-          <span class="hidden xs:inline">Bolsa</span>
+          <span class="hidden md:inline">Bolsa</span>
           <span 
             id="cart-badge" 
-            aria-live="polite" 
-            class="inline-flex items-center justify-center w-5 h-5 text-[11px] font-black bg-brand-lightgold text-brand-darkgold border border-brand-red rounded-full"
+            class="px-1.5 py-0.5 text-[11px] font-black bg-[#0F172A] text-[#FEF3C7] rounded-full min-w-[20px] text-center"
           >
             0
           </span>
         </a>
       </nav>
+    </div>
 
+    <div class="bg-[#1E293B] border-t border-slate-800/80">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between text-xs overflow-x-auto no-scrollbar whitespace-nowrap gap-5">
+        <div class="flex items-center gap-5 font-semibold text-slate-300">
+          <a href="#catalog" class="hover:text-[#FEF3C7] transition flex items-center gap-1">
+            <i data-lucide="layers" class="w-3.5 h-3.5 text-[#FEF3C7]"></i>
+            <span>Ver Todo el Catálogo</span>
+          </a>
+          <a href="#catalog?cat=psa" class="hover:text-[#FEF3C7] transition">Slabs Certificados PSA</a>
+          <a href="#catalog?cat=raw" class="hover:text-[#FEF3C7] transition">Cartas Sueltas / Raw</a>
+          <a href="#catalog?cat=sealed" class="hover:text-[#FEF3C7] transition">Cajas y Sobres Sellados Vintage</a>
+          <a href="#catalog?era=vintage" class="hover:text-[#FEF3C7] transition">Era Clásica WotC 1999-2002</a>
+          <a href="#catalog?era=modern" class="hover:text-[#FEF3C7] transition">Era Moderna &amp; Alt Arts</a>
+        </div>
+        <span class="hidden xl:inline-flex items-center gap-1.5 text-[11px] font-bold text-[#D1FAE5]">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#059669]"></i>
+          <span>Custodia Asegurada • Quito, Ecuador</span>
+        </span>
+      </div>
     </div>
   </header>
 
-  <!-- ========================================================================= -->
-  <!-- ACCESSIBLE TOAST NOTIFICATIONS (ARIA-LIVE) -->
-  <!-- ========================================================================= -->
-  <div id="toast-container" class="fixed top-24 right-4 z-50 flex flex-col gap-2 max-w-md pointer-events-none" aria-live="polite"></div>
+  <div id="categories-drawer" class="drawer-backdrop fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex justify-start" role="dialog" aria-modal="true" aria-labelledby="drawer-categories-title">
+    <div class="drawer-panel-left bg-[#0F172A] text-white w-full max-w-xs h-full flex flex-col justify-between p-6 shadow-2xl border-r border-slate-800 overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <i data-lucide="compass" class="w-5 h-5 text-[#FEF3C7]"></i>
+            <h2 id="drawer-categories-title" class="text-base font-black tracking-tight text-white">Categorías de Bóveda</h2>
+          </div>
+          <button 
+            type="button" 
+            onclick="app.closeCategoriesDrawer()" 
+            class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
+            aria-label="Cerrar menú de categorías"
+          >
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
 
-  <!-- Global Undo Item Deletion Banner (Heurística Nielsen #3) -->
-  <div id="undo-banner" class="hidden bg-brand-charcoal text-white px-4 py-3 shadow-lg border-b-2 border-brand-red sticky top-[84px] z-30 transition-all">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <span class="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
-          <i data-lucide="check" class="w-4 h-4"></i>
-        </span>
-        <span id="undo-text" class="text-sm font-medium">Ítem eliminado de la bolsa de compras.</span>
+        <nav class="mt-5 space-y-2" aria-label="Navegación de categorías">
+          <a href="#catalog" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl bg-[#1E293B] hover:bg-[#E11D48] text-white text-xs font-extrabold transition">
+            <span class="flex items-center gap-2.5">
+              <i data-lucide="layout-grid" class="w-4 h-4 text-[#FEF3C7]"></i>
+              <span>1. Ver Todo el Catálogo</span>
+            </span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </a>
+
+          <a href="#catalog?cat=psa" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl hover:bg-[#1E293B] text-slate-200 hover:text-white text-xs font-bold transition">
+            <span class="flex items-center gap-2.5">
+              <i data-lucide="award" class="w-4 h-4 text-[#D97706]"></i>
+              <span>2. Slabs Certificados PSA</span>
+            </span>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+          </a>
+
+          <a href="#catalog?cat=raw" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl hover:bg-[#1E293B] text-slate-200 hover:text-white text-xs font-bold transition">
+            <span class="flex items-center gap-2.5">
+              <i data-lucide="sparkles" class="w-4 h-4 text-[#059669]"></i>
+              <span>3. Cartas Sueltas / Raw</span>
+            </span>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+          </a>
+
+          <a href="#catalog?cat=sealed" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl hover:bg-[#1E293B] text-slate-200 hover:text-white text-xs font-bold transition">
+            <span class="flex items-center gap-2.5">
+              <i data-lucide="package" class="w-4 h-4 text-[#FEF3C7]"></i>
+              <span>4. Cajas y Sobres Sellados Vintage</span>
+            </span>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+          </a>
+
+          <a href="#catalog?era=vintage" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl hover:bg-[#1E293B] text-slate-200 hover:text-white text-xs font-bold transition">
+            <span class="flex items-center gap-2.5">
+              <i data-lucide="history" class="w-4 h-4 text-[#E11D48]"></i>
+              <span>5. Era Clásica WotC 1999-2002</span>
+            </span>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+          </a>
+
+          <a href="#catalog?era=modern" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl hover:bg-[#1E293B] text-slate-200 hover:text-white text-xs font-bold transition">
+            <span class="flex items-center gap-2.5">
+              <i data-lucide="zap" class="w-4 h-4 text-sky-400"></i>
+              <span>6. Era Moderna &amp; Alt Arts</span>
+            </span>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+          </a>
+        </nav>
       </div>
+
+      <div class="pt-4 border-t border-slate-800 space-y-2">
+        <a href="#profile" onclick="app.closeCategoriesDrawer()" class="w-full py-2.5 px-3 rounded-xl bg-[#1E293B] hover:bg-slate-700 text-xs font-bold text-white flex items-center justify-center gap-2 transition">
+          <i data-lucide="user-check" class="w-4 h-4 text-[#FEF3C7]"></i>
+          <span>Mi Perfil e Historial</span>
+        </a>
+        <a href="#tracking" onclick="app.closeCategoriesDrawer()" class="w-full py-2.5 px-3 rounded-xl border border-slate-700 hover:bg-slate-800 text-xs font-bold text-slate-300 flex items-center justify-center gap-2 transition">
+          <i data-lucide="truck" class="w-4 h-4 text-[#059669]"></i>
+          <span>Rastreo de Orden en Vivo</span>
+        </a>
+      </div>
+    </div>
+    <div class="flex-1" onclick="app.closeCategoriesDrawer()"></div>
+  </div>
+
+  <div id="undo-banner" role="status" aria-live="polite" class="hidden bg-[#0F172A] text-white border-b border-slate-700 px-4 py-2.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 text-xs sm:text-sm">
       <div class="flex items-center gap-2">
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-[#059669] flex-shrink-0"></i>
+        <span id="undo-text">Ítem eliminado de la bolsa.</span>
+      </div>
+      <div class="flex items-center gap-3">
         <button 
           type="button" 
           onclick="app.undoLastDeletion()" 
-          class="px-4 py-1.5 bg-brand-red hover:bg-brand-darkred text-white text-xs font-bold rounded-md transition flex items-center gap-1.5"
-          aria-label="Deshacer la eliminación del ítem"
+          class="font-bold text-[#FEF3C7] hover:underline"
         >
-          <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
-          <span>Deshacer acción</span>
+          [Deshacer acción]
         </button>
         <button 
           type="button" 
           onclick="document.getElementById('undo-banner').classList.add('hidden')" 
-          class="p-1 text-slate-400 hover:text-white rounded"
-          aria-label="Cerrar notificación"
+          class="text-slate-400 hover:text-white"
+          aria-label="Cerrar aviso"
         >
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
@@ -184,1284 +266,46 @@
     </div>
   </div>
 
-  <!-- ========================================================================= -->
-  <!-- MAIN CONTENT CONTAINER (SPA VIEWS) -->
-  <!-- ========================================================================= -->
-  <main class="flex-1 pb-16">
+  <main id="app-view" class="flex-1 pb-16"></main>
 
-    <!-- ===================================================================== -->
-    <!-- VIEW 01: HOME / CATÁLOGO (#home) -->
-    <!-- ===================================================================== -->
-    <section id="view-home" class="view-section active max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-10">
-      
-      <!-- 1.1 Hero Section de Alto Impacto -->
-      <section aria-labelledby="hero-heading" class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] text-white shadow-xl border border-slate-800">
-        <!-- Subtle decorative background glow -->
-        <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-red/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-6 sm:p-10 lg:p-12">
-          <div class="lg:col-span-7 space-y-5">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-amber-300 text-xs font-extrabold tracking-wide uppercase">
-              <i data-lucide="award" class="w-3.5 h-3.5"></i>
-              <span>Coleccionismo de Grado Inversión • Ecuador</span>
-            </div>
-
-            <h1 id="hero-heading" class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white">
-              Bóveda de Coleccionismo Certificado &amp; Slabs PSA
-            </h1>
-
-            <p class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl">
-              Adquiere cartas históricas verificadas, expansiones de época selladas y piezas de inversión con entrega segura y garantía de autenticidad.
-            </p>
-
-            <div class="pt-2 flex flex-wrap items-center gap-3.5">
-              <button 
-                type="button" 
-                onclick="app.exploreVaultPSA()" 
-                class="px-6 py-3.5 bg-brand-red hover:bg-brand-darkred text-white text-sm font-extrabold rounded-xl transition shadow-lg flex items-center gap-2 touch-target"
-              >
-                <i data-lucide="shield-check" class="w-4 h-4"></i>
-                <span>Explorar Bóveda PSA</span>
-              </button>
-
-              <button 
-                type="button" 
-                onclick="app.exploreSealedBoxes()" 
-                class="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 text-sm font-bold rounded-xl transition flex items-center gap-2 touch-target"
-              >
-                <i data-lucide="package" class="w-4 h-4 text-amber-400"></i>
-                <span>Ver Cajas Selladas</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Hero Visual Showcase -->
-          <div class="lg:col-span-5 flex items-center justify-center">
-            <div 
-              onclick="app.openProductPDP('charizard-base')" 
-              class="cursor-pointer group relative bg-slate-800/70 backdrop-blur-md border border-slate-700/80 rounded-2xl p-5 shadow-2xl max-w-xs w-full transition-transform duration-300 hover:-translate-y-1"
-              role="button"
-              tabindex="0"
-              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();app.openProductPDP('charizard-base');}"
-              aria-label="Inspeccionar pieza estelar Charizard Base Set 1999 PSA 10"
-            >
-              <div class="flex items-center justify-between mb-3">
-                <span class="px-2.5 py-0.5 rounded text-[10px] font-black bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                  PIEZA ESTELAR PSA 10
-                </span>
-                <span class="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                  <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +21.7% (12m)
-                </span>
-              </div>
-              <div class="aspect-[4/4] bg-slate-900/90 rounded-xl border border-slate-700 flex items-center justify-center p-4 overflow-hidden">
-                <img 
-                  src="img/charizard-base.png" 
-                  alt="Charizard Base Set 1999 #4/102 PSA 10" 
-                  class="max-h-52 object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-xl" 
-                  onerror="this.onerror=null; this.src='https://images.pokemontcg.io/base1/4_hires.png'"
-                />
-              </div>
-              <div class="mt-3 flex items-center justify-between">
-                <div>
-                  <h2 class="text-sm font-extrabold text-white group-hover:text-amber-300 transition">Charizard Base Set 1999</h2>
-                  <p class="text-[11px] text-slate-400">1st Edition Holo #4/102</p>
-                </div>
-                <div class="text-right">
-                  <span class="text-[10px] text-slate-400 block">Grado PSA 10</span>
-                  <span class="text-sm font-black text-amber-400">$18,500.00</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 1.2 Barra de Garantías y Confianza (Trust Bar) -->
-      <section aria-label="Garantías de compra y seguridad" class="bg-white border border-brand-border rounded-2xl p-5 shadow-sm">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
-          
-          <div class="flex items-start gap-3.5 pt-3 sm:pt-0 first:pt-0 sm:px-3 first:pl-0">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center flex-shrink-0 text-emerald-700">
-              <i data-lucide="shield-check" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <h2 class="text-xs sm:text-sm font-extrabold text-brand-charcoal">Autenticidad Certificada</h2>
-              <p class="text-xs text-brand-muted mt-0.5 leading-snug">Todas las cartas cuentan con registro verificable en PSA</p>
-            </div>
-          </div>
-
-          <div class="flex items-start gap-3.5 pt-3 sm:pt-0 sm:px-4">
-            <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0 text-brand-red">
-              <i data-lucide="truck" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <h2 class="text-xs sm:text-sm font-extrabold text-brand-charcoal">Envíos Blindados ($5.00)</h2>
-              <p class="text-xs text-brand-muted mt-0.5 leading-snug">Empaque especial en estuche rígido con protección UV</p>
-            </div>
-          </div>
-
-          <div class="flex items-start gap-3.5 pt-3 sm:pt-0 sm:px-4">
-            <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0 text-amber-700">
-              <i data-lucide="store" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <h2 class="text-xs sm:text-sm font-extrabold text-brand-charcoal">Retiro en Local Físico</h2>
-              <p class="text-xs text-brand-muted mt-0.5 leading-snug">Disponible en Sucursal Central Quito en 2 horas</p>
-            </div>
-          </div>
-
-          <div class="flex items-start gap-3.5 pt-3 sm:pt-0 sm:px-4">
-            <div class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-300 flex items-center justify-center flex-shrink-0 text-brand-charcoal">
-              <i data-lucide="lock" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <h2 class="text-xs sm:text-sm font-extrabold text-brand-charcoal">Transacciones Protegidas</h2>
-              <p class="text-xs text-brand-muted mt-0.5 leading-snug">Protocolos de pago seguro y custodia en bóveda</p>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- 1.3 Vitrinas Curadas del Home: Bloque A - Tesoros Destacados de la Bóveda -->
-      <section id="vault-highlights-section" aria-labelledby="vault-highlights-heading" class="space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-brand-border pb-3">
-          <div>
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-brand-red">Selección de Grado Inversión</span>
-            <h2 id="vault-highlights-heading" class="text-xl sm:text-2xl font-black text-brand-charcoal tracking-tight">
-              Tesoros Destacados de la Bóveda
-            </h2>
-          </div>
-          <button 
-            type="button" 
-            onclick="app.filterCategory('Solo PSA'); document.getElementById('catalog-complete-section').scrollIntoView({ behavior: 'smooth' });" 
-            class="text-xs font-extrabold text-brand-red hover:text-brand-darkred inline-flex items-center gap-1 self-start sm:self-auto"
-          >
-            <span>Ver todos los Slabs PSA</span>
-            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-          </button>
-        </div>
-
-        <div id="curated-vault-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <!-- Rendered dynamically by app.renderCuratedShowcases() -->
-        </div>
-      </section>
-
-      <!-- 1.3 Vitrinas Curadas del Home: Bloque B - Cajas y Sobres Vintage Sellados -->
-      <section id="sealed-vintage-section" aria-labelledby="sealed-vintage-heading" class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 sm:p-8 text-white shadow-md border border-slate-700">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div class="space-y-2 max-w-xl">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-extrabold bg-amber-400/20 text-amber-300 border border-amber-400/30">
-              <i data-lucide="Flame" class="w-3.5 h-3.5"></i>
-              <span>EXPANSIONES CLÁSICAS WOTC 1999</span>
-            </span>
-            <h2 id="sealed-vintage-heading" class="text-xl sm:text-2xl font-black tracking-tight text-white">
-              Cajas y Sobres Vintage Sellados
-            </h2>
-            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Sobres originales pesados en báscula de precisión (Heavy Packs) y ediciones selladas de fábrica conservadas en cámara con control de humedad.
-            </p>
-          </div>
-          <button 
-            type="button" 
-            onclick="app.exploreSealedBoxes()" 
-            class="px-5 py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-black rounded-xl transition shadow flex items-center gap-2 self-start lg:self-center flex-shrink-0"
-          >
-            <i data-lucide="package-open" class="w-4 h-4"></i>
-            <span>Filtrar Booster Packs en Catálogo</span>
-          </button>
-        </div>
-
-        <div id="curated-sealed-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6">
-          <!-- Rendered dynamically by app.renderCuratedShowcases() -->
-        </div>
-      </section>
-
-      <!-- 1.3 Vitrinas Curadas del Home: Bloque C - Acceso Rápido al Catálogo Completo -->
-      <section id="catalog-complete-section" aria-labelledby="catalog-complete-heading" class="space-y-5 pt-2">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-          <div>
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-brand-muted">Exploración Interactiva</span>
-            <h2 id="catalog-complete-heading" class="text-xl sm:text-2xl font-black text-brand-charcoal tracking-tight">
-              Acceso Rápido al Catálogo Completo
-            </h2>
-          </div>
-          <p class="text-xs text-brand-muted">Haz clic en cualquier tarjeta para inspeccionar grados PSA, precios y gráfica histórica</p>
-        </div>
-
-        <!-- Barra de Filtros Híbrida -->
-        <div aria-labelledby="filter-heading" class="bg-white border border-brand-border rounded-xl p-3.5 shadow-sm flex flex-wrap items-center justify-between gap-3">
-          <h3 id="filter-heading" class="sr-only">Filtros de catálogo</h3>
-          
-          <div class="flex items-center gap-2 flex-wrap" role="toolbar" aria-label="Filtros rápidos de categoría">
-            <button 
-              type="button" 
-              onclick="app.filterCategory('Todas')" 
-              data-cat="Todas"
-              class="filter-chip px-4 py-2 text-xs font-bold rounded-full bg-brand-red text-white transition shadow-sm"
-            >
-              Todas
-            </button>
-            
-            <button 
-              type="button" 
-              onclick="app.filterCategory('Cartas Sueltas')" 
-              data-cat="Cartas Sueltas"
-              class="filter-chip px-4 py-2 text-xs font-bold rounded-full border border-slate-300 text-brand-charcoal hover:bg-slate-100 transition"
-            >
-              Cartas Sueltas
-            </button>
-            
-            <button 
-              type="button" 
-              onclick="app.filterCategory('Booster Packs')" 
-              data-cat="Booster Packs"
-              class="filter-chip px-4 py-2 text-xs font-bold rounded-full border border-slate-300 text-brand-charcoal hover:bg-slate-100 transition"
-            >
-              Booster Packs
-            </button>
-            
-            <button 
-              type="button" 
-              onclick="app.filterCategory('Solo PSA')" 
-              data-cat="Solo PSA"
-              id="chip-solo-psa"
-              class="filter-chip px-4 py-2 text-xs font-bold rounded-full border border-slate-300 text-brand-charcoal hover:bg-slate-100 transition relative"
-              aria-label="Filtrar únicamente cartas con graduación oficial PSA"
-            >
-              Solo PSA
-            </button>
-          </div>
-
-          <button 
-            type="button"
-            onclick="app.openAdvancedFilters()" 
-            class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold border border-brand-charcoal text-brand-charcoal hover:bg-brand-charcoal hover:text-white rounded-lg transition"
-          >
-            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
-            <span>+ Filtros Avanzados</span>
-          </button>
-        </div>
-
-        <!-- Grilla de Productos Dinámica -->
-        <div aria-labelledby="products-heading">
-          <h3 id="products-heading" class="sr-only">Listado de productos</h3>
-          <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            <!-- Rendered dynamically by app.renderCatalog() -->
-          </div>
-        </div>
-
-        <!-- Footer Paginación Funcional -->
-        <nav id="catalog-pagination" aria-label="Paginación del catálogo" class="mt-6 bg-white border border-brand-border rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm text-sm">
-          <!-- Rendered dynamically by app.renderPagination() -->
-        </nav>
-      </section>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- VIEW 02: FICHA DE DETALLE DINÁMICA / PDP (#pdp) -->
-    <!-- ===================================================================== -->
-    <section id="view-pdp" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-      
-      <!-- Breadcrumb Accesible Dinámico -->
-      <nav aria-label="Ruta de navegación" class="flex items-center gap-2 text-xs text-brand-muted mb-6">
-        <a href="#home" class="hover:text-brand-charcoal font-medium">Catálogo</a>
-        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-        <span id="pdp-breadcrumb-set">Base Set 1999</span>
-        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-        <span id="pdp-breadcrumb-name" class="text-brand-charcoal font-bold" aria-current="page">Charizard Holo #4/102</span>
-      </nav>
-
-      <!-- Layout 60% / 40% -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-        
-        <!-- Left: Gallery (7 Cols / approx 60%) -->
-        <div class="lg:col-span-7 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 shadow-sm">
-          <!-- Main Image Viewer Dinámico -->
-          <div class="w-full aspect-[4/5] bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-center relative p-6 overflow-hidden">
-            <img 
-              id="pdp-main-image"
-              src="img/charizard-base.png" 
-              alt="Carta Pokemon"
-              class="max-h-full max-w-full object-contain filter drop-shadow-xl transition-all duration-300"
-              onerror="this.onerror=null; this.src='https://images.pokemontcg.io/base1/4_hires.png'"
-            />
-            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur border border-slate-300 px-3 py-1 rounded-md text-xs font-black text-brand-charcoal shadow-sm flex items-center gap-1.5">
-              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
-              <span id="pdp-cert-badge">PSA 10 GEM MT #CERT-OFFICIAL</span>
-            </div>
-          </div>
-
-          <!-- Thumbnails -->
-          <div class="grid grid-cols-3 gap-3 mt-4" role="tablist" aria-label="Vistas fotográficas de la carta">
-            <button 
-              type="button" 
-              onclick="document.getElementById('pdp-main-image').classList.remove('rotate-180')" 
-              class="p-2 rounded-lg border-2 border-brand-red bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1"
-              aria-label="Ver cara frontal en alta resolución"
-            >
-              <span class="text-xs font-bold text-brand-charcoal">Frontal Completo</span>
-              <span class="text-[10px] text-brand-muted">Holograma intacto</span>
-            </button>
-
-            <button 
-              type="button" 
-              onclick="document.getElementById('pdp-main-image').classList.add('rotate-180')" 
-              class="p-2 rounded-lg border border-slate-200 bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1 hover:border-slate-400"
-              aria-label="Ver reverso de la carta y esquinas"
-            >
-              <span class="text-xs font-bold text-brand-charcoal">Reverso y Bordes</span>
-              <span class="text-[10px] text-brand-muted">Centrado 50/50</span>
-            </button>
-
-            <button 
-              type="button" 
-              onclick="app.showToast('Estuche magnético sellado UV con precinto oficial.', 'info')" 
-              class="p-2 rounded-lg border border-slate-200 bg-slate-50 aspect-video flex flex-col items-center justify-center gap-1 hover:border-slate-400"
-              aria-label="Ver empaque de seguridad y estuche acrílico"
-            >
-              <span class="text-xs font-bold text-brand-charcoal">Slab &amp; Empaque</span>
-              <span class="text-[10px] text-brand-muted">Sello de autenticidad</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Right: Purchase Panel & Dynamic Market Chart (5 Cols) -->
-        <div class="lg:col-span-5 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col gap-5">
-          <div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-extrabold bg-brand-lightgold text-brand-darkgold border border-amber-300">
-              <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-500 text-amber-500"></i>
-              <span>GRADO INVERSIÓN • OFICIAL PSA</span>
-            </div>
-            <h1 id="pdp-title" class="text-2xl sm:text-3xl font-black text-brand-charcoal mt-2 tracking-tight">Charizard Base Set 1999 #4/102</h1>
-            <p id="pdp-desc" class="text-xs sm:text-sm text-brand-muted mt-1">Holo Rare 1st Edition • Idioma: Inglés • Certificación Bóveda PSA</p>
-          </div>
-
-          <!-- REQUERIMIENTO 2 & 3.3: Segmented Condition Selector + Modal Informativo "¿Qué es un Grado PSA?" -->
-          <div>
-            <div class="flex items-center justify-between gap-2 mb-2">
-              <label class="block text-xs font-extrabold text-brand-charcoal uppercase tracking-wider">
-                Seleccionar Condición / Grado PSA:
-              </label>
-              <button 
-                type="button" 
-                onclick="app.openPSAGuideModal()" 
-                class="inline-flex items-center gap-1 text-xs font-bold text-brand-red hover:text-brand-darkred underline decoration-red-300 underline-offset-2 transition"
-                aria-label="Abrir guía informativa: ¿Qué es un grado PSA?"
-              >
-                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
-                <span>¿Qué es un grado PSA?</span>
-              </button>
-            </div>
-            <div class="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Condición de la carta">
-              
-              <button 
-                type="button" 
-                onclick="app.selectPDPCondition('raw')" 
-                id="cond-raw"
-                class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition bg-white"
-              >
-                <div class="cond-title text-xs font-bold text-brand-charcoal">Raw / NM</div>
-                <div id="cond-price-raw" class="cond-price text-sm font-black text-brand-muted">$750.00</div>
-              </button>
-
-              <button 
-                type="button" 
-                onclick="app.selectPDPCondition('psa8')" 
-                id="cond-psa8"
-                class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition bg-white"
-              >
-                <div class="cond-title text-xs font-bold text-brand-charcoal">PSA 8 NM-MT</div>
-                <div id="cond-price-psa8" class="cond-price text-sm font-black text-brand-muted">$1,800.00</div>
-              </button>
-
-              <button 
-                type="button" 
-                onclick="app.selectPDPCondition('psa9')" 
-                id="cond-psa9"
-                class="cond-btn p-3 rounded-xl border border-slate-200 text-left hover:border-slate-400 transition bg-white"
-              >
-                <div class="cond-title text-xs font-bold text-brand-charcoal">PSA 9 MINT</div>
-                <div id="cond-price-psa9" class="cond-price text-sm font-black text-brand-muted">$4,850.00</div>
-              </button>
-
-              <button 
-                type="button" 
-                onclick="app.selectPDPCondition('psa10')" 
-                id="cond-psa10"
-                class="cond-btn p-3 rounded-xl bg-brand-charcoal text-white text-left shadow transition"
-              >
-                <div class="cond-title text-xs font-bold text-white flex items-center justify-between">
-                  <span>PSA 10 GEM MT</span>
-                  <i data-lucide="check" class="check-indicator w-3.5 h-3.5 text-emerald-400"></i>
-                </div>
-                <div id="cond-price-psa10" class="cond-price text-sm font-black text-amber-400">$18,500.00</div>
-              </button>
-
-            </div>
-          </div>
-
-          <!-- Market Analysis Module with Interactive Mouse Hover / Touch Chart -->
-          <div class="bg-brand-surface border border-brand-border rounded-xl p-4">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-black text-brand-charcoal flex items-center gap-1.5">
-                <i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i>
-                <span>Historial de Mercado Actual (12 meses)</span>
-              </span>
-              <span id="market-trend-pill" class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">+21.7%</span>
-            </div>
-            <p class="text-[11px] text-brand-muted mt-0.5">Pasa el cursor por la curva para inspeccionar precios históricos mes a mes</p>
-            
-            <!-- SVG Interactive Chart Container with Floating Tooltip -->
-            <div id="pdp-chart-container" class="w-full h-36 mt-3 relative select-none">
-              <svg id="pdp-interactive-chart" viewBox="0 0 400 130" class="w-full h-full overflow-visible" aria-label="Gráfica interactiva de tendencia de precio a 12 meses">
-                <line x1="20" y1="105" x2="380" y2="105" stroke="#E2E8F0" stroke-width="1.5" />
-                <line x1="20" y1="65" x2="380" y2="65" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="4,4" />
-                <line x1="20" y1="25" x2="380" y2="25" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="4,4" />
-
-                <!-- Vertical Hover Guide Line -->
-                <line id="chart-guide-line" x1="0" y1="15" x2="0" y2="115" stroke="#0F172A" stroke-width="1.5" stroke-dasharray="3,3" style="display:none;" />
-
-                <!-- Price Curve Polyline -->
-                <polyline 
-                  id="chart-polyline"
-                  points="30,85 110,75 190,80 270,50 370,25" 
-                  fill="none" 
-                  stroke="#16A34A" 
-                  stroke-width="3" 
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-
-                <!-- Dynamic Hover Dot -->
-                <circle id="chart-hover-dot" cx="0" cy="0" r="5" fill="#0F172A" stroke="#FFFFFF" stroke-width="2" style="display:none;" />
-
-                <!-- Current Active Dot -->
-                <circle id="chart-active-dot" cx="370" cy="25" r="5.5" fill="#16A34A" stroke="#FFFFFF" stroke-width="2" />
-
-                <!-- X Axis Labels -->
-                <text x="30" y="122" fill="#94A3B8" font-size="9" text-anchor="middle">Oct 2025</text>
-                <text x="143" y="122" fill="#94A3B8" font-size="9" text-anchor="middle">Feb 2026</text>
-                <text x="256" y="122" fill="#94A3B8" font-size="9" text-anchor="middle">Jun 2026</text>
-                <text x="370" y="122" fill="#0F172A" font-size="9" font-weight="bold" text-anchor="middle">Hoy</text>
-              </svg>
-
-              <!-- Dynamic HTML Floating Tooltip -->
-              <div id="chart-hover-tooltip" class="chart-tooltip absolute z-20 opacity-0"></div>
-            </div>
-          </div>
-
-          <!-- Price, Selector de Cantidad (3.2) & Primary CTA -->
-          <div class="pt-2 border-t border-brand-border">
-            <div class="flex items-baseline justify-between">
-              <span id="pdp-price" class="text-3xl font-black text-brand-charcoal">$18,500.00 USD</span>
-              <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-md">
-                En Stock • Custodia Bóveda
-              </span>
-            </div>
-            <p class="text-xs text-brand-muted mt-1 flex items-center gap-1.5">
-              <i data-lucide="shield" class="w-3.5 h-3.5 text-brand-muted"></i>
-              <span>Envío seguro con garantía de autenticidad total</span>
-            </p>
-
-            <!-- 3.2 Selector de Cantidad en Ficha de Producto (PDP) junto al botón Añadir a la bolsa -->
-            <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div class="flex items-center justify-between border-2 border-slate-300 rounded-xl bg-slate-50 px-2 py-1.5 sm:w-36" aria-label="Selector de cantidad de unidades">
-                <button 
-                  type="button" 
-                  onclick="app.updatePDPQuantity(-1)" 
-                  class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-brand-charcoal font-black text-base flex items-center justify-center transition"
-                  aria-label="Disminuir cantidad"
-                >
-                  −
-                </button>
-                <span id="pdp-quantity-value" class="px-3 text-sm font-black text-brand-charcoal select-none" aria-live="polite">1</span>
-                <button 
-                  type="button" 
-                  onclick="app.updatePDPQuantity(1)" 
-                  class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-brand-charcoal font-black text-base flex items-center justify-center transition"
-                  aria-label="Aumentar cantidad"
-                >
-                  +
-                </button>
-              </div>
-
-              <button 
-                type="button" 
-                onclick="app.addCurrentPDPToCart()" 
-                class="flex-1 py-3.5 px-6 bg-brand-red hover:bg-brand-darkred text-white text-base font-extrabold rounded-xl transition shadow-md flex items-center justify-center gap-2 touch-target"
-                aria-label="Añadir esta carta a la bolsa de compras"
-              >
-                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                <span>Añadir a la bolsa</span>
-              </button>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- VIEW 03: BOLSA DE COMPRAS (#cart) -->
-    <!-- ===================================================================== -->
-    <section id="view-cart" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-      
-      <div class="flex items-center justify-between pb-4 border-b border-brand-border">
-        <div>
-          <h1 class="text-2xl font-black text-brand-charcoal tracking-tight">Tu Bolsa de Compras</h1>
-          <p class="text-xs text-brand-muted mt-0.5">Revisa tus artículos seleccionados antes de proceder al checkout</p>
-        </div>
-        <a 
-          href="#home" 
-          class="text-xs font-bold text-brand-red hover:text-brand-darkred flex items-center gap-1"
-        >
-          <i data-lucide="arrow-left" class="w-4 h-4"></i>
-          <span>Continuar explorando</span>
-        </a>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-6">
-        
-        <!-- Items List (8 Cols) -->
-        <div class="lg:col-span-8 flex flex-col gap-4">
-          <div id="cart-items-container" class="flex flex-col gap-3">
-            <!-- Rendered reactively via app.renderCart() -->
-          </div>
-
-          <!-- Packaging Notice -->
-          <div class="bg-white border border-brand-border rounded-xl p-4 flex items-start gap-4 shadow-sm">
-            <div class="w-12 h-12 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0">
-              <i data-lucide="package" class="w-6 h-6 text-amber-700"></i>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-brand-charcoal">Empaque de Coleccionista Especial Gratuito</h3>
-              <p class="text-xs text-brand-muted mt-0.5">Todas las cartas se despachan en bolsa kraft reforzada, precintos de seguridad y estuches magnéticos con filtro ultravioleta (UV).</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- REQUERIMIENTO 3: Order Summary con Envío a $5.00 e IVA (15%) (4 Cols) -->
-        <div class="lg:col-span-4 bg-white border border-brand-border rounded-2xl p-6 shadow-sm sticky top-28">
-          <h2 class="text-lg font-black text-brand-charcoal tracking-tight">Resumen del Pedido</h2>
-          
-          <div class="mt-4 space-y-3 text-sm border-t border-brand-border pt-4">
-            <div class="flex justify-between text-brand-muted">
-              <span>Subtotal:</span>
-              <span id="summary-subtotal" class="font-bold text-brand-charcoal">$0.00</span>
-            </div>
-            
-            <div class="flex justify-between text-brand-muted">
-              <span>Envío a domicilio:</span>
-              <span id="summary-shipping" class="font-bold text-brand-charcoal">$5.00</span>
-            </div>
-
-            <div class="flex justify-between text-brand-muted">
-              <span>IVA (15%):</span>
-              <span id="summary-tax" class="font-bold text-brand-charcoal">$0.00</span>
-            </div>
-
-            <div class="flex justify-between text-emerald-700 text-xs font-semibold">
-              <span>Seguro de custodia y bóveda:</span>
-              <span>GRATIS</span>
-            </div>
-
-            <div class="border-t border-brand-border pt-3 flex justify-between items-baseline">
-              <span class="text-base font-extrabold text-brand-charcoal">Total a Pagar:</span>
-              <span id="summary-total" class="text-2xl font-black text-brand-charcoal">$0.00 USD</span>
-            </div>
-          </div>
-
-          <a 
-            href="#checkout" 
-            class="w-full mt-6 py-3.5 bg-brand-red hover:bg-brand-darkred text-white text-sm font-extrabold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
-            aria-label="Proceder al checkout con los artículos seleccionados"
-          >
-            <span>Proceder al Checkout</span>
-            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-          </a>
-
-          <p class="text-[11px] text-brand-muted text-center mt-3 flex items-center justify-center gap-1">
-            <i data-lucide="lock" class="w-3 h-3"></i>
-            <span>Transacción encriptada TLS 256-bit</span>
-          </p>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- VIEW 04: CHECKOUT SIMPLIFICADO (#checkout) -->
-    <!-- ===================================================================== -->
-    <section id="view-checkout" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-      
-      <!-- Top Security Banner -->
-      <div class="bg-slate-900 text-white rounded-xl px-4 py-2.5 flex items-center justify-between mb-6 shadow-sm">
-        <div class="flex items-center gap-2 text-xs font-bold">
-          <i data-lucide="lock" class="w-4 h-4 text-emerald-400"></i>
-          <span>Checkout Seguro TLS 256-bit • Graded &amp; Sealed TCG</span>
-        </div>
-        <span class="text-[11px] text-slate-300">Cumplimiento con estándares PCI-DSS</span>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        <!-- Col A: Usuario Frecuente (4 Cols) -->
-        <div class="lg:col-span-4 bg-white border border-brand-border rounded-2xl p-6 shadow-sm">
-          <div class="flex items-center justify-between pb-3 border-b border-brand-border">
-            <h2 class="text-base font-black text-brand-charcoal">Usuario Registrado</h2>
-            <span class="text-[10px] font-bold text-brand-red bg-red-50 border border-red-200 px-2 py-0.5 rounded">Opción A</span>
-          </div>
-          <p class="text-xs text-brand-muted mt-2">Inicia sesión para autocompletar tus datos de envío.</p>
-
-          <form onsubmit="event.preventDefault(); app.handleLogin(document.getElementById('login-email-checkout').value, document.getElementById('login-pass-checkout').value);" class="mt-4 space-y-3.5">
-            <div>
-              <label for="login-email-checkout" class="block text-xs font-bold text-brand-charcoal mb-1">Correo Electrónico:</label>
-              <input 
-                type="email" 
-                id="login-email-checkout" 
-                placeholder="tu.correo@ejemplo.com" 
-                class="w-full px-3 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white"
-                required
-              />
-            </div>
-
-            <div>
-              <label for="login-pass-checkout" class="block text-xs font-bold text-brand-charcoal mb-1">Contraseña:</label>
-              <input 
-                type="password" 
-                id="login-pass-checkout" 
-                placeholder="••••••••" 
-                class="w-full px-3 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white"
-                required
-              />
-            </div>
-
-            <button type="submit" class="w-full py-2.5 bg-brand-charcoal hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition touch-target">
-              Iniciar Sesión y Aplicar
-            </button>
-          </form>
-        </div>
-
-        <!-- Col B: Datos y Pago (8 Cols) -->
-        <div class="lg:col-span-8 bg-white border border-brand-border rounded-2xl p-6 shadow-sm space-y-6">
-          <div class="flex items-center justify-between pb-3 border-b border-brand-border">
-            <div>
-              <h2 class="text-lg font-black text-brand-charcoal">Datos de Facturación y Entrega</h2>
-              <p class="text-xs text-brand-muted mt-0.5">Ingresa tus datos para generar tu orden certificada</p>
-            </div>
-            <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">Opción B</span>
-          </div>
-
-          <!-- REQUERIMIENTO 1: Inputs Limpios con Placeholders (Sin Hardcodeos) -->
-          <fieldset class="space-y-4">
-            <legend class="text-sm font-extrabold text-brand-charcoal">1. Datos Personales y Facturación</legend>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label for="guest-name" class="block text-xs font-bold text-brand-charcoal mb-1">Nombre Completo: *</label>
-                <input type="text" id="guest-name" placeholder="Ej. Carlos Mendoza" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white" required />
-              </div>
-
-              <div>
-                <label for="guest-id" class="block text-xs font-bold text-brand-charcoal mb-1">Cédula o RUC: *</label>
-                <input 
-                  type="text" 
-                  id="guest-id" 
-                  placeholder="Ej. 1710034065" 
-                  maxlength="10"
-                  class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white transition" 
-                  required 
-                />
-                <p id="guest-id-error" class="text-xs text-red-600 font-semibold mt-1 hidden" role="alert">
-                  Cédula ecuatoriana inválida (debe contener 10 dígitos válidos)
-                </p>
-              </div>
-
-              <div>
-                <label for="guest-email" class="block text-xs font-bold text-brand-charcoal mb-1">Correo Electrónico: *</label>
-                <input type="email" id="guest-email" placeholder="carlos@correo.com" class="w-full px-3.5 py-2 text-sm bg-brand-surface border border-brand-border rounded-lg focus:bg-white" required />
-              </div>
-
-              <div>
-                <label for="guest-phone" class="block text-xs font-bold text-brand-charcoal mb-1">Teléfono Celular: *</label>
-                <div class="flex rounded-lg overflow-hidden border border-brand-border bg-white focus-within:border-brand-charcoal">
-                  <span class="inline-flex items-center px-3.5 bg-slate-100 text-slate-600 text-sm font-bold border-r border-slate-200 select-none">
-                    +593
-                  </span>
-                  <input 
-                    type="tel" 
-                    id="guest-phone" 
-                    placeholder="099 123 4567" 
-                    maxlength="10" 
-                    class="flex-1 px-3.5 py-2 text-sm bg-brand-surface focus:bg-white focus:outline-none" 
-                    required 
-                  />
-                </div>
-              </div>
-            </div>
-          </fieldset>
-
-          <!-- REQUERIMIENTO 3 & 1: Envío a Domicilio con Sincronización Reactiva de Contenedores -->
-          <fieldset class="space-y-3">
-            <legend class="text-sm font-extrabold text-brand-charcoal">2. Método de Entrega</legend>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              
-              <label id="delivery-courier-container" class="delivery-option p-4 rounded-xl border-2 border-brand-red bg-red-50/40 cursor-pointer flex items-start gap-3 transition">
-                <input type="radio" name="delivery-method" id="delivery-courier-input" value="courier" checked onchange="app.handleDeliveryChange('courier')" class="mt-1 text-brand-red" />
-                <div>
-                  <div class="text-sm font-bold text-brand-charcoal">Envío a Domicilio ($5.00)</div>
-                  <p class="text-xs text-brand-muted mt-0.5">Entrega express asegurada en 24-48h.</p>
-                </div>
-              </label>
-
-              <label id="delivery-pickup-container" class="delivery-option p-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 cursor-pointer flex items-start gap-3 transition">
-                <input type="radio" name="delivery-method" id="delivery-pickup-input" value="pickup" onchange="app.handleDeliveryChange('pickup')" class="mt-1 text-brand-red" />
-                <div>
-                  <div class="text-sm font-bold text-brand-charcoal">Retiro en Local Físico (Gratis)</div>
-                  <p class="text-xs text-brand-muted mt-0.5">Sucursal Central (Listo en 2 horas).</p>
-                </div>
-              </label>
-
-            </div>
-          </fieldset>
-
-          <!-- REQUERIMIENTO 5: Métodos de Pago Simplificados (Solo Tarjeta y Efectivo en Tienda) -->
-          <fieldset class="space-y-3">
-            <legend class="text-sm font-extrabold text-brand-charcoal">3. Método de Pago</legend>
-            
-            <div class="space-y-3">
-              <!-- Método 1: Tarjeta de Crédito / Débito -->
-              <div class="payment-option p-4 rounded-xl border border-brand-charcoal bg-slate-50 space-y-3">
-                <label class="flex items-center justify-between cursor-pointer">
-                  <div class="flex items-center gap-3">
-                    <input type="radio" name="payment-method" value="card" checked class="text-brand-red" />
-                    <div>
-                      <span class="text-sm font-bold text-brand-charcoal">Tarjeta de Crédito / Débito</span>
-                      <span class="text-xs text-brand-muted block">Visa, Mastercard, Diners Club (3D Secure)</span>
-                    </div>
-                  </div>
-                  <i data-lucide="credit-card" class="w-5 h-5 text-brand-muted"></i>
-                </label>
-
-                <!-- Inputs de Tarjeta -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200">
-                  <div class="sm:col-span-3">
-                    <label for="card-number" class="block text-xs font-bold text-slate-700 mb-1">Número de Tarjeta:</label>
-                    <input 
-                      type="text" 
-                      id="card-number" 
-                      placeholder="•••• •••• •••• 4129" 
-                      class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none"
-                    />
-                    <span class="text-[10px] text-slate-400 mt-0.5 block">Para probar fallo de banco ingresa una tarjeta terminada en 0000</span>
-                  </div>
-                  <div>
-                    <label for="card-exp" class="block text-xs font-bold text-slate-700 mb-1">Expiración:</label>
-                    <input type="text" id="card-exp" placeholder="MM/AA" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
-                  </div>
-                  <div>
-                    <label for="card-cvv" class="block text-xs font-bold text-slate-700 mb-1">CVV/CVC:</label>
-                    <input type="password" id="card-cvv" placeholder="•••" maxlength="4" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Método 2: Efectivo al retirar en tienda (Cash) -->
-              <label id="payment-cash-container" class="payment-option p-3.5 rounded-xl border border-slate-200 bg-slate-100 opacity-60 cursor-not-allowed flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <input type="radio" name="payment-method" id="payment-cash-input" value="cash" disabled class="text-brand-red" />
-                  <div>
-                    <span id="payment-cash-title" class="text-sm font-bold text-slate-500">Efectivo al retirar en tienda (Cash)</span>
-                    <span id="payment-cash-desc" class="text-xs text-slate-400 block">Solo disponible si seleccionas "Retiro en Local Físico"</span>
-                  </div>
-                </div>
-                <i data-lucide="banknote" class="w-5 h-5 text-slate-400"></i>
-              </label>
-            </div>
-          </fieldset>
-
-          <!-- Primary Commercial Checkout CTA -->
-          <div class="pt-4 border-t border-brand-border">
-            <button 
-              type="button" 
-              id="checkout-pay-button"
-              onclick="app.startPaymentProcessing()" 
-              class="w-full py-4 bg-brand-red hover:bg-brand-darkred text-white text-base font-extrabold rounded-xl transition shadow-lg flex items-center justify-center gap-2 touch-target"
-            >
-              <i data-lucide="lock" class="w-5 h-5"></i>
-              <span>Finalizar Compra y Pagar</span>
-            </button>
-            <p class="text-[11px] text-brand-muted text-center mt-2.5">
-              Al confirmar autorizas la transacción protegida bajo la política de custodia de Graded &amp; Sealed TCG.
-            </p>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- VIEW 05: CONFIRMACIÓN DE ORDEN (#confirmation) -->
-    <!-- ===================================================================== -->
-    <section id="view-confirmation" class="view-section max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-      
-      <div class="bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-sm text-center">
-        
-        <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
-          <i data-lucide="check-circle-2" class="w-10 h-10"></i>
-        </div>
-
-        <h1 class="text-2xl sm:text-3xl font-black text-brand-charcoal tracking-tight">¡Orden confirmada con éxito!</h1>
-        <div id="confirm-order-id" class="inline-block px-3 py-1 bg-brand-lightgold text-brand-darkgold font-mono font-bold text-sm rounded-md mt-2">
-          Número de Orden: #PKM-2026-PENDING
-        </div>
-        
-        <!-- REQUERIMIENTO 5: Aviso diferenciado para pago en efectivo al retirar -->
-        <div id="confirm-cash-notice" class="hidden my-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2">
-          <i data-lucide="store" class="w-5 h-5 text-amber-600 flex-shrink-0"></i>
-          <span>Orden reservada con éxito. Recuerda realizar el pago en caja al retirar en el local central.</span>
-        </div>
-
-        <p class="text-sm text-brand-muted mt-3 max-w-lg mx-auto">
-          Hemos enviado el comprobante oficial y el código de seguimiento de custodia a tu correo: 
-          <span id="confirm-email-recipient" class="font-bold text-brand-charcoal">usuario@ejemplo.com</span>
-        </p>
-
-        <!-- Dynamic Breakdown Container with 15% Tax -->
-        <div id="confirm-breakdown-container" class="mt-6 text-left bg-brand-surface border border-brand-border rounded-xl p-5 max-w-2xl mx-auto space-y-2.5 text-xs sm:text-sm"></div>
-
-        <!-- Navigation Buttons -->
-        <div class="mt-8 flex flex-wrap justify-center gap-3">
-          <a 
-            href="#tracking" 
-            class="px-6 py-3 bg-brand-charcoal hover:bg-slate-800 text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center gap-2 touch-target"
-          >
-            <i data-lucide="truck" class="w-4 h-4"></i>
-            <span>Ver Seguimiento del Pedido</span>
-          </a>
-          <a 
-            href="#home" 
-            class="px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-brand-charcoal text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center touch-target"
-          >
-            Volver a la tienda
-          </a>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- VIEW 06: PORTAL DE AUTENTICACIÓN (#auth) -->
-    <!-- ===================================================================== -->
-    <section id="view-login" class="view-section max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-      
-      <div class="text-center mb-6">
-        <h1 class="text-2xl sm:text-3xl font-black text-brand-charcoal tracking-tight">Acceso a Graded &amp; Sealed TCG</h1>
-        <p class="text-xs sm:text-sm text-brand-muted mt-1">Inicia sesión o crea una cuenta para gestionar tus pedidos y bóveda</p>
-      </div>
-
-      <!-- REQUERIMIENTO 1: Pestañas con Limpieza de Estados y Formulario Desacoplado -->
-      <div class="bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-sm max-w-lg mx-auto">
-        
-        <div class="flex border-b border-brand-border mb-6">
-          <button 
-            type="button" 
-            id="auth-tab-login"
-            onclick="app.switchAuthTab('login')" 
-            class="flex-1 py-2.5 text-xs font-bold border-b-2 border-brand-red text-brand-charcoal"
-          >
-            Iniciar Sesión
-          </button>
-          <button 
-            type="button" 
-            id="auth-tab-register"
-            onclick="app.switchAuthTab('register')" 
-            class="flex-1 py-2.5 text-xs font-bold border-b-2 border-transparent text-brand-muted hover:text-brand-charcoal"
-          >
-            Crear Cuenta
-          </button>
-        </div>
-
-        <!-- Formulario Iniciar Sesión -->
-        <div id="auth-section-login">
-          <form onsubmit="event.preventDefault(); app.handleLogin(document.getElementById('auth-email').value, document.getElementById('auth-password').value);" class="space-y-4">
-            <div>
-              <label for="auth-email" class="block text-xs font-bold text-brand-charcoal mb-1">Correo Electrónico: *</label>
-              <input type="email" id="auth-email" placeholder="tu.correo@ejemplo.com" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-lg" required />
-            </div>
-
-            <div>
-              <label for="auth-password" class="block text-xs font-bold text-brand-charcoal mb-1">Contraseña: *</label>
-              <input type="password" id="auth-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-lg" required />
-            </div>
-
-            <div class="flex items-center justify-between text-xs">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <!-- REQUERIMIENTO 1: Sin checked por defecto -->
-                <input type="checkbox" id="auth-remember" class="rounded text-brand-red" />
-                <span class="text-brand-charcoal">Recordar mis datos</span>
-              </label>
-              <a href="javascript:void(0)" onclick="app.showToast('Enlace de recuperación enviado al correo.', 'info')" class="font-bold text-brand-red hover:underline">¿Olvidaste tu contraseña?</a>
-            </div>
-
-            <button type="submit" class="w-full py-3 bg-brand-red hover:bg-brand-darkred text-white text-sm font-bold rounded-xl transition shadow touch-target">
-              Acceder a mi Cuenta
-            </button>
-          </form>
-        </div>
-
-        <!-- Formulario Crear Cuenta -->
-        <div id="auth-section-register" class="hidden">
-          <form onsubmit="event.preventDefault(); app.handleRegister(document.getElementById('reg-name').value, document.getElementById('reg-id').value, document.getElementById('reg-email').value, document.getElementById('reg-pass').value);" class="space-y-3.5">
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label for="reg-name" class="block text-xs font-bold text-brand-charcoal mb-1">Nombre: *</label>
-                <input type="text" id="reg-name" placeholder="Ej. Ana Lucía" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg" required />
-              </div>
-              <div>
-                <label for="reg-id" class="block text-xs font-bold text-brand-charcoal mb-1">Cédula/RUC: *</label>
-                <input type="text" id="reg-id" placeholder="1720000000" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg" required />
-              </div>
-            </div>
-
-            <div>
-              <label for="reg-email" class="block text-xs font-bold text-brand-charcoal mb-1">Correo Electrónico: *</label>
-              <input type="email" id="reg-email" placeholder="coleccionista@ejemplo.com" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg" required />
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label for="reg-pass" class="block text-xs font-bold text-brand-charcoal mb-1">Contraseña: *</label>
-                <input type="password" id="reg-pass" placeholder="••••••••" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg" required />
-              </div>
-              <div>
-                <label for="reg-pass-confirm" class="block text-xs font-bold text-brand-charcoal mb-1">Confirmar: *</label>
-                <input type="password" id="reg-pass-confirm" placeholder="••••••••" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg" required />
-              </div>
-            </div>
-
-            <label class="flex items-start gap-2 text-xs text-brand-muted cursor-pointer pt-1">
-              <!-- REQUERIMIENTO 1: Sin checked por defecto -->
-              <input type="checkbox" id="reg-terms" required class="mt-0.5 rounded text-brand-red" />
-              <span>Acepto los Términos de Servicio y la Política de Privacidad de Graded &amp; Sealed TCG</span>
-            </label>
-
-            <button type="submit" class="w-full py-3 bg-brand-charcoal hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition shadow touch-target">
-              Registrar mi Cuenta
-            </button>
-          </form>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- VIEW 07: SEGUIMIENTO Y TRACKING DINÁMICO (#tracking) -->
-    <!-- ===================================================================== -->
-    <section id="view-tracking" class="view-section max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-      
-      <!-- Estado vacío si no hay órdenes en localStorage -->
-      <div id="tracking-empty-state" class="bg-white border border-brand-border rounded-2xl p-10 text-center shadow-sm">
-        <i data-lucide="package-search" class="w-16 h-16 mx-auto mb-3 text-slate-300"></i>
-        <h2 class="text-xl font-black text-brand-charcoal">No tienes pedidos activos en curso</h2>
-        <p class="text-xs text-brand-muted mt-1 max-w-md mx-auto">
-          Cuando realices una compra en la tienda, podrás consultar aquí en tiempo real la línea de tiempo de custodia y despacho.
-        </p>
-        <a href="#home" class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-brand-red hover:bg-brand-darkred text-white text-xs font-bold rounded-lg shadow-sm transition">
-          <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-          <span>Explorar Cartas Disponibles</span>
-        </a>
-      </div>
-
-      <!-- REQUERIMIENTO 6: Tarjeta de Pedido Real Dinámica -->
-      <div id="tracking-active-order-box" class="bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-sm hidden">
-        
-        <!-- Header con datos de orden y botones de acción -->
-        <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-brand-border">
-          <div>
-            <span id="tracking-order-id" class="text-xs font-mono font-bold text-brand-muted">ORDEN #PKM-2026-PENDING</span>
-            <h1 class="text-2xl font-black text-brand-charcoal tracking-tight mt-0.5">Seguimiento y Estado de Custodia</h1>
-            <p id="tracking-order-date" class="text-xs text-brand-muted">Fecha de compra reciente</p>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button 
-              type="button" 
-              onclick="app.showToast('Descargando factura electrónica autorizada...', 'success')" 
-              class="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-brand-charcoal rounded-lg transition flex items-center gap-1.5 touch-target"
-            >
-              <i data-lucide="file-text" class="w-4 h-4"></i>
-              <span>Descargar Factura</span>
-            </button>
-
-            <button 
-              type="button" 
-              onclick="app.showToast('Ticket de soporte abierto (#TICK-8841).', 'info')" 
-              class="px-3.5 py-2 text-xs font-bold border border-red-300 text-brand-red hover:bg-red-50 rounded-lg transition flex items-center gap-1.5 touch-target"
-            >
-              <i data-lucide="life-buoy" class="w-4 h-4"></i>
-              <span>Soporte</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Stepper Interactivo y Accesible de 4 Etapas -->
-        <div class="py-8" role="region" aria-label="Línea de tiempo de entrega del pedido">
-          <h2 class="text-xs font-extrabold text-brand-charcoal uppercase tracking-wider mb-6">Etapas del Pedido</h2>
-          
-          <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 relative">
-            
-            <div class="flex sm:flex-col items-center sm:text-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow">
-                <i data-lucide="check" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <span class="text-xs font-extrabold text-brand-charcoal block">1. Orden Recibida</span>
-                <span class="text-[11px] text-brand-muted">Validada</span>
-              </div>
-            </div>
-
-            <div class="flex sm:flex-col items-center sm:text-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-brand-red text-white flex items-center justify-center font-bold text-sm shadow ring-4 ring-red-100">
-                <i data-lucide="package" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <span class="text-xs font-extrabold text-brand-red block">2. En Preparación</span>
-                <span class="text-[11px] text-brand-muted">Bóveda de Seguridad</span>
-              </div>
-            </div>
-
-            <div class="flex sm:flex-col items-center sm:text-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm">
-                3
-              </div>
-              <div>
-                <span class="text-xs font-bold text-slate-400 block">3. En Camino / Listo</span>
-                <span class="text-[11px] text-slate-400">Próximamente</span>
-              </div>
-            </div>
-
-            <div class="flex sm:flex-col items-center sm:text-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm">
-                4
-              </div>
-              <div>
-                <span class="text-xs font-bold text-slate-400 block">4. Entregado</span>
-                <span class="text-[11px] text-slate-400">Custodia final</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- REQUERIMIENTO 6: Artículos Reales de la Compra -->
-        <div class="border-t border-brand-border pt-6">
-          <h2 class="text-sm font-extrabold text-brand-charcoal uppercase tracking-wider mb-4">Artículos en esta Orden</h2>
-          <div id="tracking-items-container" class="space-y-3"></div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- VIEW 09: PANTALLA DE ERROR DE PAGO (#error) -->
-    <!-- ===================================================================== -->
-    <section id="view-payment-error" class="view-section max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-      
-      <div class="bg-white border border-brand-border rounded-2xl p-6 sm:p-8 shadow-sm text-center">
-        
-        <div class="w-16 h-16 rounded-full bg-red-100 text-brand-red flex items-center justify-center mx-auto mb-4">
-          <i data-lucide="alert-triangle" class="w-10 h-10"></i>
-        </div>
-
-        <h1 class="text-2xl sm:text-3xl font-black text-brand-charcoal tracking-tight">No pudimos procesar tu pago</h1>
-        <div class="inline-block px-3 py-1 bg-red-100 text-brand-red font-mono font-bold text-xs rounded-md mt-2">
-          Código de Respuesta Bancaria: #DECLINED-SEC-054
-        </div>
-
-        <!-- Non-Cryptic Clear Diagnostic Message -->
-        <div class="mt-6 text-left bg-red-50/70 border border-red-200 rounded-xl p-5 space-y-2">
-          <h2 class="text-xs font-black text-red-900 uppercase tracking-wider">Diagnóstico de la Operación</h2>
-          <p class="text-xs sm:text-sm text-red-800 leading-relaxed">
-            La transacción fue rechazada por la entidad emisora de tu tarjeta. Esto suele ocurrir por límites de seguridad diarios o requerimiento de validación 3D Secure.
-          </p>
-          <div class="flex items-center gap-1.5 text-emerald-800 text-xs font-bold pt-1">
-            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
-            <span>Tranquilidad garantizada: NO se ha realizado ningún cobro a tu cuenta bancaria.</span>
-          </div>
-        </div>
-
-        <div class="mt-4 text-left bg-brand-surface border border-brand-border rounded-xl p-4 text-xs text-brand-muted">
-          <span class="font-bold text-brand-charcoal block mb-1">Tus Datos y Carrito Permanecen Guardados:</span>
-          <span>Hemos preservado tus artículos y tus datos de facturación para que puedas reintentar fácilmente.</span>
-        </div>
-
-        <!-- Recovery Action Buttons -->
-        <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-          <a 
-            href="#checkout" 
-            class="px-6 py-3.5 bg-brand-red hover:bg-brand-darkred text-white text-xs sm:text-sm font-bold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
-          >
-            <i data-lucide="credit-card" class="w-4 h-4"></i>
-            <span>Reintentar con otro método de pago</span>
-          </a>
-
-          <button 
-            type="button" 
-            onclick="app.switchToCashPickup()" 
-            class="px-6 py-3.5 bg-white border border-slate-300 hover:bg-slate-50 text-brand-charcoal text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 touch-target"
-          >
-            <i data-lucide="store" class="w-4 h-4"></i>
-            <span>Cambiar a Retiro en Tienda y Efectivo</span>
-          </button>
-        </div>
-
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ========================================================================= -->
-  <!-- MODAL DE PROCESAMIENTO DE PAGO CON SPINNER -->
-  <!-- ========================================================================= -->
   <div id="payment-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modal-payment-title">
     <div class="modal-content bg-white border border-slate-200 rounded-2xl max-w-md w-full p-8 text-center shadow-2xl">
-      
-      <div class="w-16 h-16 rounded-full bg-red-50 text-brand-red border border-red-100 flex items-center justify-center mx-auto mb-4">
-        <i data-lucide="shield-check" class="w-8 h-8 text-brand-red"></i>
+      <div class="w-16 h-16 rounded-full bg-rose-50 text-[#E11D48] border border-rose-100 flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="shield-check" class="w-8 h-8"></i>
       </div>
-
-      <h2 id="modal-payment-title" class="text-xl font-black text-brand-charcoal tracking-tight">Procesando Transacción Segura</h2>
-      
+      <h2 id="modal-payment-title" class="text-xl font-black text-[#0F172A] tracking-tight">Procesando Transacción Segura</h2>
       <p id="payment-modal-text" class="text-sm font-semibold text-slate-600 mt-2 min-h-[40px] flex items-center justify-center" aria-live="polite">
         Conectando con la pasarela bancaria segura...
       </p>
-
       <div class="mt-6 flex flex-col items-center gap-4">
-        <div class="w-10 h-10 border-4 border-slate-200 border-t-brand-red rounded-full animate-spin-smooth"></div>
-        
+        <div class="w-10 h-10 border-4 border-slate-200 border-t-[#E11D48] rounded-full animate-spin-smooth"></div>
         <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
-          <div id="payment-progress-bar" class="bg-brand-red h-full rounded-full transition-all duration-700 ease-out" style="width: 20%;"></div>
+          <div id="payment-progress-bar" class="bg-[#E11D48] h-full rounded-full transition-all duration-700 ease-out" style="width: 20%;"></div>
         </div>
       </div>
-
       <p class="text-[11px] text-slate-400 mt-5 flex items-center justify-center gap-1">
         <i data-lucide="lock" class="w-3 h-3"></i>
         <span>Encriptación TLS de 256 bits • No cierres esta ventana</span>
       </p>
-
     </div>
   </div>
 
-  <!-- ========================================================================= -->
-  <!-- DRAWER DESLIZABLE DE FILTROS AVANZADOS -->
-  <!-- ========================================================================= -->
-  <div id="advanced-filters-drawer" class="drawer-backdrop fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex justify-end" role="dialog" aria-modal="true" aria-labelledby="drawer-filters-title">
-    <div class="drawer-panel bg-white w-full max-w-sm h-full flex flex-col justify-between p-6 shadow-2xl overflow-y-auto">
-      
-      <div>
-        <div class="flex items-center justify-between pb-4 border-b border-brand-border">
-          <div class="flex items-center gap-2">
-            <i data-lucide="sliders-horizontal" class="w-5 h-5 text-brand-red"></i>
-            <h2 id="drawer-filters-title" class="text-lg font-black text-brand-charcoal">Filtros Avanzados</h2>
-          </div>
-          <button type="button" onclick="app.closeAdvancedFilters()" class="p-1.5 text-slate-400 hover:text-brand-charcoal rounded-lg hover:bg-slate-100 transition" aria-label="Cerrar filtros">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
-        </div>
-
-        <div class="mt-6 space-y-5">
-          <!-- Filter: Type -->
-          <div>
-            <label for="filter-type" class="block text-xs font-extrabold text-brand-charcoal uppercase tracking-wider mb-1.5">
-              Tipo Elemental:
-            </label>
-            <select id="filter-type" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-charcoal">
-              <option value="all">Todos los Tipos</option>
-              <option value="Fuego">Fuego</option>
-              <option value="Psíquico">Psíquico</option>
-              <option value="Oscuridad">Oscuridad</option>
-              <option value="Eléctrico">Eléctrico</option>
-              <option value="Agua">Agua</option>
-            </select>
-          </div>
-
-          <!-- Filter: Rarity -->
-          <div>
-            <label for="filter-rarity" class="block text-xs font-extrabold text-brand-charcoal uppercase tracking-wider mb-1.5">
-              Rareza / Categoría:
-            </label>
-            <select id="filter-rarity" class="w-full px-3.5 py-2.5 text-sm bg-brand-surface border border-brand-border rounded-xl focus:outline-none focus:border-brand-charcoal">
-              <option value="all">Todas las Rarezas</option>
-              <option value="Holo Rare">Holo Rare</option>
-              <option value="Secret Rare">Secret Rare</option>
-              <option value="Gold Star">Gold Star</option>
-              <option value="Promo">Promo</option>
-            </select>
-          </div>
-
-          <!-- Filter: Price Range -->
-          <div>
-            <label class="block text-xs font-extrabold text-brand-charcoal uppercase tracking-wider mb-1.5">
-              Rango de Precio (USD):
-            </label>
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <span class="text-[10px] text-brand-muted block mb-0.5">Mínimo:</span>
-                <input type="number" id="filter-min-price" placeholder="0" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg focus:outline-none" />
-              </div>
-              <div>
-                <span class="text-[10px] text-brand-muted block mb-0.5">Máximo:</span>
-                <input type="number" id="filter-max-price" placeholder="100000" class="w-full px-3 py-2 text-xs bg-brand-surface border border-brand-border rounded-lg focus:outline-none" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div class="pt-6 border-t border-brand-border flex items-center gap-3">
-        <button 
-          type="button" 
-          onclick="app.resetAdvancedFilters()" 
-          class="flex-1 py-3 border border-slate-300 text-brand-charcoal hover:bg-slate-100 text-xs font-bold rounded-xl transition"
-        >
-          Limpiar
-        </button>
-        <button 
-          type="button" 
-          onclick="app.applyAdvancedFilters()" 
-          class="flex-1 py-3 bg-brand-red hover:bg-brand-darkred text-white text-xs font-extrabold rounded-xl transition shadow"
-        >
-          Aplicar Filtros
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- 3.3 MODAL INFORMATIVO: "¿QUÉ ES UN GRADO PSA?" -->
-  <!-- ========================================================================= -->
   <div id="psa-guide-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="psa-guide-title">
     <div class="modal-content bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl">
-      <div class="flex items-start justify-between gap-4 pb-4 border-b border-brand-border">
+      <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-200">
         <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 flex-shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-[#FEF3C7] border border-[#D97706]/30 flex items-center justify-center text-[#D97706] flex-shrink-0">
             <i data-lucide="award" class="w-5 h-5"></i>
           </div>
           <div>
-            <h2 id="psa-guide-title" class="text-lg font-black text-brand-charcoal tracking-tight">¿Qué es un Grado PSA?</h2>
-            <p class="text-xs text-brand-muted">Guía rápida de certificación y preservación</p>
+            <h2 id="psa-guide-title" class="text-lg font-black text-[#0F172A] tracking-tight">¿Qué es un Grado PSA?</h2>
+            <p class="text-xs text-slate-500">Estándar internacional de graduación y custodia</p>
           </div>
         </div>
         <button 
           type="button" 
           onclick="app.closePSAGuideModal()" 
-          class="p-1.5 text-slate-400 hover:text-brand-charcoal rounded-lg hover:bg-slate-100 transition"
+          class="p-1.5 text-slate-400 hover:text-[#0F172A] rounded-lg hover:bg-slate-100 transition"
           aria-label="Cerrar guía PSA"
         >
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -1469,45 +313,34 @@
       </div>
 
       <div class="mt-5 space-y-4 text-xs sm:text-sm">
-        <!-- Comparativa Visual Raw vs PSA 10 -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <div class="p-4 rounded-xl bg-[#F8FAFC] border border-slate-200 space-y-1.5">
             <div class="flex items-center justify-between">
-              <span class="font-extrabold text-brand-charcoal">Carta Raw (Sin Graduar)</span>
+              <span class="font-extrabold text-[#0F172A]">Carta Raw (Sin Graduar)</span>
               <span class="px-2 py-0.5 text-[10px] font-bold bg-slate-200 text-slate-700 rounded">NM</span>
             </div>
-            <p class="text-xs text-brand-muted leading-relaxed">
-              Carta auténtica en estado <strong>Near Mint</strong> conservada en funda protectora flexible (Sleeve + Top Loader), sin encapsulado ultrasónico. Ideal para completar álbumes o enviar a graduar.
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Carta original en estado <strong>Near Mint</strong> conservada en funda flexible y Top Loader, sin cápsula acrílica.
             </p>
           </div>
 
-          <div class="p-4 rounded-xl bg-amber-50/60 border border-amber-200 space-y-1.5">
+          <div class="p-4 rounded-xl bg-[#FEF3C7]/50 border border-[#D97706]/40 space-y-1.5">
             <div class="flex items-center justify-between">
-              <span class="font-extrabold text-brand-charcoal">PSA 10 Gem Mint</span>
-              <span class="px-2 py-0.5 text-[10px] font-black bg-amber-400 text-slate-950 rounded">GRADO 10</span>
+              <span class="font-extrabold text-[#0F172A]">PSA 10 Gem Mint</span>
+              <span class="px-2 py-0.5 text-[10px] font-black bg-[#0F172A] text-[#FEF3C7] rounded">GEM MT 10</span>
             </div>
-            <p class="text-xs text-brand-muted leading-relaxed">
-              Carta virtualmente perfecta (centrado 50/50, esquinas intactas y superficie impecable), <strong>encapsulada y certificada</strong> por PSA en estuche rígido (Slab) con número de serie único.
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Perfección técnica (centrado 50/50 y esquinas intactas), sellada por ultrasonido con código verificable PSA.
             </p>
           </div>
-        </div>
-
-        <div class="p-3.5 rounded-xl bg-brand-surface border border-brand-border text-xs text-brand-muted space-y-1">
-          <div class="font-bold text-brand-charcoal flex items-center gap-1.5">
-            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
-            <span>Escala Intermedia (PSA 8 y PSA 9):</span>
-          </div>
-          <p>
-            <strong>PSA 9 (Mint)</strong> presenta un estado sobresaliente con apenas un detalle microscópico de fábrica, mientras que <strong>PSA 8 (NM-MT)</strong> ofrece autenticidad encapsulada a un valor más accesible.
-          </p>
         </div>
       </div>
 
-      <div class="mt-6 pt-4 border-t border-brand-border flex justify-end">
+      <div class="mt-6 pt-4 border-t border-slate-200 flex justify-end">
         <button 
           type="button" 
           onclick="app.closePSAGuideModal()" 
-          class="px-5 py-2.5 bg-brand-charcoal hover:bg-slate-800 text-white text-xs font-extrabold rounded-xl transition"
+          class="px-5 py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-extrabold rounded-xl transition"
         >
           Entendido
         </button>
@@ -1515,32 +348,29 @@
     </div>
   </div>
 
-  <!-- ========================================================================= -->
-  <!-- 3.4 MODAL DE CONFIRMACIÓN DE ELIMINACIÓN EN CARRITO -->
-  <!-- ========================================================================= -->
   <div id="delete-confirm-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-title">
     <div class="modal-content bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl">
-      <div class="w-12 h-12 rounded-full bg-red-50 border border-red-100 text-brand-red flex items-center justify-center mx-auto mb-3">
+      <div class="w-12 h-12 rounded-full bg-rose-50 border border-rose-100 text-[#E11D48] flex items-center justify-center mx-auto mb-3">
         <i data-lucide="trash-2" class="w-6 h-6"></i>
       </div>
-      <h2 id="delete-confirm-title" class="text-base sm:text-lg font-black text-brand-charcoal">
+      <h2 id="delete-confirm-title" class="text-base sm:text-lg font-black text-[#0F172A]">
         ¿Deseas eliminar este artículo de tu bolsa?
       </h2>
-      <p id="delete-confirm-item-name" class="text-xs text-brand-muted mt-1.5 font-medium">
+      <p id="delete-confirm-item-name" class="text-xs text-slate-500 mt-1.5 font-medium">
         Esta acción retirará el producto seleccionado de tu carrito actual.
       </p>
       <div class="mt-6 flex items-center gap-3">
         <button 
           type="button" 
           onclick="app.cancelRemoveItem()" 
-          class="flex-1 py-2.5 px-4 border border-slate-300 hover:bg-slate-100 text-brand-charcoal text-xs font-bold rounded-xl transition touch-target"
+          class="flex-1 py-2.5 px-4 border border-slate-300 hover:bg-slate-100 text-[#0F172A] text-xs font-bold rounded-xl transition touch-target"
         >
           Cancelar
         </button>
         <button 
           type="button" 
           onclick="app.confirmRemoveItem()" 
-          class="flex-1 py-2.5 px-4 bg-brand-red hover:bg-brand-darkred text-white text-xs font-extrabold rounded-xl transition shadow touch-target"
+          class="flex-1 py-2.5 px-4 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-extrabold rounded-xl transition shadow touch-target"
         >
           Eliminar
         </button>
@@ -1548,55 +378,52 @@
     </div>
   </div>
 
-  <!-- ========================================================================= -->
-  <!-- 2. FOOTER COMERCIAL SOBRIO (SIN ENLACES INACTIVOS) -->
-  <!-- ========================================================================= -->
-  <footer class="bg-slate-100 border-t border-brand-border mt-auto py-8">
+  <footer class="bg-[#0F172A] text-white border-t border-slate-800 mt-auto py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-slate-200">
-        
-        <!-- Marca + Frase descriptiva -->
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-slate-800">
         <div class="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
           <div class="flex items-center gap-2.5">
-            <img src="Logo del e-commerce 1.png" alt="Graded and Sealed TCG" class="h-9 w-auto object-contain" onerror="this.onerror=null; this.src='https://placehold.co/100x40/DC2626/FFFFFF?text=G%26S'" />
-            <span class="font-black text-base text-brand-charcoal tracking-tight">GRADED &amp; SEALED TCG</span>
+            <img src="Logo del e-commerce 1.png" alt="Graded and Sealed TCG" class="h-9 w-auto object-contain rounded bg-white p-0.5" onerror="this.onerror=null; this.src='https://placehold.co/100x40/E11D48/FFFFFF?text=G%26S'" />
+            <span class="font-black text-base text-white tracking-tight">GRADED &amp; SEALED TCG</span>
           </div>
-          <span class="hidden sm:inline text-slate-300">|</span>
-          <p class="text-xs text-brand-muted max-w-md">
+          <span class="hidden sm:inline text-slate-700">|</span>
+          <p class="text-xs text-slate-300 max-w-md">
             Especialistas en preservación y comercialización de coleccionables TCG de alta gama en Ecuador.
           </p>
         </div>
 
-        <!-- Indicador visual de métodos de compra aceptados -->
         <div class="flex flex-wrap items-center justify-center gap-2" aria-label="Métodos de pago aceptados">
-          <span class="text-[11px] font-bold text-brand-muted mr-1">Métodos aceptados:</span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-300 text-xs font-black text-blue-900 shadow-sm">
-            <i data-lucide="credit-card" class="w-3.5 h-3.5 text-blue-700"></i>
+          <span class="text-[11px] font-bold text-slate-400 mr-1">Métodos aceptados:</span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1E293B] border border-slate-700 text-xs font-black text-white">
+            <i data-lucide="credit-card" class="w-3.5 h-3.5 text-[#FEF3C7]"></i>
             <span>VISA</span>
           </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-300 text-xs font-black text-slate-800 shadow-sm">
-            <i data-lucide="credit-card" class="w-3.5 h-3.5 text-amber-600"></i>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1E293B] border border-slate-700 text-xs font-black text-white">
+            <i data-lucide="credit-card" class="w-3.5 h-3.5 text-[#D97706]"></i>
             <span>Mastercard</span>
           </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-300 text-xs font-bold text-emerald-800 shadow-sm">
-            <i data-lucide="banknote" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1E293B] border border-slate-700 text-xs font-bold text-[#D1FAE5]">
+            <i data-lucide="banknote" class="w-3.5 h-3.5 text-[#059669]"></i>
             <span>Efectivo en Tienda</span>
           </span>
         </div>
-
       </div>
 
-      <!-- Línea de derechos reservados -->
-      <div class="pt-5 text-center text-xs text-brand-muted font-medium">
+      <div class="pt-5 text-center text-xs text-slate-400 font-medium">
         © 2026 Graded &amp; Sealed TCG. Todos los derechos reservados. Quito, Ecuador.
       </div>
-
     </div>
   </footer>
 
-  <!-- Modular Application Engine -->
-  <script src="app.js"></script>
-
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/views/home.js"></script>
+  <script src="js/views/catalog.js"></script>
+  <script src="js/views/pdp.js"></script>
+  <script src="js/views/cart.js"></script>
+  <script src="js/views/checkout.js"></script>
+  <script src="js/views/profile.js"></script>
+  <script src="js/views/tracking.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
