@@ -283,3 +283,14 @@ html, body {
   box-shadow: inset 0 3px 6px rgba(15, 23, 42, 0.14);
 }
 
+.brand-logo {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: high-quality;
+  image-rendering: auto;
+  image-rendering: -webkit-optimize-contrast;
+  object-fit: contain;
+}
+
+
