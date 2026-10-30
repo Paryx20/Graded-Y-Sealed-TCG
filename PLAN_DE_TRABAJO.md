@@ -12,20 +12,26 @@
 
 ---
 
-### [ ] FASE 2: Base de Datos Relacional de 10 Tablas y Datos Semilla (Miércoles - Tarde)
-- [ ] Crear 'js/db/schema.js' modelando las 10 entidades relacionales:
-      1. usuarios
-      2. direcciones_envio
-      3. categorias_producto
-      4. sets_expansiones
-      5. productos (con campo discriminador 'tipo_item': 'CARTA_INDIVIDUAL' | 'PRODUCTO_SELLADO')
-      6. detalles_cartas (atributos específicos TCG: rareza, tipo, artista)
-      7. certificaciones_psa (grados: Raw, PSA 8, PSA 9, PSA 10)
-      8. historial_precios (series cronológicas para gráfica)
-      9. ordenes_compra (desglose IVA 15% y envío $5)
-      10. items_orden
-- [ ] Crear 'js/db/db-client.js' con persistencia transaccional (Dexie.js / IndexedDB) y respaldo en localStorage.
-- [ ] Poblar el catálogo inicial con al menos 6 cartas individuales y 4 productos sellados de fábrica.
+### [X] FASE 2: Arquitectura de Base de Datos Relacional (12 Tablas de Negocio)
+- [X] Definir 'js/db/schema.js' con claves naturales/compuestas y 12 entidades relacionales:
+      1. usuarios (PK: cedula_ruc)
+      2. direcciones_envio (PK: direccion_id, FK: usuario_cedula)
+      3. categorias_producto (PK: slug_categoria)
+      4. sets_expansiones (PK: codigo_set)
+      5. productos (PK: sku, discriminador: 'CARTA_INDIVIDUAL' vs 'PRODUCTO_SELLADO')
+      6. detalles_cartas (PK/FK: producto_sku)
+      7. detalles_sellados (PK/FK: producto_sku, gramaje, arte sobre, cantidad sobres)
+      8. certificaciones_psa (PK: numero_certificacion)
+      9. historial_precios (PK: registro_id, serie mensual 12 meses)
+      10. metodos_pago_tokenizados (PK: token_tarjeta, últimos 4 dígitos)
+      11. ordenes_compra (PK: numero_orden, IVA 15%, tarifas $0/$3/$5)
+      12. items_orden (PK Compuesta: numero_orden + sku + grado)
+- [X] Implementar motor de persistencia en 'js/db/db-client.js' con Dexie.js (IndexedDB transaccional ACID).
+- [X] Implementar la función transaccional de compra `procesarOrdenTransaccional()` con rollback si falla el stock.
+- [X] Poblar la base de datos (Seed Data) con:
+      * 4 cartas individuales de inversión (Charizard Base Set #4, Umbreon VMAX Alt Art, Gengar VMAX, Lugia Neo Genesis) con sus certificaciones e historial de cotizaciones.
+      * 2 productos sellados auténticos: Booster Pack Team Rocket 1999 (Pesado 20.94g) y Jungle Booster Pack (36 sobres).
+- [X] Comprobar apertura de tablas en DevTools (F12 -> Application -> Storage -> IndexedDB).
 
 ---
 
