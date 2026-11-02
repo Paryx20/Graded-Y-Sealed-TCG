@@ -98,8 +98,8 @@ const POKEMON_CARDS_CATALOG_10 = [
     era: 'modern',
     condicionPrincipal: 'raw',
     certNumber: '84920114',
-    imagenLocal: 'img/gengar-vmax.png',
-    imagenFallbackUrl: 'https://images.pokemontcg.io/sv1/57_hires.png',
+    imagenLocal: 'img/cards/gengar-holo-scarlet.png',
+    imagenFallbackUrl: 'img/cards/gengar-holo-scarlet.png',
     precios: {
       raw: 5.00,
       psa8: 9.00,
@@ -148,8 +148,8 @@ const POKEMON_CARDS_CATALOG_10 = [
     era: 'modern',
     condicionPrincipal: 'raw',
     certNumber: '84920116',
-    imagenLocal: 'img/umbreon-vmax.png',
-    imagenFallbackUrl: 'https://images.pokemontcg.io/sv4pt5/97_hires.png',
+    imagenLocal: 'img/cards/mimikyu-rare.png',
+    imagenFallbackUrl: 'img/cards/mimikyu-rare.png',
     precios: {
       raw: 14.00,
       psa8: 20.00,
@@ -173,8 +173,8 @@ const POKEMON_CARDS_CATALOG_10 = [
     era: 'modern',
     condicionPrincipal: 'psa10',
     certNumber: '84920117',
-    imagenLocal: 'img/mewtwo-base.png',
-    imagenFallbackUrl: 'https://images.pokemontcg.io/sv3pt5/59_hires.png',
+    imagenLocal: 'img/cards/mewto-holo-rare.png',
+    imagenFallbackUrl: 'img/cards/mewto-holo-rare.png',
     precios: {
       raw: 6.00,
       psa8: 11.00,
@@ -322,12 +322,12 @@ const SEALED_PRODUCTS = [
     era: 'vintage',
     condicionPrincipal: 'sealed',
     certNumber: '48291955',
-    imagenLocal: 'img/sealed/team-rocket-box-front.png',
-    imagenFallbackUrl: 'https://images.pokemontcg.io/base3/1_hires.png',
+    imagenLocal: 'img/sealed/Paquete fossil.png',
+    imagenFallbackUrl: 'img/sealed/Paquete fossil.png',
     galeria_sellada: {
-      frontal: 'img/sealed/team-rocket-box-front.png',
-      perspectiva: 'img/sealed/team-rocket-box-perspective.png',
-      lateral: 'img/sealed/team-rocket-box-side.png'
+      frontal: 'img/sealed/Paquete fossil.png',
+      perspectiva: 'img/sealed/Paquete fossil.png',
+      lateral: 'img/sealed/Paquete fossil.png'
     },
     detalles_sellados: {
       gramaje: '745g (Caja Completa)',
