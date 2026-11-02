@@ -43,10 +43,10 @@ const CheckoutView = {
             ` : `
               <div class="mt-3 space-y-3">
                 <p class="text-xs text-slate-600">Para garantizar la autenticidad y custodia certificada, <strong>toda compra requiere registro obligatorio</strong>. Si ya tienes cuenta, inicia sesión aquí:</p>
-                <form onsubmit="event.preventDefault(); CheckoutView.handleQuickLogin();" class="mt-2 space-y-3">
+                <form onsubmit="event.preventDefault(); CheckoutView.handleQuickLogin();" class="mt-2 space-y-3" novalidate>
                   <div>
                     <label for="login-email-checkout" class="block text-xs font-bold text-[#0F172A] mb-1">Correo Electrónico:</label>
-                    <input type="email" id="login-email-checkout" placeholder="tu.correo@ejemplo.com" class="w-full px-3 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                    <input type="email" id="login-email-checkout" autocomplete="email" placeholder="tu.correo@ejemplo.com" class="w-full px-3 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                   </div>
                   <div>
                     <label for="login-pass-checkout" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña:</label>
@@ -56,12 +56,7 @@ const CheckoutView = {
                     Iniciar Sesión y Precargar
                   </button>
                 </form>
-
-                <div class="relative my-3">
-                  <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
-                  <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-bold">o con tu cuenta</span></div>
-                </div>
-                <div id="google-signin-container-checkout" class="flex justify-center min-h-[44px]"></div>
+                <p class="text-[11px] text-slate-500">¿Primera compra? Completa el formulario de la derecha y tu cuenta se crea automáticamente.</p>
               </div>
             `}
           </div>
@@ -91,13 +86,11 @@ const CheckoutView = {
                     value="${user && (user.idCard || user.cedula_ruc) ? (user.idCard || user.cedula_ruc) : ''}" 
                     placeholder="Ej. 1710034065 o 1710034065001" 
                     maxlength="13"
-                    oninput="CheckoutView.validateIdInput(this)"
+                    inputmode="numeric"
+                    oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 13)"
                     class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white transition" 
                     required 
                   />
-                  <p id="guest-id-error" class="text-xs text-[#E11D48] font-semibold mt-1 hidden" role="alert">
-                    Cédula o RUC ecuatoriano inválido (validación Módulo 10)
-                  </p>
                 </div>
 
                 <div>
@@ -107,13 +100,13 @@ const CheckoutView = {
 
                 <div>
                   <label for="guest-phone" class="block text-xs font-bold text-[#0F172A] mb-1">Teléfono Celular: *</label>
-                  <div class="flex rounded-lg overflow-hidden border border-slate-300 bg-white">
+                  <div data-field class="flex rounded-lg overflow-hidden border border-slate-300 bg-white">
                     <span class="inline-flex items-center px-3.5 bg-slate-100 text-slate-700 text-sm font-bold border-r border-slate-200 select-none">
                       +593
                     </span>
                     <input 
                       type="tel" 
-                      id="guest-phone" 
+                      id="guest-phone" inputmode="numeric" 
                       value="${rawPhone}" 
                       placeholder="0991234567" 
                       maxlength="10" 
@@ -138,14 +131,11 @@ const CheckoutView = {
                   <div class="sm:col-span-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 flex items-center gap-2">
                     <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
                     <span>Sesión activa verificada como <strong>${user.name}</strong>. Esta compra quedará registrada en tu historial.</span>
-                    <input type="hidden" id="checkout-password" value="ACTIVE_SESSION" />
-                    <input type="hidden" id="guest-password" value="ACTIVE_SESSION" />
                   </div>
                 ` : `
                   <div class="sm:col-span-2">
                     <label for="checkout-password" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña para tu cuenta Graded &amp; Sealed: *</label>
-                    <input type="password" id="checkout-password" placeholder="Crea una contraseña segura (mínimo 8 caracteres)" minlength="8" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
-                    <input type="hidden" id="guest-password" value="" />
+                    <input type="password" id="checkout-password" autocomplete="new-password" placeholder="Mínimo 8 caracteres, con letras y números" minlength="8" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                     <span class="text-[10px] text-slate-500 mt-1 block">El checkout requiere cuenta registrada para emisión de comprobante fiscal y custodia certificada.</span>
                   </div>
                 `}
@@ -205,20 +195,39 @@ const CheckoutView = {
                     <i data-lucide="credit-card" class="w-5 h-5 text-slate-500"></i>
                   </label>
 
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200">
+                  <div id="card-fields" class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200">
                     <div class="sm:col-span-3">
-                      <label for="card-number" class="block text-xs font-bold text-slate-700 mb-1">Número de Tarjeta:</label>
-                      <input type="text" id="card-number" placeholder="•••• •••• •••• 4129" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
-                      <span class="text-[10px] text-slate-400 mt-0.5 block">Para simular fallo bancario ingresa una tarjeta terminada en 0000</span>
+                      <label for="card-holder" class="block text-xs font-bold text-slate-700 mb-1">Nombre del titular (como aparece en la tarjeta):</label>
+                      <input type="text" id="card-holder" autocomplete="cc-name" placeholder="CARLOS MENDOZA" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none uppercase" />
+                    </div>
+                    <div class="sm:col-span-3">
+                      <label for="card-number" class="block text-xs font-bold text-slate-700 mb-1">Número de tarjeta:</label>
+                      <div data-field class="flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden">
+                        <input type="text" id="card-number" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="4111 1111 1111 1111" oninput="CheckoutView.formatCardNumber(this)" class="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none font-mono tracking-wide" />
+                        <span id="card-brand" class="px-3 text-[11px] font-black text-slate-400 uppercase"></span>
+                      </div>
                     </div>
                     <div>
                       <label for="card-exp" class="block text-xs font-bold text-slate-700 mb-1">Expiración:</label>
-                      <input type="text" id="card-exp" placeholder="MM/AA" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
+                      <input type="text" id="card-exp" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA" oninput="CheckoutView.formatExpiry(this)" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
                     </div>
                     <div>
                       <label for="card-cvv" class="block text-xs font-bold text-slate-700 mb-1">CVV/CVC:</label>
-                      <input type="password" id="card-cvv" placeholder="•••" maxlength="4" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
+                      <input type="password" id="card-cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="•••" maxlength="3" oninput="this.value = this.value.replace(/\\D/g, '')" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
                     </div>
+                    <details class="sm:col-span-3 text-[11px] text-slate-500">
+                      <summary class="cursor-pointer font-bold text-slate-600 select-none">Tarjetas de prueba para la demostración</summary>
+                      <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 font-mono">
+                        <span>4111 1111 1111 1111 → Aprobada</span>
+                        <span>5555 5555 5555 4444 → Aprobada</span>
+                        <span>4000 0000 0000 0002 → No existe / cancelada</span>
+                        <span>4000 0000 0000 0069 → Caducada (banco)</span>
+                        <span>4000 0000 0000 9995 → Fondos insuficientes</span>
+                        <span>4100 0000 0000 0019 → Bloqueada (robo)</span>
+                        <span>4000 0000 0000 0127 → CVV incorrecto</span>
+                        <span>Fecha pasada (ej. 09/24) → Caducada</span>
+                      </div>
+                    </details>
                   </div>
                 </div>
 
@@ -333,41 +342,45 @@ const CheckoutView = {
   },
 
   renderPaymentError() {
+    const err = Store.data.lastPaymentError || {
+      code: 'RECHAZADA',
+      title: 'Transacción rechazada',
+      message: 'La transacción fue rechazada por el banco emisor.'
+    };
     return `
       <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm text-center">
           <div class="w-16 h-16 rounded-full bg-rose-100 text-[#E11D48] flex items-center justify-center mx-auto mb-4">
-            <i data-lucide="alert-triangle" class="w-10 h-10"></i>
+            <i data-lucide="credit-card" class="w-9 h-9"></i>
           </div>
 
           <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">No pudimos procesar tu pago</h1>
           <div class="inline-block px-3 py-1 bg-rose-100 text-[#E11D48] font-mono font-bold text-xs rounded-md mt-2">
-            Código Bancario: #DECLINED-SEC-054
+            Código bancario: ${err.code}
           </div>
 
           <div class="mt-6 text-left bg-rose-50/70 border border-rose-200 rounded-xl p-5 space-y-2">
-            <h2 class="text-xs font-black text-rose-900 uppercase tracking-wider">Diagnóstico de la Operación</h2>
-            <p class="text-xs sm:text-sm text-rose-800 leading-relaxed">
-              La transacción fue rechazada por el banco emisor debido a límites de seguridad diarios o verificación 3D Secure.
-            </p>
+            <h2 class="text-xs font-black text-rose-900 uppercase tracking-wider">${err.title}</h2>
+            <p class="text-xs sm:text-sm text-rose-800 leading-relaxed">${err.message}</p>
+            ${err.cardLast4 ? `<p class="text-xs text-rose-700">Tarjeta ${err.brand || ''} terminada en <strong>${err.cardLast4}</strong></p>` : ''}
             <div class="flex items-center gap-1.5 text-[#059669] text-xs font-bold pt-1">
               <i data-lucide="shield-check" class="w-4 h-4"></i>
-              <span>Tranquilidad garantizada: NO se ha realizado ningún cargo a tu tarjeta.</span>
+              <span>No se realizó ningún cargo y la orden no fue creada. Tu bolsa sigue intacta.</span>
             </div>
           </div>
 
           <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <a 
-              href="#checkout" 
+            <a
+              href="#checkout"
               class="px-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
             >
               <i data-lucide="credit-card" class="w-4 h-4"></i>
               <span>Reintentar con otra tarjeta</span>
             </a>
 
-            <button 
-              type="button" 
-              onclick="CheckoutView.switchToCashPickup()" 
+            <button
+              type="button"
+              onclick="CheckoutView.switchToCashPickup()"
               class="px-6 py-3.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 touch-target"
             >
               <i data-lucide="store" class="w-4 h-4"></i>
@@ -408,90 +421,116 @@ const CheckoutView = {
           </div>
 
           ${isLogin ? `
-            <form onsubmit="event.preventDefault(); CheckoutView.submitLogin();" class="space-y-4">
+            <form onsubmit="event.preventDefault(); CheckoutView.submitLogin();" class="space-y-4" novalidate>
               <div>
                 <label for="auth-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo Electrónico: *</label>
-                <input type="email" id="auth-email" placeholder="tu.correo@ejemplo.com" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+                <input type="email" id="auth-email" autocomplete="email" placeholder="tu.correo@ejemplo.com" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
               <div>
                 <label for="auth-password" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña: *</label>
-                <input type="password" id="auth-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+                <input type="password" id="auth-password" autocomplete="current-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
               <button type="submit" class="w-full py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-extrabold rounded-xl transition shadow touch-target">
                 Acceder a mi Cuenta
               </button>
             </form>
-
-            <div class="relative my-4">
-              <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
-              <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-bold">o continúa con</span></div>
-            </div>
-            <div id="google-signin-container-auth-login" class="flex justify-center min-h-[44px]"></div>
+            <p class="text-center text-xs text-slate-500 mt-4">
+              ¿Aún no tienes cuenta?
+              <button type="button" onclick="CheckoutView.switchAuthTab('register')" class="font-extrabold text-[#E11D48] hover:underline">Regístrate aquí</button>
+            </p>
           ` : `
-            <form onsubmit="event.preventDefault(); CheckoutView.submitRegister();" class="space-y-3.5">
+            <form onsubmit="event.preventDefault(); CheckoutView.submitRegister();" class="space-y-3.5" novalidate>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label for="reg-name" class="block text-xs font-bold text-[#0F172A] mb-1">Nombre Completo: *</label>
-                  <input type="text" id="reg-name" placeholder="Ej. Ana Lucía" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+                  <input type="text" id="reg-name" autocomplete="name" placeholder="Ej. Ana Lucía Pérez" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
                 </div>
                 <div>
-                  <label for="reg-id" class="block text-xs font-bold text-[#0F172A] mb-1">Cédula (10 dígitos): *</label>
-                  <input type="text" id="reg-id" maxlength="10" oninput="this.value = this.value.replace(/\\D/g, '').slice(0,10)" placeholder="1710034065" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+                  <label for="reg-id" class="block text-xs font-bold text-[#0F172A] mb-1">Cédula o RUC: *</label>
+                  <input type="text" id="reg-id" inputmode="numeric" maxlength="13" oninput="this.value = this.value.replace(/\\D/g, '').slice(0,13)" placeholder="1710034065" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
                 </div>
               </div>
               <div>
                 <label for="reg-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo Electrónico: *</label>
-                <input type="email" id="reg-email" placeholder="coleccionista@ejemplo.com" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+                <input type="email" id="reg-email" autocomplete="email" placeholder="coleccionista@ejemplo.com" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label for="reg-city" class="block text-xs font-bold text-[#0F172A] mb-1">Ciudad:</label>
-                  <input type="text" id="reg-city" placeholder="Quito" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" />
+                  <label for="reg-city" class="block text-xs font-bold text-[#0F172A] mb-1">Ciudad: *</label>
+                  <input type="text" id="reg-city" autocomplete="address-level2" placeholder="Quito" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
                 </div>
                 <div>
-                  <label for="reg-phone" class="block text-xs font-bold text-[#0F172A] mb-1">Celular (+593):</label>
-                  <input type="tel" id="reg-phone" maxlength="10" oninput="this.value = this.value.replace(/\\D/g, '').slice(0,10)" placeholder="0991234567" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" />
+                  <label for="reg-phone" class="block text-xs font-bold text-[#0F172A] mb-1">Celular: *</label>
+                  <input type="tel" id="reg-phone" inputmode="numeric" maxlength="10" oninput="this.value = this.value.replace(/\\D/g, '').slice(0,10)" placeholder="0991234567" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
                 </div>
               </div>
               <div>
+                <label for="reg-address" class="block text-xs font-bold text-[#0F172A] mb-1">Dirección de entrega: *</label>
+                <input type="text" id="reg-address" autocomplete="street-address" placeholder="Av. República del Salvador N34-183 y Moscú" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+              </div>
+              <div>
                 <label for="reg-pass" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña: *</label>
-                <input type="password" id="reg-pass" placeholder="••••••••" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+                <input type="password" id="reg-pass" autocomplete="new-password" placeholder="Mínimo 8 caracteres, con letras y números" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
               <label class="flex items-start gap-2 text-xs text-slate-600 cursor-pointer pt-1">
-                <input type="checkbox" id="reg-terms" required class="mt-0.5 rounded text-[#E11D48]" />
+                <input type="checkbox" id="reg-terms" class="mt-0.5 rounded text-[#E11D48]" />
                 <span>Acepto los protocolos de custodia y términos de Graded &amp; Sealed TCG</span>
               </label>
               <button type="submit" class="w-full py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-extrabold rounded-xl transition shadow touch-target">
                 Registrar mi Cuenta
               </button>
             </form>
-
-            <div class="relative my-4">
-              <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
-              <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-bold">o regístrate en 1-clic con</span></div>
-            </div>
-            <div id="google-signin-container-auth-register" class="flex justify-center min-h-[44px]"></div>
           `}
+          <p class="text-center text-[11px] text-slate-400 mt-5 flex items-center justify-center gap-1.5">
+            <i data-lucide="database" class="w-3.5 h-3.5"></i>
+            <span>${SupabaseAPI.isOnline() ? 'Cuentas almacenadas de forma segura en Supabase' : 'Sin conexión con la base de datos'}</span>
+          </p>
         </div>
       </div>
     `;
   },
 
+  REGISTER_RULES: {
+    'reg-name': v => Validators.name(v),
+    'reg-id': v => Validators.idCard(v),
+    'reg-email': v => Validators.email(v),
+    'reg-city': v => Validators.city(v),
+    'reg-phone': v => Validators.phone(v),
+    'reg-address': v => Validators.address(v),
+    'reg-pass': v => Validators.password(v)
+  },
+
+  billingRules(needsPassword) {
+    const rules = {
+      'guest-name': v => Validators.name(v),
+      'guest-id': v => Validators.idCard(v),
+      'guest-email': v => Validators.email(v),
+      'guest-phone': v => Validators.phone(v),
+      'guest-address': v => Validators.address(v),
+      'guest-city': v => Validators.city(v)
+    };
+    if (needsPassword) rules['checkout-password'] = v => Validators.password(v);
+    return rules;
+  },
+
+  CARD_RULES: {
+    'card-holder': v => Validators.cardHolder(v),
+    'card-number': v => Validators.cardNumber(v),
+    'card-exp': v => Validators.cardExpiry(v),
+    'card-cvv': v => Validators.cardCvv(v)
+  },
+
   afterAuthRender() {
-    if (typeof app !== 'undefined' && typeof app.initGoogleSignIn === 'function') {
-      const containerId = this.authTab === 'login'
-        ? 'google-signin-container-auth-login'
-        : 'google-signin-container-auth-register';
-      app.initGoogleSignIn(containerId);
+    if (this.authTab === 'register') {
+      Validators.attach(this.REGISTER_RULES);
+    } else {
+      Validators.attach({ 'auth-email': v => Validators.email(v) });
     }
   },
 
   afterCheckoutRender() {
-    if (typeof Store !== 'undefined' && !Store.data.currentUser) {
-      if (typeof app !== 'undefined' && typeof app.initGoogleSignIn === 'function') {
-        app.initGoogleSignIn('google-signin-container-checkout');
-      }
-    }
+    Validators.attach(this.billingRules(!Store.data.currentUser));
+    Validators.attach(this.CARD_RULES);
   },
 
   afterRender() {
@@ -509,58 +548,17 @@ const CheckoutView = {
     app.renderCurrentView();
   },
 
-  validateIdInput(inputEl) {
-    inputEl.value = inputEl.value.replace(/\D/g, '').slice(0, 13);
-    const errEl = document.getElementById('guest-id-error');
-    if (!errEl) return;
-    if (inputEl.value.length === 0) {
-      errEl.classList.add('hidden');
-      inputEl.classList.remove('border-[#E11D48]', 'border-[#059669]');
-      return;
-    }
-    const valid = Store.isValidEcuadorianId(inputEl.value);
-    errEl.classList.toggle('hidden', valid);
-    inputEl.classList.toggle('border-[#E11D48]', !valid);
-    inputEl.classList.toggle('border-[#059669]', valid);
+  formatCardNumber(inputEl) {
+    const digits = inputEl.value.replace(/\D/g, '').slice(0, 19);
+    inputEl.value = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+    const brandEl = document.getElementById('card-brand');
+    if (brandEl) brandEl.textContent = Validators.cardBrand(digits);
   },
 
-  validateCreditCard(cardNumber) {
-    if (!cardNumber || typeof cardNumber !== 'string') {
-      return { valid: false, code: 'INVALID', message: 'Número de tarjeta inválido' };
-    }
-    const clean = cardNumber.replace(/\D/g, '');
-    if (clean.length < 13 || clean.length > 19) {
-      return { valid: false, code: 'INVALID_LENGTH', message: 'La tarjeta debe tener entre 13 y 19 dígitos' };
-    }
-
-    // Algoritmo de Luhn (Módulo 10 para tarjetas)
-    let sum = 0;
-    let alternate = false;
-    for (let i = clean.length - 1; i >= 0; i--) {
-      let n = parseInt(clean.charAt(i), 10);
-      if (alternate) {
-        n *= 2;
-        if (n > 9) n -= 9;
-      }
-      sum += n;
-      alternate = !alternate;
-    }
-
-    if (sum % 10 !== 0) {
-      return { valid: false, code: 'LUHN_FAILED', message: 'Dígito de verificación de tarjeta incorrecto (Luhn)' };
-    }
-
-    // Verificación de fallo simulado bancario: termina en '0000'
-    if (clean.endsWith('0000')) {
-      return {
-        valid: false,
-        simulatedDecline: true,
-        code: '#DECLINED-SEC-054',
-        message: 'Transacción denegada por el banco emisor (Límites o 3D Secure) (#DECLINED-SEC-054)'
-      };
-    }
-
-    return { valid: true, code: '00-APPROVED', message: 'Tarjeta aprobada' };
+  formatExpiry(inputEl) {
+    let d = inputEl.value.replace(/\D/g, '').slice(0, 4);
+    if (d.length === 1 && d > '1') d = '0' + d;
+    inputEl.value = d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
   },
 
   setDelivery(method) {
@@ -590,55 +588,47 @@ const CheckoutView = {
     app.showToast('Cambiado a Retiro en Tienda y Pago en Efectivo.', 'success');
   },
 
-  handleQuickLogin() {
+  async handleQuickLogin() {
     const emailEl = document.getElementById('login-email-checkout');
     const passEl = document.getElementById('login-pass-checkout');
     if (!emailEl || !passEl) return;
-    app.loginUser(emailEl.value, passEl.value, false);
-    app.renderCurrentView();
+    await app.loginUser(emailEl.value, passEl.value, false);
   },
 
-  submitLogin() {
+  async submitLogin() {
     const emailEl = document.getElementById('auth-email');
     const passEl = document.getElementById('auth-password');
     if (!emailEl || !passEl) return;
-    app.loginUser(emailEl.value, passEl.value, true);
+    await app.loginUser(emailEl.value, passEl.value, true);
   },
 
-  submitRegister() {
-    const name = document.getElementById('reg-name')?.value.trim();
-    const idCard = document.getElementById('reg-id')?.value.trim();
-    const email = document.getElementById('reg-email')?.value.trim();
-    const city = document.getElementById('reg-city')?.value.trim() || 'Quito';
-    const phoneRaw = document.getElementById('reg-phone')?.value.trim() || '0991234567';
-
-    if (!Store.isValidEcuadorianId(idCard)) {
-      app.showToast('La cédula ingresada no supera la validación Módulo 10.', 'error');
+  async submitRegister() {
+    if (!Validators.validateAll(this.REGISTER_RULES)) {
+      app.showToast('Revisa los campos marcados en rojo.', 'error');
+      return;
+    }
+    if (!document.getElementById('reg-terms')?.checked) {
+      app.showToast('Debes aceptar los términos de custodia para registrarte.', 'error');
       return;
     }
 
-    const newUser = {
-      name,
-      nombre: name,
-      idCard,
-      cedula_ruc: idCard,
-      email,
-      phone: `+593 ${phoneRaw.replace(/^\+593\s*/, '')}`,
-      telefono: `+593 ${phoneRaw.replace(/^\+593\s*/, '')}`,
-      city,
-      ciudad: city,
-      address: 'Av. República del Salvador y Naciones Unidas, Quito',
-      direccion_principal: 'Av. República del Salvador y Naciones Unidas, Quito',
-      has_account: true,
-      auth_tier: 'verified_collector'
-    };
-
-    Store.data.currentUser = newUser;
-    Store.data.users.push(newUser);
-    Store.saveUserSession();
-    app.updateNavbarUserUI();
-    app.showToast(`¡Cuenta creada con éxito, ${newUser.name}!`, 'success');
-    window.location.hash = '#profile';
+    const val = id => document.getElementById(id).value.trim();
+    try {
+      const user = await SupabaseAPI.register({
+        name: val('reg-name').replace(/\s+/g, ' '),
+        idCard: val('reg-id'),
+        email: val('reg-email'),
+        city: val('reg-city'),
+        phone: `+593 ${Validators.normalizePhone(val('reg-phone'))}`,
+        address: val('reg-address'),
+        password: document.getElementById('reg-pass').value
+      });
+      await app.startSession(user);
+      app.showToast(`¡Cuenta creada con éxito, ${user.name}!`, 'success');
+      window.location.hash = '#profile';
+    } catch (err) {
+      app.showToast(err.message, 'error');
+    }
   },
 
   async processPayment() {
@@ -648,71 +638,59 @@ const CheckoutView = {
       return;
     }
 
-    const nameInput = document.getElementById('guest-name');
-    const idInput = document.getElementById('guest-id');
-    const emailInput = document.getElementById('guest-email');
-    const phoneInput = document.getElementById('guest-phone');
-    const addressInput = document.getElementById('guest-address');
-    const cityInput = document.getElementById('guest-city');
-    const passwordInput = document.getElementById('checkout-password') || document.getElementById('guest-password');
-
-    const name = nameInput ? nameInput.value.trim() : '';
-    const email = emailInput ? emailInput.value.trim() : '';
-    const idCard = idInput ? idInput.value.trim() : '';
-    const rawPhoneDigits = phoneInput ? phoneInput.value.replace(/\D/g, '') : '';
-    const address = addressInput ? addressInput.value.trim() : 'Av. República del Salvador';
-    const city = cityInput ? cityInput.value.trim() : 'Quito';
-    const password = passwordInput ? passwordInput.value.trim() : '';
-
-    if (!name || !email) {
-      app.showToast('Completa todos los datos obligatorios de facturación.', 'error');
+    const currentUser = Store.data.currentUser;
+    if (!Validators.validateAll(this.billingRules(!currentUser))) {
+      app.showToast('Revisa los datos de facturación marcados en rojo.', 'error');
       return;
     }
 
-    // 1. Mandatory Account Creation: Password required if user is not already logged in
-    if (!Store.data.currentUser && (!password || password.length < 8)) {
-      app.showToast('Ingresa una contraseña de al menos 8 caracteres para tu cuenta Graded & Sealed.', 'error');
-      if (passwordInput && typeof passwordInput.focus === 'function') passwordInput.focus();
-      return;
-    }
+    const val = id => (document.getElementById(id)?.value || '').trim();
+    const name = val('guest-name').replace(/\s+/g, ' ');
+    const email = val('guest-email');
+    const idCard = val('guest-id');
+    const address = val('guest-address');
+    const city = val('guest-city');
+    const password = document.getElementById('checkout-password')?.value || '';
+    const formattedPhone = `+593 ${Validators.normalizePhone(val('guest-phone'))}`;
 
-    // 2. Validate Ecuadorian Cédula / RUC (Module 10)
-    if (!Store.isValidEcuadorianId(idCard)) {
-      if (idInput) {
-        this.validateIdInput(idInput);
-        if (typeof idInput.focus === 'function') idInput.focus();
-      }
-      app.showToast('Cédula o RUC ecuatoriano inválido (validación Módulo 10).', 'error');
-      return;
-    }
-
-    // 3. Validate Phone Number with +593 prefix and 9 digits
-    const digitsOnly = rawPhoneDigits.startsWith('593') ? rawPhoneDigits.slice(3) : (rawPhoneDigits.startsWith('0') ? rawPhoneDigits.slice(1) : rawPhoneDigits);
-    const formattedPhone = `+593 ${digitsOnly}`;
-    if (!Store.isValidEcuadorianPhone(formattedPhone)) {
-      app.showToast('Teléfono celular inválido. Debe tener prefijo +593 seguido de 9 dígitos.', 'error');
-      if (phoneInput && typeof phoneInput.focus === 'function') phoneInput.focus();
+    if (currentUser && currentUser.idCard && currentUser.idCard !== idCard) {
+      app.showToast('La cédula debe coincidir con la registrada en tu cuenta.', 'error');
+      document.getElementById('guest-id')?.focus();
       return;
     }
 
     const paymentMethodEl = document.querySelector('input[name="payment-method"]:checked');
     const paymentMethod = paymentMethodEl ? paymentMethodEl.value : 'card';
 
-    // 4. Validate Credit Card if payment method is 'card'
+    // Verificación de tarjeta: formato, marca, Luhn, caducidad, CVV y respuesta del banco
+    let cardInfo = null;
     if (paymentMethod === 'card') {
-      const cardNumInput = document.getElementById('card-number');
-      const cardNum = (cardNumInput ? cardNumInput.value : '').replace(/\s+/g, '');
-      const cardValidation = this.validateCreditCard(cardNum);
-
-      if (!cardValidation.valid) {
-        if (cardValidation.simulatedDecline) {
-          app.showToast('Transacción denegada por el banco (#DECLINED-SEC-054)', 'error');
-          window.location.hash = '#error';
-          return;
-        }
-        app.showToast(cardValidation.message || 'Número de tarjeta inválido', 'error');
-        if (cardNumInput && typeof cardNumInput.focus === 'function') cardNumInput.focus();
+      if (!Validators.validateAll(this.CARD_RULES)) {
+        const expMsg = Validators.cardExpiry(val('card-exp'));
+        app.showToast(expMsg === 'La tarjeta está caducada.' ? 'Tarjeta caducada: la transacción no se realizó.' : 'Revisa los datos de la tarjeta.', 'error');
         return;
+      }
+      const digits = val('card-number').replace(/\D/g, '');
+      cardInfo = { brand: Validators.cardBrand(digits), last4: digits.slice(-4), digits };
+    }
+
+    // Cuenta obligatoria: si no hay sesión se crea en Supabase antes de cobrar
+    if (!currentUser) {
+      try {
+        const user = await SupabaseAPI.register({ idCard, name, email, password, phone: formattedPhone, city, address });
+        await app.startSession(user);
+        app.showToast(`Cuenta creada para ${user.name}.`, 'success');
+      } catch (err) {
+        app.showToast(err.message, 'error');
+        return;
+      }
+    } else if (currentUser.token) {
+      try {
+        const updated = await SupabaseAPI.updateProfile(currentUser.token, { name, phone: formattedPhone, city, address });
+        Store.data.currentUser = { ...currentUser, ...updated };
+        Store.saveUserSession();
+      } catch (err) {
+        console.warn('[CheckoutView] No se pudo actualizar el perfil:', err.message);
       }
     }
 
@@ -738,19 +716,11 @@ const CheckoutView = {
 
       const userRecord = {
         cedula_ruc: idCard,
-        idCard,
         nombre: name,
-        name,
         email,
         telefono: formattedPhone,
-        phone: formattedPhone,
         ciudad: city,
-        city,
-        direccion_principal: address,
-        address,
-        password: password || (Store.data.currentUser ? Store.data.currentUser.password : 'Password2026!'),
-        has_account: true,
-        auth_tier: 'verified_collector'
+        direccion_principal: address
       };
 
       const isPickupOrder = Store.data.deliveryMethod === 'pickup';
@@ -763,9 +733,6 @@ const CheckoutView = {
       const estimatedDelivery = isPickupOrder
         ? 'Listo para retiro inmediato en Bóveda'
         : '2 a 3 días hábiles (Entrega Garantizada)';
-      const initialStatus = isPickupOrder
-        ? 'En Preparación / Listo para Retiro'
-        : 'En Preparación / En Custodia';
 
       const orderRecord = {
         numero_orden: orderId,
@@ -778,134 +745,53 @@ const CheckoutView = {
         buyerId: idCard,
         buyerEmail: email,
         buyerPhone: formattedPhone,
+        shippingAddress: isPickupOrder ? 'Bóveda Central Quito' : `${address}, ${city}`,
         fecha_creacion: now.toISOString(),
         date: formattedDate,
         subtotal,
-        iva_15: tax,
         tax,
-        costo_envio: shipping,
         shipping,
         total,
-        metodo_pago: methodLabel,
-        paymentMethod: methodLabel,
+        paymentMethod: cardInfo ? `${methodLabel} (${cardInfo.brand} •••• ${cardInfo.last4})` : methodLabel,
         metodo_entrega: Store.data.deliveryMethod,
         deliveryMethod: deliveryLabel,
-        estado: 'CONFIRMADO',
-        status: initialStatus,
-        estado_logistico: 'CONFIRMADO',
-        stages: isPickupOrder ? [
-          {
-            title: '1. Orden Recibida',
-            subtitle: 'Pago Verificado TLS 256-bit',
-            date: formattedDate,
-            status: 'completed',
-            detail: 'Fondos verificados y orden registrada en la cadena de custodia.'
-          },
-          {
-            title: '2. En Preparación',
-            subtitle: 'Sellado UV & Autenticación Bóveda',
-            date: formattedDate,
-            status: 'active',
-            detail: 'Validación de microimpresión, hologramas y encapsulado acrílico.'
-          },
-          {
-            title: '3. Listo para Retiro en Bóveda',
-            subtitle: 'Bóveda Central Quito • Sala de Entrega Privada',
-            date: 'Inmediata (Horario Bóveda)',
-            status: 'pending',
-            detail: 'Disponible para retiro en ventanilla de seguridad. Presentar cédula de identidad original.'
-          },
-          {
-            title: '4. Retirado en Bóveda',
-            subtitle: 'Custodia Transferida contra Cédula',
-            date: 'Pendiente de retiro',
-            status: 'pending',
-            detail: 'Recepción formal por el titular con documento de identidad original.'
-          }
-        ] : [
-          {
-            title: '1. Orden Recibida',
-            subtitle: 'Pago Verificado TLS 256-bit',
-            date: formattedDate,
-            status: 'completed',
-            detail: 'Fondos verificados y orden registrada en la cadena de custodia.'
-          },
-          {
-            title: '2. En Preparación',
-            subtitle: 'Sellado UV & Autenticación Bóveda',
-            date: formattedDate,
-            status: 'active',
-            detail: 'Validación de microimpresión, hologramas y encapsulado acrílico.'
-          },
-          {
-            title: '3. En Camino / Despacho',
-            subtitle: 'Transporte Blindado',
-            date: 'Programado (24-48h)',
-            status: 'pending',
-            detail: 'Embalaje con precinto tamper-evident en valija de seguridad.'
-          },
-          {
-            title: '4. Entregado',
-            subtitle: 'Custodia contra Documento',
-            date: 'Pendiente de entrega',
-            status: 'pending',
-            detail: 'Recepción formal por el titular con documento de identidad.'
-          }
-        ],
+        status: 'En preparación',
+        trackingStep: 1,
+        stepDates: { 1: formattedDate },
         items: [...Store.data.cart]
       };
 
-      // 5. ACID Persistence to Dexie.js
-      const dbRef = (typeof GradedSealedDB !== 'undefined') ? GradedSealedDB : ((typeof window !== 'undefined') ? window.GradedSealedDB : null);
-      if (dbRef) {
+      // Persistencia local (Dexie / localStorage) para funcionamiento sin conexión
+      const dbRef = (typeof GradedSealedDB !== 'undefined') ? GradedSealedDB : null;
+      if (dbRef && typeof dbRef.procesarOrdenTransaccional === 'function') {
         try {
-          if (typeof dbRef.procesarOrdenTransaccional === 'function') {
-            await dbRef.procesarOrdenTransaccional({
-              usuario: userRecord,
-              orden: orderRecord,
-              items: Store.data.cart.map(c => ({
-                sku: c.sku || c.id,
-                grado: c.condition || c.grado || 'PSA 10',
-                cantidad: c.quantity,
-                precio_unitario: c.price,
-                subtotal: c.price * c.quantity
-              }))
-            });
-          } else {
-            if (dbRef.usuarios) await dbRef.usuarios.put(userRecord);
-            if (dbRef.ordenes_compra) await dbRef.ordenes_compra.put(orderRecord);
-            if (dbRef.items_orden) {
-              for (const itm of Store.data.cart) {
-                await dbRef.items_orden.put({
-                  numero_orden: orderId,
-                  sku: itm.sku || itm.id,
-                  grado: itm.condition || itm.grado || 'RAW',
-                  cantidad: itm.quantity,
-                  precio_unitario: itm.price,
-                  subtotal: itm.price * itm.quantity
-                });
-              }
-            }
-          }
+          await dbRef.procesarOrdenTransaccional({
+            usuario: userRecord,
+            orden: orderRecord,
+            items: Store.data.cart.map(c => ({
+              sku: c.sku || c.id,
+              grado: c.condition || c.grado || 'PSA 10',
+              cantidad: c.quantity,
+              precio_unitario: c.price,
+              subtotal: c.price * c.quantity
+            }))
+          });
         } catch (dbErr) {
-          console.warn('[CheckoutView] Advertencia al persistir en Dexie:', dbErr);
+          console.warn('[CheckoutView] Advertencia al persistir localmente:', dbErr);
         }
       }
 
-      // Maintain active session state in Store and localStorage
-      Store.data.currentUser = userRecord;
-      const existingUserIdx = Store.data.users.findIndex(
-        u => (u.email && u.email.toLowerCase() === email.toLowerCase()) || (u.idCard === idCard)
-      );
-      if (existingUserIdx !== -1) {
-        Store.data.users[existingUserIdx] = { ...userRecord };
-      } else {
-        Store.data.users.push(userRecord);
+      // Registro de la orden en Supabase, asociada a la cédula del usuario
+      const sessionUser = Store.data.currentUser;
+      if (sessionUser && sessionUser.token) {
+        try {
+          await SupabaseAPI.saveOrder(sessionUser.token, orderRecord);
+        } catch (err) {
+          console.warn('[CheckoutView] La orden no se pudo guardar en Supabase:', err.message);
+          app.showToast('La orden se guardó localmente, pero no en la base de datos.', 'error');
+        }
       }
-      Store.saveUserSession();
-      app.updateNavbarUserUI();
 
-      // Save order in Store
       Store.addOrder(orderRecord);
       Store.data.cart = [];
       Store.saveCart();
@@ -923,21 +809,44 @@ const CheckoutView = {
     const modal = document.getElementById('payment-modal');
     const modalText = document.getElementById('payment-modal-text');
     const progressBar = document.getElementById('payment-progress-bar');
+    const step = (pct, text) => {
+      if (progressBar) progressBar.style.width = pct;
+      if (modalText) modalText.innerText = text;
+    };
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    if (modal) modal.classList.add('active');
-    if (progressBar) progressBar.style.width = '25%';
-    if (modalText) modalText.innerText = 'Conectando con pasarela bancaria TLS 256-bit...';
+    if (modal) {
+      modal.dataset.locked = '1';
+      modal.classList.add('active');
+    }
+    step('25%', 'Conectando con la pasarela bancaria...');
+    await wait(600);
+    step('60%', `Consultando al banco emisor (${cardInfo.brand} •••• ${cardInfo.last4})...`);
+    await wait(700);
 
-    setTimeout(() => {
-      if (progressBar) progressBar.style.width = '75%';
-      if (modalText) modalText.innerText = 'Verificando autenticación 3D Secure y custodia...';
-    }, 400);
+    const bank = Validators.bankAuthorize(cardInfo.digits);
+    if (bank.approved) {
+      step('100%', 'Pago autorizado. Registrando tu orden...');
+      await wait(400);
+    }
+    if (modal) {
+      modal.classList.remove('active');
+      delete modal.dataset.locked;
+    }
 
-    setTimeout(async () => {
-      if (progressBar) progressBar.style.width = '100%';
-      if (modal) modal.classList.remove('active');
-      await finalizeOrder('Tarjeta de Crédito / Débito');
-    }, 800);
+    if (!bank.approved) {
+      Store.data.lastPaymentError = {
+        code: bank.code,
+        title: bank.title,
+        message: bank.message,
+        brand: cardInfo.brand,
+        cardLast4: cardInfo.last4
+      };
+      app.showToast(`Pago rechazado: ${bank.title}.`, 'error');
+      window.location.hash = '#error';
+      return;
+    }
+
+    await finalizeOrder('Tarjeta de Crédito / Débito');
   }
 };
-

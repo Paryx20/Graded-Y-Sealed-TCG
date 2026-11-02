@@ -2,12 +2,16 @@ const app = {
   init() {
     Store.init();
     this.updateNavbarUserUI();
+    if (Store.data.currentUser) {
+      Store.syncOrdersFromServer().then(() => {
+        if (['profile', 'tracking'].includes(Store.data.currentView)) this.renderCurrentView();
+      });
+    }
     this.updateCartBadge();
     this.setupSearchSpotlight();
 
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        this.closeCategoriesDrawer();
         const psaModal = document.getElementById('psa-guide-modal');
         if (psaModal && psaModal.classList.contains('active')) {
           this.closePSAGuideModal();
@@ -41,7 +45,6 @@ const app = {
   },
 
   handleRoute() {
-    this.closeCategoriesDrawer();
     this.closePSAGuideModal();
     if (typeof TrackingView !== 'undefined' && typeof TrackingView.clearSimulationTimer === 'function') {
       TrackingView.clearSimulationTimer();
@@ -129,9 +132,27 @@ const app = {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
+  updateCategoryNav() {
+    const view = Store.data.currentView;
+    const f = Store.data.catalogFilters;
+    let key = '';
+    if (view === 'catalog') {
+      if (f.category !== 'all') key = `cat:${f.category}`;
+      else if (f.era !== 'all') key = `era:${f.era}`;
+      else key = 'all';
+    }
+    document.querySelectorAll('[data-nav]').forEach(link => {
+      const active = link.dataset.nav === key;
+      link.classList.toggle('is-active', active);
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  },
+
   renderCurrentView() {
     const container = document.getElementById('app-view');
     if (!container) return;
+    this.updateCategoryNav();
 
     const view = Store.data.currentView;
     let html = '';
@@ -222,20 +243,6 @@ const app = {
     } else {
       window.location.hash = targetHash;
     }
-  },
-
-  openCategoriesDrawer() {
-    const drawer = document.getElementById('categories-drawer');
-    const btn = document.getElementById('btn-categories-drawer');
-    if (drawer) drawer.classList.add('active');
-    if (btn) btn.setAttribute('aria-expanded', 'true');
-  },
-
-  closeCategoriesDrawer() {
-    const drawer = document.getElementById('categories-drawer');
-    const btn = document.getElementById('btn-categories-drawer');
-    if (drawer) drawer.classList.remove('active');
-    if (btn) btn.setAttribute('aria-expanded', 'false');
   },
 
   addToCart(id, name, condition, price, imageLocal, imageFallback, qty = 1) {
@@ -401,184 +408,44 @@ const app = {
     }
   },
 
-  loginUser(email, password, redirectHome = true) {
-    if (!email || !password) {
-      this.showToast('Ingresa tu correo y contraseña.', 'error');
-      return;
+  async loginUser(email, password, redirectHome = true) {
+    const emailMsg = Validators.email(email);
+    if (emailMsg || !password) {
+      this.showToast(emailMsg || 'Ingresa tu contraseña.', 'error');
+      return false;
     }
 
-    const matched = Store.data.users.find(
-      u => u.email.toLowerCase() === email.trim().toLowerCase()
-    );
-
-    const userObj = matched || {
-      name: (email || 'user@tcgvault.com').split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-      email: email.trim(),
-      idCard: '',
-      phone: '',
-      city: '',
-      address: ''
-    };
-
-    Store.data.currentUser = userObj;
-    Store.saveUserSession();
-    this.updateNavbarUserUI();
-    this.showToast(`¡Bienvenido a la bóveda, ${userObj.name}!`, 'success');
-
-    if (redirectHome) {
-      window.location.hash = '#profile';
-    }
-  },
-
-  decodeJwtResponse(token) {
-    if (!token || typeof token !== 'string') return null;
     try {
-      const parts = token.split('.');
-      if (parts.length < 2) return null;
-      const base64Url = parts[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const binaryStr = (typeof atob === 'function')
-        ? atob(base64)
-        : (typeof Buffer !== 'undefined' ? Buffer.from(base64, 'base64').toString('binary') : '');
-      if (!binaryStr) return null;
-      const jsonPayload = decodeURIComponent(
-        binaryStr
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      return JSON.parse(jsonPayload);
-    } catch (err) {
-      console.warn('[GIS] Error al decodificar JWT de Google:', err);
-      return null;
-    }
-  },
-
-  initGoogleSignIn(containerId = 'google-signin-container') {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    const clientId = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.GOOGLE_CLIENT_ID) 
-      ? APP_CONFIG.GOOGLE_CLIENT_ID 
-      : '';
-    const isConfigured = clientId && !clientId.includes('YOUR_GOOGLE_CLIENT_ID') && clientId.endsWith('.apps.googleusercontent.com');
-    const hasGIS = typeof window !== 'undefined' && window.google && window.google.accounts && window.google.accounts.id;
-
-    if (hasGIS && isConfigured) {
-      try {
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: (response) => this.handleGoogleCredentialResponse(response),
-          auto_select: false,
-          cancel_on_tap_outside: true
-        });
-        container.innerHTML = '';
-        window.google.accounts.id.renderButton(container, {
-          type: 'standard',
-          theme: 'filled_black',
-          size: 'large',
-          text: 'signin_with',
-          shape: 'rectangular',
-          logo_alignment: 'left',
-          width: 280
-        });
-        return;
-      } catch (err) {
-        console.warn('[GIS] Error al inicializar SDK de Google, activando botón alternativo:', err);
+      const user = await SupabaseAPI.login(email, password);
+      this.startSession(user);
+      this.showToast(`¡Bienvenido a la bóveda, ${user.name}!`, 'success');
+      if (redirectHome) {
+        window.location.hash = '#profile';
       }
-    }
-
-    // Material Design Google Fallback Button
-    container.innerHTML = `
-      <button 
-        type="button" 
-        id="btn-google-fallback"
-        onclick="app.handleSimulatedGoogleLogin()" 
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-6 py-3 bg-white hover:bg-slate-50 text-[#0F172A] border border-slate-300 hover:border-slate-400 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 touch-target"
-        aria-label="Continuar con cuenta de Google"
-      >
-        <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-        </svg>
-        <span>Continuar con Google</span>
-      </button>
-    `;
-  },
-
-  handleGoogleCredentialResponse(response) {
-    if (!response || !response.credential) {
-      this.showToast('No se recibió credencial válida de Google.', 'error');
-      return;
-    }
-    const payload = this.decodeJwtResponse(response.credential);
-    if (!payload || !payload.email) {
-      this.showToast('No se pudo verificar el token de Google.', 'error');
-      return;
-    }
-
-    const googleUser = {
-      id: payload.sub || `google-${Date.now()}`,
-      name: payload.name || payload.email.split('@')[0],
-      email: payload.email,
-      avatar: payload.picture || '',
-      authProvider: 'google',
-      idCard: '',
-      phone: '',
-      city: '',
-      address: ''
-    };
-
-    Store.data.currentUser = googleUser;
-    Store.saveUserSession();
-    this.updateNavbarUserUI();
-    this.showToast(`¡Sesión iniciada con Google como ${googleUser.name}!`, 'success');
-    if (Store.data.currentView === 'auth') {
-      window.location.hash = '#profile';
-    } else {
-      this.renderCurrentView();
+      return true;
+    } catch (err) {
+      this.showToast(err.message, 'error');
+      return false;
     }
   },
 
-  handleSimulatedGoogleLogin() {
-    const simulatedUser = {
-      id: 'google-oauth2-10829574102948',
-      name: 'Patrick Mora',
-      email: 'patrickmora2006@gmail.com',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
-      authProvider: 'google',
-      idCard: '',
-      phone: '',
-      city: '',
-      address: ''
-    };
-
-    Store.data.currentUser = simulatedUser;
+  // Guarda la sesión y trae desde Supabase el historial de órdenes del usuario
+  async startSession(user) {
+    Store.data.currentUser = user;
     Store.saveUserSession();
     this.updateNavbarUserUI();
-    this.showToast(`¡Sesión iniciada con Google como ${simulatedUser.name}!`, 'success');
-    if (Store.data.currentView === 'auth') {
-      window.location.hash = '#profile';
-    } else {
+    await Store.syncOrdersFromServer();
+    if (['profile', 'checkout', 'tracking'].includes(Store.data.currentView)) {
       this.renderCurrentView();
     }
   },
 
   logoutUser() {
-    const googleObj = (typeof window !== 'undefined' && window.google) 
-      ? window.google 
-      : ((typeof google !== 'undefined') ? google : null);
-    if (googleObj && googleObj.accounts && googleObj.accounts.id && typeof googleObj.accounts.id.disableAutoSelect === 'function') {
-      try {
-        googleObj.accounts.id.disableAutoSelect();
-      } catch (err) {
-        console.warn('[GIS] Error en disableAutoSelect:', err);
-      }
-    }
     Store.data.currentUser = null;
+    Store.data.orders = [];
+    Store.data.activeTrackingOrderId = null;
     Store.saveUserSession();
+    Store.saveOrders();
     this.updateNavbarUserUI();
     this.showToast('Sesión cerrada correctamente.', 'info');
     if (Store.data.currentView === 'profile') {

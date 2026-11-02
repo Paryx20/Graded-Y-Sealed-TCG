@@ -3,7 +3,6 @@ const APP_CONFIG = {
   QUITO_SHIPPING_FEE: 3.00,
   COURIER_SHIPPING_FEE: 5.00,
   PICKUP_SHIPPING_FEE: 0.00,
-  GOOGLE_CLIENT_ID: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
 };
 
 /**

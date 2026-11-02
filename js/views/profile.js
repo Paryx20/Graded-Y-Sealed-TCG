@@ -10,23 +10,27 @@ const ProfileView = {
             </div>
             
             <div class="space-y-2">
-              <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">Acceso a Bóveda &amp; Perfil de Custodia</h1>
+              <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">Acceso a tu perfil</h1>
               <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-                Inicia sesión con tu cuenta oficial de Google para acceder a tu bóveda privada, historial de adquisiciones certificadas PSA y seguimiento blindado en vivo.
+                Inicia sesión para ver tus datos, tu historial de compras y el seguimiento de tus pedidos.
               </p>
             </div>
 
-            <div class="pt-2 flex flex-col items-center justify-center gap-3">
-              <div id="google-signin-container" class="flex justify-center min-h-[44px]"></div>
-              <p class="text-[11px] text-slate-400">Autenticación segura federada con Google Identity Services (OAuth 2.0)</p>
-            </div>
+            <form onsubmit="event.preventDefault(); app.loginUser(document.getElementById('prof-login-email').value, document.getElementById('prof-login-pass').value, false);" class="max-w-sm mx-auto space-y-3 text-left" novalidate>
+              <div>
+                <label for="prof-login-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo electrónico</label>
+                <input type="email" id="prof-login-email" autocomplete="email" placeholder="tu.correo@ejemplo.com" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" />
+              </div>
+              <div>
+                <label for="prof-login-pass" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña</label>
+                <input type="password" id="prof-login-pass" autocomplete="current-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" />
+              </div>
+              <button type="submit" class="w-full py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-extrabold rounded-xl transition shadow touch-target">Iniciar sesión</button>
+            </form>
 
-            <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-slate-500">
-              <span class="text-slate-400">¿Prefieres acceso tradicional?</span>
-              <a href="#auth" class="inline-flex items-center gap-1.5 font-extrabold text-[#E11D48] hover:text-[#BE123C] transition">
-                <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
-                <span>Ingresar con Correo y Contraseña</span>
-              </a>
+            <div class="pt-4 border-t border-slate-100 text-xs text-slate-500">
+              ¿No tienes cuenta?
+              <a href="#auth" onclick="CheckoutView.authTab='register'" class="font-extrabold text-[#E11D48] hover:text-[#BE123C]">Crear una cuenta</a>
             </div>
           </div>
         </div>
@@ -42,27 +46,13 @@ const ProfileView = {
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         <div class="bg-[#0F172A] text-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="flex items-center gap-4">
-            ${user.avatar ? `
-              <img 
-                src="${user.avatar}" 
-                alt="${user.name}" 
-                class="w-14 h-14 rounded-2xl object-cover border border-[#D97706]/40 flex-shrink-0 shadow-sm"
-                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-14 h-14 rounded-2xl bg-[#1E293B] border border-[#D97706]/40 text-[#FEF3C7] flex items-center justify-center font-black text-xl flex-shrink-0\\'>${userInitial}</div>';"
-              />
-            ` : `
-              <div class="w-14 h-14 rounded-2xl bg-[#1E293B] border border-[#D97706]/40 text-[#FEF3C7] flex items-center justify-center font-black text-xl flex-shrink-0">
-                ${userInitial}
-              </div>
-            `}
+            <div class="w-14 h-14 rounded-2xl bg-[#1E293B] border border-[#D97706]/40 text-[#FEF3C7] flex items-center justify-center font-black text-xl flex-shrink-0">
+              ${userInitial}
+            </div>
             <div>
               <div class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-[#D1FAE5] bg-[#059669]/30 px-2.5 py-0.5 rounded mb-1">
-                ${user.authProvider === 'google' ? `
-                  <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-                  <span>Cuenta Google Verificada</span>
-                ` : `
-                  <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-                  <span>Titular de Bóveda Verificado</span>
-                `}
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                <span>Titular de Bóveda Verificado</span>
               </div>
               <h1 class="text-xl sm:text-2xl font-black tracking-tight">${user.name}</h1>
               <p class="text-xs text-slate-300">${user.email}${user.idCard ? ` • Cédula/RUC: ${user.idCard}` : ''}</p>
@@ -106,7 +96,7 @@ const ProfileView = {
               <p class="text-xs text-slate-500 mt-0.5">Estos datos se utilizan automáticamente en tus facturas electrónicas y despachos blindados.</p>
             </div>
 
-            <form onsubmit="event.preventDefault(); ProfileView.saveProfileChanges();" class="space-y-4">
+            <form onsubmit="event.preventDefault(); ProfileView.saveProfileChanges();" class="space-y-4" novalidate>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label for="prof-name" class="block text-xs font-extrabold text-[#0F172A] mb-1">Nombre Completo: *</label>
@@ -125,14 +115,10 @@ const ProfileView = {
                     type="text" 
                     id="prof-id" 
                     value="${user.idCard || ''}" 
-                    maxlength="10"
-                    oninput="ProfileView.validateProfileId(this)"
-                    required 
-                    class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-xl focus:bg-white text-[#0F172A] font-semibold"
+                    readonly
+                    class="w-full px-3.5 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-semibold cursor-not-allowed"
                   />
-                  <p id="prof-id-error" class="text-xs text-[#E11D48] font-bold mt-1 hidden">
-                    Cédula ecuatoriana inválida (10 dígitos Módulo 10)
-                  </p>
+                  <p class="text-[10px] text-slate-400 mt-1">La cédula identifica tu cuenta y no se puede cambiar.</p>
                 </div>
 
                 <div>
@@ -141,14 +127,14 @@ const ProfileView = {
                     type="email" 
                     id="prof-email" 
                     value="${user.email || ''}" 
-                    required 
-                    class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-xl focus:bg-white text-[#0F172A] font-semibold"
+                    readonly
+                    class="w-full px-3.5 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-semibold cursor-not-allowed"
                   />
                 </div>
 
                 <div>
                   <label for="prof-phone" class="block text-xs font-extrabold text-[#0F172A] mb-1">Teléfono Celular: *</label>
-                  <div class="flex rounded-xl overflow-hidden border border-slate-300 bg-white">
+                  <div data-field class="flex rounded-xl overflow-hidden border border-slate-300 bg-white">
                     <span class="inline-flex items-center px-3.5 bg-slate-100 text-slate-700 text-sm font-bold border-r border-slate-200 select-none">
                       +593
                     </span>
@@ -277,11 +263,16 @@ const ProfileView = {
     `;
   },
 
+  PROFILE_RULES: {
+    'prof-name': v => Validators.name(v),
+    'prof-phone': v => Validators.phone(v),
+    'prof-city': v => Validators.city(v),
+    'prof-address': v => Validators.address(v)
+  },
+
   afterRender() {
-    if (!Store.data.currentUser) {
-      if (typeof app !== 'undefined' && typeof app.initGoogleSignIn === 'function') {
-        app.initGoogleSignIn('google-signin-container');
-      }
+    if (Store.data.currentUser) {
+      Validators.attach(this.PROFILE_RULES);
     }
   },
 
@@ -290,51 +281,30 @@ const ProfileView = {
     app.renderCurrentView();
   },
 
-  validateProfileId(inputEl) {
-    inputEl.value = inputEl.value.replace(/\D/g, '').slice(0, 10);
-    const errEl = document.getElementById('prof-id-error');
-    if (!errEl) return;
-    const valid = Store.isValidEcuadorianId(inputEl.value);
-    errEl.classList.toggle('hidden', valid);
-    inputEl.classList.toggle('border-[#E11D48]', !valid);
-    inputEl.classList.toggle('border-[#059669]', valid);
-  },
-
-  saveProfileChanges() {
-    const name = document.getElementById('prof-name')?.value.trim();
-    const idCard = document.getElementById('prof-id')?.value.trim();
-    const email = document.getElementById('prof-email')?.value.trim();
-    const phoneRaw = document.getElementById('prof-phone')?.value.trim();
-    const city = document.getElementById('prof-city')?.value.trim();
-    const address = document.getElementById('prof-address')?.value.trim();
-
-    if (!name || !email) {
-      app.showToast('El nombre y el correo electrónico son obligatorios.', 'error');
+  async saveProfileChanges() {
+    const user = Store.data.currentUser;
+    if (!user) return;
+    if (!Validators.validateAll(this.PROFILE_RULES)) {
+      app.showToast('Revisa los campos marcados en rojo.', 'error');
       return;
     }
 
-    if (!Store.isValidEcuadorianId(idCard)) {
-      const idEl = document.getElementById('prof-id');
-      if (idEl) {
-        this.validateProfileId(idEl);
-        idEl.focus();
-      }
-      app.showToast('La cédula ingresada no es válida según el algoritmo Módulo 10.', 'error');
-      return;
+    const val = id => document.getElementById(id).value.trim();
+    const fields = {
+      name: val('prof-name').replace(/\s+/g, ' '),
+      phone: `+593 ${Validators.normalizePhone(val('prof-phone'))}`,
+      city: val('prof-city'),
+      address: val('prof-address')
+    };
+
+    try {
+      const updated = await SupabaseAPI.updateProfile(user.token, fields);
+      Store.updateProfile(updated);
+      app.updateNavbarUserUI();
+      app.renderCurrentView();
+      app.showToast('Perfil actualizado correctamente', 'success');
+    } catch (err) {
+      app.showToast(err.message, 'error');
     }
-
-    Store.updateProfile({
-      name,
-      idCard,
-      email,
-      phone: `+593 ${phoneRaw.replace(/^\+593\s*/, '')}`,
-      city,
-      address
-    });
-
-    app.updateNavbarUserUI();
-    app.renderCurrentView();
-    app.showToast('Perfil actualizado correctamente', 'success');
   }
 };
-

@@ -32,6 +32,13 @@ const Store = {
     try {
       const savedUser = localStorage.getItem('gstcg_user');
       if (savedUser) this.data.currentUser = JSON.parse(savedUser);
+      // Sesiones antiguas (Google simulado o sin token de Supabase) dejan de ser válidas
+      if (this.data.currentUser && !this.data.currentUser.token) {
+        this.data.currentUser = null;
+        localStorage.removeItem('gstcg_user');
+        localStorage.removeItem('gstcg_orders');
+        localStorage.removeItem('gstcg_last_order');
+      }
 
       const savedUsers = localStorage.getItem('gstcg_users');
       if (savedUsers) this.data.users = JSON.parse(savedUsers);
@@ -95,30 +102,42 @@ const Store = {
   },
 
   getOrderById(orderId) {
-    if (this.data.orders && this.data.orders.length > 0) {
-      if (!orderId) return this.data.orders[0];
-      const found = this.data.orders.find(o => o.orderId === orderId);
-      if (found) return found;
-    }
-    // Return preloaded simulated order if requested or when orders list is empty
-    if (orderId === '#GS-2026-9481' || !this.data.orders || this.data.orders.length === 0) {
-      return this.getPreloadedSimulatedOrder();
-    }
-    return this.data.orders[0] || null;
+    const orders = this.data.orders || [];
+    if (!orderId) return orders[0] || null;
+    return orders.find(o => o.orderId === orderId) || null;
   },
 
+  // Reemplaza el historial local por las órdenes guardadas en Supabase
+  async syncOrdersFromServer() {
+    const user = this.data.currentUser;
+    if (!user || !user.token || typeof SupabaseAPI === 'undefined') return;
+    try {
+      const remote = await SupabaseAPI.listOrders(user.token);
+      this.data.orders = remote;
+      if (!this.getOrderById(this.data.activeTrackingOrderId)) {
+        this.data.activeTrackingOrderId = remote.length ? remote[0].orderId : null;
+      }
+      this.saveOrders();
+    } catch (err) {
+      console.warn('[Store] No se pudo sincronizar el historial de órdenes:', err.message);
+    }
+  },
+
+  // Orden de demostración para el tracking: GS-2026-9481 + cédula 1710034065
   getPreloadedSimulatedOrder() {
     return {
       orderId: '#GS-2026-9481',
       numero_orden: '#GS-2026-9481',
       date: '02 Nov 2026, 09:15',
-      buyerName: 'Patricio Mora (Coleccionista Verificado)',
+      buyerName: 'Patricio Mora',
+      buyerId: '1710034065',
       buyerEmail: 'coleccionista.paryx@bovedatcg.ec',
       deliveryMethod: 'Courier Nacional Blindado Especializado',
       trackingNumber: 'GUI-EC-948102-PSA',
       courierName: 'Servientrega Blindado • Bóveda G&S',
       estimatedDelivery: '04 Nov 2026 (Entrega Garantizada en Mano)',
       status: 'En Custodia • Autenticación PSA Bóveda',
+      isDemo: true,
       currentStageIndex: 1,
       subtotal: 18500.00,
       tax: 2775.00,

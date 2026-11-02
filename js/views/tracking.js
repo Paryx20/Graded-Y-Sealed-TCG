@@ -1,82 +1,26 @@
 /**
  * ==============================================================================
- * TrackingView - Live Order Tracking & Vault Custody Simulation (Requirement R5)
+ * TrackingView - Seguimiento de órdenes con verificación de identidad por cédula
  * File: js/views/tracking.js
- * 
- * Features:
- *   - Preloaded active simulated order (#GS-2026-9481) on initial view load
- *   - Zero manual simulation controls (fully automated, realistic live timeline)
- *   - Dynamic timeline step renderer with active custody milestone & pulsating glow
- *   - Real checkout purchase order integration with tracking code and courier metadata
+ *
+ * Flujo de la simulación:
+ *   1. El cliente rastrea su pedido con número de orden (o guía) + cédula del titular.
+ *      Si la cédula no coincide con la registrada en la orden, no se muestra nada.
+ *   2. Las etapas avanzan solas: Preparación → En camino → Llegó a destino.
+ *   3. En la entrega, el courier (o la ventanilla de bóveda) pide la cédula.
+ *      Solo si coincide con el titular se marca como Entregado; tras 3 intentos
+ *      fallidos la entrega queda retenida y la pieza regresa a bóveda.
  * ==============================================================================
  */
 
 const TrackingView = {
-  getSimulatedOrder() {
-    if (typeof Store !== 'undefined' && typeof Store.getPreloadedSimulatedOrder === 'function') {
-      return Store.getPreloadedSimulatedOrder();
-    }
-    return {
-      orderId: '#GS-2026-9481',
-      numero_orden: '#GS-2026-9481',
-      date: '02 Nov 2026, 09:15',
-      buyerName: 'Patricio Mora (Coleccionista Verificado)',
-      buyerEmail: 'coleccionista.paryx@bovedatcg.ec',
-      deliveryMethod: 'Courier Nacional Blindado Especializado',
-      trackingNumber: 'GUI-EC-948102-PSA',
-      courierName: 'Servientrega Blindado • Bóveda G&S',
-      estimatedDelivery: '04 Nov 2026 (Entrega Garantizada en Mano)',
-      status: 'En Custodia • Autenticación PSA Bóveda',
-      currentStageIndex: 1,
-      subtotal: 18500.00,
-      tax: 2775.00,
-      shipping: 5.00,
-      total: 21280.00,
-      paymentMethod: 'Tarjeta de Crédito (3D Secure Verificado)',
-      stages: [
-        {
-          title: '1. Orden Recibida',
-          subtitle: 'Pago Verificado TLS 256-bit',
-          date: '02 Nov 2026, 08:30',
-          status: 'completed',
-          detail: 'Fondos verificados y orden registrada en la cadena de custodia.'
-        },
-        {
-          title: '2. Autenticación PSA',
-          subtitle: 'Sellado UV & Inspección Óptica',
-          date: '02 Nov 2026, 09:15',
-          status: 'active',
-          detail: 'Validación de microimpresión, hologramas y encapsulado acrílico.'
-        },
-        {
-          title: '3. Despacho Blindado',
-          subtitle: 'Asignado a Transporte Especial',
-          date: '03 Nov 2026, 10:00 (Est.)',
-          status: 'pending',
-          detail: 'Embalaje con precinto tamper-evident en valija de seguridad.'
-        },
-        {
-          title: '4. En Reparto / Entrega',
-          subtitle: 'Custodia contra Cédula y Firma',
-          date: '04 Nov 2026, 14:00 (Est.)',
-          status: 'pending',
-          detail: 'Recepción formal por el titular con documento de identidad.'
-        }
-      ],
-      items: [
-        {
-          id: 'charizard-base-psa10',
-          name: 'Charizard Base Set 1999 #4/102',
-          condition: 'PSA 10 GEM MT',
-          price: 18500.00,
-          quantity: 1,
-          imageLocal: 'img/cards/card-back.png',
-          imageFallback: 'https://images.pokemontcg.io/base1/4_hires.png'
-        }
-      ]
-    };
-  },
+  // Pasos: 1 preparación, 2 en camino / listo, 3 esperando verificación, 4 entregado, -1 retenido
+  STEP_DELAY_MS: 3500,
+  MAX_ID_ATTEMPTS: 3,
 
+  current: null,      // orden desbloqueada que se está mostrando
+  verifiedId: null,   // cédula con la que se desbloqueó
+  lookupError: '',
   _simulationTimer: null,
 
   clearSimulationTimer() {
@@ -86,171 +30,298 @@ const TrackingView = {
     }
   },
 
-  afterRender() {
-    this.clearSimulationTimer();
-    this.initSimulationTimer();
+  isPickup(order) {
+    return order.metodo_entrega === 'pickup' || /retiro/i.test(order.deliveryMethod || '');
   },
 
-  initSimulationTimer() {
-    let order = (typeof Store !== 'undefined' && Store.getOrderById)
-      ? Store.getOrderById(Store.data.activeTrackingOrderId)
-      : null;
+  maskId(id) {
+    const v = String(id || '');
+    return v.length > 4 ? '•'.repeat(v.length - 4) + v.slice(-4) : v;
+  },
 
-    if (!order) {
-      order = this.getSimulatedOrder();
-    }
+  nowLabel() {
+    return new Date().toLocaleString('es-EC', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  },
 
-    if (!order || !Array.isArray(order.stages) || order.stages.length < 3) {
+  // Deriva el paso actual de órdenes antiguas que solo tienen `stages`
+  getStep(order) {
+    if (typeof order.trackingStep === 'number') return order.trackingStep;
+    const stages = order.stages || [];
+    const activeIdx = stages.findIndex(s => s.status === 'active');
+    if (activeIdx > 0) return activeIdx;
+    if (stages.length && stages.every(s => s.status === 'completed')) return 4;
+    return 1;
+  },
+
+  buildStages(order) {
+    const step = this.getStep(order);
+    const dates = order.stepDates || {};
+    const pickup = this.isPickup(order);
+    const held = step === -1;
+    const tpl = pickup ? [
+      { title: 'Orden recibida', subtitle: 'Pago verificado', detail: 'Orden registrada en la cadena de custodia.' },
+      { title: 'En preparación', subtitle: 'Sellado UV en bóveda', detail: 'Revisión de hologramas, microimpresión y encapsulado.' },
+      { title: 'Listo para retiro', subtitle: 'Bóveda Central Quito', detail: 'Disponible en ventanilla de seguridad.' },
+      { title: 'Retirado', subtitle: 'Entrega contra cédula', detail: 'El titular presenta su cédula original en ventanilla.' }
+    ] : [
+      { title: 'Orden recibida', subtitle: 'Pago verificado', detail: 'Orden registrada en la cadena de custodia.' },
+      { title: 'En preparación', subtitle: 'Sellado UV en bóveda', detail: 'Revisión de hologramas, microimpresión y encapsulado.' },
+      { title: 'En camino', subtitle: order.courierName || 'Transporte blindado', detail: 'Valija con precinto tamper-evident y GPS activo.' },
+      { title: 'Entregado', subtitle: 'Entrega contra cédula', detail: 'El courier verifica la cédula del titular antes de entregar.' }
+    ];
+
+    return tpl.map((s, idx) => {
+      let status = 'pending';
+      if (held) {
+        status = idx < 3 ? 'completed' : 'failed';
+      } else if (idx === 0 || idx < step || step === 4) {
+        status = 'completed';
+      } else if (idx === step || (step === 3 && idx === 3)) {
+        status = 'active';
+      }
+      if (step === 3 && idx === 2) status = 'completed';
+
+      let date = idx === 0 ? (order.date || '') : (dates[idx] || '');
+      if (!date && status === 'pending') date = 'Pendiente';
+      if (status === 'active' && idx === 3) date = 'Esperando verificación';
+      if (status === 'failed') date = dates.held || 'Entrega retenida';
+      return { ...s, status, date, title: `${idx + 1}. ${s.title}` };
+    });
+  },
+
+  statusLabel(order) {
+    const step = this.getStep(order);
+    const pickup = this.isPickup(order);
+    if (step === -1) return 'Entrega retenida • Regresa a bóveda';
+    if (step === 4) return pickup ? 'Retirado en bóveda' : 'Entregado';
+    if (step === 3) return pickup ? 'En ventanilla • Verificando identidad' : 'En destino • Verificando identidad';
+    if (step === 2) return pickup ? 'Listo para retiro' : 'En camino';
+    return 'En preparación';
+  },
+
+  // -------------------------------------------------------------- Búsqueda
+
+  async lookup() {
+    const codeEl = document.getElementById('track-code');
+    const idEl = document.getElementById('track-id');
+    const code = (codeEl ? codeEl.value : '').trim().replace(/^#/, '').toUpperCase();
+    const idCard = (idEl ? idEl.value : '').trim();
+
+    if (!code) {
+      Validators.showError(codeEl, 'Ingresa el número de orden o de guía.');
+      codeEl.focus();
       return;
     }
+    Validators.showError(codeEl, '');
+    if (!Validators.validateAll({ 'track-id': v => Validators.idCard(v) })) return;
 
-    const stage2 = order.stages[1];
-    if (stage2 && stage2.status === 'active') {
-      this._simulationTimer = setTimeout(() => {
-        stage2.status = 'completed';
-        if (!stage2.date || stage2.date.includes('Est')) {
-          stage2.date = 'Completado hace unos momentos';
-        }
+    const matchesCode = o => [o.orderId, o.numero_orden, o.trackingNumber]
+      .filter(Boolean)
+      .some(c => String(c).replace(/^#/, '').toUpperCase() === code);
 
-        if (order.stages[2]) {
-          order.stages[2].status = 'active';
-          order.currentStageIndex = 2;
-        }
+    const btn = document.getElementById('track-submit');
+    if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
 
-        const isPickup = order.metodo_entrega === 'pickup' || 
-                         (order.deliveryMethod && /retiro/i.test(order.deliveryMethod));
-        order.status = isPickup 
-          ? 'Listo para Retiro en Bóveda' 
-          : 'En Camino / Despacho Blindado';
+    let order = (Store.data.orders || []).find(matchesCode);
+    const demo = Store.getPreloadedSimulatedOrder();
+    if (!order && matchesCode(demo)) order = this._demoOrder || (this._demoOrder = demo);
 
-        if (typeof Store !== 'undefined' && typeof Store.saveOrders === 'function') {
-          Store.saveOrders();
-        }
+    let error = '';
+    if (order) {
+      if ((order.buyerId || order.usuario_cedula) !== idCard) {
+        error = 'La cédula no coincide con el titular registrado en esta orden. Por seguridad no podemos mostrar el seguimiento.';
+        order = null;
+      }
+    } else {
+      try {
+        order = await SupabaseAPI.trackOrder(code, idCard);
+        if (!order) error = 'No encontramos una orden con ese código registrada a esa cédula.';
+      } catch (err) {
+        error = err.message;
+      }
+    }
 
-        this.updateStagesDOM(order);
-      }, 2000);
+    this.lookupError = error;
+    if (order) {
+      this.current = order;
+      this.verifiedId = idCard;
+      app.showToast('Identidad verificada. Mostrando el seguimiento de tu orden.', 'success');
+    }
+    app.renderCurrentView();
+  },
+
+  resetLookup() {
+    this.clearSimulationTimer();
+    this.current = null;
+    this.verifiedId = null;
+    this.lookupError = '';
+    Store.data.activeTrackingOrderId = null;
+    if (window.location.hash !== '#tracking') {
+      window.location.hash = '#tracking';
+    } else {
+      app.renderCurrentView();
     }
   },
 
-  updateStagesDOM(order) {
-    const statusBadge = document.getElementById('tracking-status-badge');
-    if (statusBadge) {
-      statusBadge.innerText = order.status;
+  // Orden a mostrar: la buscada con cédula, o una del historial del usuario con sesión
+  resolveOrder() {
+    const user = Store.data.currentUser;
+    const wanted = Store.data.activeTrackingOrderId;
+    if (wanted && user) {
+      const own = Store.getOrderById(wanted);
+      if (own && (!this.current || this.current.orderId !== own.orderId)) {
+        this.current = own;
+        this.verifiedId = own.buyerId || user.idCard;
+      }
     }
+    return this.current;
+  },
 
-    const timelineContainer = document.getElementById('tracking-timeline-container');
-    if (timelineContainer) {
-      timelineContainer.innerHTML = this.renderTimelineStages(order.stages);
-    }
+  // ------------------------------------------------------------ Simulación
 
-    const transitSection = document.getElementById('tracking-transit-section');
-    if (transitSection) {
-      const isPickup = order.metodo_entrega === 'pickup' || 
-                       (order.deliveryMethod && /retiro/i.test(order.deliveryMethod));
-      transitSection.innerHTML = isPickup 
-        ? this.renderPickupCard(order) 
-        : this.renderArmoredTransitCard(order);
-    }
-
-    if (typeof lucide !== 'undefined' && lucide.createIcons) {
-      lucide.createIcons();
-    }
-
-    if (typeof app !== 'undefined' && typeof app.showToast === 'function') {
-      const isPickup = order.metodo_entrega === 'pickup' || 
-                       (order.deliveryMethod && /retiro/i.test(order.deliveryMethod));
-      app.showToast(
-        isPickup 
-          ? '¡Hito completado! Tu orden está lista para retiro en Bóveda Central Quito.' 
-          : '¡Hito completado! Tu orden ha sido despachada en transporte blindado.',
-        'success'
-      );
+  afterRender() {
+    this.clearSimulationTimer();
+    const order = this.current;
+    if (order) this.scheduleNextStep(order);
+    if (typeof Validators !== 'undefined') {
+      Validators.attach({ 'track-id': v => Validators.idCard(v) });
     }
   },
 
-  renderPickupCard(order) {
+  scheduleNextStep(order) {
+    const step = this.getStep(order);
+    if (step < 1 || step >= 3) return;
+    this._simulationTimer = setTimeout(() => {
+      this.setStep(order, step + 1);
+      const pickup = this.isPickup(order);
+      const msg = step + 1 === 2
+        ? (pickup ? 'Tu pieza está lista para retiro en Bóveda Central.' : 'Tu pedido salió de la bóveda en transporte blindado.')
+        : (pickup ? 'Estás en ventanilla: presenta tu cédula para retirar.' : 'El courier llegó a destino y solicita la cédula del titular.');
+      app.showToast(msg, 'info');
+      this.refreshDetail();
+      this.scheduleNextStep(order);
+    }, this.STEP_DELAY_MS);
+  },
+
+  setStep(order, step) {
+    order.trackingStep = step;
+    order.stepDates = { ...(order.stepDates || {}), [step]: this.nowLabel() };
+    if (step === -1) order.stepDates.held = this.nowLabel();
+    order.status = this.statusLabel(order);
+    order.stages = this.buildStages(order);
+    this.persist(order);
+  },
+
+  persist(order) {
+    Store.saveOrders();
+    if (!order.isDemo && this.verifiedId && SupabaseAPI.isOnline()) {
+      SupabaseAPI.updateOrderStatus(order, this.verifiedId).catch(err => {
+        console.warn('[TrackingView] No se pudo guardar el estado en Supabase:', err.message);
+      });
+    }
+  },
+
+  refreshDetail() {
+    const box = document.getElementById('tracking-detail');
+    if (!box || !this.current) return;
+    box.innerHTML = this.renderDetail(this.current);
+    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    Validators.attach({ 'deliver-id': v => Validators.idCard(v) });
+  },
+
+  verifyDelivery() {
+    const order = this.current;
+    const input = document.getElementById('deliver-id');
+    if (!order || !input) return;
+    if (!Validators.validateAll({ 'deliver-id': v => Validators.idCard(v) })) return;
+
+    const holderId = order.buyerId || order.usuario_cedula;
+    const pickup = this.isPickup(order);
+    if (input.value.trim() === holderId) {
+      order.deliveredTo = order.buyerName;
+      order.idAttempts = 0;
+      this.setStep(order, 4);
+      app.showToast(pickup ? 'Identidad verificada. Pieza retirada en bóveda.' : 'Identidad verificada. Pedido entregado.', 'success');
+    } else {
+      order.idAttempts = (order.idAttempts || 0) + 1;
+      if (order.idAttempts >= this.MAX_ID_ATTEMPTS) {
+        this.setStep(order, -1);
+        app.showToast('Entrega retenida: demasiados intentos con una cédula incorrecta.', 'error');
+      } else {
+        this.persist(order);
+        app.showToast('La cédula no coincide con el titular. No se entrega el pedido.', 'error');
+      }
+    }
+    this.refreshDetail();
+  },
+
+  // ----------------------------------------------------------------- Vistas
+
+  renderLookupForm(compact) {
     return `
-      <div class="mt-6 p-5 sm:p-6 bg-emerald-50/70 border border-emerald-200 rounded-2xl shadow-xs">
-        <div class="flex items-start gap-3.5">
-          <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
-            <i data-lucide="shield-check" class="w-6 h-6"></i>
+      <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm ${compact ? '' : 'max-w-2xl mx-auto'}">
+        <div class="flex items-start gap-3 mb-5">
+          <div class="w-10 h-10 rounded-xl bg-[#0F172A] text-[#FEF3C7] flex items-center justify-center flex-shrink-0">
+            <i data-lucide="package-search" class="w-5 h-5"></i>
           </div>
-          <div class="flex-1 space-y-2">
-            <div>
-              <span class="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
-                Retiro Seguro en Bóveda Central Quito
-              </span>
-              <h3 class="text-base font-black text-[#0F172A] mt-1">Listo para retiro presencial en Bóveda</h3>
-              <p class="text-xs text-slate-600 mt-0.5">
-                Tu pieza certificada se encuentra resguardada en caja fuerte climatizada y lista para entrega en sala privada.
-              </p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
-              <div class="p-3 bg-white border border-emerald-100 rounded-xl">
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Dirección de Retiro:</span>
-                <strong class="text-[#0F172A] block mt-0.5">Av. República del Salvador N34-183 y Moscú</strong>
-                <span class="text-slate-500 text-[11px] block">Edificio Bóveda Central, Piso 2, Quito</span>
-              </div>
-
-              <div class="p-3 bg-white border border-emerald-100 rounded-xl">
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Horario de Atención:</span>
-                <strong class="text-[#0F172A] block mt-0.5">Lunes a Sábado: 09:00 - 18:00</strong>
-                <span class="text-slate-500 text-[11px] block">Entrega inmediata en ventanilla de seguridad</span>
-              </div>
-            </div>
-
-            <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center gap-2">
-              <i data-lucide="alert-circle" class="w-4 h-4 text-amber-700 flex-shrink-0"></i>
-              <span><strong>Requisito Obligatorio:</strong> Presentar Cédula de Identidad original del titular registrado (<strong>${order.buyerName || 'Coleccionista'}</strong>) o código QR de orden.</span>
-            </div>
+          <div>
+            <h1 class="text-xl font-black text-[#0F172A] tracking-tight">Rastrear un pedido</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Por seguridad, el seguimiento solo se muestra al titular. Ingresa el número de orden o guía y la cédula con la que se hizo la compra.</p>
           </div>
         </div>
-      </div>
+
+        <form onsubmit="event.preventDefault(); TrackingView.lookup();" class="grid grid-cols-1 sm:grid-cols-5 gap-3 items-start" novalidate>
+          <div class="sm:col-span-2">
+            <label for="track-code" class="block text-xs font-bold text-[#0F172A] mb-1">Orden o guía</label>
+            <input id="track-code" type="text" autocomplete="off" placeholder="PKM-2026-15875" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white font-mono uppercase" />
+          </div>
+          <div class="sm:col-span-2">
+            <label for="track-id" class="block text-xs font-bold text-[#0F172A] mb-1">Cédula del titular</label>
+            <input id="track-id" type="text" inputmode="numeric" maxlength="13" placeholder="1710034065" oninput="this.value = this.value.replace(/\\D/g, '')" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" />
+          </div>
+          <div class="sm:pt-5">
+            <button id="track-submit" type="submit" class="w-full py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-extrabold rounded-lg transition touch-target">Rastrear</button>
+          </div>
+        </form>
+
+        ${this.lookupError ? `
+          <div class="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-800 flex items-start gap-2" role="alert">
+            <i data-lucide="shield-alert" class="w-4 h-4 text-[#E11D48] flex-shrink-0 mt-0.5"></i>
+            <span>${this.lookupError}</span>
+          </div>
+        ` : ''}
+
+        <p class="mt-4 text-[11px] text-slate-400">
+          Pedido de demostración: orden <span class="font-mono font-bold text-slate-500">GS-2026-9481</span> con cédula <span class="font-mono font-bold text-slate-500">1710034065</span>.
+        </p>
+      </section>
     `;
   },
 
-  renderArmoredTransitCard(order) {
+  renderUserOrders() {
+    const user = Store.data.currentUser;
+    const orders = Store.data.orders || [];
+    if (!user || orders.length === 0) return '';
     return `
-      <div class="mt-6 p-5 sm:p-6 bg-[#0F172A] text-white rounded-2xl shadow-md border border-slate-800">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-          <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center">
-              <i data-lucide="truck" class="w-5 h-5 animate-pulse"></i>
-            </div>
-            <div>
-              <h3 class="text-sm font-black text-[#FEF3C7]">Transporte Blindado Especializado en Tránsito</h3>
-              <span class="text-[11px] text-slate-400">${order.courierName || 'Servientrega Blindado • Bóveda G&S'}</span>
-            </div>
-          </div>
-          <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-lg self-start sm:self-center">
-            GPS Activo • Valija Nivel IV
-          </span>
+      <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+        <span class="text-xs font-extrabold text-[#0F172A]">Tus órdenes (${orders.length}):</span>
+        <div class="flex flex-wrap gap-2">
+          ${orders.map(o => `
+            <button type="button" onclick="app.openOrderTracking('${o.orderId}')"
+              class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${this.current && o.orderId === this.current.orderId ? 'bg-[#0F172A] text-[#FEF3C7]' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
+              ${o.orderId}
+            </button>
+          `).join('')}
         </div>
-
-        <div class="pt-4 space-y-2">
-          <div class="flex items-center justify-between text-xs text-slate-300">
-            <span>Bóveda Central Quito</span>
-            <span class="font-mono text-amber-400 font-bold">En Ruta de Entrega</span>
-            <span>${order.buyerName || 'Destinatario'}</span>
-          </div>
-          <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden relative">
-            <div class="bg-gradient-to-r from-amber-500 via-emerald-500 to-amber-400 h-full w-2/3 rounded-full relative">
-              <div class="absolute right-0 top-0 bottom-0 w-2 bg-white animate-ping"></div>
-            </div>
-          </div>
-          <p class="text-[11px] text-slate-400 pt-1">
-            Entrega blindada con protocolo de seguridad personal y verificación contra documento de identidad.
-          </p>
-        </div>
-      </div>
+      </section>
     `;
   },
 
   renderTimelineStages(stages) {
-    return (stages || []).map((stg, idx) => {
+    return stages.map((stg, idx) => {
       const isCompleted = stg.status === 'completed';
       const isActive = stg.status === 'active';
+      const isFailed = stg.status === 'failed';
       let iconClass = 'bg-slate-200 text-slate-500';
       let iconContent = String(idx + 1);
 
@@ -259,235 +330,216 @@ const TrackingView = {
         iconContent = '<i data-lucide="check" class="w-5 h-5"></i>';
       } else if (isActive) {
         iconClass = 'bg-[#0F172A] text-[#FEF3C7] shadow ring-4 ring-slate-200';
-        iconContent = '<i data-lucide="package" class="w-5 h-5 animate-pulse"></i>';
+        iconContent = `<i data-lucide="${idx === 3 ? 'id-card' : 'package'}" class="w-5 h-5 animate-pulse"></i>`;
+      } else if (isFailed) {
+        iconClass = 'bg-[#E11D48] text-white shadow';
+        iconContent = '<i data-lucide="x" class="w-5 h-5"></i>';
       }
 
+      const boxClass = isActive
+        ? 'bg-amber-50/60 border border-amber-200/80 ring-1 ring-amber-300/50'
+        : (isFailed ? 'bg-rose-50 border border-rose-200' : 'bg-slate-50/40 border border-slate-100');
+      const subClass = isActive ? 'text-[#D97706] font-bold' : (isCompleted ? 'text-[#059669] font-semibold' : (isFailed ? 'text-[#E11D48] font-bold' : 'text-slate-400'));
+
       return `
-        <div class="flex sm:flex-col items-center sm:text-center gap-3 p-3 rounded-xl transition-all ${isActive ? 'bg-amber-50/60 border border-amber-200/80 shadow-xs ring-1 ring-amber-300/50' : 'bg-slate-50/40 border border-slate-100'}">
-          <div class="w-10 h-10 rounded-full ${iconClass} flex items-center justify-center font-bold text-sm flex-shrink-0">
-            ${iconContent}
-          </div>
+        <div class="flex sm:flex-col items-center sm:text-center gap-3 p-3 rounded-xl transition-all ${boxClass}">
+          <div class="w-10 h-10 rounded-full ${iconClass} flex items-center justify-center font-bold text-sm flex-shrink-0">${iconContent}</div>
           <div>
             <span class="text-xs font-extrabold text-[#0F172A] block">${stg.title}</span>
-            <span class="text-[11px] ${isActive ? 'text-[#D97706] font-bold' : (isCompleted ? 'text-[#059669] font-semibold' : 'text-slate-400')} block">
-              ${stg.subtitle}
-            </span>
+            <span class="text-[11px] ${subClass} block">${stg.subtitle}</span>
             ${stg.date ? `<span class="text-[10px] text-slate-400 block mt-0.5">${stg.date}</span>` : ''}
-            ${stg.detail ? `<p class="text-[10px] text-slate-500 mt-1 line-clamp-2 hidden sm:block">${stg.detail}</p>` : ''}
+            <p class="text-[10px] text-slate-500 mt-1 hidden sm:block">${stg.detail}</p>
           </div>
         </div>
       `;
     }).join('');
   },
 
-  getDefaultStages(order) {
-    const orderDate = order?.date || '02 Nov 2026';
-    const status = (order?.status || order?.estado || '').toUpperCase();
-    
-    const isDelivered = status.includes('ENTREGADO') || status.includes('RETIRADO');
-    const isInTransit = isDelivered || status.includes('TRANSITO') || status.includes('CAMINO') || status.includes('DESPACHADO') || status.includes('LISTO');
-    const isPickup = order?.metodo_entrega === 'pickup' || 
-                     (order?.deliveryMethod && /retiro/i.test(order.deliveryMethod));
-
-    if (isPickup) {
-      return [
-        {
-          title: '1. Orden Recibida',
-          subtitle: 'Pago Verificado TLS 256-bit',
-          date: orderDate,
-          status: 'completed',
-          detail: 'Fondos verificados y orden registrada en la cadena de custodia.'
-        },
-        {
-          title: '2. En Preparación',
-          subtitle: 'Sellado UV en Bóveda',
-          date: orderDate,
-          status: isInTransit ? 'completed' : 'active',
-          detail: 'Validación de microimpresión, hologramas y encapsulado acrílico.'
-        },
-        {
-          title: '3. Listo para Retiro en Bóveda',
-          subtitle: 'Bóveda Central Quito • Sala Privada',
-          date: isInTransit ? 'Disponible Ahora' : 'Programado (24h)',
-          status: isDelivered ? 'completed' : (isInTransit ? 'active' : 'pending'),
-          detail: 'Disponible para entrega en ventanilla de seguridad. Presentar cédula original.'
-        },
-        {
-          title: '4. Retirado en Bóveda',
-          subtitle: 'Custodia Transferida contra Cédula',
-          date: isDelivered ? 'Retiro completado' : 'Pendiente de retiro',
-          status: isDelivered ? 'completed' : 'pending',
-          detail: 'Recepción formal por el titular con documento de identidad original.'
-        }
-      ];
-    }
-
-    return [
-      {
-        title: '1. Orden Recibida',
-        subtitle: 'Pago Verificado TLS 256-bit',
-        date: orderDate,
-        status: 'completed',
-        detail: 'Fondos verificados y orden registrada en la cadena de custodia.'
-      },
-      {
-        title: '2. En Preparación',
-        subtitle: 'Sellado UV en Bóveda',
-        date: orderDate,
-        status: isInTransit ? 'completed' : 'active',
-        detail: 'Validación de microimpresión, hologramas y encapsulado acrílico.'
-      },
-      {
-        title: '3. En Camino / Despacho',
-        subtitle: 'Transporte Blindado',
-        date: isInTransit ? (isDelivered ? 'Completado' : 'En tránsito') : 'Programado (24-48h)',
-        status: isDelivered ? 'completed' : (isInTransit ? 'active' : 'pending'),
-        detail: 'Embalaje con precinto tamper-evident en valija de seguridad.'
-      },
-      {
-        title: '4. Entregado',
-        subtitle: 'Custodia contra Documento',
-        date: isDelivered ? 'Recepción confirmada' : 'Pendiente de entrega',
-        status: isDelivered ? 'completed' : 'pending',
-        detail: 'Recepción formal por el titular con documento de identidad.'
-      }
-    ];
+  renderTransitCard(order) {
+    const step = this.getStep(order);
+    const progress = { 1: '15%', 2: '60%', 3: '95%', 4: '100%', '-1': '95%' }[step] || '15%';
+    const label = { 1: 'Preparando despacho', 2: 'En ruta de entrega', 3: 'En la dirección de entrega', 4: 'Entregado', '-1': 'Regresando a bóveda' }[step];
+    return `
+      <div class="mt-6 p-5 sm:p-6 bg-[#0F172A] text-white rounded-2xl shadow-md border border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center">
+              <i data-lucide="truck" class="w-5 h-5 ${step === 2 ? 'animate-pulse' : ''}"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-[#FEF3C7]">Transporte blindado</h3>
+              <span class="text-[11px] text-slate-400">${order.courierName || 'Servientrega Blindado • Bóveda G&S'}</span>
+            </div>
+          </div>
+          <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-lg self-start sm:self-center">GPS activo</span>
+        </div>
+        <div class="pt-4 space-y-2">
+          <div class="flex items-center justify-between text-xs text-slate-300">
+            <span>Bóveda Central Quito</span>
+            <span class="font-mono text-amber-400 font-bold">${label}</span>
+            <span>${order.buyerName || 'Destinatario'}</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-500 via-emerald-500 to-amber-400 h-full rounded-full transition-all duration-700" style="width: ${progress}"></div>
+          </div>
+        </div>
+      </div>
+    `;
   },
 
-  render() {
-    const orders = (typeof Store !== 'undefined' && Store.data && Store.data.orders) ? Store.data.orders : [];
-    let order = (typeof Store !== 'undefined' && Store.getOrderById)
-      ? Store.getOrderById(Store.data.activeTrackingOrderId)
-      : null;
-
-    if (!order) {
-      order = this.getSimulatedOrder();
-    }
-
-    const stages = (Array.isArray(order.stages) && order.stages.length > 0)
-      ? order.stages
-      : this.getDefaultStages(order);
-
-    const isPickup = order.metodo_entrega === 'pickup' || 
-                     (order.deliveryMethod && /retiro/i.test(order.deliveryMethod));
-
-    const trackingNumber = order.trackingNumber || (isPickup ? 'RET-UIO-948102' : 'GUI-EC-948102-PSA');
-    const courierName = order.courierName || (isPickup ? 'Retiro Presencial en Bóveda Central Quito' : 'Servientrega Blindado • Bóveda G&S');
-    const estimatedDelivery = order.estimatedDelivery || (isPickup ? 'Listo para retiro inmediato en Bóveda' : '04 Nov 2026 (Entrega Garantizada en Mano)');
-
+  renderPickupCard(order) {
     return `
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-5">
-        ${orders.length > 1 ? `
-          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
-            <span class="text-xs font-extrabold text-[#0F172A]">Seleccionar orden del historial (${orders.length}):</span>
-            <div class="flex flex-wrap gap-2">
-              ${orders.map(o => `
-                <button 
-                  type="button" 
-                  onclick="app.openOrderTracking('${o.orderId}')" 
-                  class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${o.orderId === order.orderId ? 'bg-[#0F172A] text-[#FEF3C7]' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}"
-                >
-                  ${o.orderId}
-                </button>
-              `).join('')}
-            </div>
+      <div class="mt-6 p-5 sm:p-6 bg-emerald-50/70 border border-emerald-200 rounded-2xl">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="p-3 bg-white border border-emerald-100 rounded-xl">
+            <span class="text-slate-400 block text-[10px] uppercase font-bold">Dirección de retiro</span>
+            <strong class="text-[#0F172A] block mt-0.5">Av. República del Salvador N34-183 y Moscú</strong>
+            <span class="text-slate-500 text-[11px] block">Edificio Bóveda Central, Piso 2, Quito</span>
           </div>
-        ` : ''}
+          <div class="p-3 bg-white border border-emerald-100 rounded-xl">
+            <span class="text-slate-400 block text-[10px] uppercase font-bold">Horario</span>
+            <strong class="text-[#0F172A] block mt-0.5">Lunes a sábado: 09:00 - 18:00</strong>
+            <span class="text-slate-500 text-[11px] block">Titular: ${order.buyerName || 'Coleccionista'}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  },
 
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-          <!-- Order Header Bar -->
-          <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-200">
-            <div>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-mono font-black text-[#D97706] bg-[#FEF3C7] px-2.5 py-0.5 rounded">ORDEN ${order.orderId || order.numero_orden}</span>
-                <span id="tracking-status-badge" class="text-xs font-extrabold text-[#059669] bg-[#D1FAE5] px-2.5 py-0.5 rounded">${order.status || (isPickup ? 'Listo para Retiro en Bóveda' : 'En Preparación / En Custodia')}</span>
-                <span class="text-xs font-mono font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded flex items-center gap-1">
-                  <i data-lucide="${isPickup ? 'shield-check' : 'truck'}" class="w-3.5 h-3.5 ${isPickup ? 'text-[#059669]' : 'text-slate-500'}"></i>
-                  <span>${isPickup ? 'Código de Retiro: ' + trackingNumber : 'Guía: ' + trackingNumber}</span>
-                </span>
-              </div>
-              <h1 class="text-2xl font-black text-[#0F172A] tracking-tight mt-2">Seguimiento y Estado de Custodia</h1>
-              <p class="text-xs text-slate-500 mt-0.5">
-                Fecha: ${order.date || '02 Nov 2026'} • Titular: ${order.buyerName || 'Coleccionista'} • Entrega: ${order.deliveryMethod || (isPickup ? 'Retiro en Bóveda Quito' : 'Courier Nacional Blindado')}
+  renderIdentityPanel(order) {
+    const step = this.getStep(order);
+    const pickup = this.isPickup(order);
+
+    if (step === 3) {
+      const attemptsLeft = this.MAX_ID_ATTEMPTS - (order.idAttempts || 0);
+      return `
+        <div class="mt-6 p-5 sm:p-6 border-2 border-[#D97706]/50 bg-[#FEF3C7]/40 rounded-2xl">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#D97706] text-white flex items-center justify-center flex-shrink-0">
+              <i data-lucide="id-card" class="w-5 h-5"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-base font-black text-[#0F172A]">Verificación de identidad</h3>
+              <p class="text-xs text-slate-600 mt-0.5">
+                ${pickup ? 'El agente de ventanilla' : 'El courier'} solicita la cédula de <strong>${order.buyerName}</strong> (titular •••${String(order.buyerId || '').slice(-4)}).
+                La pieza solo se entrega si la cédula coincide.
               </p>
-              <p class="text-xs text-slate-600 mt-1 font-semibold flex items-center gap-1.5">
-                <i data-lucide="${isPickup ? 'map-pin' : 'shield-check'}" class="w-3.5 h-3.5 ${isPickup ? 'text-[#E11D48]' : 'text-[#059669]'}"></i>
-                <span>${isPickup 
-                  ? 'Punto de Retiro: <strong>Bóveda Central Quito</strong> • Horario: <strong>Lun-Sáb 09:00 - 18:00</strong>' 
-                  : 'Courier: <strong>' + courierName + '</strong> • Estimada: <strong>' + estimatedDelivery + '</strong>'}</span>
-              </p>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2">
-              <button 
-                type="button" 
-                onclick="app.showToast('Descargando factura electrónica SRI (${order.orderId || order.numero_orden})...', 'success')" 
-                class="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-[#0F172A] rounded-xl transition flex items-center gap-1.5 touch-target"
-              >
-                <i data-lucide="file-text" class="w-4 h-4"></i>
-                <span>Descargar Factura</span>
-              </button>
-
-              <a 
-                href="#profile" 
-                onclick="Store.data.profileActiveTab='orders'"
-                class="px-3.5 py-2 text-xs font-bold bg-[#0F172A] text-white hover:bg-[#1E293B] rounded-xl transition flex items-center gap-1.5 touch-target"
-              >
-                <i data-lucide="history" class="w-4 h-4"></i>
-                <span>Ver Historial Completo</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- Dynamic Timeline Steps (Automated Live Simulation) -->
-          <div class="py-8" role="region" aria-label="Línea de tiempo de entrega del pedido">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xs font-extrabold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
-                <i data-lucide="route" class="w-4 h-4 text-[#059669]"></i>
-                <span>Etapas de Custodia y Despacho en Vivo</span>
-              </h2>
-              <span class="text-[11px] font-mono font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
-                Monitoreo Bóveda G&amp;S 24/7
-              </span>
-            </div>
-
-            <div id="tracking-timeline-container" class="grid grid-cols-1 sm:grid-cols-4 gap-4 relative">
-              ${this.renderTimelineStages(stages)}
-            </div>
-
-            <div id="tracking-transit-section">
-              ${isPickup ? this.renderPickupCard(order) : this.renderArmoredTransitCard(order)}
-            </div>
-          </div>
-
-          <!-- Pieces in Order -->
-          <div class="border-t border-slate-200 pt-6">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="text-sm font-extrabold text-[#0F172A] uppercase tracking-wider">Piezas Incluidas en esta Orden</h2>
-              <span class="text-sm font-black text-[#0F172A]">Total (IVA 15% incl.): $${(order.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
-            </div>
-
-            <div class="space-y-3">
-              ${(order.items || []).map(item => `
-                <div class="flex items-center justify-between p-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl">
-                  <div class="flex items-center gap-3">
-                    <img 
-                      src="${item.imageLocal || item.imagen || item.imagenLocal || 'img/cards/card-back.png'}" 
-                      alt="${item.name || item.nombre || 'Pokémon Card'}" 
-                      class="w-12 h-16 object-contain bg-white rounded-lg border border-slate-200 p-0.5" 
-                      onerror="this.onerror=null; this.src='${item.imageFallback || item.imagenFallbackUrl || 'img/cards/card-back.png'}'"
-                    />
-                    <div>
-                      <h3 class="text-sm font-extrabold text-[#0F172A]">${item.name || item.nombre}</h3>
-                      <span class="text-xs text-slate-500">${item.condition || item.grado || 'PSA 10'} • Cantidad: ${item.quantity || 1}</span>
-                    </div>
-                  </div>
-                  <span class="text-sm font-black text-[#0F172A]">$${((item.price || 0) * (item.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <form onsubmit="event.preventDefault(); TrackingView.verifyDelivery();" class="mt-3 flex flex-col sm:flex-row gap-2 sm:items-start" novalidate>
+                <div class="flex-1">
+                  <label for="deliver-id" class="sr-only">Cédula presentada</label>
+                  <input id="deliver-id" type="text" inputmode="numeric" maxlength="13" placeholder="Cédula presentada en la entrega" oninput="this.value = this.value.replace(/\\D/g, '')" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg" />
                 </div>
-              `).join('')}
+                <button type="submit" class="px-5 py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-extrabold rounded-lg transition touch-target">Verificar y entregar</button>
+              </form>
+              ${order.idAttempts ? `<p class="text-[11px] text-[#E11D48] font-semibold mt-2">Cédula incorrecta. Intentos restantes: ${attemptsLeft}</p>` : ''}
             </div>
           </div>
         </div>
+      `;
+    }
+
+    if (step === 4) {
+      return `
+        <div class="mt-6 p-5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3">
+          <i data-lucide="badge-check" class="w-6 h-6 text-[#059669] flex-shrink-0"></i>
+          <div class="text-xs text-emerald-900">
+            <strong class="block text-sm">${pickup ? 'Retirado en bóveda' : 'Entregado'} a ${order.deliveredTo || order.buyerName}</strong>
+            Identidad verificada con cédula ${this.maskId(order.buyerId)} • ${(order.stepDates || {})[4] || ''}
+          </div>
+        </div>
+      `;
+    }
+
+    if (step === -1) {
+      return `
+        <div class="mt-6 p-5 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-3" role="alert">
+          <i data-lucide="shield-x" class="w-6 h-6 text-[#E11D48] flex-shrink-0"></i>
+          <div class="text-xs text-rose-900">
+            <strong class="block text-sm">Entrega retenida por seguridad</strong>
+            Se presentaron ${this.MAX_ID_ATTEMPTS} cédulas que no coinciden con el titular. La pieza regresa a Bóveda Central Quito;
+            el titular debe retirarla en persona con su cédula original.
+          </div>
+        </div>
+      `;
+    }
+    return '';
+  },
+
+  renderDetail(order) {
+    const pickup = this.isPickup(order);
+    const stages = this.buildStages(order);
+    const trackingNumber = order.trackingNumber || '';
+    return `
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-200">
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-mono font-black text-[#D97706] bg-[#FEF3C7] px-2.5 py-0.5 rounded">ORDEN ${order.orderId}</span>
+            <span class="text-xs font-extrabold ${this.getStep(order) === -1 ? 'text-[#E11D48] bg-rose-100' : 'text-[#059669] bg-[#D1FAE5]'} px-2.5 py-0.5 rounded">${this.statusLabel(order)}</span>
+            ${trackingNumber ? `<span class="text-xs font-mono font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded">${pickup ? 'Código de retiro' : 'Guía'}: ${trackingNumber}</span>` : ''}
+          </div>
+          <h1 class="text-2xl font-black text-[#0F172A] tracking-tight mt-2">Seguimiento de tu pedido</h1>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Fecha: ${order.date || ''} • Titular: ${order.buyerName || ''} (${this.maskId(order.buyerId)}) • ${order.deliveryMethod || ''}
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="TrackingView.resetLookup()" class="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-[#0F172A] rounded-xl transition flex items-center gap-1.5 touch-target">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            <span>Rastrear otro pedido</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="py-8" role="region" aria-label="Etapas de entrega del pedido" aria-live="polite">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xs font-extrabold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="route" class="w-4 h-4 text-[#059669]"></i>
+            <span>Etapas de custodia y despacho</span>
+          </h2>
+          ${[1, 2].includes(this.getStep(order)) ? `
+            <span class="text-[11px] font-bold text-slate-500 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#059669] animate-pulse"></span>Simulación en vivo
+            </span>` : ''}
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">${this.renderTimelineStages(stages)}</div>
+        ${this.renderIdentityPanel(order)}
+        ${pickup ? this.renderPickupCard(order) : this.renderTransitCard(order)}
+      </div>
+
+      <div class="border-t border-slate-200 pt-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <h2 class="text-sm font-extrabold text-[#0F172A] uppercase tracking-wider">Piezas de esta orden</h2>
+          <span class="text-sm font-black text-[#0F172A]">Total (IVA incl.): $${(order.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
+        </div>
+        <div class="space-y-3">
+          ${(order.items || []).map(item => `
+            <div class="flex items-center justify-between p-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl">
+              <div class="flex items-center gap-3">
+                <img src="${item.imageLocal || 'img/cards/card-back.png'}" alt="${item.name}" class="w-12 h-16 object-contain bg-white rounded-lg border border-slate-200 p-0.5"
+                  onerror="this.onerror=null; this.src='${item.imageFallback || 'img/cards/card-back.png'}'" />
+                <div>
+                  <h3 class="text-sm font-extrabold text-[#0F172A]">${item.name}</h3>
+                  <span class="text-xs text-slate-500">${item.condition || ''} • Cantidad: ${item.quantity || 1}</span>
+                </div>
+              </div>
+              <span class="text-sm font-black text-[#0F172A]">$${((item.price || 0) * (item.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  },
+
+  render() {
+    const order = this.resolveOrder();
+    return `
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-5">
+        ${this.renderUserOrders()}
+        ${order ? `
+          <div id="tracking-detail" class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+            ${this.renderDetail(order)}
+          </div>
+        ` : this.renderLookupForm(false)}
       </div>
     `;
   }
@@ -495,7 +547,4 @@ const TrackingView = {
 
 if (typeof window !== 'undefined') {
   window.TrackingView = TrackingView;
-}
-if (typeof globalThis !== 'undefined') {
-  globalThis.TrackingView = TrackingView;
 }

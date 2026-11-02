@@ -357,23 +357,7 @@
             }
           }
 
-          // Sincronización transparente con Supabase si está disponible
-          if (dbInstance.supabaseClient) {
-            try {
-              if (payload.usuario) {
-                await dbInstance.supabaseClient.from('usuarios').upsert([payload.usuario]);
-              }
-              if (payload.orden) {
-                await dbInstance.supabaseClient.from('ordenes_compra').upsert([payload.orden]);
-              }
-              if (Array.isArray(payload.items) && payload.items.length > 0) {
-                await dbInstance.supabaseClient.from('items_orden').upsert(payload.items);
-              }
-            } catch (sbErr) {
-              console.warn('[GradedSealedDB] Supabase sync diferido (objeto):', sbErr);
-            }
-          }
-
+          // La sincronización con Supabase se hace vía RPC en js/db/supabase-api.js
           return {
             success: true,
             orderId,

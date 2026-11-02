@@ -393,3 +393,36 @@ html, body {
 }
 
 
+
+/* Barra de categorías: pestañas de texto con subrayado para la sección activa */
+.category-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding: 0.7rem 0.75rem 0.6rem;
+  color: #cbd5e1;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.category-link:hover {
+  color: #ffffff;
+  border-bottom-color: #475569;
+}
+.category-link.is-active {
+  color: #ffffff;
+  border-bottom-color: #E11D48;
+}
+.category-meta {
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+}
+.category-link.is-active .category-meta,
+.category-link:hover .category-meta {
+  color: #94a3b8;
+}
+.category-divider {
+  width: 1px;
+  margin: 0.65rem 0.5rem;
+  background: #334155;
+}
