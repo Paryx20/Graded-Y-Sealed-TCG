@@ -23,8 +23,8 @@
     return '';
   };
 
-  var SUPABASE_URL = getEnv('SUPABASE_URL') || '';
-  var SUPABASE_ANON_KEY = getEnv('SUPABASE_ANON_KEY') || '';
+  var SUPABASE_URL = getEnv('SUPABASE_URL') || 'https://dlbsjkdolegcxcnwgike.supabase.co';
+  var SUPABASE_ANON_KEY = getEnv('SUPABASE_ANON_KEY') || 'sb_publishable_gypPzlCYkQyxttpVAcQoTw_DYZNm7EY';
 
   var clientInstance = null;
 
