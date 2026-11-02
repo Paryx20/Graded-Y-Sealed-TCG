@@ -426,3 +426,32 @@ html, body {
   margin: 0.65rem 0.5rem;
   background: #334155;
 }
+
+/* Enlace "saltar al contenido" (WCAG 2.4.1): visible solo al recibir foco con teclado */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  z-index: 60;
+  padding: 0.6rem 1rem;
+  background: #FEF3C7;
+  color: #0F172A;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border-radius: 0.75rem;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 0.75rem;
+}
+
+/* Foco visible para navegación con teclado (WCAG 2.4.7 / 2.4.11) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #D97706;
+  outline-offset: 2px;
+}

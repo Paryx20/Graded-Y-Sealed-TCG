@@ -43,6 +43,12 @@ const Store = {
       const savedUsers = localStorage.getItem('gstcg_users');
       if (savedUsers) this.data.users = JSON.parse(savedUsers);
 
+      const savedDelivery = localStorage.getItem('gstcg_delivery');
+      if (savedDelivery) this.data.deliveryMethod = savedDelivery;
+
+      const savedPaymentError = sessionStorage.getItem('gstcg_payment_error');
+      if (savedPaymentError) this.data.lastPaymentError = JSON.parse(savedPaymentError);
+
       const savedCart = localStorage.getItem('gstcg_cart');
       if (savedCart) this.data.cart = JSON.parse(savedCart);
 
@@ -66,6 +72,19 @@ const Store = {
       if (this.data.orders.length > 0 && !this.data.activeTrackingOrderId) {
         this.data.activeTrackingOrderId = this.data.orders[0].orderId;
       }
+    } catch (e) {}
+  },
+
+  saveDelivery() {
+    try {
+      localStorage.setItem('gstcg_delivery', this.data.deliveryMethod);
+    } catch (e) {}
+  },
+
+  // El detalle del rechazo se muestra en otra página (pago-rechazado.html)
+  savePaymentError() {
+    try {
+      sessionStorage.setItem('gstcg_payment_error', JSON.stringify(this.data.lastPaymentError));
     } catch (e) {}
   },
 

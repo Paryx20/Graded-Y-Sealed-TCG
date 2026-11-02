@@ -30,7 +30,7 @@ const ProfileView = {
 
             <div class="pt-4 border-t border-slate-100 text-xs text-slate-500">
               ¿No tienes cuenta?
-              <a href="#auth" onclick="CheckoutView.authTab='register'" class="font-extrabold text-[#E11D48] hover:text-[#BE123C]">Crear una cuenta</a>
+              <a href="login.html?tab=register" class="font-extrabold text-[#E11D48] hover:text-[#BE123C]">Crear una cuenta</a>
             </div>
           </div>
         </div>
@@ -201,7 +201,7 @@ const ProfileView = {
                 <p class="text-xs text-slate-500 max-w-md mx-auto">
                   Tus adquisiciones de Slabs PSA y Cajas Selladas aparecerán aquí con desglose tributario y acceso directo al seguimiento en vivo.
                 </p>
-                <a href="#catalog" class="mt-2 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-extrabold rounded-xl shadow transition">
+                <a href="catalogo.html" class="mt-2 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-extrabold rounded-xl shadow transition">
                   <i data-lucide="shopping-bag" class="w-4 h-4"></i>
                   <span>Explorar Bóveda</span>
                 </a>

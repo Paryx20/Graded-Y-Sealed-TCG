@@ -156,11 +156,8 @@ const TrackingView = {
     this.verifiedId = null;
     this.lookupError = '';
     Store.data.activeTrackingOrderId = null;
-    if (window.location.hash !== '#tracking') {
-      window.location.hash = '#tracking';
-    } else {
-      app.renderCurrentView();
-    }
+    history.replaceState(null, '', app.url('tracking'));
+    app.renderCurrentView();
   },
 
   // Orden a mostrar: la buscada con cédula, o una del historial del usuario con sesión

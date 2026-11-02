@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Graded &amp; Sealed TCG — Bóveda de Coleccionismo Certificado &amp; Slabs PSA</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Inicio | Graded &amp; Sealed TCG</title>
+  <meta name="description" content="Bóveda de cartas Pokémon certificadas PSA, sellados y cartas raw en Quito, Ecuador." />
+    <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -36,7 +37,9 @@
   </script>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body class="bg-[#F8FAFC] text-[#0F172A] antialiased selection:bg-[#E11D48] selection:text-white min-h-screen flex flex-col">
+<body data-page="home" class="bg-[#F8FAFC] text-[#0F172A] antialiased selection:bg-[#E11D48] selection:text-white min-h-screen flex flex-col">
+
+  <a href="#app-view" class="skip-link">Saltar al contenido principal</a>
 
   <div id="search-spotlight-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 opacity-0 pointer-events-none" aria-hidden="true"></div>
 
@@ -45,7 +48,7 @@
   <header class="sticky top-0 z-40 bg-[#0F172A] text-white border-b border-slate-800 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <a href="#home" class="flex items-center gap-2.5 flex-shrink-0 group" aria-label="Ir al inicio de Graded and Sealed TCG">
+        <a href="index.html" class="flex items-center gap-2.5 flex-shrink-0 group" aria-label="Ir al inicio de Graded and Sealed TCG">
           <img 
             src="img/logo.png" 
             alt="Logo Graded & Sealed TCG" 
@@ -86,7 +89,8 @@
 
       <nav class="flex items-center gap-2" aria-label="Herramientas de usuario">
         <a 
-          href="#catalog" 
+          href="catalogo.html" 
+          data-page-link="catalog"
           class="hidden md:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-200 hover:text-white hover:bg-[#1E293B] rounded-xl transition touch-target"
         >
           <i data-lucide="layout-grid" class="w-4 h-4 text-[#FEF3C7]"></i>
@@ -94,7 +98,8 @@
         </a>
 
         <a 
-          href="#tracking" 
+          href="tracking.html" 
+          data-page-link="tracking"
           class="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-200 hover:text-white hover:bg-[#1E293B] rounded-xl transition touch-target"
         >
           <i data-lucide="package-check" class="w-4 h-4 text-[#059669]"></i>
@@ -113,7 +118,7 @@
         </button>
 
         <a 
-          href="#cart" 
+          href="carrito.html" 
           class="relative flex items-center gap-2 px-3.5 py-2 text-xs font-extrabold text-white bg-[#E11D48] hover:bg-[#BE123C] rounded-xl transition shadow touch-target"
           aria-label="Ver bolsa de compras"
         >
@@ -132,13 +137,15 @@
     <nav class="category-bar bg-[#1E293B] border-t border-slate-800/80" aria-label="Categorías del catálogo">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-6 overflow-x-auto no-scrollbar whitespace-nowrap">
         <ul class="flex items-stretch gap-1 text-[13px] font-semibold">
-          <li><a href="#catalog" data-nav="all" class="category-link">Todo</a></li>
-          <li><a href="#catalog?cat=psa" data-nav="cat:psa" class="category-link">Slabs PSA</a></li>
-          <li><a href="#catalog?cat=raw" data-nav="cat:raw" class="category-link">Cartas raw</a></li>
-          <li><a href="#catalog?cat=sealed" data-nav="cat:sealed" class="category-link">Sellados</a></li>
+          <li><a href="catalogo.html" data-nav="all" class="category-link">Todo</a></li>
+          <li><a href="catalogo.html?cat=psa" data-nav="cat:psa" class="category-link">Slabs PSA</a></li>
+          <li><a href="catalogo.html?cat=raw" data-nav="cat:raw" class="category-link">Cartas raw</a></li>
+          <li><a href="catalogo.html?cat=sealed" data-nav="cat:sealed" class="category-link">Sellados</a></li>
           <li class="category-divider" aria-hidden="true"></li>
-          <li><a href="#catalog?era=vintage" data-nav="era:vintage" class="category-link">Vintage <span class="category-meta">1999–2002</span></a></li>
-          <li><a href="#catalog?era=modern" data-nav="era:modern" class="category-link">Moderno <span class="category-meta">SWSH · SV</span></a></li>
+          <li><a href="catalogo.html?era=vintage" data-nav="era:vintage" class="category-link">Vintage <span class="category-meta">1999–2002</span></a></li>
+          <li><a href="catalogo.html?era=modern" data-nav="era:modern" class="category-link">Moderno <span class="category-meta">SWSH · SV</span></a></li>
+          <li class="category-divider lg:hidden" aria-hidden="true"></li>
+          <li class="lg:hidden"><a href="tracking.html" data-page-link="tracking" class="category-link">Rastrear pedido</a></li>
         </ul>
         <span class="hidden xl:block text-[11px] text-slate-400">Envíos a todo Ecuador desde Quito</span>
       </div>
@@ -171,7 +178,7 @@
     </div>
   </div>
 
-  <main id="app-view" class="flex-1 pb-16"></main>
+  <main id="app-view" tabindex="-1" class="flex-1 pb-16 focus:outline-none"></main>
 
   <div id="payment-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modal-payment-title">
     <div class="modal-content bg-white border border-slate-200 rounded-2xl max-w-md w-full p-8 text-center shadow-2xl">
@@ -352,7 +359,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script src="js/db/supabase-config.js"></script>
   <script src="js/db/supabase-api.js"></script>
-  <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+  <script src="https://unpkg.com/dexie@3.2.7/dist/dexie.js"></script>
   <script src="js/db/schema.js"></script>
   <script src="js/db/db-client.js"></script>
 

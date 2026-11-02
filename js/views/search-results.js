@@ -163,13 +163,9 @@ const SearchResultsView = {
   },
 
   _updateHashSilently(query) {
-    const target = `#search-results?q=${encodeURIComponent(query)}`;
-    if (window.location.hash !== target) {
-      if (typeof history !== 'undefined' && history.replaceState) {
-        history.replaceState(null, '', target);
-      } else {
-        window.location.hash = target;
-      }
+    const target = app.url('search-results', { q: query });
+    if (typeof history !== 'undefined' && history.replaceState) {
+      history.replaceState(null, '', target);
     }
   },
 
@@ -307,7 +303,7 @@ const SearchResultsView = {
           <button type="button" onclick="SearchResultsView.quickSearch('Charizard')" class="text-xs font-bold text-[#E11D48] hover:bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 transition">Charizard Base Set</button>
           <button type="button" onclick="SearchResultsView.quickSearch('Umbreon')" class="text-xs font-bold text-[#E11D48] hover:bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 transition">Moonbreon Alt Art</button>
           <button type="button" onclick="SearchResultsView.quickSearch('Lugia')" class="text-xs font-bold text-[#E11D48] hover:bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 transition">Lugia 1st Edition</button>
-          <a href="#catalog" class="text-xs font-bold text-slate-700 hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300 transition">Ver Catálogo Completo →</a>
+          <a href="catalogo.html" class="text-xs font-bold text-slate-700 hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300 transition">Ver Catálogo Completo →</a>
         </div>
       </div>
     `;

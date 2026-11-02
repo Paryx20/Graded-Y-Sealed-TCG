@@ -35,7 +35,7 @@ const CheckoutView = {
                   <div class="text-slate-500">Cédula/RUC: ${user.idCard || user.cedula_ruc || 'No registrada'}</div>
                   <div class="text-slate-500">Tel: ${user.phone || user.telefono || 'No registrado'}</div>
                 </div>
-                <a href="#profile" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
+                <a href="perfil.html" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
                   <i data-lucide="user-check" class="w-4 h-4"></i>
                   <span>Ver Mi Perfil e Historial</span>
                 </a>
@@ -265,8 +265,9 @@ const CheckoutView = {
     if (!order) {
       return `
         <div class="max-w-3xl mx-auto px-4 pt-10 text-center">
-          <p class="text-sm text-slate-600">No hay una orden recién procesada.</p>
-          <a href="#catalog" class="mt-4 inline-block px-5 py-2.5 bg-[#E11D48] text-white text-xs font-bold rounded-xl">Ir al Catálogo</a>
+          <h1 class="text-lg font-black text-[#0F172A]">No hay una orden recién procesada</h1>
+          <p class="text-sm text-slate-600 mt-1">Cuando completes una compra verás aquí su resumen.</p>
+          <a href="catalogo.html" class="mt-4 inline-block px-5 py-2.5 bg-[#E11D48] text-white text-xs font-bold rounded-xl">Ir al Catálogo</a>
         </div>
       `;
     }
@@ -329,7 +330,7 @@ const CheckoutView = {
               <span>Ver Seguimiento del Pedido</span>
             </button>
             <a 
-              href="#profile" 
+              href="perfil.html" 
               class="px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-[#0F172A] text-xs sm:text-sm font-bold rounded-xl transition flex items-center gap-2 touch-target"
             >
               <i data-lucide="history" class="w-4 h-4"></i>
@@ -371,7 +372,7 @@ const CheckoutView = {
 
           <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="#checkout"
+              href="checkout.html"
               class="px-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
             >
               <i data-lucide="credit-card" class="w-4 h-4"></i>
@@ -529,6 +530,10 @@ const CheckoutView = {
   },
 
   afterCheckoutRender() {
+    if (new URLSearchParams(window.location.search).get('pago') === 'efectivo') {
+      const cashRadio = document.getElementById('payment-cash-input');
+      if (cashRadio) cashRadio.checked = true;
+    }
     Validators.attach(this.billingRules(!Store.data.currentUser));
     Validators.attach(this.CARD_RULES);
   },
@@ -563,6 +568,7 @@ const CheckoutView = {
 
   setDelivery(method) {
     Store.data.deliveryMethod = method;
+    Store.saveDelivery();
     if (method === 'pickup' || method === 'retiro') {
       Store.data.shippingFee = APP_CONFIG.PICKUP_SHIPPING_FEE;
       app.showToast('Entrega: Retiro en Local Físico ($0.00). Efectivo habilitado.', 'info');
@@ -579,13 +585,8 @@ const CheckoutView = {
 
   switchToCashPickup() {
     Store.data.deliveryMethod = 'pickup';
-    Store.data.shippingFee = APP_CONFIG.PICKUP_SHIPPING_FEE;
-    window.location.hash = '#checkout';
-    setTimeout(() => {
-      const cashRadio = document.getElementById('payment-cash-input');
-      if (cashRadio) cashRadio.checked = true;
-    }, 60);
-    app.showToast('Cambiado a Retiro en Tienda y Pago en Efectivo.', 'success');
+    Store.saveDelivery();
+    app.go('checkout', { pago: 'efectivo' });
   },
 
   async handleQuickLogin() {
@@ -625,7 +626,7 @@ const CheckoutView = {
       });
       await app.startSession(user);
       app.showToast(`¡Cuenta creada con éxito, ${user.name}!`, 'success');
-      window.location.hash = '#profile';
+      app.go('profile');
     } catch (err) {
       app.showToast(err.message, 'error');
     }
@@ -634,7 +635,7 @@ const CheckoutView = {
   async processPayment() {
     if (Store.data.cart.length === 0) {
       app.showToast('Tu bolsa de compras está vacía.', 'error');
-      window.location.hash = '#catalog';
+      app.go('catalog');
       return;
     }
 
@@ -798,7 +799,7 @@ const CheckoutView = {
       app.updateCartBadge();
 
       app.showToast(`¡Orden ${orderId} confirmada con éxito!`, 'success');
-      window.location.hash = '#confirmation';
+      app.go('confirmation', { order: orderId });
     };
 
     if (paymentMethod === 'cash') {
@@ -842,8 +843,8 @@ const CheckoutView = {
         brand: cardInfo.brand,
         cardLast4: cardInfo.last4
       };
-      app.showToast(`Pago rechazado: ${bank.title}.`, 'error');
-      window.location.hash = '#error';
+      Store.savePaymentError();
+      app.go('error');
       return;
     }
 

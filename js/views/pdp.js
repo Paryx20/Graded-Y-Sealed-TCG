@@ -332,9 +332,9 @@ const PDPView = {
     return `
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <nav aria-label="Ruta de navegación" class="flex flex-wrap items-center gap-2 text-xs text-slate-500 mb-6">
-          <a href="#home" class="hover:text-[#0F172A] font-semibold">Inicio</a>
+          <a href="index.html" class="hover:text-[#0F172A] font-semibold">Inicio</a>
           <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-          <a href="#catalog" class="hover:text-[#0F172A] font-semibold">Catálogo</a>
+          <a href="catalogo.html" class="hover:text-[#0F172A] font-semibold">Catálogo</a>
           <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
           <span class="text-slate-600 font-semibold">${product.set || 'Colección TCG'}</span>
           <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>

@@ -36,7 +36,7 @@ const HomeView = {
               <!-- CTAs Principales con paleta carmesí / dorado -->
               <div class="pt-2 flex flex-wrap items-center gap-3.5">
                 <a 
-                  href="#catalog?cat=psa" 
+                  href="catalogo.html?cat=psa" 
                   class="px-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-extrabold rounded-xl transition shadow-lg flex items-center gap-2 touch-target"
                 >
                   <i data-lucide="shield-check" class="w-4 h-4"></i>
@@ -44,7 +44,7 @@ const HomeView = {
                 </a>
 
                 <a 
-                  href="#catalog?cat=sealed" 
+                  href="catalogo.html?cat=sealed" 
                   class="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 text-sm font-bold rounded-xl transition flex items-center gap-2 touch-target"
                 >
                   <i data-lucide="package" class="w-4 h-4 text-[#FEF3C7]"></i>
@@ -52,7 +52,7 @@ const HomeView = {
                 </a>
 
                 <a 
-                  href="#catalog" 
+                  href="catalogo.html" 
                   class="px-5 py-3.5 bg-transparent hover:bg-white/10 text-slate-200 text-sm font-bold rounded-xl transition flex items-center gap-1.5 touch-target"
                 >
                   <span>Catálogo Completo</span>
@@ -220,7 +220,7 @@ const HomeView = {
               </h2>
             </div>
             <a 
-              href="#catalog?cat=psa" 
+              href="catalogo.html?cat=psa" 
               class="text-xs font-extrabold text-[#E11D48] hover:text-[#BE123C] inline-flex items-center gap-1 self-start sm:self-auto transition"
             >
               <span>Ver todos los Slabs PSA</span>
@@ -294,7 +294,7 @@ const HomeView = {
               </p>
             </div>
             <a 
-              href="#catalog?cat=sealed" 
+              href="catalogo.html?cat=sealed" 
               class="px-5 py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs sm:text-sm font-black rounded-xl transition shadow flex items-center gap-2 self-start lg:self-center flex-shrink-0 touch-target"
             >
               <i data-lucide="package-open" class="w-4 h-4"></i>
@@ -404,14 +404,14 @@ const HomeView = {
                 Explora el Catálogo por Categoría o Era
               </h2>
             </div>
-            <a href="#catalog" class="text-xs font-extrabold text-[#E11D48] hover:text-[#BE123C] inline-flex items-center gap-1 transition">
+            <a href="catalogo.html" class="text-xs font-extrabold text-[#E11D48] hover:text-[#BE123C] inline-flex items-center gap-1 transition">
               <span>Abrir Catálogo Avanzado</span>
               <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
             </a>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a href="#catalog?cat=psa" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
+            <a href="catalogo.html?cat=psa" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
               <div class="flex items-center gap-3.5">
                 <div class="w-11 h-11 rounded-xl bg-[#0F172A] text-[#FEF3C7] flex items-center justify-center flex-shrink-0">
                   <i data-lucide="award" class="w-5 h-5"></i>
@@ -424,7 +424,7 @@ const HomeView = {
               <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F172A] transition"></i>
             </a>
 
-            <a href="#catalog?cat=raw" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
+            <a href="catalogo.html?cat=raw" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
               <div class="flex items-center gap-3.5">
                 <div class="w-11 h-11 rounded-xl bg-[#D1FAE5] text-[#059669] flex items-center justify-center flex-shrink-0">
                   <i data-lucide="sparkles" class="w-5 h-5"></i>
@@ -437,7 +437,7 @@ const HomeView = {
               <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F172A] transition"></i>
             </a>
 
-            <a href="#catalog?cat=sealed" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
+            <a href="catalogo.html?cat=sealed" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
               <div class="flex items-center gap-3.5">
                 <div class="w-11 h-11 rounded-xl bg-[#FEF3C7] text-[#D97706] flex items-center justify-center flex-shrink-0">
                   <i data-lucide="package" class="w-5 h-5"></i>
@@ -450,7 +450,7 @@ const HomeView = {
               <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F172A] transition"></i>
             </a>
 
-            <a href="#catalog?era=vintage" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
+            <a href="catalogo.html?era=vintage" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
               <div class="flex items-center gap-3.5">
                 <div class="w-11 h-11 rounded-xl bg-rose-50 text-[#E11D48] flex items-center justify-center flex-shrink-0">
                   <i data-lucide="history" class="w-5 h-5"></i>
@@ -463,7 +463,7 @@ const HomeView = {
               <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F172A] transition"></i>
             </a>
 
-            <a href="#catalog?era=modern" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
+            <a href="catalogo.html?era=modern" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
               <div class="flex items-center gap-3.5">
                 <div class="w-11 h-11 rounded-xl bg-slate-100 text-[#0F172A] flex items-center justify-center flex-shrink-0">
                   <i data-lucide="zap" class="w-5 h-5"></i>
@@ -476,7 +476,7 @@ const HomeView = {
               <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F172A] transition"></i>
             </a>
 
-            <a href="#catalog" class="group p-5 bg-[#0F172A] hover:bg-[#1E293B] text-white rounded-2xl shadow-sm flex items-center justify-between transition">
+            <a href="catalogo.html" class="group p-5 bg-[#0F172A] hover:bg-[#1E293B] text-white rounded-2xl shadow-sm flex items-center justify-between transition">
               <div class="flex items-center gap-3.5">
                 <div class="w-11 h-11 rounded-xl bg-white/10 text-[#FEF3C7] flex items-center justify-center flex-shrink-0">
                   <i data-lucide="layout-grid" class="w-5 h-5"></i>
@@ -508,7 +508,7 @@ const HomeView = {
             </p>
           </div>
           <a 
-            href="#catalog" 
+            href="catalogo.html" 
             class="px-6 py-4 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-extrabold rounded-xl transition shadow-lg flex items-center gap-2 flex-shrink-0 touch-target"
           >
             <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>

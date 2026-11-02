@@ -273,6 +273,13 @@ const CatalogView = {
               <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
                 <span>Mostrando <strong id="catalog-inline-count" class="text-[#0F172A]">${filtered.length}</strong> de ${PRODUCTS.length} activos en bóveda</span>
                 ${this.isVaultFallback ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Búsqueda en toda la Bóveda</span>` : ''}
+                ${f.searchQuery ? `
+                  <a href="${app.url('catalog', f.category !== 'all' ? { cat: f.category } : (f.era !== 'all' ? { era: f.era } : null))}"
+                     class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#0F172A] text-white text-[11px] font-bold hover:bg-[#1E293B]"
+                     aria-label="Quitar la búsqueda ${f.searchQuery} y ver todo el catálogo">
+                    <span>Búsqueda: “${f.searchQuery}”</span>
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                  </a>` : ''}
               </div>
 
               <div class="flex items-center gap-2">
@@ -413,6 +420,7 @@ const CatalogView = {
     };
     const searchInput = document.getElementById('global-search');
     if (searchInput) searchInput.value = '';
+    history.replaceState(null, '', app.url('catalog'));
     app.renderCurrentView();
     app.showToast('Filtros del catálogo restablecidos.', 'info');
   },

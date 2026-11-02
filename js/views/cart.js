@@ -11,7 +11,7 @@ const CartView = {
             <p class="text-xs text-slate-500 mt-0.5">Revisa tus piezas certificadas antes de proceder al pago</p>
           </div>
           <a 
-            href="#catalog" 
+            href="catalogo.html" 
             class="text-xs font-extrabold text-[#E11D48] hover:text-[#BE123C] flex items-center gap-1"
           >
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -27,7 +27,7 @@ const CartView = {
                   <i data-lucide="shopping-bag" class="w-14 h-14 mx-auto mb-3 text-slate-300"></i>
                   <h2 class="font-extrabold text-base text-[#0F172A]">Tu bolsa de compras está vacía</h2>
                   <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Añade cartas coleccionables, slabs PSA o booster packs para iniciar tu orden.</p>
-                  <a href="#catalog" class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-extrabold rounded-xl shadow-sm transition">
+                  <a href="catalogo.html" class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-extrabold rounded-xl shadow-sm transition">
                     <i data-lucide="compass" class="w-4 h-4"></i>
                     <span>Explorar Catálogo</span>
                   </a>
@@ -124,7 +124,7 @@ const CartView = {
             </div>
 
             <a 
-              href="#checkout" 
+              href="checkout.html" 
               class="w-full mt-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-extrabold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
             >
               <span>Proceder al Pago</span>

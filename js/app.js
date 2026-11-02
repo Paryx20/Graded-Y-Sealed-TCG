@@ -36,111 +36,106 @@ const app = {
       });
     }
 
-    window.addEventListener('hashchange', () => this.handleRoute());
-    if (!window.location.hash) {
-      window.location.hash = '#home';
-    } else {
-      this.handleRoute();
+    // Enlaces antiguos del sitio de una sola página (index.html#catalog?cat=psa)
+    const legacy = window.location.hash.match(/^#([a-z-]+)(?:\?(.*))?$/);
+    if (legacy && this.PAGES[legacy[1]]) {
+      window.location.replace(this.url(legacy[1], legacy[2] || ''));
+      return;
     }
+    this.handleRoute();
+  },
+
+  // Cada vista es una página HTML independiente
+  PAGES: {
+    home: 'index.html',
+    catalog: 'catalogo.html',
+    pdp: 'producto.html',
+    cart: 'carrito.html',
+    checkout: 'checkout.html',
+    confirmation: 'confirmacion.html',
+    error: 'pago-rechazado.html',
+    auth: 'login.html',
+    profile: 'perfil.html',
+    tracking: 'tracking.html',
+    'search-results': 'busqueda.html'
+  },
+
+  url(route, params) {
+    const qs = params ? new URLSearchParams(params).toString() : '';
+    return (this.PAGES[route] || this.PAGES.home) + (qs ? `?${qs}` : '');
+  },
+
+  go(route, params) {
+    window.location.href = this.url(route, params);
   },
 
   handleRoute() {
-    this.closePSAGuideModal();
-    if (typeof TrackingView !== 'undefined' && typeof TrackingView.clearSimulationTimer === 'function') {
-      TrackingView.clearSimulationTimer();
-    }
-    const raw = window.location.hash.replace(/^#/, '').trim();
-    const parts = raw.split('?');
-    const route = (parts[0] || 'home').toLowerCase();
-    const params = new URLSearchParams(parts[1] || '');
+    const route = (document.body && document.body.dataset.page) || 'home';
+    const params = new URLSearchParams(window.location.search);
 
     if (route === 'pdp') {
       const prodId = params.get('id');
-      if (prodId) {
-        const found = (typeof Store !== 'undefined' && Store.getProduct)
-          ? Store.getProduct(prodId)
-          : PRODUCTS.find(p => p.id === prodId);
-        if (found) {
-          Store.data.currentPdpProduct = found;
-          Store.data.pdpSelectedCondition = found.condicionPrincipal === 'psa9' ? 'psa9' : 'psa10';
-          Store.data.pdpQuantity = 1;
-          Store.data.pdpInspectorMode = 'front';
-        }
+      const found = prodId && Store.getProduct ? Store.getProduct(prodId) : null;
+      if (found) {
+        Store.data.currentPdpProduct = found;
+        Store.data.pdpSelectedCondition = found.condicionPrincipal === 'psa9' ? 'psa9' : 'psa10';
+        Store.data.pdpQuantity = 1;
+        Store.data.pdpInspectorMode = 'front';
       }
-      Store.data.currentView = 'pdp';
-      this.renderCurrentView();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
     }
 
     if (route === 'catalog') {
       const catParam = params.get('cat');
       const eraParam = params.get('era');
-      const qParam = params.get('q');
-
-      if (catParam) {
-        Store.data.catalogFilters.category = catParam;
-        Store.data.catalogFilters.era = 'all';
-      } else if (eraParam) {
-        Store.data.catalogFilters.era = eraParam;
-        Store.data.catalogFilters.category = 'all';
-      } else {
-        Store.data.catalogFilters.category = 'all';
-        Store.data.catalogFilters.era = 'all';
-      }
-
-      if (qParam !== null) {
-        Store.data.catalogFilters.searchQuery = qParam;
-        Store.data.searchQuery = qParam;
-      }
-
-      Store.data.currentView = 'catalog';
-      this.renderCurrentView();
-
+      const qParam = (params.get('q') || '').trim();
+      Store.data.catalogFilters.category = catParam || 'all';
+      Store.data.catalogFilters.era = catParam ? 'all' : (eraParam || 'all');
+      // La búsqueda solo se aplica cuando viene en la URL (?q=)
+      Store.data.catalogFilters.searchQuery = qParam;
+      Store.data.searchQuery = qParam;
       const searchInput = document.getElementById('global-search');
-      if (searchInput && qParam !== null) {
-        searchInput.value = qParam;
-      }
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    if (route === 'tracking') {
-      const orderParam = params.get('order');
-      if (orderParam) {
-        Store.data.activeTrackingOrderId = orderParam;
-      }
-      Store.data.currentView = 'tracking';
-      this.renderCurrentView();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
+      if (searchInput) searchInput.value = qParam;
     }
 
     if (route === 'search-results') {
-      const qParam = params.get('q');
-      Store.data.searchQuery = qParam !== null ? qParam : '';
-      Store.data.currentView = 'search-results';
-      this.renderCurrentView();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
+      Store.data.searchQuery = params.get('q') || '';
+      const searchInput = document.getElementById('global-search');
+      if (searchInput) searchInput.value = Store.data.searchQuery;
     }
 
-    const validRoutes = ['home', 'cart', 'checkout', 'confirmation', 'error', 'auth', 'profile', 'search-results'];
-    Store.data.currentView = validRoutes.includes(route) ? route : 'home';
+    if (route === 'tracking' || route === 'confirmation') {
+      const orderParam = params.get('order');
+      if (orderParam) Store.data.activeTrackingOrderId = orderParam;
+    }
+
+    if (route === 'profile' && params.get('tab') === 'orders') {
+      Store.data.profileActiveTab = 'orders';
+    }
+
+    if (route === 'auth' && params.get('tab') === 'register') {
+      CheckoutView.authTab = 'register';
+    }
+
+    Store.data.currentView = route;
     this.renderCurrentView();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   updateCategoryNav() {
     const view = Store.data.currentView;
     const f = Store.data.catalogFilters;
     let key = '';
-    if (view === 'catalog') {
+    if (view === 'catalog' && !f.searchQuery) {
       if (f.category !== 'all') key = `cat:${f.category}`;
       else if (f.era !== 'all') key = `era:${f.era}`;
       else key = 'all';
     }
+    document.querySelectorAll('[data-page-link]').forEach(link => {
+      const current = link.dataset.pageLink === view;
+      link.classList.toggle('text-white', current);
+      link.classList.toggle('bg-[#1E293B]', current);
+      if (current) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
     document.querySelectorAll('[data-nav]').forEach(link => {
       const active = link.dataset.nav === key;
       link.classList.toggle('is-active', active);
@@ -214,35 +209,11 @@ const app = {
   },
 
   openProductPDP(productId) {
-    const found = (typeof Store !== 'undefined' && Store.getProduct)
-      ? Store.getProduct(productId)
-      : PRODUCTS.find(p => p.id === productId);
-    if (!found) return;
-    Store.data.currentPdpProduct = found;
-    Store.data.pdpSelectedCondition = found.condicionPrincipal === 'psa9' ? 'psa9' : 'psa10';
-    Store.data.pdpQuantity = 1;
-    Store.data.pdpInspectorMode = 'front';
-
-    const targetHash = `#pdp?id=${found.id}`;
-    if (window.location.hash === targetHash) {
-      Store.data.currentView = 'pdp';
-      this.renderCurrentView();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      window.location.hash = targetHash;
-    }
+    this.go('pdp', { id: productId });
   },
 
   openOrderTracking(orderId) {
-    Store.data.activeTrackingOrderId = orderId;
-    const targetHash = `#tracking?order=${encodeURIComponent(orderId)}`;
-    if (window.location.hash === targetHash) {
-      Store.data.currentView = 'tracking';
-      this.renderCurrentView();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      window.location.hash = targetHash;
-    }
+    this.go('tracking', { order: orderId });
   },
 
   addToCart(id, name, condition, price, imageLocal, imageFallback, qty = 1) {
@@ -401,11 +372,7 @@ const app = {
   },
 
   handleNavAccountClick() {
-    if (Store.data.currentUser) {
-      window.location.hash = '#profile';
-    } else {
-      window.location.hash = '#auth';
-    }
+    this.go(Store.data.currentUser ? 'profile' : 'auth');
   },
 
   async loginUser(email, password, redirectHome = true) {
@@ -420,7 +387,7 @@ const app = {
       this.startSession(user);
       this.showToast(`¡Bienvenido a la bóveda, ${user.name}!`, 'success');
       if (redirectHome) {
-        window.location.hash = '#profile';
+        this.go('profile');
       }
       return true;
     } catch (err) {
@@ -451,7 +418,7 @@ const app = {
     if (Store.data.currentView === 'profile') {
       this.renderCurrentView();
     } else {
-      window.location.hash = '#home';
+      this.go('home');
     }
   },
 
@@ -569,7 +536,7 @@ const app = {
           <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
           <span>Búsqueda Multifuente en Tiempo Real →</span>
         </button>
-        <a href="#catalog?q=${encodeURIComponent(q)}" class="text-slate-500 hover:text-slate-800 font-semibold text-[11px]">
+        <a href="${this.url('catalog', { q })}" class="text-slate-500 hover:text-slate-800 font-semibold text-[11px]">
           Catálogo Tradicional
         </a>
       </div>
@@ -595,7 +562,7 @@ const app = {
     const cleanQ = (query || '').trim();
     Store.data.searchQuery = cleanQ;
     Store.data.catalogFilters.searchQuery = cleanQ;
-    window.location.hash = `#search-results?q=${encodeURIComponent(cleanQ)}`;
+    this.go('search-results', { q: cleanQ });
   },
 
   _activeToastTimeout: null,
