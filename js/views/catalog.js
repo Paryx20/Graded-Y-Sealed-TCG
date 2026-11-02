@@ -1,18 +1,37 @@
 const CatalogView = {
   mobileFiltersOpen: false,
 
+  matchesCategory(card, category) {
+    if (!card) return false;
+    if (category === 'all') return true;
+    if (category === 'sealed') {
+      return card.categoria === 'sealed' || 
+             card.tipo_discriminador === 'PRODUCTO_SELLADO' || 
+             Boolean(card.set && card.set.toLowerCase().includes('sealed'));
+    }
+    if (category === 'psa') {
+      return card.categoria === 'psa' || 
+             Boolean(card.precios && (card.precios.psa10 || card.precios.psa9 || card.precios.psa8));
+    }
+    if (category === 'raw') {
+      return card.categoria === 'raw' || 
+             (card.categoria !== 'sealed' && Boolean(card.precios && card.precios.raw));
+    }
+    return card.categoria === category;
+  },
+
   getFilteredProducts() {
     const f = Store.data.catalogFilters;
     const condKey = (f.condition && f.condition !== 'all' && f.condition !== 'sealed') ? f.condition : 'raw';
 
-    const list = PRODUCTS.filter(card => {
-      if (f.category !== 'all' && card.categoria !== f.category) return false;
-      if (f.era !== 'all' && card.era !== f.era) return false;
+    const testCard = (card, useCategoryFilter, useEraFilter) => {
+      if (useCategoryFilter && !this.matchesCategory(card, f.category)) return false;
+      if (useEraFilter && f.era !== 'all' && card.era !== f.era) return false;
 
       if (f.condition !== 'all') {
         if (f.condition === 'sealed' && card.categoria !== 'sealed') return false;
-        if (f.condition === 'raw' && card.categoria === 'sealed') return false;
-        if ((f.condition === 'psa8' || f.condition === 'psa9' || f.condition === 'psa10') && card.categoria !== 'psa') {
+        if (f.condition === 'raw' && (card.categoria === 'sealed' || !card.precios?.raw)) return false;
+        if ((f.condition === 'psa8' || f.condition === 'psa9' || f.condition === 'psa10') && (!card.precios || !card.precios[f.condition])) {
           return false;
         }
       }
@@ -35,14 +54,29 @@ const CatalogView = {
 
       if (f.searchQuery) {
         const q = f.searchQuery.toLowerCase().trim();
-        const inName = card.nombre.toLowerCase().includes(q);
-        const inSet = card.set.toLowerCase().includes(q);
-        const inType = card.tipo.toLowerCase().includes(q);
-        if (!inName && !inSet && !inType) return false;
+        const inName = (card.nombre || '').toLowerCase().includes(q);
+        const inSet = (card.set || '').toLowerCase().includes(q);
+        const inType = (card.tipo || '').toLowerCase().includes(q);
+        const inRarity = (card.rareza || '').toLowerCase().includes(q);
+        const inCert = (card.certNumber || '').toLowerCase().includes(q);
+        if (!inName && !inSet && !inType && !inRarity && !inCert) return false;
       }
 
       return true;
-    });
+    };
+
+    let list = PRODUCTS.filter(card => testCard(card, true, true));
+
+    // Vault search fallback: If a text query produces 0 results within the selected category/era,
+    // fallback gracefully to searching across all categories in the vault so the user is never blocked.
+    this.isVaultFallback = false;
+    if (list.length === 0 && f.searchQuery) {
+      const fallbackList = PRODUCTS.filter(card => testCard(card, false, false));
+      if (fallbackList.length > 0) {
+        list = fallbackList;
+        this.isVaultFallback = true;
+      }
+    }
 
     if (f.sortBy === 'price-asc') {
       list.sort((a, b) => a.precios[condKey] - b.precios[condKey]);
@@ -238,6 +272,7 @@ const CatalogView = {
             <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
                 <span>Mostrando <strong id="catalog-inline-count" class="text-[#0F172A]">${filtered.length}</strong> de ${PRODUCTS.length} activos en bóveda</span>
+                ${this.isVaultFallback ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Búsqueda en toda la Bóveda</span>` : ''}
               </div>
 
               <div class="flex items-center gap-2">
@@ -340,7 +375,7 @@ const CatalogView = {
           <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
             <div>
               <span class="text-[10px] font-bold text-slate-500 block">${displayCond}</span>
-              <span class="text-base font-black text-[#0F172A]">$${displayPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span class="text-base font-black text-[#0F172A]">$${Number(displayPrice || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
             </div>
             <span class="px-3.5 py-1.5 text-xs font-extrabold text-white bg-[#0F172A] group-hover:bg-[#E11D48] rounded-xl transition inline-flex items-center gap-1">
               <span>Ver Ficha</span>
@@ -401,8 +436,9 @@ const CatalogView = {
     if (grid) grid.innerHTML = this.renderCardsGrid(filtered);
     if (countBadge) countBadge.innerText = filtered.length;
     if (inlineCount) inlineCount.innerText = filtered.length;
-    if (titleEl) titleEl.innerText = this.getActiveTitle();
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+      lucide.createIcons();
+    }
   }
 };
 

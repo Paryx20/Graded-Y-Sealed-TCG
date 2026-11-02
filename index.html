@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Identity Services (GIS) Web SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script>
     tailwind.config = {
       theme: {
@@ -47,9 +49,12 @@
       <div class="flex items-center gap-3">
         <button 
           type="button" 
+          id="btn-categories-drawer"
           onclick="app.openCategoriesDrawer()" 
-          class="px-3 py-2 rounded-xl bg-[#1E293B] hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-white flex items-center gap-2 transition touch-target"
+          class="px-3.5 py-2 rounded-xl bg-[#1E293B] hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-white flex items-center gap-2 transition touch-target shadow-xs"
           aria-label="Abrir menú de categorías"
+          aria-expanded="false"
+          aria-controls="categories-drawer"
         >
           <i data-lucide="menu" class="w-4 h-4 text-[#FEF3C7]"></i>
           <span>Categorías</span>
@@ -178,66 +183,138 @@
           </button>
         </div>
 
-        <nav class="mt-5 space-y-2" aria-label="Navegación de categorías">
-          <a href="#catalog" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl bg-[#1E293B] hover:bg-[#E11D48] text-white text-xs font-extrabold transition">
-            <span class="flex items-center gap-2.5">
-              <i data-lucide="layout-grid" class="w-4 h-4 text-[#FEF3C7]"></i>
-              <span>1. Ver Todo el Catálogo</span>
-            </span>
-            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <nav class="mt-5 space-y-2.5" aria-label="Navegación de categorías">
+          <!-- 1. Ver Todo el Catálogo -->
+          <a href="#catalog" onclick="app.closeCategoriesDrawer()" class="drawer-cat-btn group flex items-center justify-between p-3 rounded-xl border border-slate-700/60 bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 hover:from-slate-800 hover:to-slate-700/80 hover:border-amber-500/40 text-white transition-all duration-200 hover:translate-x-1 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-[#FEF3C7] group-hover:scale-110 transition-transform">
+                <i data-lucide="layout-grid" class="w-4 h-4 text-[#FEF3C7]"></i>
+              </div>
+              <div class="text-left">
+                <div class="text-xs font-black tracking-tight group-hover:text-[#FEF3C7] transition-colors">1. Ver Todo el Catálogo</div>
+                <div class="text-[10px] text-slate-400 font-medium">Bóveda Completa • 10 Activos</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 text-[9.5px] font-black rounded-full bg-white/10 text-slate-200 border border-white/15 shadow-xs">Todos</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transform -translate-x-1 group-hover:translate-x-0 transition-all"></i>
+            </div>
           </a>
 
-          <a href="#catalog?cat=psa" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl hover:bg-[#1E293B] text-slate-200 hover:text-white text-xs font-bold transition">
-            <span class="flex items-center gap-2.5">
-              <i data-lucide="award" class="w-4 h-4 text-[#D97706]"></i>
-              <span>2. Slabs Certificados PSA</span>
-            </span>
-            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+          <!-- 2. Slabs Certificados PSA -->
+          <a href="#catalog?cat=psa" onclick="app.closeCategoriesDrawer()" class="drawer-cat-btn group flex items-center justify-between p-3 rounded-xl border border-slate-700/60 bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 hover:from-slate-800 hover:to-slate-700/80 hover:border-amber-500/40 text-white transition-all duration-200 hover:translate-x-1 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-[#D97706] group-hover:scale-110 transition-transform">
+                <i data-lucide="award" class="w-4 h-4 text-[#D97706]"></i>
+              </div>
+              <div class="text-left">
+                <div class="text-xs font-black tracking-tight group-hover:text-amber-300 transition-colors">2. Slabs Certificados PSA</div>
+                <div class="text-[10px] text-slate-400 font-medium">Grados de Inversión • Certificación Oficial</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 text-[9.5px] font-black rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-xs">Grado 8-10</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transform -translate-x-1 group-hover:translate-x-0 transition-all"></i>
+            </div>
           </a>
 
-          <a href="#catalog?cat=raw" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl hover:bg-[#1E293B] text-slate-200 hover:text-white text-xs font-bold transition">
-            <span class="flex items-center gap-2.5">
-              <i data-lucide="sparkles" class="w-4 h-4 text-[#059669]"></i>
-              <span>3. Cartas Sueltas / Raw</span>
-            </span>
-            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+          <!-- 3. Cartas Sueltas / Raw -->
+          <a href="#catalog?cat=raw" onclick="app.closeCategoriesDrawer()" class="drawer-cat-btn group flex items-center justify-between p-3 rounded-xl border border-slate-700/60 bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 hover:from-slate-800 hover:to-slate-700/80 hover:border-emerald-500/40 text-white transition-all duration-200 hover:translate-x-1 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-[#059669] group-hover:scale-110 transition-transform">
+                <i data-lucide="sparkles" class="w-4 h-4 text-[#059669]"></i>
+              </div>
+              <div class="text-left">
+                <div class="text-xs font-black tracking-tight group-hover:text-emerald-300 transition-colors">3. Cartas Sueltas / Raw</div>
+                <div class="text-[10px] text-slate-400 font-medium">Condición Near Mint • Para Colección</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 text-[9.5px] font-black rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-xs">Near Mint</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transform -translate-x-1 group-hover:translate-x-0 transition-all"></i>
+            </div>
           </a>
 
-          <a href="#catalog?cat=sealed" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl hover:bg-[#1E293B] text-slate-200 hover:text-white text-xs font-bold transition">
-            <span class="flex items-center gap-2.5">
-              <i data-lucide="package" class="w-4 h-4 text-[#FEF3C7]"></i>
-              <span>4. Cajas y Sobres Sellados Vintage</span>
-            </span>
-            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+          <!-- 4. Cajas y Sobres Sellados Vintage -->
+          <a href="#catalog?cat=sealed" onclick="app.closeCategoriesDrawer()" class="drawer-cat-btn group flex items-center justify-between p-3 rounded-xl border border-slate-700/60 bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 hover:from-slate-800 hover:to-slate-700/80 hover:border-rose-500/40 text-white transition-all duration-200 hover:translate-x-1 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-[#E11D48] group-hover:scale-110 transition-transform">
+                <i data-lucide="package" class="w-4 h-4 text-[#E11D48]"></i>
+              </div>
+              <div class="text-left">
+                <div class="text-xs font-black tracking-tight group-hover:text-rose-300 transition-colors">4. Cajas y Sobres Sellados Vintage</div>
+                <div class="text-[10px] text-slate-400 font-medium">Booster Packs • Factory Sealed WotC</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 text-[9.5px] font-black rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 shadow-xs">1999 WotC</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transform -translate-x-1 group-hover:translate-x-0 transition-all"></i>
+            </div>
           </a>
 
-          <a href="#catalog?era=vintage" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl hover:bg-[#1E293B] text-slate-200 hover:text-white text-xs font-bold transition">
-            <span class="flex items-center gap-2.5">
-              <i data-lucide="history" class="w-4 h-4 text-[#E11D48]"></i>
-              <span>5. Era Clásica WotC 1999-2002</span>
-            </span>
-            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+          <!-- 5. Era Clásica WotC 1999-2002 -->
+          <a href="#catalog?era=vintage" onclick="app.closeCategoriesDrawer()" class="drawer-cat-btn group flex items-center justify-between p-3 rounded-xl border border-slate-700/60 bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 hover:from-slate-800 hover:to-slate-700/80 hover:border-orange-500/40 text-white transition-all duration-200 hover:translate-x-1 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform">
+                <i data-lucide="history" class="w-4 h-4 text-orange-400"></i>
+              </div>
+              <div class="text-left">
+                <div class="text-xs font-black tracking-tight group-hover:text-orange-300 transition-colors">5. Era Clásica WotC 1999-2002</div>
+                <div class="text-[10px] text-slate-400 font-medium">Base Set, Jungle, Fossil, Neo</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 text-[9.5px] font-black rounded-full bg-orange-500/15 text-orange-300 border border-orange-500/30 shadow-xs">Base/Neo</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transform -translate-x-1 group-hover:translate-x-0 transition-all"></i>
+            </div>
           </a>
 
-          <a href="#catalog?era=modern" onclick="app.closeCategoriesDrawer()" class="flex items-center justify-between p-3 rounded-xl hover:bg-[#1E293B] text-slate-200 hover:text-white text-xs font-bold transition">
-            <span class="flex items-center gap-2.5">
-              <i data-lucide="zap" class="w-4 h-4 text-sky-400"></i>
-              <span>6. Era Moderna &amp; Alt Arts</span>
-            </span>
-            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+          <!-- 6. Era Moderna & Alt Arts -->
+          <a href="#catalog?era=modern" onclick="app.closeCategoriesDrawer()" class="drawer-cat-btn group flex items-center justify-between p-3 rounded-xl border border-slate-700/60 bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 hover:from-slate-800 hover:to-slate-700/80 hover:border-sky-500/40 text-white transition-all duration-200 hover:translate-x-1 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform">
+                <i data-lucide="zap" class="w-4 h-4 text-sky-400"></i>
+              </div>
+              <div class="text-left">
+                <div class="text-xs font-black tracking-tight group-hover:text-sky-300 transition-colors">6. Era Moderna &amp; Alt Arts</div>
+                <div class="text-[10px] text-slate-400 font-medium">Sword &amp; Shield, Scarlet &amp; Violet Sets</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 text-[9.5px] font-black rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 shadow-xs">Secret Rare</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transform -translate-x-1 group-hover:translate-x-0 transition-all"></i>
+            </div>
           </a>
         </nav>
       </div>
 
-      <div class="pt-4 border-t border-slate-800 space-y-2">
-        <a href="#profile" onclick="app.closeCategoriesDrawer()" class="w-full py-2.5 px-3 rounded-xl bg-[#1E293B] hover:bg-slate-700 text-xs font-bold text-white flex items-center justify-center gap-2 transition">
-          <i data-lucide="user-check" class="w-4 h-4 text-[#FEF3C7]"></i>
-          <span>Mi Perfil e Historial</span>
-        </a>
-        <a href="#tracking" onclick="app.closeCategoriesDrawer()" class="w-full py-2.5 px-3 rounded-xl border border-slate-700 hover:bg-slate-800 text-xs font-bold text-slate-300 flex items-center justify-center gap-2 transition">
-          <i data-lucide="truck" class="w-4 h-4 text-[#059669]"></i>
-          <span>Rastreo de Orden en Vivo</span>
-        </a>
+      <div class="pt-4 border-t border-slate-800 space-y-3">
+        <div class="p-3 bg-[#1E293B]/80 rounded-xl border border-slate-700/80 space-y-2 text-[11px]">
+          <span class="font-extrabold text-[#FEF3C7] uppercase tracking-wider block text-[10px]">Garantías de Bóveda</span>
+          <div class="flex items-center gap-2 text-slate-300">
+            <i data-lucide="truck" class="w-3.5 h-3.5 text-[#E11D48] flex-shrink-0"></i>
+            <span>Envío Blindado: <strong>$5.00 Nacional</strong></span>
+          </div>
+          <div class="flex items-center gap-2 text-slate-300">
+            <i data-lucide="award" class="w-3.5 h-3.5 text-[#D97706] flex-shrink-0"></i>
+            <span>Certificación: <strong>100% Oficial PSA</strong></span>
+          </div>
+          <div class="flex items-center gap-2 text-slate-300">
+            <i data-lucide="store" class="w-3.5 h-3.5 text-[#059669] flex-shrink-0"></i>
+            <span>Retiro Presencial: <strong>$0.00 en Quito</strong></span>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <a href="#profile" onclick="app.closeCategoriesDrawer()" class="w-full py-2.5 px-3 rounded-xl bg-[#1E293B] hover:bg-slate-700 text-xs font-bold text-white flex items-center justify-center gap-2 transition">
+            <i data-lucide="user-check" class="w-4 h-4 text-[#FEF3C7]"></i>
+            <span>Mi Perfil e Historial</span>
+          </a>
+          <a href="#tracking" onclick="app.closeCategoriesDrawer()" class="w-full py-2.5 px-3 rounded-xl border border-slate-700 hover:bg-slate-800 text-xs font-bold text-slate-300 flex items-center justify-center gap-2 transition">
+            <i data-lucide="package-check" class="w-4 h-4 text-[#059669]"></i>
+            <span>Rastreo de Orden en Vivo</span>
+          </a>
+        </div>
       </div>
     </div>
     <div class="flex-1" onclick="app.closeCategoriesDrawer()"></div>
@@ -293,7 +370,7 @@
     </div>
   </div>
 
-  <div id="psa-guide-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="psa-guide-title">
+  <div id="psa-guide-modal" onclick="if (event.target === this) app.closePSAGuideModal()" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="psa-guide-title" aria-hidden="true">
     <div class="modal-content bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl">
       <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-200">
         <div class="flex items-center gap-2.5">
@@ -324,6 +401,26 @@
             </div>
             <p class="text-xs text-slate-600 leading-relaxed">
               Carta original en estado <strong>Near Mint</strong> conservada en funda flexible y Top Loader, sin cápsula acrílica.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-[#F8FAFC] border border-slate-200 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-[#0F172A]">PSA 8 NM-MT</span>
+              <span class="px-2 py-0.5 text-[10px] font-black bg-slate-200 text-slate-800 rounded">NM-MT 8</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Excelente condición de colección con bordes nítidos y centrado dentro de los parámetros 60/40.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-[#F8FAFC] border border-slate-200 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-[#0F172A]">PSA 9 Mint</span>
+              <span class="px-2 py-0.5 text-[10px] font-black bg-slate-200 text-slate-800 rounded">MINT 9</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Condición superior con micro-imperfecciones prácticamente imperceptibles a simple vista.
             </p>
           </div>
 
@@ -426,18 +523,22 @@
     </div>
   </footer>
 
-  <!-- Persistencia Relacional y Base de Datos (Fase 2) -->
+  <!-- Persistencia Relacional y Base de Datos (Fase 8: Supabase con Fallback a Dexie) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/db/supabase-config.js"></script>
   <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
   <script src="js/db/schema.js"></script>
   <script src="js/db/db-client.js"></script>
 
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
+  <script src="js/services/pokemon-api.js"></script>
   <script src="js/views/home.js"></script>
   <script src="js/views/catalog.js"></script>
   <script src="js/views/pdp.js"></script>
   <script src="js/views/cart.js"></script>
   <script src="js/views/checkout.js"></script>
+  <script src="js/views/search-results.js"></script>
   <script src="js/views/profile.js"></script>
   <script src="js/views/tracking.js"></script>
   <script src="js/app.js"></script>

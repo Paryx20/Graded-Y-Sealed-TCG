@@ -4,6 +4,8 @@ const CheckoutView = {
   renderCheckout() {
     const user = Store.data.currentUser;
     const isPickup = Store.data.deliveryMethod === 'pickup';
+    const isQuito = Store.data.deliveryMethod === 'quito' || Store.data.deliveryMethod === 'local_express';
+    const isCourier = !isPickup && !isQuito;
     const { total } = Store.getCartTotals();
     const rawPhone = user && user.phone ? user.phone.replace(/^\+593\s*/, '').replace(/\D/g, '') : '';
 
@@ -20,8 +22,8 @@ const CheckoutView = {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div class="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-              <h2 class="text-base font-black text-[#0F172A]">${user ? 'Sesión Activa' : 'Usuario Registrado'}</h2>
-              <span class="text-[10px] font-bold text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded">${user ? 'Verificado' : 'Opción A'}</span>
+              <h2 class="text-base font-black text-[#0F172A]">${user ? 'Sesión Activa' : 'Cuenta de Coleccionista'}</h2>
+              <span class="text-[10px] font-bold text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded">${user ? 'Verificado' : 'Obligatorio'}</span>
             </div>
 
             ${user ? `
@@ -30,7 +32,8 @@ const CheckoutView = {
                 <div class="p-3.5 rounded-xl bg-[#F8FAFC] border border-slate-200 text-xs space-y-1">
                   <div class="font-black text-[#0F172A]">${user.name}</div>
                   <div class="text-slate-500">${user.email}</div>
-                  <div class="text-slate-500">Cédula/RUC: ${user.idCard || 'No registrada'}</div>
+                  <div class="text-slate-500">Cédula/RUC: ${user.idCard || user.cedula_ruc || 'No registrada'}</div>
+                  <div class="text-slate-500">Tel: ${user.phone || user.telefono || 'No registrado'}</div>
                 </div>
                 <a href="#profile" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
                   <i data-lucide="user-check" class="w-4 h-4"></i>
@@ -38,27 +41,35 @@ const CheckoutView = {
                 </a>
               </div>
             ` : `
-              <p class="text-xs text-slate-500 mt-2">Inicia sesión para autocompletar tus datos de envío.</p>
-              <form onsubmit="event.preventDefault(); CheckoutView.handleQuickLogin();" class="mt-4 space-y-3.5">
-                <div>
-                  <label for="login-email-checkout" class="block text-xs font-bold text-[#0F172A] mb-1">Correo Electrónico:</label>
-                  <input type="email" id="login-email-checkout" placeholder="tu.correo@ejemplo.com" class="w-full px-3 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+              <div class="mt-3 space-y-3">
+                <p class="text-xs text-slate-600">Para garantizar la autenticidad y custodia certificada, <strong>toda compra requiere registro obligatorio</strong>. Si ya tienes cuenta, inicia sesión aquí:</p>
+                <form onsubmit="event.preventDefault(); CheckoutView.handleQuickLogin();" class="mt-2 space-y-3">
+                  <div>
+                    <label for="login-email-checkout" class="block text-xs font-bold text-[#0F172A] mb-1">Correo Electrónico:</label>
+                    <input type="email" id="login-email-checkout" placeholder="tu.correo@ejemplo.com" class="w-full px-3 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                  </div>
+                  <div>
+                    <label for="login-pass-checkout" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña:</label>
+                    <input type="password" id="login-pass-checkout" placeholder="••••••••" class="w-full px-3 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                  </div>
+                  <button type="submit" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-lg transition touch-target">
+                    Iniciar Sesión y Precargar
+                  </button>
+                </form>
+
+                <div class="relative my-3">
+                  <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+                  <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-bold">o con tu cuenta</span></div>
                 </div>
-                <div>
-                  <label for="login-pass-checkout" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña:</label>
-                  <input type="password" id="login-pass-checkout" placeholder="••••••••" class="w-full px-3 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
-                </div>
-                <button type="submit" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-lg transition touch-target">
-                  Iniciar Sesión y Aplicar
-                </button>
-              </form>
+                <div id="google-signin-container-checkout" class="flex justify-center min-h-[44px]"></div>
+              </div>
             `}
           </div>
 
           <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
-                <h1 class="text-lg font-black text-[#0F172A]">Datos de Facturación y Entrega</h1>
+                <h1 class="text-lg font-black text-[#0F172A]">Datos de Facturación y Creación de Cuenta</h1>
                 <p class="text-xs text-slate-500 mt-0.5">Completa los datos para emitir tu factura electrónica y orden de custodia</p>
               </div>
               <span class="text-[10px] font-bold text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded">Custodia Asegurada</span>
@@ -77,15 +88,15 @@ const CheckoutView = {
                   <input 
                     type="text" 
                     id="guest-id" 
-                    value="${user && user.idCard ? user.idCard : ''}" 
-                    placeholder="Ej. 1710034065" 
-                    maxlength="10"
+                    value="${user && (user.idCard || user.cedula_ruc) ? (user.idCard || user.cedula_ruc) : ''}" 
+                    placeholder="Ej. 1710034065 o 1710034065001" 
+                    maxlength="13"
                     oninput="CheckoutView.validateIdInput(this)"
                     class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white transition" 
                     required 
                   />
                   <p id="guest-id-error" class="text-xs text-[#E11D48] font-semibold mt-1 hidden" role="alert">
-                    Cédula ecuatoriana inválida (debe contener 10 dígitos válidos)
+                    Cédula o RUC ecuatoriano inválido (validación Módulo 10)
                   </p>
                 </div>
 
@@ -112,25 +123,68 @@ const CheckoutView = {
                     />
                   </div>
                 </div>
+
+                <div>
+                  <label for="guest-address" class="block text-xs font-bold text-[#0F172A] mb-1">Dirección de Entrega: *</label>
+                  <input type="text" id="guest-address" value="${user ? (user.address || user.direccion_principal || '') : ''}" placeholder="Av. República del Salvador N34-183" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                </div>
+
+                <div>
+                  <label for="guest-city" class="block text-xs font-bold text-[#0F172A] mb-1">Ciudad: *</label>
+                  <input type="text" id="guest-city" value="${user ? (user.city || user.ciudad || '') : ''}" placeholder="Quito" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                </div>
+
+                ${user ? `
+                  <div class="sm:col-span-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 flex items-center gap-2">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+                    <span>Sesión activa verificada como <strong>${user.name}</strong>. Esta compra quedará registrada en tu historial.</span>
+                    <input type="hidden" id="checkout-password" value="ACTIVE_SESSION" />
+                    <input type="hidden" id="guest-password" value="ACTIVE_SESSION" />
+                  </div>
+                ` : `
+                  <div class="sm:col-span-2">
+                    <label for="checkout-password" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña para tu cuenta Graded &amp; Sealed: *</label>
+                    <input type="password" id="checkout-password" placeholder="Crea una contraseña segura (mínimo 8 caracteres)" minlength="8" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                    <input type="hidden" id="guest-password" value="" />
+                    <span class="text-[10px] text-slate-500 mt-1 block">El checkout requiere cuenta registrada para emisión de comprobante fiscal y custodia certificada.</span>
+                  </div>
+                `}
               </div>
             </fieldset>
 
             <fieldset class="space-y-3">
-              <legend class="text-sm font-extrabold text-[#0F172A]">2. Método de Entrega</legend>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <label class="p-4 rounded-xl cursor-pointer flex items-start gap-3 transition ${!isPickup ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
-                  <input type="radio" name="delivery-method" value="courier" ${!isPickup ? 'checked' : ''} onchange="CheckoutView.setDelivery('courier')" class="mt-1 text-[#E11D48]" />
-                  <div>
-                    <div class="text-sm font-bold text-[#0F172A]">Envío Blindado a Domicilio ($5.00)</div>
-                    <p class="text-xs text-slate-500 mt-0.5">Entrega asegurada en 24-48h con protección UV.</p>
+              <legend class="text-sm font-extrabold text-[#0F172A]">2. Método de Entrega (Tarifa Plana Ecuador)</legend>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <label class="p-3.5 rounded-xl cursor-pointer flex flex-col justify-between transition ${isCourier ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
+                  <div class="flex items-start gap-2.5">
+                    <input type="radio" name="delivery-method" value="courier" ${isCourier ? 'checked' : ''} onchange="CheckoutView.setDelivery('courier')" class="mt-0.5 text-[#E11D48]" />
+                    <div>
+                      <div class="text-xs font-bold text-[#0F172A]">Envío Nacional Blindado</div>
+                      <span class="text-xs font-black text-[#E11D48]">$5.00</span>
+                      <p class="text-[10px] text-slate-500 mt-0.5">Todo el Ecuador con empaque rígido y UV.</p>
+                    </div>
                   </div>
                 </label>
 
-                <label class="p-4 rounded-xl cursor-pointer flex items-start gap-3 transition ${isPickup ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
-                  <input type="radio" name="delivery-method" value="pickup" ${isPickup ? 'checked' : ''} onchange="CheckoutView.setDelivery('pickup')" class="mt-1 text-[#E11D48]" />
-                  <div>
-                    <div class="text-sm font-bold text-[#0F172A]">Retiro en Local Físico (Gratis)</div>
-                    <p class="text-xs text-slate-500 mt-0.5">Sucursal Central Quito (Listo en 2 horas).</p>
+                <label class="p-3.5 rounded-xl cursor-pointer flex flex-col justify-between transition ${isQuito ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
+                  <div class="flex items-start gap-2.5">
+                    <input type="radio" name="delivery-method" value="quito" ${isQuito ? 'checked' : ''} onchange="CheckoutView.setDelivery('quito')" class="mt-0.5 text-[#E11D48]" />
+                    <div>
+                      <div class="text-xs font-bold text-[#0F172A]">Local Express (Quito)</div>
+                      <span class="text-xs font-black text-[#E11D48]">$3.00</span>
+                      <p class="text-[10px] text-slate-500 mt-0.5">Entrega express en el DMQ (24h).</p>
+                    </div>
+                  </div>
+                </label>
+
+                <label class="p-3.5 rounded-xl cursor-pointer flex flex-col justify-between transition ${isPickup ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
+                  <div class="flex items-start gap-2.5">
+                    <input type="radio" name="delivery-method" value="pickup" ${isPickup ? 'checked' : ''} onchange="CheckoutView.setDelivery('pickup')" class="mt-0.5 text-[#E11D48]" />
+                    <div>
+                      <div class="text-xs font-bold text-[#0F172A]">Retiro en Local Físico</div>
+                      <span class="text-xs font-black text-[#059669]">$0.00 (Gratis)</span>
+                      <p class="text-[10px] text-slate-500 mt-0.5">Sucursal Central Quito. Pago en efectivo disponible.</p>
+                    </div>
                   </div>
                 </label>
               </div>
@@ -145,7 +199,7 @@ const CheckoutView = {
                       <input type="radio" name="payment-method" value="card" checked class="text-[#E11D48]" />
                       <div>
                         <span class="text-sm font-bold text-[#0F172A]">Tarjeta de Crédito / Débito</span>
-                        <span class="text-xs text-slate-500 block">Visa, Mastercard (3D Secure)</span>
+                        <span class="text-xs text-slate-500 block">Visa, Mastercard (Validación Luhn &amp; 3D Secure)</span>
                       </div>
                     </div>
                     <i data-lucide="credit-card" class="w-5 h-5 text-slate-500"></i>
@@ -325,7 +379,8 @@ const CheckoutView = {
     `;
   },
 
-  renderAuth() {
+  renderAuth(tab) {
+    if (tab) this.authTab = tab;
     const isLogin = this.authTab === 'login';
     return `
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -366,6 +421,12 @@ const CheckoutView = {
                 Acceder a mi Cuenta
               </button>
             </form>
+
+            <div class="relative my-4">
+              <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+              <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-bold">o continúa con</span></div>
+            </div>
+            <div id="google-signin-container-auth-login" class="flex justify-center min-h-[44px]"></div>
           ` : `
             <form onsubmit="event.preventDefault(); CheckoutView.submitRegister();" class="space-y-3.5">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -404,10 +465,43 @@ const CheckoutView = {
                 Registrar mi Cuenta
               </button>
             </form>
+
+            <div class="relative my-4">
+              <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+              <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-bold">o regístrate en 1-clic con</span></div>
+            </div>
+            <div id="google-signin-container-auth-register" class="flex justify-center min-h-[44px]"></div>
           `}
         </div>
       </div>
     `;
+  },
+
+  afterAuthRender() {
+    if (typeof app !== 'undefined' && typeof app.initGoogleSignIn === 'function') {
+      const containerId = this.authTab === 'login'
+        ? 'google-signin-container-auth-login'
+        : 'google-signin-container-auth-register';
+      app.initGoogleSignIn(containerId);
+    }
+  },
+
+  afterCheckoutRender() {
+    if (typeof Store !== 'undefined' && !Store.data.currentUser) {
+      if (typeof app !== 'undefined' && typeof app.initGoogleSignIn === 'function') {
+        app.initGoogleSignIn('google-signin-container-checkout');
+      }
+    }
+  },
+
+  afterRender() {
+    if (typeof Store !== 'undefined') {
+      if (Store.data.currentView === 'auth') {
+        this.afterAuthRender();
+      } else if (Store.data.currentView === 'checkout') {
+        this.afterCheckoutRender();
+      }
+    }
   },
 
   switchAuthTab(tab) {
@@ -416,7 +510,7 @@ const CheckoutView = {
   },
 
   validateIdInput(inputEl) {
-    inputEl.value = inputEl.value.replace(/\D/g, '').slice(0, 10);
+    inputEl.value = inputEl.value.replace(/\D/g, '').slice(0, 13);
     const errEl = document.getElementById('guest-id-error');
     if (!errEl) return;
     if (inputEl.value.length === 0) {
@@ -430,16 +524,59 @@ const CheckoutView = {
     inputEl.classList.toggle('border-[#059669]', valid);
   },
 
+  validateCreditCard(cardNumber) {
+    if (!cardNumber || typeof cardNumber !== 'string') {
+      return { valid: false, code: 'INVALID', message: 'Número de tarjeta inválido' };
+    }
+    const clean = cardNumber.replace(/\D/g, '');
+    if (clean.length < 13 || clean.length > 19) {
+      return { valid: false, code: 'INVALID_LENGTH', message: 'La tarjeta debe tener entre 13 y 19 dígitos' };
+    }
+
+    // Algoritmo de Luhn (Módulo 10 para tarjetas)
+    let sum = 0;
+    let alternate = false;
+    for (let i = clean.length - 1; i >= 0; i--) {
+      let n = parseInt(clean.charAt(i), 10);
+      if (alternate) {
+        n *= 2;
+        if (n > 9) n -= 9;
+      }
+      sum += n;
+      alternate = !alternate;
+    }
+
+    if (sum % 10 !== 0) {
+      return { valid: false, code: 'LUHN_FAILED', message: 'Dígito de verificación de tarjeta incorrecto (Luhn)' };
+    }
+
+    // Verificación de fallo simulado bancario: termina en '0000'
+    if (clean.endsWith('0000')) {
+      return {
+        valid: false,
+        simulatedDecline: true,
+        code: '#DECLINED-SEC-054',
+        message: 'Transacción denegada por el banco emisor (Límites o 3D Secure) (#DECLINED-SEC-054)'
+      };
+    }
+
+    return { valid: true, code: '00-APPROVED', message: 'Tarjeta aprobada' };
+  },
+
   setDelivery(method) {
     Store.data.deliveryMethod = method;
-    Store.data.shippingFee = method === 'pickup' ? APP_CONFIG.PICKUP_SHIPPING_FEE : APP_CONFIG.COURIER_SHIPPING_FEE;
+    if (method === 'pickup' || method === 'retiro') {
+      Store.data.shippingFee = APP_CONFIG.PICKUP_SHIPPING_FEE;
+      app.showToast('Entrega: Retiro en Local Físico ($0.00). Efectivo habilitado.', 'info');
+    } else if (method === 'quito' || method === 'local' || method === 'local_express') {
+      Store.data.shippingFee = APP_CONFIG.QUITO_SHIPPING_FEE;
+      app.showToast('Entrega: Local Express Quito ($3.00).', 'info');
+    } else {
+      Store.data.deliveryMethod = 'courier';
+      Store.data.shippingFee = APP_CONFIG.COURIER_SHIPPING_FEE;
+      app.showToast('Entrega: Envío Nacional Blindado ($5.00).', 'info');
+    }
     app.renderCurrentView();
-    app.showToast(
-      method === 'pickup'
-        ? 'Entrega: Retiro en Local Central ($0.00). Efectivo habilitado.'
-        : 'Entrega: Envío Blindado a Domicilio ($5.00).',
-      'info'
-    );
   },
 
   switchToCashPickup() {
@@ -482,11 +619,18 @@ const CheckoutView = {
 
     const newUser = {
       name,
+      nombre: name,
       idCard,
+      cedula_ruc: idCard,
       email,
       phone: `+593 ${phoneRaw.replace(/^\+593\s*/, '')}`,
+      telefono: `+593 ${phoneRaw.replace(/^\+593\s*/, '')}`,
       city,
-      address: 'Av. República del Salvador y Naciones Unidas, Quito'
+      ciudad: city,
+      address: 'Av. República del Salvador y Naciones Unidas, Quito',
+      direccion_principal: 'Av. República del Salvador y Naciones Unidas, Quito',
+      has_account: true,
+      auth_tier: 'verified_collector'
     };
 
     Store.data.currentUser = newUser;
@@ -497,7 +641,7 @@ const CheckoutView = {
     window.location.hash = '#profile';
   },
 
-  processPayment() {
+  async processPayment() {
     if (Store.data.cart.length === 0) {
       app.showToast('Tu bolsa de compras está vacía.', 'error');
       window.location.hash = '#catalog';
@@ -508,25 +652,71 @@ const CheckoutView = {
     const idInput = document.getElementById('guest-id');
     const emailInput = document.getElementById('guest-email');
     const phoneInput = document.getElementById('guest-phone');
+    const addressInput = document.getElementById('guest-address');
+    const cityInput = document.getElementById('guest-city');
+    const passwordInput = document.getElementById('checkout-password') || document.getElementById('guest-password');
 
-    if (!nameInput?.value.trim() || !emailInput?.value.trim()) {
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const idCard = idInput ? idInput.value.trim() : '';
+    const rawPhoneDigits = phoneInput ? phoneInput.value.replace(/\D/g, '') : '';
+    const address = addressInput ? addressInput.value.trim() : 'Av. República del Salvador';
+    const city = cityInput ? cityInput.value.trim() : 'Quito';
+    const password = passwordInput ? passwordInput.value.trim() : '';
+
+    if (!name || !email) {
       app.showToast('Completa todos los datos obligatorios de facturación.', 'error');
       return;
     }
 
-    if (!idInput || !Store.isValidEcuadorianId(idInput.value)) {
+    // 1. Mandatory Account Creation: Password required if user is not already logged in
+    if (!Store.data.currentUser && (!password || password.length < 8)) {
+      app.showToast('Ingresa una contraseña de al menos 8 caracteres para tu cuenta Graded & Sealed.', 'error');
+      if (passwordInput && typeof passwordInput.focus === 'function') passwordInput.focus();
+      return;
+    }
+
+    // 2. Validate Ecuadorian Cédula / RUC (Module 10)
+    if (!Store.isValidEcuadorianId(idCard)) {
       if (idInput) {
         this.validateIdInput(idInput);
-        idInput.focus();
+        if (typeof idInput.focus === 'function') idInput.focus();
       }
-      app.showToast('Cédula ecuatoriana inválida (validación Módulo 10).', 'error');
+      app.showToast('Cédula o RUC ecuatoriano inválido (validación Módulo 10).', 'error');
+      return;
+    }
+
+    // 3. Validate Phone Number with +593 prefix and 9 digits
+    const digitsOnly = rawPhoneDigits.startsWith('593') ? rawPhoneDigits.slice(3) : (rawPhoneDigits.startsWith('0') ? rawPhoneDigits.slice(1) : rawPhoneDigits);
+    const formattedPhone = `+593 ${digitsOnly}`;
+    if (!Store.isValidEcuadorianPhone(formattedPhone)) {
+      app.showToast('Teléfono celular inválido. Debe tener prefijo +593 seguido de 9 dígitos.', 'error');
+      if (phoneInput && typeof phoneInput.focus === 'function') phoneInput.focus();
       return;
     }
 
     const paymentMethodEl = document.querySelector('input[name="payment-method"]:checked');
     const paymentMethod = paymentMethodEl ? paymentMethodEl.value : 'card';
 
-    const buildOrderRecord = (methodLabel) => {
+    // 4. Validate Credit Card if payment method is 'card'
+    if (paymentMethod === 'card') {
+      const cardNumInput = document.getElementById('card-number');
+      const cardNum = (cardNumInput ? cardNumInput.value : '').replace(/\s+/g, '');
+      const cardValidation = this.validateCreditCard(cardNum);
+
+      if (!cardValidation.valid) {
+        if (cardValidation.simulatedDecline) {
+          app.showToast('Transacción denegada por el banco (#DECLINED-SEC-054)', 'error');
+          window.location.hash = '#error';
+          return;
+        }
+        app.showToast(cardValidation.message || 'Número de tarjeta inválido', 'error');
+        if (cardNumInput && typeof cardNumInput.focus === 'function') cardNumInput.focus();
+        return;
+      }
+    }
+
+    const finalizeOrder = async (methodLabel) => {
       const randomNum = Math.floor(10000 + Math.random() * 90000);
       const orderId = `#PKM-2026-${randomNum}`;
       const { subtotal, shipping, tax, total } = Store.getCartTotals();
@@ -539,40 +729,196 @@ const CheckoutView = {
         minute: '2-digit'
       });
 
-      return {
-        orderId,
-        date: formattedDate,
-        status: 'En Preparación / En Custodia',
-        buyerName: nameInput.value.trim(),
-        buyerId: idInput.value.trim(),
-        buyerEmail: emailInput.value.trim(),
-        buyerPhone: `+593 ${(phoneInput?.value || '').trim()}`,
-        paymentMethod: methodLabel,
-        deliveryMethod: Store.data.deliveryMethod === 'courier'
-          ? 'Envío Blindado a Domicilio ($5.00)'
-          : 'Retiro en Local Central ($0.00)',
-        items: [...Store.data.cart],
-        subtotal,
-        tax,
-        shipping,
-        total
-      };
-    };
+      let deliveryLabel = 'Envío Nacional Blindado ($5.00)';
+      if (Store.data.deliveryMethod === 'pickup') {
+        deliveryLabel = 'Retiro en Local Central ($0.00)';
+      } else if (Store.data.deliveryMethod === 'quito' || Store.data.deliveryMethod === 'local_express') {
+        deliveryLabel = 'Local Express Quito ($3.00)';
+      }
 
-    if (paymentMethod === 'cash') {
-      const orderObj = buildOrderRecord('Efectivo en Tienda');
-      Store.addOrder(orderObj);
+      const userRecord = {
+        cedula_ruc: idCard,
+        idCard,
+        nombre: name,
+        name,
+        email,
+        telefono: formattedPhone,
+        phone: formattedPhone,
+        ciudad: city,
+        city,
+        direccion_principal: address,
+        address,
+        password: password || (Store.data.currentUser ? Store.data.currentUser.password : 'Password2026!'),
+        has_account: true,
+        auth_tier: 'verified_collector'
+      };
+
+      const isPickupOrder = Store.data.deliveryMethod === 'pickup';
+      const trackingCode = isPickupOrder
+        ? `RET-UIO-${Math.floor(100000 + Math.random() * 900000)}`
+        : `GUI-EC-${Math.floor(100000 + Math.random() * 900000)}-PSA`;
+      const courierName = isPickupOrder
+        ? 'Retiro Presencial en Bóveda Central Quito'
+        : 'Servientrega Blindado • Bóveda G&S';
+      const estimatedDelivery = isPickupOrder
+        ? 'Listo para retiro inmediato en Bóveda'
+        : '2 a 3 días hábiles (Entrega Garantizada)';
+      const initialStatus = isPickupOrder
+        ? 'En Preparación / Listo para Retiro'
+        : 'En Preparación / En Custodia';
+
+      const orderRecord = {
+        numero_orden: orderId,
+        orderId,
+        trackingNumber: trackingCode,
+        courierName,
+        estimatedDelivery,
+        usuario_cedula: idCard,
+        buyerName: name,
+        buyerId: idCard,
+        buyerEmail: email,
+        buyerPhone: formattedPhone,
+        fecha_creacion: now.toISOString(),
+        date: formattedDate,
+        subtotal,
+        iva_15: tax,
+        tax,
+        costo_envio: shipping,
+        shipping,
+        total,
+        metodo_pago: methodLabel,
+        paymentMethod: methodLabel,
+        metodo_entrega: Store.data.deliveryMethod,
+        deliveryMethod: deliveryLabel,
+        estado: 'CONFIRMADO',
+        status: initialStatus,
+        estado_logistico: 'CONFIRMADO',
+        stages: isPickupOrder ? [
+          {
+            title: '1. Orden Recibida',
+            subtitle: 'Pago Verificado TLS 256-bit',
+            date: formattedDate,
+            status: 'completed',
+            detail: 'Fondos verificados y orden registrada en la cadena de custodia.'
+          },
+          {
+            title: '2. En Preparación',
+            subtitle: 'Sellado UV & Autenticación Bóveda',
+            date: formattedDate,
+            status: 'active',
+            detail: 'Validación de microimpresión, hologramas y encapsulado acrílico.'
+          },
+          {
+            title: '3. Listo para Retiro en Bóveda',
+            subtitle: 'Bóveda Central Quito • Sala de Entrega Privada',
+            date: 'Inmediata (Horario Bóveda)',
+            status: 'pending',
+            detail: 'Disponible para retiro en ventanilla de seguridad. Presentar cédula de identidad original.'
+          },
+          {
+            title: '4. Retirado en Bóveda',
+            subtitle: 'Custodia Transferida contra Cédula',
+            date: 'Pendiente de retiro',
+            status: 'pending',
+            detail: 'Recepción formal por el titular con documento de identidad original.'
+          }
+        ] : [
+          {
+            title: '1. Orden Recibida',
+            subtitle: 'Pago Verificado TLS 256-bit',
+            date: formattedDate,
+            status: 'completed',
+            detail: 'Fondos verificados y orden registrada en la cadena de custodia.'
+          },
+          {
+            title: '2. En Preparación',
+            subtitle: 'Sellado UV & Autenticación Bóveda',
+            date: formattedDate,
+            status: 'active',
+            detail: 'Validación de microimpresión, hologramas y encapsulado acrílico.'
+          },
+          {
+            title: '3. En Camino / Despacho',
+            subtitle: 'Transporte Blindado',
+            date: 'Programado (24-48h)',
+            status: 'pending',
+            detail: 'Embalaje con precinto tamper-evident en valija de seguridad.'
+          },
+          {
+            title: '4. Entregado',
+            subtitle: 'Custodia contra Documento',
+            date: 'Pendiente de entrega',
+            status: 'pending',
+            detail: 'Recepción formal por el titular con documento de identidad.'
+          }
+        ],
+        items: [...Store.data.cart]
+      };
+
+      // 5. ACID Persistence to Dexie.js
+      const dbRef = (typeof GradedSealedDB !== 'undefined') ? GradedSealedDB : ((typeof window !== 'undefined') ? window.GradedSealedDB : null);
+      if (dbRef) {
+        try {
+          if (typeof dbRef.procesarOrdenTransaccional === 'function') {
+            await dbRef.procesarOrdenTransaccional({
+              usuario: userRecord,
+              orden: orderRecord,
+              items: Store.data.cart.map(c => ({
+                sku: c.sku || c.id,
+                grado: c.condition || c.grado || 'PSA 10',
+                cantidad: c.quantity,
+                precio_unitario: c.price,
+                subtotal: c.price * c.quantity
+              }))
+            });
+          } else {
+            if (dbRef.usuarios) await dbRef.usuarios.put(userRecord);
+            if (dbRef.ordenes_compra) await dbRef.ordenes_compra.put(orderRecord);
+            if (dbRef.items_orden) {
+              for (const itm of Store.data.cart) {
+                await dbRef.items_orden.put({
+                  numero_orden: orderId,
+                  sku: itm.sku || itm.id,
+                  grado: itm.condition || itm.grado || 'RAW',
+                  cantidad: itm.quantity,
+                  precio_unitario: itm.price,
+                  subtotal: itm.price * itm.quantity
+                });
+              }
+            }
+          }
+        } catch (dbErr) {
+          console.warn('[CheckoutView] Advertencia al persistir en Dexie:', dbErr);
+        }
+      }
+
+      // Maintain active session state in Store and localStorage
+      Store.data.currentUser = userRecord;
+      const existingUserIdx = Store.data.users.findIndex(
+        u => (u.email && u.email.toLowerCase() === email.toLowerCase()) || (u.idCard === idCard)
+      );
+      if (existingUserIdx !== -1) {
+        Store.data.users[existingUserIdx] = { ...userRecord };
+      } else {
+        Store.data.users.push(userRecord);
+      }
+      Store.saveUserSession();
+      app.updateNavbarUserUI();
+
+      // Save order in Store
+      Store.addOrder(orderRecord);
       Store.data.cart = [];
       Store.saveCart();
       app.updateCartBadge();
-      app.showToast(`Orden ${orderObj.orderId} reservada para pago en tienda.`, 'success');
+
+      app.showToast(`¡Orden ${orderId} confirmada con éxito!`, 'success');
       window.location.hash = '#confirmation';
+    };
+
+    if (paymentMethod === 'cash') {
+      await finalizeOrder('Efectivo en Tienda');
       return;
     }
-
-    const cardNumInput = document.getElementById('card-number');
-    const cardNum = (cardNumInput ? cardNumInput.value : '').replace(/\s+/g, '');
-    const isSimulatedFailure = cardNum.endsWith('0000');
 
     const modal = document.getElementById('payment-modal');
     const modalText = document.getElementById('payment-modal-text');
@@ -585,25 +931,13 @@ const CheckoutView = {
     setTimeout(() => {
       if (progressBar) progressBar.style.width = '75%';
       if (modalText) modalText.innerText = 'Verificando autenticación 3D Secure y custodia...';
-    }, 900);
+    }, 400);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (progressBar) progressBar.style.width = '100%';
       if (modal) modal.classList.remove('active');
-
-      if (isSimulatedFailure) {
-        app.showToast('Transacción denegada por el banco (#DECLINED-SEC-054)', 'error');
-        window.location.hash = '#error';
-      } else {
-        const orderObj = buildOrderRecord('Tarjeta de Crédito / Débito');
-        Store.addOrder(orderObj);
-        Store.data.cart = [];
-        Store.saveCart();
-        app.updateCartBadge();
-        app.showToast(`¡Pago confirmado! Orden ${orderObj.orderId} registrada.`, 'success');
-        window.location.hash = '#confirmation';
-      }
-    }, 1900);
+      await finalizeOrder('Tarjeta de Crédito / Débito');
+    }, 800);
   }
 };
 

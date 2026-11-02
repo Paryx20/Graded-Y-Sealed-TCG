@@ -1,11 +1,407 @@
 const APP_CONFIG = {
   TAX_RATE: 0.15,
+  QUITO_SHIPPING_FEE: 3.00,
   COURIER_SHIPPING_FEE: 5.00,
-  PICKUP_SHIPPING_FEE: 0.00
+  PICKUP_SHIPPING_FEE: 0.00,
+  GOOGLE_CLIENT_ID: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
 };
 
-const PRODUCTS = [
+/**
+ * Catálogo Principal de 10 Cartas Pokémon a Precios Normales de Mercado Real ($5.00 a $80.00 USD)
+ * Requisito R6 / Fase 8: Eliminación de precios especulativos inflados.
+ */
+const POKEMON_CARDS_CATALOG_10 = [
   {
+    id: 'pikachu-crown-zenith',
+    nombre: 'Pikachu Secret Rare #160/159',
+    set: 'Crown Zenith 2023',
+    rareza: 'Secret Rare',
+    tipo: 'Eléctrico',
+    categoria: 'psa',
+    tipo_discriminador: 'CARTA_INDIVIDUAL',
+    tipo_item: 'CARTA_INDIVIDUAL',
+    era: 'modern',
+    condicionPrincipal: 'psa10',
+    certNumber: '84920111',
+    imagenLocal: 'img/charizard-base.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/swsh12pt5/160_hires.png',
+    precios: {
+      raw: 12.00,
+      psa8: 18.00,
+      psa9: 24.00,
+      psa10: 48.00
+    },
+    descripcion: 'Pikachu Secret Rare #160/159 • Zenit Supremo 2023 • Certificación Bóveda PSA',
+    tendencia12m: '+11.5%',
+    rendimientoAnual: 11.5,
+    historialBase: [0.89, 0.90, 0.91, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00, 1.00]
+  },
+  {
+    id: 'charizard-ex-paldean',
+    nombre: 'Charizard ex Double Rare #054/091',
+    set: 'Paldean Fates 2024',
+    rareza: 'Double Rare',
+    tipo: 'Oscuridad',
+    categoria: 'psa',
+    tipo_discriminador: 'CARTA_INDIVIDUAL',
+    tipo_item: 'CARTA_INDIVIDUAL',
+    era: 'modern',
+    condicionPrincipal: 'psa10',
+    certNumber: '84920112',
+    imagenLocal: 'img/charizard-base.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/sv4pt5/54_hires.png',
+    precios: {
+      raw: 10.00,
+      psa8: 16.00,
+      psa9: 22.00,
+      psa10: 45.00
+    },
+    descripcion: 'Charizard ex Doble Rara • Destinos de Paldea 2024 • Certificación Bóveda PSA',
+    tendencia12m: '+13.2%',
+    rendimientoAnual: 13.2,
+    historialBase: [0.88, 0.89, 0.90, 0.92, 0.93, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00, 1.00]
+  },
+  {
+    id: 'eevee-twilight',
+    nombre: 'Eevee Illustration Rare #188/167',
+    set: 'Twilight Masquerade 2024',
+    rareza: 'Illustration Rare',
+    tipo: 'Incoloro',
+    categoria: 'raw',
+    tipo_discriminador: 'CARTA_INDIVIDUAL',
+    tipo_item: 'CARTA_INDIVIDUAL',
+    era: 'modern',
+    condicionPrincipal: 'raw',
+    certNumber: '84920113',
+    imagenLocal: 'img/umbreon-vmax.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/sv6/188_hires.png',
+    precios: {
+      raw: 38.00,
+      psa8: 45.00,
+      psa9: 55.00,
+      psa10: 78.00
+    },
+    descripcion: 'Eevee Arte Especial • Mascarada Crepuscular • Near Mint Verificado',
+    tendencia12m: '+15.8%',
+    rendimientoAnual: 15.8,
+    historialBase: [0.85, 0.87, 0.89, 0.90, 0.92, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00, 1.00]
+  },
+  {
+    id: 'gengar-scarlet-violet',
+    nombre: 'Gengar Holo Rare #057/198',
+    set: 'Scarlet & Violet 2023',
+    rareza: 'Holo Rare',
+    tipo: 'Psíquico',
+    categoria: 'raw',
+    tipo_discriminador: 'CARTA_INDIVIDUAL',
+    tipo_item: 'CARTA_INDIVIDUAL',
+    era: 'modern',
+    condicionPrincipal: 'raw',
+    certNumber: '84920114',
+    imagenLocal: 'img/gengar-vmax.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/sv1/57_hires.png',
+    precios: {
+      raw: 5.00,
+      psa8: 9.00,
+      psa9: 14.00,
+      psa10: 28.00
+    },
+    descripcion: 'Gengar Holo Rare #057/198 • Escarlata y Púrpura • Funda Protectora',
+    tendencia12m: '+8.4%',
+    rendimientoAnual: 8.4,
+    historialBase: [0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 0.99, 1.00, 1.00]
+  },
+  {
+    id: 'greninja-ex-twilight',
+    nombre: 'Greninja ex Double Rare #106/167',
+    set: 'Twilight Masquerade 2024',
+    rareza: 'Double Rare',
+    tipo: 'Agua',
+    categoria: 'psa',
+    tipo_discriminador: 'CARTA_INDIVIDUAL',
+    tipo_item: 'CARTA_INDIVIDUAL',
+    era: 'modern',
+    condicionPrincipal: 'psa10',
+    certNumber: '84920115',
+    imagenLocal: 'img/blastoise-shadowless.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/sv6/106_hires.png',
+    precios: {
+      raw: 8.50,
+      psa8: 14.00,
+      psa9: 20.00,
+      psa10: 38.00
+    },
+    descripcion: 'Greninja ex Mascarada Crepuscular 2024 • Certificación PSA 10 GEM MT',
+    tendencia12m: '+16.2%',
+    rendimientoAnual: 16.2,
+    historialBase: [0.86, 0.88, 0.90, 0.92, 0.93, 0.95, 0.96, 0.98, 0.99, 0.99, 1.00, 1.00]
+  },
+  {
+    id: 'mimikyu-paldean',
+    nombre: 'Mimikyu Baby Shiny #097/091',
+    set: 'Paldean Fates 2024',
+    rareza: 'Shiny Rare',
+    tipo: 'Psíquico',
+    categoria: 'raw',
+    tipo_discriminador: 'CARTA_INDIVIDUAL',
+    tipo_item: 'CARTA_INDIVIDUAL',
+    era: 'modern',
+    condicionPrincipal: 'raw',
+    certNumber: '84920116',
+    imagenLocal: 'img/umbreon-vmax.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/sv4pt5/97_hires.png',
+    precios: {
+      raw: 14.00,
+      psa8: 20.00,
+      psa9: 28.00,
+      psa10: 52.00
+    },
+    descripcion: 'Mimikyu Shiny Holo • Destinos de Paldea • Estado Near Mint',
+    tendencia12m: '+12.7%',
+    rendimientoAnual: 12.7,
+    historialBase: [0.87, 0.89, 0.91, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00, 1.00]
+  },
+  {
+    id: 'mewtwo-151',
+    nombre: 'Mewtwo Holo Rare #059/165',
+    set: 'Pokemon 151 2023',
+    rareza: 'Holo Rare',
+    tipo: 'Psíquico',
+    categoria: 'psa',
+    tipo_discriminador: 'CARTA_INDIVIDUAL',
+    tipo_item: 'CARTA_INDIVIDUAL',
+    era: 'modern',
+    condicionPrincipal: 'psa10',
+    certNumber: '84920117',
+    imagenLocal: 'img/mewtwo-base.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/sv3pt5/59_hires.png',
+    precios: {
+      raw: 6.00,
+      psa8: 11.00,
+      psa9: 16.00,
+      psa10: 32.00
+    },
+    descripcion: 'Mewtwo Holo Rare • Colección Pokémon 151 • Grado PSA 10 Gem Mint',
+    tendencia12m: '+10.4%',
+    rendimientoAnual: 10.4,
+    historialBase: [0.90, 0.91, 0.92, 0.93, 0.95, 0.96, 0.97, 0.98, 0.99, 0.99, 1.00, 1.00]
+  },
+  {
+    id: 'lucario-vstar-zenith',
+    nombre: 'Lucario VSTAR Promo SWSH291',
+    set: 'Crown Zenith Promos 2023',
+    rareza: 'Promo Holo',
+    tipo: 'Lucha',
+    categoria: 'psa',
+    tipo_discriminador: 'CARTA_INDIVIDUAL',
+    tipo_item: 'CARTA_INDIVIDUAL',
+    era: 'modern',
+    condicionPrincipal: 'psa10',
+    certNumber: '84920118',
+    imagenLocal: 'img/charizard-base.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/swshp/SWSH291_hires.png',
+    precios: {
+      raw: 7.00,
+      psa8: 12.00,
+      psa9: 18.00,
+      psa10: 36.00
+    },
+    descripcion: 'Lucario VSTAR Arte Especial Promo • Grado Inversión Bóveda PSA',
+    tendencia12m: '+11.1%',
+    rendimientoAnual: 11.1,
+    historialBase: [0.89, 0.90, 0.92, 0.93, 0.94, 0.96, 0.97, 0.98, 0.99, 0.99, 1.00, 1.00]
+  },
+  {
+    id: 'raichu-gx',
+    nombre: 'Raichu GX Fase 1 Full Art #29/73',
+    set: 'Leyendas Luminosas 2017',
+    rareza: 'Ultra Rare GX',
+    tipo: 'Eléctrico',
+    categoria: 'psa',
+    tipo_discriminador: 'CARTA_INDIVIDUAL',
+    tipo_item: 'CARTA_INDIVIDUAL',
+    era: 'modern',
+    condicionPrincipal: 'psa10',
+    certNumber: '48291077',
+    imagenLocal: 'img/cards/raichu-gx.png',
+    imagenFallbackUrl: 'img/cards/raichu-gx.png',
+    precios: {
+      raw: 6.50,
+      psa8: 12.00,
+      psa9: 18.00,
+      psa10: 35.00
+    },
+    descripcion: 'Carta oficial Raichu GX • PS 210 • Chispa Poderosa • Bóveda PSA oficial',
+    tendencia12m: '+14.8%',
+    rendimientoAnual: 14.8,
+    historialBase: [0.86, 0.88, 0.89, 0.91, 0.92, 0.93, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'blastoise-ex-151',
+    nombre: 'Blastoise ex Double Rare #009/165',
+    set: 'Pokemon 151 2023',
+    rareza: 'Double Rare',
+    tipo: 'Agua',
+    categoria: 'psa',
+    tipo_discriminador: 'CARTA_INDIVIDUAL',
+    tipo_item: 'CARTA_INDIVIDUAL',
+    era: 'modern',
+    condicionPrincipal: 'psa10',
+    certNumber: '84920120',
+    imagenLocal: 'img/blastoise-shadowless.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/sv3pt5/9_hires.png',
+    precios: {
+      raw: 8.00,
+      psa8: 14.00,
+      psa9: 20.00,
+      psa10: 42.00
+    },
+    descripcion: 'Blastoise ex #009/165 • Pokémon 151 • Bóveda PSA oficial',
+    tendencia12m: '+12.3%',
+    rendimientoAnual: 12.3,
+    historialBase: [0.88, 0.89, 0.91, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00, 1.00]
+  }
+];
+
+/**
+ * Productos Sellados Vintage WotC
+ */
+const SEALED_PRODUCTS = [
+  {
+    id: 'booster-team-rocket',
+    nombre: 'Booster Box Team Rocket 1999 Sealed',
+    set: 'Team Rocket 1999',
+    rareza: 'Sellado de Fábrica',
+    tipo: 'Oscuridad',
+    categoria: 'sealed',
+    tipo_discriminador: 'PRODUCTO_SELLADO',
+    tipo_item: 'PRODUCTO_SELLADO',
+    era: 'vintage',
+    condicionPrincipal: 'sealed',
+    certNumber: '48291901',
+    imagenLocal: 'img/sealed/team-rocket-box-front.png',
+    imagenFallbackUrl: 'img/sealed/team-rocket-box-perspective.png',
+    galeria_sellada: {
+      frontal: 'img/sealed/team-rocket-box-front.png',
+      perspectiva: 'img/sealed/team-rocket-box-perspective.png',
+      lateral: 'img/sealed/team-rocket-box-side.png'
+    },
+    detalles_sellados: {
+      gramaje: '750g (Caja Completa)',
+      gramaje_gramos: 750,
+      cantidad_sobres_interior: 36,
+      es_pesado_verificado: true,
+      sellos: 'Sello oficial Wizards of the Coast termo-sellado con logo blanco',
+      sello_fabrica: 'Wizards of the Coast Authentic Shrinkwrap with White Logo',
+      packs: '36 Sobres de 11 Cartas c/u',
+      estado: 'Sin pesar / Unweighed • Sellado de Fábrica Intacto',
+      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+    },
+    precios: {
+      raw: 3500.00,
+      psa8: 3800.00,
+      psa9: 4200.00,
+      psa10: 5500.00,
+      sealed: 3500.00
+    },
+    precioUnitario: 3500.00,
+    descripcion: 'Display original Team Rocket 1999 de 36 sobres sellado de fábrica con celofán original Wizards of the Coast',
+    tendencia12m: '+18.4%',
+    rendimientoAnual: 18.4,
+    historialBase: [0.82, 0.84, 0.85, 0.87, 0.89, 0.91, 0.93, 0.95, 0.96, 0.98, 0.99, 1.00]
+  },
+  {
+    id: 'booster-box-fossil-1999',
+    nombre: 'Caja Sellada Booster Box Fossil 1999 (36 Packs)',
+    set: 'Fossil WotC 1999',
+    rareza: 'Sellado de Fábrica',
+    tipo: 'Incoloro',
+    categoria: 'sealed',
+    tipo_discriminador: 'PRODUCTO_SELLADO',
+    tipo_item: 'PRODUCTO_SELLADO',
+    era: 'vintage',
+    condicionPrincipal: 'sealed',
+    certNumber: '48291955',
+    imagenLocal: 'img/sealed/team-rocket-box-front.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/base3/1_hires.png',
+    galeria_sellada: {
+      frontal: 'img/sealed/team-rocket-box-front.png',
+      perspectiva: 'img/sealed/team-rocket-box-perspective.png',
+      lateral: 'img/sealed/team-rocket-box-side.png'
+    },
+    detalles_sellados: {
+      gramaje: '745g (Caja Completa)',
+      gramaje_gramos: 745,
+      cantidad_sobres_interior: 36,
+      es_pesado_verificado: true,
+      sellos: 'Sello oficial Wizards of the Coast termo-sellado con logo blanco',
+      sello_fabrica: 'Wizards of the Coast Authentic Shrinkwrap with White Logo',
+      packs: '36 Sobres de 11 Cartas c/u',
+      estado: 'Sin pesar / Unweighed • Sellado de Fábrica Intacto',
+      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+    },
+    precios: {
+      raw: 8400.00,
+      psa8: 8900.00,
+      psa9: 9600.00,
+      psa10: 12500.00,
+      sealed: 8400.00
+    },
+    precioUnitario: 8400.00,
+    descripcion: 'Display original de 36 sobres con celofán de fábrica Wizards of the Coast',
+    tendencia12m: '+24.1%',
+    rendimientoAnual: 24.1,
+    historialBase: [0.80, 0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96, 0.97, 0.99, 1.00]
+  },
+  {
+    id: 'booster-pack-base-1999',
+    nombre: 'Booster Pack Base Set 1999 1st Edition',
+    set: 'Base Set 1999',
+    rareza: 'Sellado de Fábrica',
+    tipo: 'Fuego',
+    tipo_discriminador: 'PRODUCTO_SELLADO',
+    tipo_item: 'PRODUCTO_SELLADO',
+    era: 'vintage',
+    condicionPrincipal: 'sealed',
+    certNumber: '48291999',
+    imagenLocal: 'img/booster-team-rocket.png',
+    imagenFallbackUrl: 'https://images.pokemontcg.io/base1/4_hires.png',
+    galeria_sellada: {
+      frontal: 'img/booster-team-rocket.png',
+      perspectiva: 'img/booster-team-rocket.png',
+      lateral: 'img/booster-team-rocket.png'
+    },
+    detalles_sellados: {
+      gramaje: '21.2g (Sobre Individual)',
+      gramaje_gramos: 21.2,
+      cantidad_sobres_interior: 1,
+      es_pesado_verificado: true,
+      sellos: 'Sello de calor original Wizards of the Coast 1999',
+      sello_fabrica: 'Wizards of the Coast 1st Edition Foil Crimping',
+      packs: '1 Sobre de 11 Cartas',
+      estado: 'Sin pesar / Heavy Pack Candidate • Bóveda UV',
+      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+    },
+    precios: {
+      raw: 1450.00,
+      psa8: 1750.00,
+      psa9: 2200.00,
+      psa10: 3600.00,
+      sealed: 1450.00
+    },
+    precioUnitario: 1450.00,
+    descripcion: 'Sobre individual 1999 1st Edition • Estuche magnético UV incluido',
+    tendencia12m: '+19.5%',
+    rendimientoAnual: 19.5,
+    historialBase: [0.83, 0.85, 0.87, 0.88, 0.90, 0.91, 0.93, 0.95, 0.96, 0.98, 0.99, 1.00]
+  }
+];
+
+/**
+ * Fixtures históricos preservados para retrocompatibilidad total con pruebas unitarias existentes
+ */
+const LEGACY_FIXTURE_PRODUCTS = {
+  'charizard-base': {
     id: 'charizard-base',
     nombre: 'Charizard Base Set 1999 #4/102',
     set: 'Base Set 1999',
@@ -28,7 +424,7 @@ const PRODUCTS = [
     rendimientoAnual: 21.7,
     historialBase: [0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00]
   },
-  {
+  'umbreon-vmax': {
     id: 'umbreon-vmax',
     nombre: 'Umbreon VMAX Moonbreon Alt Art #215',
     set: 'Evolving Skies 2021',
@@ -51,7 +447,7 @@ const PRODUCTS = [
     rendimientoAnual: 18.9,
     historialBase: [0.84, 0.85, 0.87, 0.89, 0.90, 0.92, 0.93, 0.95, 0.96, 0.98, 0.99, 1.00]
   },
-  {
+  'lugia-neo': {
     id: 'lugia-neo',
     nombre: 'Lugia 1st Edition Holo #9/111',
     set: 'Neo Genesis 2000',
@@ -74,7 +470,7 @@ const PRODUCTS = [
     rendimientoAnual: 15.4,
     historialBase: [0.86, 0.87, 0.89, 0.90, 0.91, 0.93, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00]
   },
-  {
+  'gengar-vmax': {
     id: 'gengar-vmax',
     nombre: 'Gengar VMAX Secret Rare Alt Art #271',
     set: 'Fusion Strike 2021',
@@ -97,30 +493,7 @@ const PRODUCTS = [
     rendimientoAnual: 14.2,
     historialBase: [0.87, 0.88, 0.89, 0.91, 0.92, 0.93, 0.94, 0.96, 0.97, 0.98, 0.99, 1.00]
   },
-  {
-    id: 'booster-team-rocket',
-    nombre: 'Booster Pack Team Rocket 1999 Heavy',
-    set: 'Team Rocket 1999',
-    rareza: 'Sellado de Fábrica',
-    tipo: 'Oscuridad',
-    categoria: 'sealed',
-    era: 'vintage',
-    condicionPrincipal: 'sealed',
-    certNumber: '48291901',
-    imagenLocal: 'img/booster-team-rocket.png',
-    imagenFallbackUrl: 'https://images.pokemontcg.io/base5/3_hires.png',
-    precios: {
-      raw: 320.00,
-      psa8: 350.00,
-      psa9: 410.00,
-      psa10: 540.00
-    },
-    descripcion: 'Sobre sellado de fábrica 21.2g Heavy Pack • Conservación térmica',
-    tendencia12m: '+11.2%',
-    rendimientoAnual: 11.2,
-    historialBase: [0.89, 0.90, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]
-  },
-  {
+  'blastoise-shadowless': {
     id: 'blastoise-shadowless',
     nombre: 'Blastoise Shadowless Base Set 1999 #2/102',
     set: 'Base Set 1999',
@@ -143,7 +516,7 @@ const PRODUCTS = [
     rendimientoAnual: 12.8,
     historialBase: [0.88, 0.89, 0.90, 0.91, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]
   },
-  {
+  'rayquaza-vmax-alt': {
     id: 'rayquaza-vmax-alt',
     nombre: 'Rayquaza VMAX Alt Art #218/203',
     set: 'Evolving Skies 2021',
@@ -166,7 +539,7 @@ const PRODUCTS = [
     rendimientoAnual: 16.5,
     historialBase: [0.85, 0.86, 0.88, 0.89, 0.91, 0.92, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00]
   },
-  {
+  'mewtwo-base-1999': {
     id: 'mewtwo-base-1999',
     nombre: 'Mewtwo Holo Base Set 1999 #10/102',
     set: 'Base Set 1999',
@@ -189,30 +562,7 @@ const PRODUCTS = [
     rendimientoAnual: 9.8,
     historialBase: [0.91, 0.92, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.98, 0.99, 1.00]
   },
-  {
-    id: 'booster-box-fossil-1999',
-    nombre: 'Caja Sellada Booster Box Fossil 1999 (36 Packs)',
-    set: 'Fossil WotC 1999',
-    rareza: 'Sellado de Fábrica',
-    tipo: 'Incoloro',
-    categoria: 'sealed',
-    era: 'vintage',
-    condicionPrincipal: 'sealed',
-    certNumber: '48291955',
-    imagenLocal: 'img/booster-team-rocket.png',
-    imagenFallbackUrl: 'https://images.pokemontcg.io/base3/1_hires.png',
-    precios: {
-      raw: 8400.00,
-      psa8: 8900.00,
-      psa9: 9600.00,
-      psa10: 12500.00
-    },
-    descripcion: 'Display original de 36 sobres con celofán de fábrica Wizards of the Coast',
-    tendencia12m: '+24.1%',
-    rendimientoAnual: 24.1,
-    historialBase: [0.80, 0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96, 0.97, 0.99, 1.00]
-  },
-  {
+  'tyranitar-aquapolis': {
     id: 'tyranitar-aquapolis',
     nombre: 'Shining Tyranitar Neo Destiny #113/105',
     set: 'Neo Destiny 2002',
@@ -235,7 +585,7 @@ const PRODUCTS = [
     rendimientoAnual: 13.6,
     historialBase: [0.88, 0.89, 0.90, 0.91, 0.92, 0.93, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]
   },
-  {
+  'giratina-v-alt': {
     id: 'giratina-v-alt',
     nombre: 'Giratina V Alt Art Lost Origin #186/196',
     set: 'Lost Origin 2022',
@@ -257,29 +607,76 @@ const PRODUCTS = [
     tendencia12m: '+17.3%',
     rendimientoAnual: 17.3,
     historialBase: [0.85, 0.86, 0.87, 0.89, 0.91, 0.92, 0.94, 0.95, 0.96, 0.98, 0.99, 1.00]
-  },
-  {
-    id: 'booster-pack-base-1999',
-    nombre: 'Booster Pack Base Set 1999 1st Edition',
-    set: 'Base Set 1999',
-    rareza: 'Sellado de Fábrica',
-    tipo: 'Fuego',
-    categoria: 'sealed',
-    era: 'vintage',
-    condicionPrincipal: 'sealed',
-    certNumber: '48291999',
-    imagenLocal: 'img/booster-team-rocket.png',
-    imagenFallbackUrl: 'https://images.pokemontcg.io/base1/4_hires.png',
-    precios: {
-      raw: 1450.00,
-      psa8: 1750.00,
-      psa9: 2200.00,
-      psa10: 3600.00
-    },
-    descripcion: 'Sobre individual 1999 1st Edition • Estuche magnético UV incluido',
-    tendencia12m: '+19.5%',
-    rendimientoAnual: 19.5,
-    historialBase: [0.83, 0.85, 0.87, 0.88, 0.90, 0.91, 0.93, 0.95, 0.96, 0.98, 0.99, 1.00]
   }
+};
+
+/**
+ * Catálogo Oficial Integrado Graded & Sealed TCG
+ */
+const PRODUCTS = [
+  ...POKEMON_CARDS_CATALOG_10,
+  ...SEALED_PRODUCTS
 ];
 
+// Ensure all products have standardized discriminators
+PRODUCTS.forEach(p => {
+  if (!p.tipo_discriminador) {
+    p.tipo_discriminador = (p.categoria === 'sealed') ? 'PRODUCTO_SELLADO' : 'CARTA_INDIVIDUAL';
+  }
+  if (!p.tipo_item) {
+    p.tipo_item = p.tipo_discriminador;
+  }
+  if (p.tipo_discriminador === 'PRODUCTO_SELLADO' || p.categoria === 'sealed') {
+    if (!p.galeria_sellada) {
+      p.galeria_sellada = {
+        frontal: p.imagenLocal,
+        perspectiva: p.imagenFallbackUrl || p.imagenLocal,
+        lateral: p.imagenLocal
+      };
+    }
+    if (!p.detalles_sellados) {
+      p.detalles_sellados = {
+        gramaje: '750g (Caja Completa)',
+        gramaje_gramos: 750,
+        cantidad_sobres_interior: 36,
+        es_pesado_verificado: true,
+        sellos: 'Sello oficial Wizards of the Coast termo-sellado con logo blanco',
+        sello_fabrica: 'Wizards of the Coast Authentic Shrinkwrap with White Logo',
+        packs: '36 Sobres de 11 Cartas c/u',
+        estado: 'Sin pesar / Unweighed • Sellado de Fábrica Intacto',
+        conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+      };
+    }
+    if (!p.precios.sealed) {
+      p.precios.sealed = p.precioUnitario || p.precios.raw || 1000;
+    }
+    if (!p.precioUnitario) {
+      p.precioUnitario = p.precios.sealed;
+    }
+  }
+});
+
+// Exportaciones para entornos globales y módulos Node
+if (typeof globalThis !== 'undefined') {
+  globalThis.APP_CONFIG = APP_CONFIG;
+  globalThis.POKEMON_CARDS_CATALOG_10 = POKEMON_CARDS_CATALOG_10;
+  globalThis.SEALED_PRODUCTS = SEALED_PRODUCTS;
+  globalThis.LEGACY_FIXTURE_PRODUCTS = LEGACY_FIXTURE_PRODUCTS;
+  globalThis.PRODUCTS = PRODUCTS;
+}
+if (typeof window !== 'undefined') {
+  window.APP_CONFIG = APP_CONFIG;
+  window.POKEMON_CARDS_CATALOG_10 = POKEMON_CARDS_CATALOG_10;
+  window.SEALED_PRODUCTS = SEALED_PRODUCTS;
+  window.LEGACY_FIXTURE_PRODUCTS = LEGACY_FIXTURE_PRODUCTS;
+  window.PRODUCTS = PRODUCTS;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    APP_CONFIG,
+    POKEMON_CARDS_CATALOG_10,
+    SEALED_PRODUCTS,
+    LEGACY_FIXTURE_PRODUCTS,
+    PRODUCTS
+  };
+}

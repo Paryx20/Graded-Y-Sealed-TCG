@@ -35,50 +35,65 @@
 
 ---
 
-### [ ] FASE 3: Rediseño Estético del Home y Menú de Categorías (Jueves - Mañana)
-- [ ] Construir Hero Section comercial con propuesta de valor de bóveda de inversión.
-- [ ] Crear la Barra de Garantías (Envío blindado $5.00, Certificación PSA, Retiro en Quito).
-- [ ] Implementar Drawer lateral deslizable de Categorías [☰ Categorías] en el Navbar.
-- [ ] Aplicar paleta cromática 60-30-10 (Blanco galería, Azul noche de resguardo, Acentos dorados/carmesí).
-- [ ] Separar el catálogo exploratorio libre (#catalog) de la página de inicio (#home).
+### [X] FASE 3: Rediseño Estético del Home y Menú de Categorías (Jueves - Mañana)
+- [X] Construir Hero Section comercial con propuesta de valor de bóveda de inversión.
+- [X] Crear la Barra de Garantías (Envío blindado $5.00, Certificación PSA, Retiro en Quito).
+- [X] Implementar Drawer lateral deslizable de Categorías [☰ Categorías] en el Navbar.
+- [X] Aplicar paleta cromática 60-30-10 (Blanco galería, Azul noche de resguardo, Acentos dorados/carmesí).
+- [X] Separar el catálogo exploratorio libre (#catalog) de la página de inicio (#home).
 
 ---
 
-### [ ] FASE 4: Ficha de Producto (PDP) e Inspector Técnico Adaptativo (Jueves - Tarde)
-- [ ] Lógica condicional según 'tipo_item':
+### [X] FASE 4: Ficha de Producto (PDP) e Inspector Técnico Adaptativo (Jueves - Tarde)
+- [X] Lógica condicional según 'tipo_item':
       * Si es 'PRODUCTO_SELLADO' (Cajas/Packs): OCULTAR selector de grados PSA y botones de giro 3D; mostrar detalles de fábrica y fotos del empaque.
       * Si es 'CARTA_INDIVIDUAL': Habilitar grados PSA, gráfica de cotización y visor técnico.
-- [ ] Inspector 3D de Cartas:
+- [X] Inspector 3D de Cartas:
       * Botón 'Frontal': Vista vertical normal con brillo holográfico.
       * Botón 'Reverso y Bordes': Giro 3D en eje Y (rotateY 180deg) mostrando dorso oficial azul y cuadrícula de centrado 50/50.
       * Botón 'Slab PSA': Enmarcar la carta dentro de una cápsula acrílica con etiqueta superior oficial PSA en CSS.
-- [ ] Agregar selector numérico de cantidad (- [ 1 ] +) antes de añadir a la bolsa.
-- [ ] Modal pedagógico accesible: "¿Qué es un Grado PSA?".
+- [X] Agregar selector numérico de cantidad (- [ 1 ] +) antes de añadir a la bolsa.
+- [X] Modal pedagógico accesible: "¿Qué es un Grado PSA?".
 
 ---
 
-### [ ] FASE 5: Carrito, Checkout Ecuatoriano y Notificación Única (Viernes - Mañana)
-- [ ] Sistema de Notificación Singleton: Máximo un mensaje flotante en pantalla (auto-cierre en 2.5s, sin spam en el DOM).
-- [ ] Confirmación modal antes de eliminar un ítem del carrito con opción de 'Deshacer'.
-- [ ] Formularios de Checkout con validaciones ecuatorianas:
-      * Cédula / RUC mediante algoritmo Módulo 10 en tiempo real.
-      * Teléfono con prefijo fijo no editable '+593' y longitud de 9 dígitos.
-      * Tarjetas de crédito con algoritmo de Luhn (terminación '0000' dispara error simulado #DECLINED-SEC-054).
-- [ ] Cálculos financieros exactos: IVA al 15% desglosado y tarifa plana de envío a $5.00 (gratis en retiro local).
+### [X] FASE 5: Carrito, Checkout con Registro Obligatorio y Validaciones Ecuatorianas
+- [X] Eliminar la compra como invitado anónimo sin persistencia.
+- [X] Formulario de Checkout unificado:
+      * Captura de datos obligatorios: Nombre completo, Cédula/RUC (validada con Módulo 10), Teléfono (+593), Dirección de entrega.
+      * Creación de cuenta en el mismo paso: Campo de contraseña ("Crea tu contraseña para registrar tu compra y acceder a tu historial").
+- [X] Lógica de persistencia en Dexie.js al pagar:
+      * Inserta o actualiza al cliente en la tabla 'usuarios'.
+      * Asocia formalmente la orden generada al 'usuario_id' en 'ordenes_compra'.
+      * Activa la sesión en 'state.js' automáticamente.
+- [X] Validaciones y pagos:
+      * Tarjetas validadas con Luhn (terminación '0000' dispara error simulado #DECLINED-SEC-054).
+      * Tarifa plana de envío: $3.00 (Quito) / $5.00 (Nacional) / $0.00 (Retiro en local).
+      * Desglose del IVA al 15%.
+- [X] Sistema de Notificación Singleton: Máximo un toast activo en pantalla con auto-cierre en 2.5s.
+- [X] Confirmación modal antes de eliminar ítems del carrito con opción de 'Deshacer'.
 
 ---
 
-### [ ] FASE 6: Doble API de Búsqueda con Failover (Viernes - Tarde)
-- [ ] Crear 'js/services/pokemon-api.js' con lógica de conmutación por fallo:
+### [X] FASE 6: Doble API de Búsqueda con Failover (Viernes - Tarde)
+- [X] Crear 'js/services/pokemon-api.js' con lógica de conmutación por fallo:
       * Primaria: 'pokemontcg.io' (metadatos completos y cotizaciones).
       * Secundaria (Respaldo): 'tcgdex.net' (gratuita, sin límite de cuota).
       * Fallback Offline: Catálogo local en memoria si no hay conexión a internet.
-- [ ] Crear la vista desacoplada '#search-results' con debounce de 400ms, skeleton loader y estado amigable de 'Cero resultados'.
+- [X] Crear la vista desacoplada '#search-results' con debounce de 400ms, skeleton loader y estado amigable de 'Cero resultados'.
 
 ---
 
-### [ ] FASE 7: Perfil de Usuario, Tracking en Vivo y Despliegue (Viernes - Noche)
-- [ ] Vista '#profile' con pestañas de "Datos Personales" (editables) e "Historial de Compras".
-- [ ] Conexión del historial con la vista '#tracking' para ver el estado real de la orden generada.
-- [ ] Auditoría de navegación móvil (sin desbordamientos horizontales ni textos cortados).
-- [ ] Commit final y despliegue verificado en GitHub Pages.
+### [X] FASE 7: Perfil de Usuario, Historial "Mis Últimas Compras" y Despliegue
+- [X] Vista '#profile' completamente reactiva conectada a Dexie.js:
+      * Pestaña "Mis Datos Personales": Permite editar nombre, teléfono y dirección guardada.
+      * Pestaña "Mis Últimas Compras": Lee la tabla 'ordenes_compra' filtrada por el 'usuario_id' activo y renderiza los pedidos reales con miniaturas, fecha, método de pago y estado logístico.
+- [X] Botón en cada orden del historial: [Ver Tracking en Vivo] que redirige a la vista '#tracking' con los datos exactos de esa compra.
+- [X] Botón de [Cerrar Sesión] que limpia el estado activo y redirige al Home.
+
+### [X] FASE 8: Migración a Supabase (PostgreSQL en la Nube) y Backend Real
+- [X] Extraer el modelo de datos a un archivo `js/db/schema.sql` compatible con PostgreSQL.
+- [X] Importar el cliente de Supabase por CDN en `index.html`.
+- [X] Crear `js/db/supabase-config.js` para inicializar el cliente con la URL y anon_key.
+- [X] Refactorizar `js/db/db-client.js` para que las consultas y mutaciones (lectura de catálogo, inserción de usuarios y órdenes) apunten a Supabase en lugar de IndexedDB.
+- [X] Configurar Políticas de Seguridad de Filas (RLS) en Supabase para permitir lecturas públicas del catálogo e inserciones seguras de órdenes.

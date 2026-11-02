@@ -4,18 +4,28 @@ const ProfileView = {
     if (!user) {
       return `
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-          <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center shadow-sm space-y-4">
-            <div class="w-16 h-16 rounded-full bg-slate-100 text-[#0F172A] flex items-center justify-center mx-auto">
-              <i data-lucide="user-lock" class="w-8 h-8"></i>
+          <div class="bg-white border border-slate-200 rounded-2xl p-8 sm:p-10 text-center shadow-sm space-y-6">
+            <div class="w-16 h-16 rounded-full bg-slate-100 text-[#0F172A] flex items-center justify-center mx-auto shadow-inner">
+              <i data-lucide="shield-check" class="w-8 h-8 text-[#059669]"></i>
             </div>
-            <h1 class="text-2xl font-black text-[#0F172A]">Inicia sesión para acceder a tu Perfil</h1>
-            <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-              Gestiona tus datos personales de facturación, dirección predeterminada y consulta el historial completo de tus órdenes en custodia.
-            </p>
-            <div class="pt-2">
-              <a href="#auth" class="inline-flex items-center gap-2 px-6 py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs sm:text-sm font-extrabold rounded-xl shadow transition">
-                <i data-lucide="log-in" class="w-4 h-4"></i>
-                <span>Ir al Portal de Acceso</span>
+            
+            <div class="space-y-2">
+              <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">Acceso a Bóveda &amp; Perfil de Custodia</h1>
+              <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
+                Inicia sesión con tu cuenta oficial de Google para acceder a tu bóveda privada, historial de adquisiciones certificadas PSA y seguimiento blindado en vivo.
+              </p>
+            </div>
+
+            <div class="pt-2 flex flex-col items-center justify-center gap-3">
+              <div id="google-signin-container" class="flex justify-center min-h-[44px]"></div>
+              <p class="text-[11px] text-slate-400">Autenticación segura federada con Google Identity Services (OAuth 2.0)</p>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-slate-500">
+              <span class="text-slate-400">¿Prefieres acceso tradicional?</span>
+              <a href="#auth" class="inline-flex items-center gap-1.5 font-extrabold text-[#E11D48] hover:text-[#BE123C] transition">
+                <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                <span>Ingresar con Correo y Contraseña</span>
               </a>
             </div>
           </div>
@@ -26,21 +36,36 @@ const ProfileView = {
     const activeTab = Store.data.profileActiveTab || 'personal';
     const orders = Store.data.orders || [];
     const cleanPhone = (user.phone || '').replace(/^\+593\s*/, '').replace(/\D/g, '');
+    const userInitial = (user.name || 'U').charAt(0).toUpperCase();
 
     return `
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         <div class="bg-[#0F172A] text-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-[#1E293B] border border-[#D97706]/40 text-[#FEF3C7] flex items-center justify-center font-black text-xl flex-shrink-0">
-              ${user.name.charAt(0).toUpperCase()}
-            </div>
+            ${user.avatar ? `
+              <img 
+                src="${user.avatar}" 
+                alt="${user.name}" 
+                class="w-14 h-14 rounded-2xl object-cover border border-[#D97706]/40 flex-shrink-0 shadow-sm"
+                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-14 h-14 rounded-2xl bg-[#1E293B] border border-[#D97706]/40 text-[#FEF3C7] flex items-center justify-center font-black text-xl flex-shrink-0\\'>${userInitial}</div>';"
+              />
+            ` : `
+              <div class="w-14 h-14 rounded-2xl bg-[#1E293B] border border-[#D97706]/40 text-[#FEF3C7] flex items-center justify-center font-black text-xl flex-shrink-0">
+                ${userInitial}
+              </div>
+            `}
             <div>
               <div class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-[#D1FAE5] bg-[#059669]/30 px-2.5 py-0.5 rounded mb-1">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-                <span>Titular de Bóveda Verificado</span>
+                ${user.authProvider === 'google' ? `
+                  <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+                  <span>Cuenta Google Verificada</span>
+                ` : `
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                  <span>Titular de Bóveda Verificado</span>
+                `}
               </div>
               <h1 class="text-xl sm:text-2xl font-black tracking-tight">${user.name}</h1>
-              <p class="text-xs text-slate-300">${user.email} • Cédula/RUC: ${user.idCard || '1710034065'}</p>
+              <p class="text-xs text-slate-300">${user.email}${user.idCard ? ` • Cédula/RUC: ${user.idCard}` : ''}</p>
             </div>
           </div>
 
@@ -99,7 +124,7 @@ const ProfileView = {
                   <input 
                     type="text" 
                     id="prof-id" 
-                    value="${user.idCard || '1710034065'}" 
+                    value="${user.idCard || ''}" 
                     maxlength="10"
                     oninput="ProfileView.validateProfileId(this)"
                     required 
@@ -130,7 +155,7 @@ const ProfileView = {
                     <input 
                       type="tel" 
                       id="prof-phone" 
-                      value="${cleanPhone || '0991234567'}" 
+                      value="${cleanPhone || ''}" 
                       maxlength="10"
                       oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 10)"
                       required 
@@ -144,7 +169,7 @@ const ProfileView = {
                   <input 
                     type="text" 
                     id="prof-city" 
-                    value="${user.city || 'Quito'}" 
+                    value="${user.city || ''}" 
                     required 
                     class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-xl focus:bg-white text-[#0F172A] font-semibold"
                   />
@@ -155,7 +180,7 @@ const ProfileView = {
                   <input 
                     type="text" 
                     id="prof-address" 
-                    value="${user.address || 'Av. República del Salvador N34-183, Quito'}" 
+                    value="${user.address || ''}" 
                     required 
                     class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-xl focus:bg-white text-[#0F172A] font-semibold"
                   />
@@ -250,6 +275,14 @@ const ProfileView = {
         `}
       </div>
     `;
+  },
+
+  afterRender() {
+    if (!Store.data.currentUser) {
+      if (typeof app !== 'undefined' && typeof app.initGoogleSignIn === 'function') {
+        app.initGoogleSignIn('google-signin-container');
+      }
+    }
   },
 
   switchTab(tabName) {

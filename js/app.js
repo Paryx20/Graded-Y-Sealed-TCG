@@ -5,6 +5,33 @@ const app = {
     this.updateCartBadge();
     this.setupSearchSpotlight();
 
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closeCategoriesDrawer();
+        const psaModal = document.getElementById('psa-guide-modal');
+        if (psaModal && psaModal.classList.contains('active')) {
+          this.closePSAGuideModal();
+        }
+        const delModal = document.getElementById('delete-confirm-modal');
+        if (delModal) delModal.classList.remove('active');
+        const payModal = document.getElementById('payment-modal');
+        if (payModal && !payModal.dataset.locked) payModal.classList.remove('active');
+        const spotlight = document.getElementById('search-spotlight-backdrop');
+        if (spotlight) spotlight.classList.remove('active');
+        const liveSearch = document.getElementById('search-live-dropdown');
+        if (liveSearch) liveSearch.classList.add('hidden');
+      }
+    });
+
+    const psaModal = document.getElementById('psa-guide-modal');
+    if (psaModal && typeof psaModal.addEventListener === 'function') {
+      psaModal.addEventListener('click', (e) => {
+        if (e.target === psaModal) {
+          this.closePSAGuideModal();
+        }
+      });
+    }
+
     window.addEventListener('hashchange', () => this.handleRoute());
     if (!window.location.hash) {
       window.location.hash = '#home';
@@ -15,6 +42,10 @@ const app = {
 
   handleRoute() {
     this.closeCategoriesDrawer();
+    this.closePSAGuideModal();
+    if (typeof TrackingView !== 'undefined' && typeof TrackingView.clearSimulationTimer === 'function') {
+      TrackingView.clearSimulationTimer();
+    }
     const raw = window.location.hash.replace(/^#/, '').trim();
     const parts = raw.split('?');
     const route = (parts[0] || 'home').toLowerCase();
@@ -23,7 +54,9 @@ const app = {
     if (route === 'pdp') {
       const prodId = params.get('id');
       if (prodId) {
-        const found = PRODUCTS.find(p => p.id === prodId);
+        const found = (typeof Store !== 'undefined' && Store.getProduct)
+          ? Store.getProduct(prodId)
+          : PRODUCTS.find(p => p.id === prodId);
         if (found) {
           Store.data.currentPdpProduct = found;
           Store.data.pdpSelectedCondition = found.condicionPrincipal === 'psa9' ? 'psa9' : 'psa10';
@@ -48,17 +81,24 @@ const app = {
       } else if (eraParam) {
         Store.data.catalogFilters.era = eraParam;
         Store.data.catalogFilters.category = 'all';
-      } else if (!qParam) {
+      } else {
         Store.data.catalogFilters.category = 'all';
         Store.data.catalogFilters.era = 'all';
       }
 
       if (qParam !== null) {
         Store.data.catalogFilters.searchQuery = qParam;
+        Store.data.searchQuery = qParam;
       }
 
       Store.data.currentView = 'catalog';
       this.renderCurrentView();
+
+      const searchInput = document.getElementById('global-search');
+      if (searchInput && qParam !== null) {
+        searchInput.value = qParam;
+      }
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -74,7 +114,16 @@ const app = {
       return;
     }
 
-    const validRoutes = ['home', 'cart', 'checkout', 'confirmation', 'error', 'auth', 'profile'];
+    if (route === 'search-results') {
+      const qParam = params.get('q');
+      Store.data.searchQuery = qParam !== null ? qParam : '';
+      Store.data.currentView = 'search-results';
+      this.renderCurrentView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const validRoutes = ['home', 'cart', 'checkout', 'confirmation', 'error', 'auth', 'profile', 'search-results'];
     Store.data.currentView = validRoutes.includes(route) ? route : 'home';
     this.renderCurrentView();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -107,20 +156,46 @@ const app = {
       html = ProfileView.render();
     } else if (view === 'tracking') {
       html = TrackingView.render();
+    } else if (view === 'search-results') {
+      html = (typeof SearchResultsView !== 'undefined' && SearchResultsView.render)
+        ? SearchResultsView.render(Store.data.searchQuery || '')
+        : '<div class="p-8 text-center text-slate-500 font-bold">Cargando motor de búsqueda...</div>';
     } else {
       html = HomeView.render();
     }
 
     container.innerHTML = html;
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+      lucide.createIcons();
+    }
 
     if (view === 'pdp') {
       PDPView.afterRender();
+    } else if (view === 'search-results' && typeof SearchResultsView !== 'undefined' && SearchResultsView.afterRender) {
+      SearchResultsView.afterRender();
+    } else if (view === 'profile' && typeof ProfileView !== 'undefined' && ProfileView.afterRender) {
+      ProfileView.afterRender();
+    } else if (view === 'tracking' && typeof TrackingView !== 'undefined' && TrackingView.afterRender) {
+      TrackingView.afterRender();
+    } else if (view === 'auth' && typeof CheckoutView !== 'undefined') {
+      if (typeof CheckoutView.afterAuthRender === 'function') {
+        CheckoutView.afterAuthRender();
+      } else if (typeof CheckoutView.afterRender === 'function') {
+        CheckoutView.afterRender();
+      }
+    } else if (view === 'checkout' && typeof CheckoutView !== 'undefined') {
+      if (typeof CheckoutView.afterCheckoutRender === 'function') {
+        CheckoutView.afterCheckoutRender();
+      } else if (typeof CheckoutView.afterRender === 'function') {
+        CheckoutView.afterRender();
+      }
     }
   },
 
   openProductPDP(productId) {
-    const found = PRODUCTS.find(p => p.id === productId);
+    const found = (typeof Store !== 'undefined' && Store.getProduct)
+      ? Store.getProduct(productId)
+      : PRODUCTS.find(p => p.id === productId);
     if (!found) return;
     Store.data.currentPdpProduct = found;
     Store.data.pdpSelectedCondition = found.condicionPrincipal === 'psa9' ? 'psa9' : 'psa10';
@@ -151,12 +226,16 @@ const app = {
 
   openCategoriesDrawer() {
     const drawer = document.getElementById('categories-drawer');
+    const btn = document.getElementById('btn-categories-drawer');
     if (drawer) drawer.classList.add('active');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
   },
 
   closeCategoriesDrawer() {
     const drawer = document.getElementById('categories-drawer');
+    const btn = document.getElementById('btn-categories-drawer');
     if (drawer) drawer.classList.remove('active');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
   },
 
   addToCart(id, name, condition, price, imageLocal, imageFallback, qty = 1) {
@@ -171,8 +250,8 @@ const app = {
         condition,
         price,
         quantity: units,
-        imageLocal: imageLocal || 'img/charizard-base.png',
-        imageFallback: imageFallback || 'https://images.pokemontcg.io/base1/4_hires.png'
+        imageLocal: imageLocal || 'img/cards/card-back.png',
+        imageFallback: imageFallback || 'img/cards/card-back.png'
       });
     }
 
@@ -211,7 +290,9 @@ const app = {
     }
     if (modal) {
       modal.classList.add('active');
-      lucide.createIcons();
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
     }
   },
 
@@ -244,7 +325,9 @@ const app = {
     if (banner && text) {
       text.innerText = `Ítem "${removed.name}" eliminado de la bolsa.`;
       banner.classList.remove('hidden');
-      lucide.createIcons();
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
     }
   },
 
@@ -273,14 +356,41 @@ const app = {
   openPSAGuideModal() {
     const modal = document.getElementById('psa-guide-modal');
     if (modal) {
+      if (typeof document !== 'undefined' && document.activeElement) {
+        this._psaModalTrigger = document.activeElement;
+      }
       modal.classList.add('active');
-      lucide.createIcons();
+      if (typeof modal.setAttribute === 'function') {
+        modal.setAttribute('aria-hidden', 'false');
+      }
+      if (typeof document !== 'undefined' && document.body && document.body.classList) {
+        document.body.classList.add('overflow-hidden');
+      }
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
+      const closeBtn = (typeof modal.querySelector === 'function') ? (modal.querySelector('button[aria-label="Cerrar guía PSA"]') || modal.querySelector('button')) : null;
+      if (closeBtn && typeof closeBtn.focus === 'function') {
+        closeBtn.focus();
+      }
     }
   },
 
   closePSAGuideModal() {
     const modal = document.getElementById('psa-guide-modal');
-    if (modal) modal.classList.remove('active');
+    if (modal) {
+      modal.classList.remove('active');
+      if (typeof modal.setAttribute === 'function') {
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    }
+    if (typeof document !== 'undefined' && document.body && document.body.classList) {
+      document.body.classList.remove('overflow-hidden');
+    }
+    if (this._psaModalTrigger && typeof this._psaModalTrigger.focus === 'function') {
+      this._psaModalTrigger.focus();
+      this._psaModalTrigger = null;
+    }
   },
 
   handleNavAccountClick() {
@@ -302,12 +412,12 @@ const app = {
     );
 
     const userObj = matched || {
-      name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      name: (email || 'user@tcgvault.com').split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
       email: email.trim(),
-      idCard: '1710034065',
-      phone: '+593 0991234567',
-      city: 'Quito',
-      address: 'Av. República del Salvador N34-183, Quito'
+      idCard: '',
+      phone: '',
+      city: '',
+      address: ''
     };
 
     Store.data.currentUser = userObj;
@@ -320,12 +430,162 @@ const app = {
     }
   },
 
+  decodeJwtResponse(token) {
+    if (!token || typeof token !== 'string') return null;
+    try {
+      const parts = token.split('.');
+      if (parts.length < 2) return null;
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const binaryStr = (typeof atob === 'function')
+        ? atob(base64)
+        : (typeof Buffer !== 'undefined' ? Buffer.from(base64, 'base64').toString('binary') : '');
+      if (!binaryStr) return null;
+      const jsonPayload = decodeURIComponent(
+        binaryStr
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch (err) {
+      console.warn('[GIS] Error al decodificar JWT de Google:', err);
+      return null;
+    }
+  },
+
+  initGoogleSignIn(containerId = 'google-signin-container') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const clientId = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.GOOGLE_CLIENT_ID) 
+      ? APP_CONFIG.GOOGLE_CLIENT_ID 
+      : '';
+    const isConfigured = clientId && !clientId.includes('YOUR_GOOGLE_CLIENT_ID') && clientId.endsWith('.apps.googleusercontent.com');
+    const hasGIS = typeof window !== 'undefined' && window.google && window.google.accounts && window.google.accounts.id;
+
+    if (hasGIS && isConfigured) {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: (response) => this.handleGoogleCredentialResponse(response),
+          auto_select: false,
+          cancel_on_tap_outside: true
+        });
+        container.innerHTML = '';
+        window.google.accounts.id.renderButton(container, {
+          type: 'standard',
+          theme: 'filled_black',
+          size: 'large',
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+          width: 280
+        });
+        return;
+      } catch (err) {
+        console.warn('[GIS] Error al inicializar SDK de Google, activando botón alternativo:', err);
+      }
+    }
+
+    // Material Design Google Fallback Button
+    container.innerHTML = `
+      <button 
+        type="button" 
+        id="btn-google-fallback"
+        onclick="app.handleSimulatedGoogleLogin()" 
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-6 py-3 bg-white hover:bg-slate-50 text-[#0F172A] border border-slate-300 hover:border-slate-400 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 touch-target"
+        aria-label="Continuar con cuenta de Google"
+      >
+        <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+        </svg>
+        <span>Continuar con Google</span>
+      </button>
+    `;
+  },
+
+  handleGoogleCredentialResponse(response) {
+    if (!response || !response.credential) {
+      this.showToast('No se recibió credencial válida de Google.', 'error');
+      return;
+    }
+    const payload = this.decodeJwtResponse(response.credential);
+    if (!payload || !payload.email) {
+      this.showToast('No se pudo verificar el token de Google.', 'error');
+      return;
+    }
+
+    const googleUser = {
+      id: payload.sub || `google-${Date.now()}`,
+      name: payload.name || payload.email.split('@')[0],
+      email: payload.email,
+      avatar: payload.picture || '',
+      authProvider: 'google',
+      idCard: '',
+      phone: '',
+      city: '',
+      address: ''
+    };
+
+    Store.data.currentUser = googleUser;
+    Store.saveUserSession();
+    this.updateNavbarUserUI();
+    this.showToast(`¡Sesión iniciada con Google como ${googleUser.name}!`, 'success');
+    if (Store.data.currentView === 'auth') {
+      window.location.hash = '#profile';
+    } else {
+      this.renderCurrentView();
+    }
+  },
+
+  handleSimulatedGoogleLogin() {
+    const simulatedUser = {
+      id: 'google-oauth2-10829574102948',
+      name: 'Patrick Mora',
+      email: 'patrickmora2006@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
+      authProvider: 'google',
+      idCard: '',
+      phone: '',
+      city: '',
+      address: ''
+    };
+
+    Store.data.currentUser = simulatedUser;
+    Store.saveUserSession();
+    this.updateNavbarUserUI();
+    this.showToast(`¡Sesión iniciada con Google como ${simulatedUser.name}!`, 'success');
+    if (Store.data.currentView === 'auth') {
+      window.location.hash = '#profile';
+    } else {
+      this.renderCurrentView();
+    }
+  },
+
   logoutUser() {
+    const googleObj = (typeof window !== 'undefined' && window.google) 
+      ? window.google 
+      : ((typeof google !== 'undefined') ? google : null);
+    if (googleObj && googleObj.accounts && googleObj.accounts.id && typeof googleObj.accounts.id.disableAutoSelect === 'function') {
+      try {
+        googleObj.accounts.id.disableAutoSelect();
+      } catch (err) {
+        console.warn('[GIS] Error en disableAutoSelect:', err);
+      }
+    }
     Store.data.currentUser = null;
     Store.saveUserSession();
     this.updateNavbarUserUI();
     this.showToast('Sesión cerrada correctamente.', 'info');
-    window.location.hash = '#home';
+    if (Store.data.currentView === 'profile') {
+      this.renderCurrentView();
+    } else {
+      window.location.hash = '#home';
+    }
   },
 
   updateNavbarUserUI() {
@@ -431,19 +691,24 @@ const app = {
               </div>
             </div>
             <div class="text-right">
-              <span class="text-xs font-black text-[#0F172A]">$${card.precios.psa10.toLocaleString('en-US')}</span>
+              <span class="text-xs font-black text-[#0F172A]">$${Number((card.precios && (card.precios.psa10 || card.precios.raw)) || card.precioEstimado || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
               <span class="block text-[9px] text-[#D97706] font-bold">PSA 10</span>
             </div>
           </div>
         `).join('')}
       </div>
-      <div class="p-2 border-t border-slate-100 text-center">
-        <button type="button" onclick="app.executeGlobalSearch('${q.replace(/'/g, '')}')" class="text-xs font-extrabold text-[#E11D48] hover:text-[#BE123C]">
-          Filtrar resultados en el Catálogo Avanzado →
+      <div class="p-2 border-t border-slate-100 flex items-center justify-between text-xs">
+        <button type="button" onclick="app.executeGlobalSearch('${q.replace(/'/g, '')}')" class="font-extrabold text-[#E11D48] hover:text-[#BE123C] flex items-center gap-1">
+          <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+          <span>Búsqueda Multifuente en Tiempo Real →</span>
         </button>
+        <a href="#catalog?q=${encodeURIComponent(q)}" class="text-slate-500 hover:text-slate-800 font-semibold text-[11px]">
+          Catálogo Tradicional
+        </a>
       </div>
     `;
     dropdown.classList.remove('hidden');
+    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
   },
 
   selectSpotlightProduct(cardId) {
@@ -460,17 +725,27 @@ const app = {
     if (backdrop) backdrop.classList.remove('active');
     if (dropdown) dropdown.classList.add('hidden');
 
-    Store.data.catalogFilters.searchQuery = (query || '').trim();
-    Store.data.catalogFilters.category = 'all';
-    Store.data.catalogFilters.era = 'all';
-    window.location.hash = `#catalog?q=${encodeURIComponent(Store.data.catalogFilters.searchQuery)}`;
+    const cleanQ = (query || '').trim();
+    Store.data.searchQuery = cleanQ;
+    Store.data.catalogFilters.searchQuery = cleanQ;
+    window.location.hash = `#search-results?q=${encodeURIComponent(cleanQ)}`;
   },
+
+  _activeToastTimeout: null,
 
   showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
+    // Strict singleton: clear pending timer and existing toast
+    if (this._activeToastTimeout) {
+      clearTimeout(this._activeToastTimeout);
+      this._activeToastTimeout = null;
+    }
+    container.innerHTML = '';
+
     const toast = document.createElement('div');
+    toast.setAttribute('data-type', type);
     toast.className = 'pointer-events-auto bg-[#0F172A] text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl border-l-4 flex items-center gap-2.5 transition-all transform translate-y-2 opacity-0';
 
     let icon = 'info';
@@ -490,17 +765,30 @@ const app = {
     `;
 
     container.appendChild(toast);
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+      lucide.createIcons();
+    }
 
-    requestAnimationFrame(() => {
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+      });
+    } else {
       toast.classList.remove('translate-y-2', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
-    });
+    }
 
-    setTimeout(() => {
+    // Auto-dismiss after exactly 2.5 seconds (2500ms)
+    this._activeToastTimeout = setTimeout(() => {
       toast.classList.add('opacity-0', 'translate-y-2');
-      setTimeout(() => toast.remove(), 250);
-    }, 3800);
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+        this._activeToastTimeout = null;
+      }, 200);
+    }, 2500);
   }
 };
 

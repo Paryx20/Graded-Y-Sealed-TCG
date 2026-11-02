@@ -294,20 +294,106 @@
     dbInstance = new LocalStorageFallbackDB();
   }
 
+  // Integración Supabase (Fase 8: Esquema híbrido activo-pasivo)
+  const SupabaseConfig = (typeof global.SupabaseConfig !== 'undefined')
+    ? global.SupabaseConfig
+    : (typeof require !== 'undefined' ? (function () {
+        try { return require('./supabase-config.js'); } catch (_) { return null; }
+      })() : null);
+
+  const supabaseClient = (SupabaseConfig && typeof SupabaseConfig.isConfigured === 'function' && SupabaseConfig.isConfigured())
+    ? SupabaseConfig.getClient()
+    : null;
+
+  dbInstance.supabaseClient = supabaseClient;
+  dbInstance.activeBackend = supabaseClient ? 'supabase' : (useFallback ? 'localstorage' : 'dexie');
+
   /**
    * ============================================================================
    * TRANSACCIÓN ACID: PROCESAMIENTO DE ÓRDENES Y DESCUENTO DE INVENTARIO
    * ============================================================================
    */
-  async function procesarOrdenTransaccional({
-    usuario_cedula = '1710034065',
-    items = [],
-    metodo_entrega = 'courier',
-    tarifa_envio = null,
-    metodo_pago = 'Tarjeta de Crédito (Visa ***9921)',
-    direccion_envio_id = 1,
-    notas = ''
-  }) {
+  async function procesarOrdenTransaccional(payload = {}) {
+    // Soporte para firma con objetos anidados { usuario, orden, items }
+    if (payload.usuario || payload.orden) {
+      return await dbInstance.transaction(
+        'rw',
+        [
+          dbInstance.usuarios,
+          dbInstance.ordenes_compra,
+          dbInstance.items_orden
+        ],
+        async () => {
+          if (payload.usuario && (payload.usuario.cedula_ruc || payload.usuario.idCard)) {
+            const userRecord = {
+              cedula_ruc: payload.usuario.cedula_ruc || payload.usuario.idCard,
+              nombre: payload.usuario.nombre || payload.usuario.name,
+              email: payload.usuario.email,
+              telefono: payload.usuario.telefono || payload.usuario.phone,
+              ciudad: payload.usuario.ciudad || payload.usuario.city,
+              direccion_principal: payload.usuario.direccion_principal || payload.usuario.address,
+              ...payload.usuario
+            };
+            await dbInstance.usuarios.put(userRecord);
+          }
+
+          if (payload.orden && (payload.orden.numero_orden || payload.orden.orderId)) {
+            const numOrden = payload.orden.numero_orden || payload.orden.orderId;
+            const orderRecord = {
+              numero_orden: numOrden,
+              usuario_cedula: payload.orden.usuario_cedula || (payload.usuario ? (payload.usuario.cedula_ruc || payload.usuario.idCard) : '1710034065'),
+              ...payload.orden
+            };
+            await dbInstance.ordenes_compra.put(orderRecord);
+          }
+
+          const orderId = payload.orden ? (payload.orden.numero_orden || payload.orden.orderId) : '#PKM-ORDER';
+          if (Array.isArray(payload.items)) {
+            for (const item of payload.items) {
+              await dbInstance.items_orden.put({
+                ...item,
+                numero_orden: item.numero_orden || orderId
+              });
+            }
+          }
+
+          // Sincronización transparente con Supabase si está disponible
+          if (dbInstance.supabaseClient) {
+            try {
+              if (payload.usuario) {
+                await dbInstance.supabaseClient.from('usuarios').upsert([payload.usuario]);
+              }
+              if (payload.orden) {
+                await dbInstance.supabaseClient.from('ordenes_compra').upsert([payload.orden]);
+              }
+              if (Array.isArray(payload.items) && payload.items.length > 0) {
+                await dbInstance.supabaseClient.from('items_orden').upsert(payload.items);
+              }
+            } catch (sbErr) {
+              console.warn('[GradedSealedDB] Supabase sync diferido (objeto):', sbErr);
+            }
+          }
+
+          return {
+            success: true,
+            orderId,
+            orden: payload.orden,
+            items: payload.items
+          };
+        }
+      );
+    }
+
+    const {
+      usuario_cedula = '1710034065',
+      items = [],
+      metodo_entrega = 'courier',
+      tarifa_envio = null,
+      metodo_pago = 'Tarjeta de Crédito (Visa ***9921)',
+      direccion_envio_id = 1,
+      notas = ''
+    } = payload;
+
     if (!items || !Array.isArray(items) || items.length === 0) {
       throw new Error('La orden debe contener al menos un producto coleccionable.');
     }
@@ -449,6 +535,26 @@
           });
         }
 
+        // Sincronización transparente con Supabase si está disponible
+        if (dbInstance.supabaseClient) {
+          try {
+            await dbInstance.supabaseClient.from('ordenes_compra').insert([nuevaOrden]);
+            const sbItems = lineasProcesadas.map(l => ({
+              numero_orden: nuevaOrden.numero_orden,
+              sku: l.sku,
+              grado: l.grado,
+              cantidad: l.cantidad,
+              precio_unitario: l.precio_unitario,
+              subtotal: l.subtotal
+            }));
+            if (sbItems.length > 0) {
+              await dbInstance.supabaseClient.from('items_orden').insert(sbItems);
+            }
+          } catch (sbErr) {
+            console.warn('[GradedSealedDB] Supabase sync diferido (orden):', sbErr);
+          }
+        }
+
         return {
           orden: nuevaOrden,
           items: lineasProcesadas
@@ -505,7 +611,13 @@
             { codigo_set: 'swsh8', nombre_set: 'Fusion Strike 2021', era: 'modern', anio_lanzamiento: 2021 },
             { codigo_set: 'neo1', nombre_set: 'Neo Genesis 2000', era: 'vintage', anio_lanzamiento: 2000 },
             { codigo_set: 'base5', nombre_set: 'Team Rocket 1999', era: 'vintage', anio_lanzamiento: 1999 },
-            { codigo_set: 'base2', nombre_set: 'Jungle 1999', era: 'vintage', anio_lanzamiento: 1999 }
+            { codigo_set: 'base2', nombre_set: 'Jungle 1999', era: 'vintage', anio_lanzamiento: 1999 },
+            { codigo_set: 'sv4pt5', nombre_set: 'Paldean Fates 2024', era: 'modern', anio_lanzamiento: 2024 },
+            { codigo_set: 'sv6', nombre_set: 'Twilight Masquerade 2024', era: 'modern', anio_lanzamiento: 2024 },
+            { codigo_set: 'sv1', nombre_set: 'Scarlet & Violet 2023', era: 'modern', anio_lanzamiento: 2023 },
+            { codigo_set: 'sv3pt5', nombre_set: 'Pokemon 151 2023', era: 'modern', anio_lanzamiento: 2023 },
+            { codigo_set: 'swsh12pt5', nombre_set: 'Crown Zenith 2023', era: 'modern', anio_lanzamiento: 2023 },
+            { codigo_set: 'sm3pt5', nombre_set: 'Leyendas Luminosas 2017', era: 'modern', anio_lanzamiento: 2017 }
           ]);
 
           // C. Usuario coleccionista verificado
@@ -640,6 +752,166 @@
               imagen_fallback: 'https://images.pokemontcg.io/base2/box_hires.png',
               precio_base: 14200.00,
               stock_total: 2,
+              activo: 1,
+              creado_en: '2026-01-01T00:00:00.000Z'
+            },
+            // 7. Pikachu Secret Rare #160/159
+            {
+              sku: 'PKM-CZ-PIKA-160',
+              nombre: 'Pikachu Secret Rare #160/159',
+              tipo_discriminador: 'CARTA_INDIVIDUAL',
+              slug_categoria: 'psa',
+              codigo_set: 'swsh12pt5',
+              era: 'modern',
+              descripcion: 'Pikachu Secret Rare #160/159 • Zenit Supremo 2023 • Certificación Bóveda PSA',
+              imagen_local: 'img/charizard-base.png',
+              imagen_fallback: 'https://images.pokemontcg.io/swsh12pt5/160_hires.png',
+              precio_base: 48.00,
+              stock_total: 10,
+              activo: 1,
+              creado_en: '2026-01-01T00:00:00.000Z'
+            },
+            // 8. Charizard ex Double Rare #054/091
+            {
+              sku: 'PKM-PF-CHAR-054',
+              nombre: 'Charizard ex Double Rare #054/091',
+              tipo_discriminador: 'CARTA_INDIVIDUAL',
+              slug_categoria: 'psa',
+              codigo_set: 'sv4pt5',
+              era: 'modern',
+              descripcion: 'Charizard ex Doble Rara • Destinos de Paldea 2024 • Certificación Bóveda PSA',
+              imagen_local: 'img/charizard-base.png',
+              imagen_fallback: 'https://images.pokemontcg.io/sv4pt5/54_hires.png',
+              precio_base: 45.00,
+              stock_total: 10,
+              activo: 1,
+              creado_en: '2026-01-01T00:00:00.000Z'
+            },
+            // 9. Eevee Illustration Rare #188/167
+            {
+              sku: 'PKM-TM-EEV-188',
+              nombre: 'Eevee Illustration Rare #188/167',
+              tipo_discriminador: 'CARTA_INDIVIDUAL',
+              slug_categoria: 'raw',
+              codigo_set: 'sv6',
+              era: 'modern',
+              descripcion: 'Eevee Arte Especial • Mascarada Crepuscular • Near Mint Verificado',
+              imagen_local: 'img/umbreon-vmax.png',
+              imagen_fallback: 'https://images.pokemontcg.io/sv6/188_hires.png',
+              precio_base: 78.00,
+              stock_total: 8,
+              activo: 1,
+              creado_en: '2026-01-01T00:00:00.000Z'
+            },
+            // 10. Gengar Holo Rare #057/198
+            {
+              sku: 'PKM-SV-GEN-057',
+              nombre: 'Gengar Holo Rare #057/198',
+              tipo_discriminador: 'CARTA_INDIVIDUAL',
+              slug_categoria: 'raw',
+              codigo_set: 'sv1',
+              era: 'modern',
+              descripcion: 'Gengar Holo Rare #057/198 • Escarlata y Púrpura • Funda Protectora',
+              imagen_local: 'img/gengar-vmax.png',
+              imagen_fallback: 'https://images.pokemontcg.io/sv1/57_hires.png',
+              precio_base: 28.00,
+              stock_total: 15,
+              activo: 1,
+              creado_en: '2026-01-01T00:00:00.000Z'
+            },
+            // 11. Greninja ex Double Rare #106/167
+            {
+              sku: 'PKM-TM-GREN-106',
+              nombre: 'Greninja ex Double Rare #106/167',
+              tipo_discriminador: 'CARTA_INDIVIDUAL',
+              slug_categoria: 'psa',
+              codigo_set: 'sv6',
+              era: 'modern',
+              descripcion: 'Greninja ex Mascarada Crepuscular 2024 • Certificación PSA 10 GEM MT',
+              imagen_local: 'img/blastoise-shadowless.png',
+              imagen_fallback: 'https://images.pokemontcg.io/sv6/106_hires.png',
+              precio_base: 38.00,
+              stock_total: 12,
+              activo: 1,
+              creado_en: '2026-01-01T00:00:00.000Z'
+            },
+            // 12. Mimikyu Baby Shiny #097/091
+            {
+              sku: 'PKM-PF-MIM-097',
+              nombre: 'Mimikyu Baby Shiny #097/091',
+              tipo_discriminador: 'CARTA_INDIVIDUAL',
+              slug_categoria: 'raw',
+              codigo_set: 'sv4pt5',
+              era: 'modern',
+              descripcion: 'Mimikyu Shiny Holo • Destinos de Paldea • Estado Near Mint',
+              imagen_local: 'img/umbreon-vmax.png',
+              imagen_fallback: 'https://images.pokemontcg.io/sv4pt5/97_hires.png',
+              precio_base: 52.00,
+              stock_total: 7,
+              activo: 1,
+              creado_en: '2026-01-01T00:00:00.000Z'
+            },
+            // 13. Mewtwo Holo Rare #059/165
+            {
+              sku: 'PKM-151-MEW-059',
+              nombre: 'Mewtwo Holo Rare #059/165',
+              tipo_discriminador: 'CARTA_INDIVIDUAL',
+              slug_categoria: 'psa',
+              codigo_set: 'sv3pt5',
+              era: 'modern',
+              descripcion: 'Mewtwo Holo Rare • Colección Pokémon 151 • Grado PSA 10 Gem Mint',
+              imagen_local: 'img/mewtwo-base.png',
+              imagen_fallback: 'https://images.pokemontcg.io/sv3pt5/59_hires.png',
+              precio_base: 32.00,
+              stock_total: 14,
+              activo: 1,
+              creado_en: '2026-01-01T00:00:00.000Z'
+            },
+            // 14. Lucario VSTAR Promo SWSH291
+            {
+              sku: 'PKM-CZ-LUC-291',
+              nombre: 'Lucario VSTAR Promo SWSH291',
+              tipo_discriminador: 'CARTA_INDIVIDUAL',
+              slug_categoria: 'psa',
+              codigo_set: 'swsh12pt5',
+              era: 'modern',
+              descripcion: 'Lucario VSTAR Arte Especial Promo • Grado Inversión Bóveda PSA',
+              imagen_local: 'img/charizard-base.png',
+              imagen_fallback: 'https://images.pokemontcg.io/swshp/SWSH291_hires.png',
+              precio_base: 36.00,
+              stock_total: 9,
+              activo: 1,
+              creado_en: '2026-01-01T00:00:00.000Z'
+            },
+            // 15. Raichu GX Full Art #29/73
+            {
+              sku: 'PKM-LL-RAI-029',
+              nombre: 'Raichu GX Fase 1 Full Art #29/73',
+              tipo_discriminador: 'CARTA_INDIVIDUAL',
+              slug_categoria: 'psa',
+              codigo_set: 'sm3pt5',
+              era: 'modern',
+              descripcion: 'Carta oficial Raichu GX • PS 210 • Chispa Poderosa • Bóveda PSA oficial',
+              imagen_local: 'img/cards/raichu-gx.png',
+              imagen_fallback: 'img/cards/raichu-gx.png',
+              precio_base: 35.00,
+              stock_total: 6,
+              activo: 1,
+              creado_en: '2026-01-01T00:00:00.000Z'
+            },
+            // 16. Blastoise ex Double Rare #009/165
+            {
+              sku: 'PKM-151-BLAS-009',
+              nombre: 'Blastoise ex Double Rare #009/165',
+              tipo_discriminador: 'CARTA_INDIVIDUAL',
+              slug_categoria: 'psa',
+              codigo_set: 'sv3pt5',
+              era: 'modern',
+              descripcion: 'Blastoise ex #009/165 • Pokémon 151 • Bóveda PSA oficial',
+              imagen_local: 'img/blastoise-shadowless.png',
+              imagen_fallback: 'https://images.pokemontcg.io/sv3pt5/9_hires.png',
+              precio_base: 42.00,
+              stock_total: 11,
               activo: 1,
               creado_en: '2026-01-01T00:00:00.000Z'
             }
@@ -917,7 +1189,68 @@
               calificacion_superficie: 10.0,
               precio: 4200.00,
               stock_disponible: 1
-            }
+            },
+
+            // 10 Cartas Pokémon a Precios Normales ($5.00 a $80.00 USD)
+            // Pikachu Crown Zenith #160
+            { numero_certificacion: 'RAW-PIKA-160-01', producto_sku: 'PKM-CZ-PIKA-160', grado: 'RAW', etiqueta_grado: 'Near Mint Raw', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 12.00, stock_disponible: 5 },
+            { numero_certificacion: 'PSA8-84920111-8', producto_sku: 'PKM-CZ-PIKA-160', grado: 'PSA 8', etiqueta_grado: 'NM-MT 8', calificacion_centrado: 8.5, calificacion_esquinas: 8.5, calificacion_bordes: 8.5, calificacion_superficie: 8.5, precio: 18.00, stock_disponible: 3 },
+            { numero_certificacion: 'PSA9-84920111-9', producto_sku: 'PKM-CZ-PIKA-160', grado: 'PSA 9', etiqueta_grado: 'MINT 9', calificacion_centrado: 9.0, calificacion_esquinas: 9.5, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 24.00, stock_disponible: 2 },
+            { numero_certificacion: 'PSA10-84920111', producto_sku: 'PKM-CZ-PIKA-160', grado: 'PSA 10', etiqueta_grado: 'GEM MT 10', calificacion_centrado: 10.0, calificacion_esquinas: 10.0, calificacion_bordes: 10.0, calificacion_superficie: 10.0, precio: 48.00, stock_disponible: 1 },
+
+            // Charizard ex Paldean Fates #054
+            { numero_certificacion: 'RAW-CHAR-054-01', producto_sku: 'PKM-PF-CHAR-054', grado: 'RAW', etiqueta_grado: 'Near Mint Raw', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 10.00, stock_disponible: 5 },
+            { numero_certificacion: 'PSA8-84920112-8', producto_sku: 'PKM-PF-CHAR-054', grado: 'PSA 8', etiqueta_grado: 'NM-MT 8', calificacion_centrado: 8.5, calificacion_esquinas: 8.5, calificacion_bordes: 8.5, calificacion_superficie: 8.5, precio: 16.00, stock_disponible: 3 },
+            { numero_certificacion: 'PSA9-84920112-9', producto_sku: 'PKM-PF-CHAR-054', grado: 'PSA 9', etiqueta_grado: 'MINT 9', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.5, calificacion_superficie: 9.0, precio: 22.00, stock_disponible: 2 },
+            { numero_certificacion: 'PSA10-84920112', producto_sku: 'PKM-PF-CHAR-054', grado: 'PSA 10', etiqueta_grado: 'GEM MT 10', calificacion_centrado: 10.0, calificacion_esquinas: 10.0, calificacion_bordes: 10.0, calificacion_superficie: 10.0, precio: 45.00, stock_disponible: 1 },
+
+            // Eevee Twilight Masquerade #188
+            { numero_certificacion: 'RAW-EEV-188-01', producto_sku: 'PKM-TM-EEV-188', grado: 'RAW', etiqueta_grado: 'Near Mint Raw', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 38.00, stock_disponible: 4 },
+            { numero_certificacion: 'PSA8-84920113-8', producto_sku: 'PKM-TM-EEV-188', grado: 'PSA 8', etiqueta_grado: 'NM-MT 8', calificacion_centrado: 8.5, calificacion_esquinas: 8.5, calificacion_bordes: 8.5, calificacion_superficie: 8.5, precio: 45.00, stock_disponible: 2 },
+            { numero_certificacion: 'PSA9-84920113-9', producto_sku: 'PKM-TM-EEV-188', grado: 'PSA 9', etiqueta_grado: 'MINT 9', calificacion_centrado: 9.0, calificacion_esquinas: 9.5, calificacion_bordes: 9.0, calificacion_superficie: 9.5, precio: 55.00, stock_disponible: 2 },
+            { numero_certificacion: 'PSA10-84920113', producto_sku: 'PKM-TM-EEV-188', grado: 'PSA 10', etiqueta_grado: 'GEM MT 10', calificacion_centrado: 10.0, calificacion_esquinas: 10.0, calificacion_bordes: 10.0, calificacion_superficie: 10.0, precio: 78.00, stock_disponible: 1 },
+
+            // Gengar Scarlet & Violet #057
+            { numero_certificacion: 'RAW-GEN-057-01', producto_sku: 'PKM-SV-GEN-057', grado: 'RAW', etiqueta_grado: 'Near Mint Raw', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 5.00, stock_disponible: 8 },
+            { numero_certificacion: 'PSA8-84920114-8', producto_sku: 'PKM-SV-GEN-057', grado: 'PSA 8', etiqueta_grado: 'NM-MT 8', calificacion_centrado: 8.5, calificacion_esquinas: 8.5, calificacion_bordes: 8.5, calificacion_superficie: 8.5, precio: 9.00, stock_disponible: 4 },
+            { numero_certificacion: 'PSA9-84920114-9', producto_sku: 'PKM-SV-GEN-057', grado: 'PSA 9', etiqueta_grado: 'MINT 9', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 14.00, stock_disponible: 3 },
+            { numero_certificacion: 'PSA10-84920114', producto_sku: 'PKM-SV-GEN-057', grado: 'PSA 10', etiqueta_grado: 'GEM MT 10', calificacion_centrado: 10.0, calificacion_esquinas: 10.0, calificacion_bordes: 10.0, calificacion_superficie: 10.0, precio: 28.00, stock_disponible: 1 },
+
+            // Greninja ex Twilight Masquerade #106
+            { numero_certificacion: 'RAW-GREN-106-01', producto_sku: 'PKM-TM-GREN-106', grado: 'RAW', etiqueta_grado: 'Near Mint Raw', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 8.50, stock_disponible: 6 },
+            { numero_certificacion: 'PSA8-84920115-8', producto_sku: 'PKM-TM-GREN-106', grado: 'PSA 8', etiqueta_grado: 'NM-MT 8', calificacion_centrado: 8.5, calificacion_esquinas: 8.5, calificacion_bordes: 8.5, calificacion_superficie: 8.5, precio: 14.00, stock_disponible: 4 },
+            { numero_certificacion: 'PSA9-84920115-9', producto_sku: 'PKM-TM-GREN-106', grado: 'PSA 9', etiqueta_grado: 'MINT 9', calificacion_centrado: 9.0, calificacion_esquinas: 9.5, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 20.00, stock_disponible: 2 },
+            { numero_certificacion: 'PSA10-84920115', producto_sku: 'PKM-TM-GREN-106', grado: 'PSA 10', etiqueta_grado: 'GEM MT 10', calificacion_centrado: 10.0, calificacion_esquinas: 10.0, calificacion_bordes: 10.0, calificacion_superficie: 10.0, precio: 38.00, stock_disponible: 1 },
+
+            // Mimikyu Paldean Fates #097
+            { numero_certificacion: 'RAW-MIM-097-01', producto_sku: 'PKM-PF-MIM-097', grado: 'RAW', etiqueta_grado: 'Near Mint Raw', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 14.00, stock_disponible: 5 },
+            { numero_certificacion: 'PSA8-84920116-8', producto_sku: 'PKM-PF-MIM-097', grado: 'PSA 8', etiqueta_grado: 'NM-MT 8', calificacion_centrado: 8.5, calificacion_esquinas: 8.5, calificacion_bordes: 8.5, calificacion_superficie: 8.5, precio: 20.00, stock_disponible: 3 },
+            { numero_certificacion: 'PSA9-84920116-9', producto_sku: 'PKM-PF-MIM-097', grado: 'PSA 9', etiqueta_grado: 'MINT 9', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.5, calificacion_superficie: 9.0, precio: 28.00, stock_disponible: 2 },
+            { numero_certificacion: 'PSA10-84920116', producto_sku: 'PKM-PF-MIM-097', grado: 'PSA 10', etiqueta_grado: 'GEM MT 10', calificacion_centrado: 10.0, calificacion_esquinas: 10.0, calificacion_bordes: 10.0, calificacion_superficie: 10.0, precio: 52.00, stock_disponible: 1 },
+
+            // Mewtwo 151 #059
+            { numero_certificacion: 'RAW-MEW-059-01', producto_sku: 'PKM-151-MEW-059', grado: 'RAW', etiqueta_grado: 'Near Mint Raw', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 6.00, stock_disponible: 6 },
+            { numero_certificacion: 'PSA8-84920117-8', producto_sku: 'PKM-151-MEW-059', grado: 'PSA 8', etiqueta_grado: 'NM-MT 8', calificacion_centrado: 8.5, calificacion_esquinas: 8.5, calificacion_bordes: 8.5, calificacion_superficie: 8.5, precio: 11.00, stock_disponible: 4 },
+            { numero_certificacion: 'PSA9-84920117-9', producto_sku: 'PKM-151-MEW-059', grado: 'PSA 9', etiqueta_grado: 'MINT 9', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 16.00, stock_disponible: 3 },
+            { numero_certificacion: 'PSA10-84920117', producto_sku: 'PKM-151-MEW-059', grado: 'PSA 10', etiqueta_grado: 'GEM MT 10', calificacion_centrado: 10.0, calificacion_esquinas: 10.0, calificacion_bordes: 10.0, calificacion_superficie: 10.0, precio: 32.00, stock_disponible: 1 },
+
+            // Lucario VSTAR SWSH291
+            { numero_certificacion: 'RAW-LUC-291-01', producto_sku: 'PKM-CZ-LUC-291', grado: 'RAW', etiqueta_grado: 'Near Mint Raw', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 7.00, stock_disponible: 5 },
+            { numero_certificacion: 'PSA8-84920118-8', producto_sku: 'PKM-CZ-LUC-291', grado: 'PSA 8', etiqueta_grado: 'NM-MT 8', calificacion_centrado: 8.5, calificacion_esquinas: 8.5, calificacion_bordes: 8.5, calificacion_superficie: 8.5, precio: 12.00, stock_disponible: 3 },
+            { numero_certificacion: 'PSA9-84920118-9', producto_sku: 'PKM-CZ-LUC-291', grado: 'PSA 9', etiqueta_grado: 'MINT 9', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 18.00, stock_disponible: 2 },
+            { numero_certificacion: 'PSA10-84920118', producto_sku: 'PKM-CZ-LUC-291', grado: 'PSA 10', etiqueta_grado: 'GEM MT 10', calificacion_centrado: 10.0, calificacion_esquinas: 10.0, calificacion_bordes: 10.0, calificacion_superficie: 10.0, precio: 36.00, stock_disponible: 1 },
+
+            // Raichu GX Leyendas Luminosas #029
+            { numero_certificacion: 'RAW-RAI-029-01', producto_sku: 'PKM-LL-RAI-029', grado: 'RAW', etiqueta_grado: 'Near Mint Raw', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 6.50, stock_disponible: 4 },
+            { numero_certificacion: 'PSA8-48291075', producto_sku: 'PKM-LL-RAI-029', grado: 'PSA 8', etiqueta_grado: 'NM-MT 8', calificacion_centrado: 8.5, calificacion_esquinas: 8.5, calificacion_bordes: 8.5, calificacion_superficie: 8.5, precio: 12.00, stock_disponible: 2 },
+            { numero_certificacion: 'PSA9-48291076', producto_sku: 'PKM-LL-RAI-029', grado: 'PSA 9', etiqueta_grado: 'MINT 9', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 18.00, stock_disponible: 2 },
+            { numero_certificacion: 'PSA10-48291077', producto_sku: 'PKM-LL-RAI-029', grado: 'PSA 10', etiqueta_grado: 'GEM MT 10', calificacion_centrado: 10.0, calificacion_esquinas: 10.0, calificacion_bordes: 10.0, calificacion_superficie: 10.0, precio: 35.00, stock_disponible: 1 },
+
+            // Blastoise ex Pokemon 151 #009
+            { numero_certificacion: 'RAW-BLAS-009-01', producto_sku: 'PKM-151-BLAS-009', grado: 'RAW', etiqueta_grado: 'Near Mint Raw', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 8.00, stock_disponible: 5 },
+            { numero_certificacion: 'PSA8-84920120-8', producto_sku: 'PKM-151-BLAS-009', grado: 'PSA 8', etiqueta_grado: 'NM-MT 8', calificacion_centrado: 8.5, calificacion_esquinas: 8.5, calificacion_bordes: 8.5, calificacion_superficie: 8.5, precio: 14.00, stock_disponible: 3 },
+            { numero_certificacion: 'PSA9-84920120-9', producto_sku: 'PKM-151-BLAS-009', grado: 'PSA 9', etiqueta_grado: 'MINT 9', calificacion_centrado: 9.0, calificacion_esquinas: 9.0, calificacion_bordes: 9.0, calificacion_superficie: 9.0, precio: 20.00, stock_disponible: 2 },
+            { numero_certificacion: 'PSA10-84920120', producto_sku: 'PKM-151-BLAS-009', grado: 'PSA 10', etiqueta_grado: 'GEM MT 10', calificacion_centrado: 10.0, calificacion_esquinas: 10.0, calificacion_bordes: 10.0, calificacion_superficie: 10.0, precio: 42.00, stock_disponible: 1 }
           ]);
 
           // J. Historial cronológico de cotizaciones a 12 meses

@@ -103,7 +103,7 @@ const CartView = {
               </div>
 
               <div class="flex justify-between text-slate-600">
-                <span>Envío blindado:</span>
+                <span>Envío:</span>
                 <span class="font-bold text-[#0F172A]">$${shipping.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
               </div>
 
