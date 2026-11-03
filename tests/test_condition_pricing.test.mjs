@@ -126,6 +126,7 @@ function createPricingEnvironment() {
     app: {
       renderCurrentView: () => { fullReRenderCount++; },
       showToast: (msg, type) => { toastHistory.push({ msg, type }); },
+      refreshIcons: () => {},
       addToCart: (sku, name, label, price, img, fallback, qty) => {
         cartHistory.push({ sku, name, label, price, img, fallback, qty });
       }

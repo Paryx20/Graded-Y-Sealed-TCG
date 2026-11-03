@@ -21,14 +21,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif']
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif']
           },
           colors: {
             brand: {
@@ -69,11 +70,10 @@
             height="47"
             class="h-10 w-auto object-contain rounded bg-white/95 p-0.5 shadow-xs brand-logo"
             style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;"
-            onerror="this.onerror=null; this.src='https://placehold.co/80x100/E11D48/FFFFFF?text=G%26S';"
           />
           <div class="hidden sm:block">
-            <span class="font-black text-sm tracking-tight text-white block leading-none">GRADED &amp; SEALED</span>
-            <span class="text-xs font-bold text-[#FEF3C7] tracking-widest uppercase">BÓVEDA TCG • PSA</span>
+            <span class="brand-wordmark">GRADED &amp; SEALED</span>
+            <span class="brand-tagline">Bóveda TCG · PSA</span>
           </div>
         </a>
       </div>
@@ -150,15 +150,15 @@
     <nav class="category-bar bg-[#1E293B] border-t border-slate-800/80" aria-label="Categorías del catálogo">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-6 overflow-x-auto no-scrollbar whitespace-nowrap">
         <ul class="flex items-stretch gap-1 text-[13px] font-semibold">
-          <li><a href="pages/catalogo.html" data-nav="all" class="category-link">Todo</a></li>
-          <li><a href="pages/catalogo.html?cat=psa" data-nav="cat:psa" class="category-link">Slabs PSA</a></li>
-          <li><a href="pages/catalogo.html?cat=raw" data-nav="cat:raw" class="category-link">Cartas raw</a></li>
-          <li><a href="pages/catalogo.html?cat=sealed" data-nav="cat:sealed" class="category-link">Sellados</a></li>
+          <li><a href="pages/catalogo.html" data-nav="all" class="category-link"><i data-lucide="layout-grid" class="w-4 h-4"></i>Todo</a></li>
+          <li><a href="pages/catalogo.html?cat=psa" data-nav="cat:psa" class="category-link"><i data-lucide="award" class="w-4 h-4"></i>Slabs PSA</a></li>
+          <li><a href="pages/catalogo.html?cat=raw" data-nav="cat:raw" class="category-link"><i data-lucide="layers" class="w-4 h-4"></i>Cartas raw</a></li>
+          <li><a href="pages/catalogo.html?cat=sealed" data-nav="cat:sealed" class="category-link"><i data-lucide="package" class="w-4 h-4"></i>Sellados</a></li>
           <li class="category-divider" aria-hidden="true"></li>
-          <li><a href="pages/catalogo.html?era=vintage" data-nav="era:vintage" class="category-link">Vintage <span class="category-meta">1999–2002</span></a></li>
-          <li><a href="pages/catalogo.html?era=modern" data-nav="era:modern" class="category-link">Moderno <span class="category-meta">SWSH · SV</span></a></li>
+          <li><a href="pages/catalogo.html?era=vintage" data-nav="era:vintage" class="category-link"><i data-lucide="history" class="w-4 h-4"></i>Vintage <span class="category-meta">1999–2002</span></a></li>
+          <li><a href="pages/catalogo.html?era=modern" data-nav="era:modern" class="category-link"><i data-lucide="sparkles" class="w-4 h-4"></i>Moderno <span class="category-meta">SWSH · SV</span></a></li>
           <li class="category-divider lg:hidden" aria-hidden="true"></li>
-          <li class="lg:hidden"><a href="pages/seguimiento.html" data-page-link="tracking" class="category-link">Rastrear pedido</a></li>
+          <li class="lg:hidden"><a href="pages/seguimiento.html" data-page-link="tracking" class="category-link"><i data-lucide="package-search" class="w-4 h-4"></i>Rastrear pedido</a></li>
         </ul>
         <span class="hidden xl:block text-xs text-slate-400">Envíos a todo Ecuador desde Quito</span>
       </div>
@@ -191,7 +191,17 @@
     </div>
   </div>
 
-  <main id="app-view" tabindex="-1" class="flex-1 pb-16 focus:outline-none"></main>
+  <main id="app-view" tabindex="-1" class="flex-1 pb-16 focus:outline-none">
+    <div class="page-skeleton max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6" aria-hidden="true">
+      <div class="skeleton h-28 mb-6"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="skeleton h-80"></div>
+        <div class="skeleton h-80 hidden sm:block"></div>
+        <div class="skeleton h-80 hidden lg:block"></div>
+      </div>
+    </div>
+    <p class="sr-only" role="status">Cargando contenido…</p>
+  </main>
 
   <div id="payment-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modal-payment-title">
     <div class="modal-content bg-white border border-slate-200 rounded-2xl max-w-md w-full p-8 text-center shadow-2xl">

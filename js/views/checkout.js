@@ -22,7 +22,7 @@ const CheckoutView = {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div class="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-              <h2 class="text-base font-black text-[#0F172A]">${user ? 'Sesión Activa' : 'Cuenta de Coleccionista'}</h2>
+              <h2 class="text-base font-bold text-[#0F172A]">${user ? 'Sesión Activa' : 'Cuenta de Coleccionista'}</h2>
               <span class="text-xs font-bold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded">${user ? 'Verificado' : 'Obligatorio'}</span>
             </div>
 
@@ -30,7 +30,7 @@ const CheckoutView = {
               <div class="mt-4 space-y-3">
                 <p class="text-xs text-slate-600">Tus datos de perfil se han precargado automáticamente para esta orden.</p>
                 <div class="p-3.5 rounded-xl bg-[#F8FAFC] border border-slate-200 text-xs space-y-1">
-                  <div class="font-black text-[#0F172A]">${user.name}</div>
+                  <div class="font-bold text-[#0F172A]">${user.name}</div>
                   <div class="text-slate-500">${user.email}</div>
                   <div class="text-slate-500">Cédula/RUC: ${user.idCard || user.cedula_ruc || 'No registrada'}</div>
                   <div class="text-slate-500">Tel: ${user.phone || user.telefono || 'No registrado'}</div>
@@ -64,14 +64,14 @@ const CheckoutView = {
           <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
-                <h1 class="text-lg font-black text-[#0F172A]">Datos de Facturación y Creación de Cuenta</h1>
+                <h1 class="text-lg font-bold text-[#0F172A]">Datos de Facturación y Creación de Cuenta</h1>
                 <p class="text-xs text-slate-500 mt-0.5">Completa los datos para emitir tu factura electrónica y orden de custodia</p>
               </div>
               <span class="text-xs font-bold text-[#B45309] bg-[#FEF3C7] px-2 py-0.5 rounded">Custodia Asegurada</span>
             </div>
 
             <fieldset class="space-y-4">
-              <legend class="text-sm font-extrabold text-[#0F172A]">1. Datos Personales y Facturación</legend>
+              <legend class="text-sm font-semibold text-[#0F172A]">1. Datos Personales y Facturación</legend>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label for="guest-name" class="block text-xs font-bold text-[#0F172A] mb-1">Nombre Completo: *</label>
@@ -143,14 +143,14 @@ const CheckoutView = {
             </fieldset>
 
             <fieldset class="space-y-3">
-              <legend class="text-sm font-extrabold text-[#0F172A]">2. Método de Entrega (Tarifa Plana Ecuador)</legend>
+              <legend class="text-sm font-semibold text-[#0F172A]">2. Método de Entrega (Tarifa Plana Ecuador)</legend>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <label class="p-3.5 rounded-xl cursor-pointer flex flex-col justify-between transition ${isCourier ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
                   <div class="flex items-start gap-2.5">
                     <input type="radio" name="delivery-method" value="courier" ${isCourier ? 'checked' : ''} onchange="CheckoutView.setDelivery('courier')" class="mt-0.5 text-[#BE123C]" />
                     <div>
                       <div class="text-xs font-bold text-[#0F172A]">Envío Nacional Blindado</div>
-                      <span class="text-xs font-black text-[#BE123C]">$5.00</span>
+                      <span class="text-xs font-bold text-[#BE123C]">$5.00</span>
                       <p class="text-xs text-slate-500 mt-0.5">Todo el Ecuador con empaque rígido y UV.</p>
                     </div>
                   </div>
@@ -161,7 +161,7 @@ const CheckoutView = {
                     <input type="radio" name="delivery-method" value="quito" ${isQuito ? 'checked' : ''} onchange="CheckoutView.setDelivery('quito')" class="mt-0.5 text-[#BE123C]" />
                     <div>
                       <div class="text-xs font-bold text-[#0F172A]">Local Express (Quito)</div>
-                      <span class="text-xs font-black text-[#BE123C]">$3.00</span>
+                      <span class="text-xs font-bold text-[#BE123C]">$3.00</span>
                       <p class="text-xs text-slate-500 mt-0.5">Entrega express en el DMQ (24h).</p>
                     </div>
                   </div>
@@ -172,7 +172,7 @@ const CheckoutView = {
                     <input type="radio" name="delivery-method" value="pickup" ${isPickup ? 'checked' : ''} onchange="CheckoutView.setDelivery('pickup')" class="mt-0.5 text-[#BE123C]" />
                     <div>
                       <div class="text-xs font-bold text-[#0F172A]">Retiro en Local Físico</div>
-                      <span class="text-xs font-black text-[#047857]">$0.00 (Gratis)</span>
+                      <span class="text-xs font-bold text-[#047857]">$0.00 (Gratis)</span>
                       <p class="text-xs text-slate-500 mt-0.5">Sucursal Central Quito. Pago en efectivo disponible.</p>
                     </div>
                   </div>
@@ -181,7 +181,7 @@ const CheckoutView = {
             </fieldset>
 
             <fieldset class="space-y-3">
-              <legend class="text-sm font-extrabold text-[#0F172A]">3. Método de Pago</legend>
+              <legend class="text-sm font-semibold text-[#0F172A]">3. Método de Pago</legend>
               <div class="space-y-3">
                 <div class="p-4 rounded-xl border border-[#0F172A] bg-[#F8FAFC] space-y-3">
                   <label class="flex items-center justify-between cursor-pointer">
@@ -204,7 +204,7 @@ const CheckoutView = {
                       <label for="card-number" class="block text-xs font-bold text-slate-700 mb-1">Número de tarjeta:</label>
                       <div data-field class="flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden">
                         <input type="text" id="card-number" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000" oninput="CheckoutView.formatCardNumber(this)" class="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none font-mono tracking-wide" />
-                        <span id="card-brand" class="px-3 text-xs font-black text-slate-500 uppercase"></span>
+                        <span id="card-brand" class="px-3 text-xs font-bold text-slate-500 uppercase"></span>
                       </div>
                     </div>
                     <div>
@@ -235,7 +235,7 @@ const CheckoutView = {
               <button 
                 type="button" 
                 onclick="CheckoutView.processPayment()" 
-                class="w-full py-4 bg-[#E11D48] hover:bg-[#BE123C] text-white text-base font-extrabold rounded-xl transition shadow-lg flex items-center justify-center gap-2 touch-target"
+                class="w-full py-4 bg-[#E11D48] hover:bg-[#BE123C] text-white text-base font-semibold rounded-xl transition shadow-lg flex items-center justify-center gap-2 touch-target"
               >
                 <i data-lucide="lock" class="w-5 h-5"></i>
                 <span>Proceder al Pago ($${total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD)</span>
@@ -256,7 +256,7 @@ const CheckoutView = {
     if (!order) {
       return `
         <div class="max-w-3xl mx-auto px-4 pt-10 text-center">
-          <h1 class="text-lg font-black text-[#0F172A]">No hay una orden recién procesada</h1>
+          <h1 class="text-lg font-bold text-[#0F172A]">No hay una orden recién procesada</h1>
           <p class="text-sm text-slate-600 mt-1">Cuando completes una compra verás aquí su resumen.</p>
           <a href="pages/catalogo.html" class="mt-4 inline-block px-5 py-2.5 bg-[#E11D48] text-white text-xs font-bold rounded-xl">Ir al Catálogo</a>
         </div>
@@ -272,7 +272,7 @@ const CheckoutView = {
             <i data-lucide="check-circle-2" class="w-10 h-10"></i>
           </div>
 
-          <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">¡Orden confirmada con éxito!</h1>
+          <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">¡Orden confirmada con éxito!</h1>
           <div class="inline-block px-3 py-1 bg-[#FEF3C7] text-[#B45309] font-mono font-bold text-sm rounded-md mt-2">
             Número de Orden: ${order.orderId}
           </div>
@@ -290,7 +290,7 @@ const CheckoutView = {
           </p>
 
           <div class="mt-6 text-left bg-[#F8FAFC] border border-slate-200 rounded-xl p-5 max-w-2xl mx-auto space-y-2.5 text-xs sm:text-sm">
-            <h2 class="font-black text-[#0F172A] text-sm uppercase tracking-wider mb-2">Desglose de la Transacción</h2>
+            <h2 class="font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-2">Desglose de la Transacción</h2>
             ${order.items.map(item => `
               <div class="flex justify-between text-slate-600">
                 <span>${item.quantity}x ${item.name} (${item.condition})</span>
@@ -305,7 +305,7 @@ const CheckoutView = {
               <span>Impuestos (IVA 15%):</span>
               <span class="font-bold text-[#0F172A]">$${order.tax.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
             </div>
-            <div class="flex justify-between font-black text-base text-[#0F172A] border-t border-slate-300 pt-2">
+            <div class="flex justify-between font-bold text-base text-[#0F172A] border-t border-slate-300 pt-2">
               <span>Total Pagado (${order.paymentMethod}):</span>
               <span class="text-[#BE123C]">$${order.total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
             </div>
@@ -346,13 +346,13 @@ const CheckoutView = {
             <i data-lucide="credit-card" class="w-9 h-9"></i>
           </div>
 
-          <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">No pudimos procesar tu pago</h1>
+          <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">No pudimos procesar tu pago</h1>
           <div class="inline-block px-3 py-1 bg-rose-100 text-[#BE123C] font-mono font-bold text-xs rounded-md mt-2">
             Código bancario: ${err.code}
           </div>
 
           <div class="mt-6 text-left bg-rose-50/70 border border-rose-200 rounded-xl p-5 space-y-2">
-            <h2 class="text-xs font-black text-rose-900 uppercase tracking-wider">${err.title}</h2>
+            <h2 class="text-xs font-bold text-rose-900 uppercase tracking-wider">${err.title}</h2>
             <p class="text-xs sm:text-sm text-rose-800 leading-relaxed">${err.message}</p>
             ${err.cardLast4 ? `<p class="text-xs text-rose-700">Tarjeta ${err.brand || ''} terminada en <strong>${err.cardLast4}</strong></p>` : ''}
             <div class="flex items-center gap-1.5 text-[#047857] text-xs font-bold pt-1">
@@ -390,7 +390,7 @@ const CheckoutView = {
     return `
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div class="text-center mb-6">
-          <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">Portal de Coleccionistas • Graded &amp; Sealed</h1>
+          <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Portal de Coleccionistas • Graded &amp; Sealed</h1>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">Inicia sesión o registra tu cuenta para gestionar perfil, custodia y seguimiento</p>
         </div>
 
@@ -399,14 +399,14 @@ const CheckoutView = {
             <button 
               type="button" 
               onclick="CheckoutView.switchAuthTab('login')" 
-              class="flex-1 py-2.5 text-xs font-extrabold border-b-2 transition ${isLogin ? 'border-[#E11D48] text-[#0F172A]' : 'border-transparent text-slate-500 hover:text-[#0F172A]'}"
+              class="flex-1 py-2.5 text-xs font-semibold border-b-2 transition ${isLogin ? 'border-[#E11D48] text-[#0F172A]' : 'border-transparent text-slate-500 hover:text-[#0F172A]'}"
             >
               Iniciar Sesión
             </button>
             <button 
               type="button" 
               onclick="CheckoutView.switchAuthTab('register')" 
-              class="flex-1 py-2.5 text-xs font-extrabold border-b-2 transition ${!isLogin ? 'border-[#E11D48] text-[#0F172A]' : 'border-transparent text-slate-500 hover:text-[#0F172A]'}"
+              class="flex-1 py-2.5 text-xs font-semibold border-b-2 transition ${!isLogin ? 'border-[#E11D48] text-[#0F172A]' : 'border-transparent text-slate-500 hover:text-[#0F172A]'}"
             >
               Crear Cuenta
             </button>
@@ -422,13 +422,13 @@ const CheckoutView = {
                 <label for="auth-password" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña: *</label>
                 <input type="password" id="auth-password" autocomplete="current-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
-              <button type="submit" class="w-full py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-extrabold rounded-xl transition shadow touch-target">
+              <button type="submit" class="w-full py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-xl transition shadow touch-target">
                 Acceder a mi Cuenta
               </button>
             </form>
             <p class="text-center text-xs text-slate-500 mt-4">
               ¿Aún no tienes cuenta?
-              <button type="button" onclick="CheckoutView.switchAuthTab('register')" class="font-extrabold text-[#BE123C] hover:underline">Regístrate aquí</button>
+              <button type="button" onclick="CheckoutView.switchAuthTab('register')" class="font-semibold text-[#BE123C] hover:underline">Regístrate aquí</button>
             </p>
           ` : `
             <form onsubmit="event.preventDefault(); CheckoutView.submitRegister();" class="space-y-3.5" novalidate>
@@ -464,7 +464,7 @@ const CheckoutView = {
                 <label for="reg-pass" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña: *</label>
                 <input type="password" id="reg-pass" autocomplete="new-password" placeholder="Mínimo 8 caracteres, con letras y números" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
-              <button type="submit" class="w-full py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-extrabold rounded-xl transition shadow touch-target">
+              <button type="submit" class="w-full py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-semibold rounded-xl transition shadow touch-target">
                 Registrar mi Cuenta
               </button>
             </form>

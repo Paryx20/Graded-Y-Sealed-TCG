@@ -32,7 +32,7 @@ const PDPView = {
           <!-- Official PSA White Paper Label with Signature Red Border Frame -->
           <div class="psa-flip-label psa-official-label mb-3 relative">
             <!-- Header Bar: PROFESSIONAL SPORTS AUTHENTICATOR & PSA -->
-            <div class="flex items-center justify-between text-xs sm:text-[8.5px] font-black text-[#D8232A] tracking-wider uppercase border-b border-rose-100 pb-1 mb-1.5 select-none">
+            <div class="flex items-center justify-between text-xs sm:text-[8.5px] font-bold text-[#D8232A] tracking-wider uppercase border-b border-rose-100 pb-1 mb-1.5 select-none">
               <span class="tracking-widest">PROFESSIONAL SPORTS AUTHENTICATOR</span>
               <span>PSA</span>
             </div>
@@ -40,15 +40,15 @@ const PDPView = {
             <!-- 3-Line Official Typography Grid -->
             <div class="grid grid-cols-12 gap-1 items-start text-[#0F172A] font-mono leading-tight">
               <div class="col-span-8 text-left space-y-0.5">
-                <div class="text-xs font-black tracking-tight line-clamp-1 uppercase text-slate-900">${String(product.set || 'EXP').toUpperCase()}</div>
-                <div class="text-xs font-black tracking-tight line-clamp-1 text-slate-950">${product.nombre}</div>
+                <div class="text-xs font-bold tracking-tight line-clamp-1 uppercase text-slate-900">${String(product.set || 'EXP').toUpperCase()}</div>
+                <div class="text-xs font-bold tracking-tight line-clamp-1 text-slate-950">${product.nombre}</div>
                 <div class="text-[9.5px] font-bold text-slate-600 line-clamp-1 uppercase">${product.rareza || 'SPECIAL ART RARE'}</div>
               </div>
               <div class="col-span-4 text-right flex flex-col items-end justify-start">
-                <span class="text-[10.5px] font-black text-slate-800 tracking-tighter">${cardNum}</span>
+                <span class="text-[10.5px] font-bold text-slate-800 tracking-tighter">${cardNum}</span>
                 <div class="mt-0.5 text-right">
-                  <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider block leading-none">GRADO</span>
-                  <span class="text-xs font-black text-slate-950 leading-tight block">${gradeLabel}</span>
+                  <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block leading-none">GRADO</span>
+                  <span class="text-xs font-bold text-slate-950 leading-tight block">${gradeLabel}</span>
                 </div>
               </div>
             </div>
@@ -56,8 +56,8 @@ const PDPView = {
             <!-- Bottom Row: Barcode, Center Hologram Security Foil & Cert Number -->
             <div class="mt-2 pt-1 border-t border-slate-200 flex items-center justify-between gap-1">
               <div class="psa-barcode flex-shrink-0" aria-label="Código de barras oficial"></div>
-              <div class="psa-hologram-emblem flex-shrink-0 flex items-center justify-center px-1.5 py-0.5 rounded bg-gradient-to-r from-slate-200 via-amber-100 to-slate-200 border border-slate-300 text-xs font-black shadow-xs" title="PSA Authentic Security Hologram">
-                <span class="text-[#0284C7] font-black">P</span><span class="text-[#D8232A] font-black">S</span><span class="text-[#0F172A] font-black">A</span>
+              <div class="psa-hologram-emblem flex-shrink-0 flex items-center justify-center px-1.5 py-0.5 rounded bg-gradient-to-r from-slate-200 via-amber-100 to-slate-200 border border-slate-300 text-xs font-bold shadow-xs" title="PSA Authentic Security Hologram">
+                <span class="text-[#0284C7] font-bold">P</span><span class="text-[#D8232A] font-bold">S</span><span class="text-[#0F172A] font-bold">A</span>
               </div>
               <span class="font-mono text-xs font-bold text-slate-700 tracking-wider">#${certCode}</span>
             </div>
@@ -124,7 +124,7 @@ const PDPView = {
           </div>
         </div>
 
-        <div class="absolute top-3 left-3 bg-[#0F172A] text-white border border-slate-700 px-3 py-1 rounded-lg text-xs font-black shadow-md flex items-center gap-1.5 z-10 pointer-events-none">
+        <div class="absolute top-3 left-3 bg-[#0F172A] text-white border border-slate-700 px-3 py-1 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 z-10 pointer-events-none">
           <i data-lucide="shield-check" class="w-4 h-4 text-[#047857]"></i>
           <span id="pdp-cert-badge">${this.getConditionFullTitle(condition)} • #${certCode}</span>
         </div>
@@ -174,7 +174,7 @@ const PDPView = {
             onerror="this.onerror=null; this.src='${product.imagenFallbackUrl}'"
           />
         </div>
-        <div class="absolute top-3 left-3 bg-[#0F172A] text-white border border-slate-700 px-3 py-1 rounded-lg text-xs font-black shadow-md flex items-center gap-1.5 z-10">
+        <div class="absolute top-3 left-3 bg-[#0F172A] text-white border border-slate-700 px-3 py-1 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 z-10">
           <i data-lucide="package-check" class="w-4 h-4 text-[#B45309]"></i>
           <span>${sealLabel}</span>
         </div>
@@ -204,7 +204,7 @@ const PDPView = {
               aria-selected="${isActive}"
             >
               <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-black text-[#0F172A]">${ang.title}</span>
+                <span class="text-xs font-bold text-[#0F172A]">${ang.title}</span>
                 <i data-lucide="${ang.icon}" class="w-4 h-4 ${isActive ? 'text-[#B45309]' : 'text-slate-500'}"></i>
               </div>
               <div class="w-full h-16 rounded-lg bg-white border border-slate-200 flex items-center justify-center overflow-hidden mb-1.5">
@@ -234,11 +234,11 @@ const PDPView = {
     return `
       <div id="sealed-factory-specs" class="bg-[#F8FAFC] border border-slate-200 rounded-xl p-4 sm:p-5 space-y-3.5">
         <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-          <span class="text-xs font-black text-[#0F172A] flex items-center gap-1.5 uppercase tracking-wide">
+          <span class="text-xs font-bold text-[#0F172A] flex items-center gap-1.5 uppercase tracking-wide">
             <i data-lucide="file-check-2" class="w-4 h-4 text-[#B45309]"></i>
             <span>Especificaciones de Fábrica Sellada${product.era === 'vintage' ? ' WotC' : ''}</span>
           </span>
-          <span class="text-xs font-extrabold bg-[#D1FAE5] text-[#047857] px-2 py-0.5 rounded-full border border-[#059669]/20">
+          <span class="text-xs font-semibold bg-[#D1FAE5] text-[#047857] px-2 py-0.5 rounded-full border border-[#059669]/20">
             VERIFICADO BÓVEDA
           </span>
         </div>
@@ -246,7 +246,7 @@ const PDPView = {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div class="p-2.5 rounded-lg bg-white border border-slate-200">
             <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Gramaje Verificado</div>
-            <div class="font-extrabold text-[#0F172A] mt-0.5 flex items-center gap-1">
+            <div class="font-semibold text-[#0F172A] mt-0.5 flex items-center gap-1">
               <i data-lucide="scale" class="w-3.5 h-3.5 text-[#B45309]"></i>
               <span>${specs.gramaje}</span>
             </div>
@@ -255,7 +255,7 @@ const PDPView = {
 
           <div class="p-2.5 rounded-lg bg-white border border-slate-200">
             <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Contenido Interior</div>
-            <div class="font-extrabold text-[#0F172A] mt-0.5 flex items-center gap-1">
+            <div class="font-semibold text-[#0F172A] mt-0.5 flex items-center gap-1">
               <i data-lucide="boxes" class="w-3.5 h-3.5 text-[#B45309]"></i>
               <span>${specs.packs}</span>
             </div>
@@ -315,7 +315,7 @@ const PDPView = {
           <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
           <span class="text-slate-600 font-semibold">${product.set || 'Colección TCG'}</span>
           <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-          <span class="text-[#0F172A] font-extrabold" aria-current="page">${product.nombre}</span>
+          <span class="text-[#0F172A] font-semibold" aria-current="page">${product.nombre}</span>
         </nav>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
@@ -340,7 +340,7 @@ const PDPView = {
                     aria-selected="${mode === 'front'}"
                   >
                     <div class="flex items-center justify-between">
-                      <span class="text-xs font-black text-[#0F172A]">Frontal Completo</span>
+                      <span class="text-xs font-bold text-[#0F172A]">Frontal Completo</span>
                       <i data-lucide="sparkles" class="w-4 h-4 ${mode === 'front' ? 'text-[#BE123C]' : 'text-slate-500'}"></i>
                     </div>
                     <span class="text-xs text-slate-500 mt-0.5">Holograma intacto</span>
@@ -353,7 +353,7 @@ const PDPView = {
                     aria-selected="${mode === 'back'}"
                   >
                     <div class="flex items-center justify-between">
-                      <span class="text-xs font-black text-[#0F172A]">Reverso y Bordes</span>
+                      <span class="text-xs font-bold text-[#0F172A]">Reverso y Bordes</span>
                       <i data-lucide="flip-horizontal" class="w-4 h-4 ${mode === 'back' ? 'text-[#BE123C]' : 'text-slate-500'}"></i>
                     </div>
                     <span class="text-xs text-slate-500 mt-0.5">Reverso oficial (Giro 3D Y)</span>
@@ -366,7 +366,7 @@ const PDPView = {
                     aria-selected="${mode === 'slab'}"
                   >
                     <div class="flex items-center justify-between">
-                      <span class="text-xs font-black text-[#0F172A]">Slab &amp; Empaque</span>
+                      <span class="text-xs font-bold text-[#0F172A]">Slab &amp; Empaque</span>
                       <i data-lucide="shield-check" class="w-4 h-4 ${mode === 'slab' ? 'text-[#BE123C]' : 'text-slate-500'}"></i>
                     </div>
                     <span class="text-xs text-slate-500 mt-0.5">Sello de autenticidad PSA</span>
@@ -377,18 +377,18 @@ const PDPView = {
 
           <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col gap-5">
             <div>
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-extrabold bg-[#FEF3C7] text-[#B45309] border border-[#D97706]/30">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#FEF3C7] text-[#B45309] border border-[#D97706]/30">
                 <i data-lucide="${isSealed ? 'package-check' : 'award'}" class="w-3.5 h-3.5"></i>
                 <span>${isSealed ? (product.era === 'vintage' ? 'PRODUCTO SELLADO DE COLECCIÓN • WOTC' : 'PRODUCTO SELLADO DE COLECCIÓN') : 'GRADO INVERSIÓN • OFICIAL PSA'}</span>
               </div>
-              <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] mt-2 tracking-tight">${product.nombre}</h1>
+              <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] mt-2 tracking-tight">${product.nombre}</h1>
               <p class="text-xs sm:text-sm text-slate-500 mt-1">${product.rareza || 'Coleccionable'} • ${product.set || 'EXP'} • ${isSealed ? `Era ${(product.era || 'vintage').toUpperCase()} • Display Sellado` : `${product.tipo || 'Carta'} • Cert #${product.certNumber || '00000000'}`}</p>
             </div>
 
             ${isSealed ? this.renderFactorySpecs(product) : `
               <div>
                 <div class="flex items-center justify-between gap-2 mb-2">
-                  <label class="block text-xs font-extrabold text-[#0F172A] uppercase tracking-wider">
+                  <label class="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider">
                     Seleccionar Condición / Grado PSA:
                   </label>
                   <button 
@@ -421,10 +421,10 @@ const PDPView = {
                             <span>${item.title}</span>
                             ${isActive ? '<i data-lucide="check" class="w-3.5 h-3.5 text-[#047857]"></i>' : ''}
                           </div>
-                          <div class="text-sm font-black mt-0.5 ${isActive ? 'text-[#FEF3C7]' : 'text-slate-600'}">
+                          <div class="text-sm font-bold mt-0.5 ${isActive ? 'text-[#FEF3C7]' : 'text-slate-600'}">
                             $${Number(item.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                           </div>
-                          ${Store.getStock(product.id, item.key) === 0 ? `<div class="text-xs font-extrabold uppercase tracking-wide mt-0.5 ${isActive ? 'text-rose-300' : 'text-[#BE123C]'}">Agotado</div>` : ''}
+                          ${Store.getStock(product.id, item.key) === 0 ? `<div class="text-xs font-semibold uppercase tracking-wide mt-0.5 ${isActive ? 'text-rose-300' : 'text-[#BE123C]'}">Agotado</div>` : ''}
                         </button>
                       `;
                     }).join('');
@@ -435,7 +435,7 @@ const PDPView = {
 
             <div class="pt-3 border-t border-slate-200">
               <div class="flex items-baseline justify-between">
-                <span id="pdp-price" class="text-3xl font-black text-[#0F172A]">$${Number(currentPrice || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
+                <span id="pdp-price" class="text-3xl font-bold text-[#0F172A]">$${Number(currentPrice || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
                 ${this.renderStockBadge(product, isSealed ? 'sealed' : condition)}
               </div>
               <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
@@ -448,16 +448,16 @@ const PDPView = {
                   <button 
                     type="button" 
                     onclick="PDPView.updateQuantity(-1)" 
-                    class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-[#0F172A] font-black text-base flex items-center justify-center transition"
+                    class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-[#0F172A] font-bold text-base flex items-center justify-center transition"
                     aria-label="Disminuir cantidad"
                   >
                     −
                   </button>
-                  <span id="pdp-quantity-value" class="px-3 text-sm font-black text-[#0F172A] select-none" aria-live="polite">${qty}</span>
+                  <span id="pdp-quantity-value" class="px-3 text-sm font-bold text-[#0F172A] select-none" aria-live="polite">${qty}</span>
                   <button 
                     type="button" 
                     onclick="PDPView.updateQuantity(1)" 
-                    class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-[#0F172A] font-black text-base flex items-center justify-center transition"
+                    class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-[#0F172A] font-bold text-base flex items-center justify-center transition"
                     aria-label="Aumentar cantidad"
                   >
                     +
@@ -467,10 +467,22 @@ const PDPView = {
                 <button 
                   type="button" 
                   onclick="PDPView.addToCart()" 
-                  class="flex-1 py-3.5 px-6 bg-[#E11D48] hover:bg-[#BE123C] text-white text-base font-extrabold rounded-xl transition shadow-md flex items-center justify-center gap-2 touch-target"
+                  class="flex-1 py-3.5 px-6 bg-[#E11D48] hover:bg-[#BE123C] text-white text-base font-semibold rounded-xl transition shadow-md flex items-center justify-center gap-2 touch-target"
                 >
                   <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                   <span>Añadir a la bolsa</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="icon-btn self-center"
+                  style="width: 3rem; height: 3rem;"
+                  data-favorite-id="${product.id}"
+                  aria-pressed="${Store.isFavorite(product.id) ? 'true' : 'false'}"
+                  aria-label="${Store.isFavorite(product.id) ? 'Quitar de favoritos' : 'Añadir a favoritos'}: ${product.nombre}"
+                  onclick="app.toggleFavorite('${product.id}')"
+                >
+                  <i data-lucide="heart" class="w-5 h-5"></i>
                 </button>
               </div>
             </div>
@@ -787,14 +799,12 @@ const PDPView = {
           // If active, insert exactly one check icon and initialize with Lucide
           if (isActive) {
             headerDiv.insertAdjacentHTML('beforeend', '<i data-lucide="check" class="w-3.5 h-3.5 text-[#047857]"></i>');
-            if (typeof lucide !== 'undefined' && lucide.createIcons) {
-              lucide.createIcons();
-            }
+            app.refreshIcons();
           }
         }
         const priceDiv = btn.querySelector('div:last-child');
         if (priceDiv) {
-          priceDiv.className = `text-sm font-black mt-0.5 ${isActive ? 'text-[#FEF3C7]' : 'text-slate-600'}`;
+          priceDiv.className = `text-sm font-bold mt-0.5 ${isActive ? 'text-[#FEF3C7]' : 'text-slate-600'}`;
         }
       });
     }
@@ -1017,7 +1027,7 @@ const PDPView = {
       tooltip.innerHTML = `
         <div class="px-2.5 py-1.5 bg-[#0F172A] text-white rounded-lg shadow-xl text-xs border border-slate-700 whitespace-nowrap">
           <div class="text-xs text-slate-500 font-bold">${nearest.pt.month}</div>
-          <div class="font-black text-xs text-white mt-0.5">$${nearest.pt.price.toLocaleString('en-US')} USD</div>
+          <div class="font-bold text-xs text-white mt-0.5">$${nearest.pt.price.toLocaleString('en-US')} USD</div>
           <div class="text-xs font-bold ${isUp ? 'text-[#047857]' : 'text-[#BE123C]'} flex items-center gap-1 mt-0.5">
             <span>${nearest.pt.trend}</span>
             <span>${isUp ? '▲' : '▼'}</span>

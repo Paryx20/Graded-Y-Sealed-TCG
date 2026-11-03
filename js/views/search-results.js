@@ -32,11 +32,11 @@ const SearchResultsView = {
         <!-- Header Banner -->
         <div class="bg-[#0F172A] text-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-800 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div class="inline-flex items-center gap-2 text-xs font-extrabold text-[#FEF3C7] uppercase tracking-wider mb-1">
+            <div class="inline-flex items-center gap-2 text-xs font-semibold text-[#FEF3C7] uppercase tracking-wider mb-1">
               <i data-lucide="cpu" class="w-3.5 h-3.5 text-[#B45309]"></i>
               <span>Doble API con Failover Automático • 3-Tier Cascade</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black tracking-tight">Búsqueda Multifuente en Tiempo Real</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Búsqueda Multifuente en Tiempo Real</h1>
             <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
               Consulta en cascada automática: <strong>pokemontcg.io</strong> → <strong>tcgdex.net</strong> → <strong>Bóveda Local G&amp;S</strong> con tolerancia a desconexión y latencia.
             </p>
@@ -65,7 +65,7 @@ const SearchResultsView = {
             />
             <button 
               type="submit"
-              class="absolute right-2 px-4 py-2 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-black rounded-lg transition shadow flex items-center gap-1.5 touch-target"
+              class="absolute right-2 px-4 py-2 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold rounded-lg transition shadow flex items-center gap-1.5 touch-target"
             >
               <span>Buscar</span>
               <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
@@ -124,7 +124,7 @@ const SearchResultsView = {
       const container = document.getElementById('search-results-container');
       if (container && !this.isLoading) {
         container.innerHTML = this.renderLoadingSkeleton();
-        if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+        app.refreshIcons();
       }
     }
 
@@ -136,7 +136,7 @@ const SearchResultsView = {
         const container = document.getElementById('search-results-container');
         if (container) {
           container.innerHTML = this.renderInitialPrompt();
-          if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+          app.refreshIcons();
         }
       }
     }, 400);
@@ -180,13 +180,13 @@ const SearchResultsView = {
 
     if (!q) {
       container.innerHTML = this.renderInitialPrompt();
-      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+      app.refreshIcons();
       return;
     }
 
     this.isLoading = true;
     container.innerHTML = this.renderLoadingSkeleton();
-    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    app.refreshIcons();
 
     try {
       const api = (typeof PokemonAPI !== 'undefined') ? PokemonAPI : null;
@@ -231,9 +231,7 @@ const SearchResultsView = {
       `;
     }
 
-    if (typeof lucide !== 'undefined' && lucide.createIcons) {
-      lucide.createIcons();
-    }
+    app.refreshIcons();
   },
 
   /**
@@ -281,7 +279,7 @@ const SearchResultsView = {
         <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto mb-4">
           <i data-lucide="search-x" class="w-8 h-8 text-[#BE123C]"></i>
         </div>
-        <h2 class="text-xl sm:text-2xl font-black text-[#0F172A] mb-2">No encontramos resultados para "${qEscaped}"</h2>
+        <h2 class="text-xl sm:text-2xl font-bold text-[#0F172A] mb-2">No encontramos resultados para "${qEscaped}"</h2>
         <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-6">
           Intenta buscando por nombre de Pokémon, expansión (Base Set) o rareza.
         </p>
@@ -319,7 +317,7 @@ const SearchResultsView = {
         <div class="w-16 h-16 rounded-full bg-slate-100 text-[#0F172A] flex items-center justify-center mx-auto mb-4">
           <i data-lucide="sparkles" class="w-8 h-8 text-[#B45309]"></i>
         </div>
-        <h2 class="text-xl font-black text-[#0F172A] mb-2">Comienza a escribir para buscar</h2>
+        <h2 class="text-xl font-bold text-[#0F172A] mb-2">Comienza a escribir para buscar</h2>
         <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-6">
           Escribe al menos 2 letras en la barra de búsqueda superior para activar la consulta multifuente.
         </p>
@@ -350,7 +348,7 @@ const SearchResultsView = {
         <!-- Results stats bar -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-600 bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-2xs">
           <div class="flex items-center gap-2">
-            <span class="font-extrabold text-[#0F172A]">${total} ${total === 1 ? 'carta encontrada' : 'cartas encontradas'}</span>
+            <span class="font-semibold text-[#0F172A]">${total} ${total === 1 ? 'carta encontrada' : 'cartas encontradas'}</span>
             ${query ? `<span class="text-slate-500">para "${qEscaped}"</span>` : ''}
           </div>
           <div class="flex items-center gap-3 text-xs font-semibold text-slate-500">
@@ -404,7 +402,7 @@ const SearchResultsView = {
         <div>
           <!-- Card Header / Source Badge -->
           <div class="p-3 pb-0 flex items-center justify-between text-xs">
-            <span class="font-extrabold uppercase px-2 py-0.5 rounded-full border ${badgeClass}">
+            <span class="font-semibold uppercase px-2 py-0.5 rounded-full border ${badgeClass}">
               ${badgeText}
             </span>
             <span class="font-bold text-slate-500">${this._escapeHtml(card.rareza || 'Coleccionable')}</span>
@@ -429,7 +427,7 @@ const SearchResultsView = {
             onclick="app.openProductPDP('${card.id}')"
             class="px-4 pb-2 cursor-pointer"
           >
-            <h3 class="text-sm font-extrabold text-[#0F172A] line-clamp-1 group-hover:text-[#BE123C] transition">
+            <h3 class="text-sm font-semibold text-[#0F172A] line-clamp-1 group-hover:text-[#BE123C] transition">
               ${this._escapeHtml(card.nombre)}
             </h3>
             <p class="text-xs text-slate-500 mt-0.5">${this._escapeHtml(card.set || 'Expansión')}</p>
@@ -441,7 +439,7 @@ const SearchResultsView = {
           <div class="flex items-baseline justify-between mb-3">
             <div>
               <span class="text-xs uppercase font-bold text-slate-500 block">Cotización Est.</span>
-              <span class="text-base font-black text-[#0F172A]">$${formattedPrice}</span>
+              <span class="text-base font-bold text-[#0F172A]">$${formattedPrice}</span>
             </div>
             ${matchedVaultProduct ? `
               <span class="text-xs font-bold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded">

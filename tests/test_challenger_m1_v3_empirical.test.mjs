@@ -265,6 +265,7 @@ function createChallengerEnv() {
     app: {
       renderCurrentView: () => {},
       showToast: () => {},
+      refreshIcons: () => lucideMock.createIcons(),
       addToCart: () => {}
     }
   };

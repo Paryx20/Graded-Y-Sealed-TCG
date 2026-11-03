@@ -222,7 +222,7 @@ const TrackingView = {
     const box = document.getElementById('tracking-detail');
     if (!box || !this.current) return;
     box.innerHTML = this.renderDetail(this.current);
-    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    app.refreshIcons();
     Validators.attach({ 'deliver-id': v => Validators.idCard(v) });
   },
 
@@ -262,7 +262,7 @@ const TrackingView = {
             <i data-lucide="package-search" class="w-5 h-5"></i>
           </div>
           <div>
-            <h1 class="text-xl font-black text-[#0F172A] tracking-tight">Rastrear un pedido</h1>
+            <h1 class="text-xl font-bold text-[#0F172A] tracking-tight">Rastrear un pedido</h1>
             <p class="text-xs text-slate-500 mt-0.5">Por seguridad, el seguimiento solo se muestra al titular. Ingresa el número de orden o guía y la cédula con la que se hizo la compra.</p>
           </div>
         </div>
@@ -277,7 +277,7 @@ const TrackingView = {
             <input id="track-id" type="text" inputmode="numeric" maxlength="13" placeholder="1710034065" oninput="this.value = this.value.replace(/\\D/g, '')" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" />
           </div>
           <div class="sm:pt-5">
-            <button id="track-submit" type="submit" class="w-full py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-extrabold rounded-lg transition touch-target">Rastrear</button>
+            <button id="track-submit" type="submit" class="w-full py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-lg transition touch-target">Rastrear</button>
           </div>
         </form>
 
@@ -301,7 +301,7 @@ const TrackingView = {
     if (!user || orders.length === 0) return '';
     return `
       <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
-        <span class="text-xs font-extrabold text-[#0F172A]">Tus órdenes (${orders.length}):</span>
+        <span class="text-xs font-semibold text-[#0F172A]">Tus órdenes (${orders.length}):</span>
         <div class="flex flex-wrap gap-2">
           ${orders.map(o => `
             <button type="button" onclick="app.openOrderTracking('${o.orderId}')"
@@ -342,7 +342,7 @@ const TrackingView = {
         <div class="flex sm:flex-col items-center sm:text-center gap-3 p-3 rounded-xl transition-all ${boxClass}">
           <div class="w-10 h-10 rounded-full ${iconClass} flex items-center justify-center font-bold text-sm flex-shrink-0">${iconContent}</div>
           <div>
-            <span class="text-xs font-extrabold text-[#0F172A] block">${stg.title}</span>
+            <span class="text-xs font-semibold text-[#0F172A] block">${stg.title}</span>
             <span class="text-xs ${subClass} block">${stg.subtitle}</span>
             ${stg.date ? `<span class="text-xs text-slate-500 block mt-0.5">${stg.date}</span>` : ''}
             <p class="text-xs text-slate-500 mt-1 hidden sm:block">${stg.detail}</p>
@@ -364,7 +364,7 @@ const TrackingView = {
               <i data-lucide="truck" class="w-5 h-5 ${step === 2 ? 'animate-pulse' : ''}"></i>
             </div>
             <div>
-              <h3 class="text-sm font-black text-[#FEF3C7]">Transporte blindado</h3>
+              <h3 class="text-sm font-bold text-[#FEF3C7]">Transporte blindado</h3>
               <span class="text-xs text-slate-400">${order.courierName || 'Servientrega Blindado • Bóveda G&S'}</span>
             </div>
           </div>
@@ -416,7 +416,7 @@ const TrackingView = {
               <i data-lucide="id-card" class="w-5 h-5"></i>
             </div>
             <div class="flex-1">
-              <h3 class="text-base font-black text-[#0F172A]">Verificación de identidad</h3>
+              <h3 class="text-base font-bold text-[#0F172A]">Verificación de identidad</h3>
               <p class="text-xs text-slate-600 mt-0.5">
                 ${pickup ? 'El agente de ventanilla' : 'El courier'} solicita la cédula de <strong>${order.buyerName}</strong> (titular •••${String(order.buyerId || '').slice(-4)}).
                 La pieza solo se entrega si la cédula coincide.
@@ -426,7 +426,7 @@ const TrackingView = {
                   <label for="deliver-id" class="sr-only">Cédula presentada</label>
                   <input id="deliver-id" type="text" inputmode="numeric" maxlength="13" placeholder="Cédula presentada en la entrega" oninput="this.value = this.value.replace(/\\D/g, '')" class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg" />
                 </div>
-                <button type="submit" class="px-5 py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-extrabold rounded-lg transition touch-target">Verificar y entregar</button>
+                <button type="submit" class="px-5 py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-semibold rounded-lg transition touch-target">Verificar y entregar</button>
               </form>
               ${order.idAttempts ? `<p class="text-xs text-[#BE123C] font-semibold mt-2">Cédula incorrecta. Intentos restantes: ${attemptsLeft}</p>` : ''}
             </div>
@@ -470,11 +470,11 @@ const TrackingView = {
       <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
           <div class="flex flex-wrap items-center gap-2">
-            <span class="text-xs font-mono font-black text-[#B45309] bg-[#FEF3C7] px-2.5 py-0.5 rounded">ORDEN ${order.orderId}</span>
-            <span class="text-xs font-extrabold ${this.getStep(order) === -1 ? 'text-[#BE123C] bg-rose-100' : 'text-[#047857] bg-[#D1FAE5]'} px-2.5 py-0.5 rounded">${this.statusLabel(order)}</span>
+            <span class="text-xs font-mono font-bold text-[#B45309] bg-[#FEF3C7] px-2.5 py-0.5 rounded">ORDEN ${order.orderId}</span>
+            <span class="text-xs font-semibold ${this.getStep(order) === -1 ? 'text-[#BE123C] bg-rose-100' : 'text-[#047857] bg-[#D1FAE5]'} px-2.5 py-0.5 rounded">${this.statusLabel(order)}</span>
             ${trackingNumber ? `<span class="text-xs font-mono font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded">${pickup ? 'Código de retiro' : 'Guía'}: ${trackingNumber}</span>` : ''}
           </div>
-          <h1 class="text-2xl font-black text-[#0F172A] tracking-tight mt-2">Seguimiento de tu pedido</h1>
+          <h1 class="text-2xl font-bold text-[#0F172A] tracking-tight mt-2">Seguimiento de tu pedido</h1>
           <p class="text-xs text-slate-500 mt-0.5">
             Fecha: ${order.date || ''} • Titular: ${order.buyerName || ''} (${this.maskId(order.buyerId)}) • ${order.deliveryMethod || ''}
           </p>
@@ -489,7 +489,7 @@ const TrackingView = {
 
       <div class="py-8" role="region" aria-label="Etapas de entrega del pedido" aria-live="polite">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xs font-extrabold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
+          <h2 class="text-xs font-semibold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
             <i data-lucide="route" class="w-4 h-4 text-[#047857]"></i>
             <span>Etapas de custodia y despacho</span>
           </h2>
@@ -505,8 +505,8 @@ const TrackingView = {
 
       <div class="border-t border-slate-200 pt-6">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-          <h2 class="text-sm font-extrabold text-[#0F172A] uppercase tracking-wider">Piezas de esta orden</h2>
-          <span class="text-sm font-black text-[#0F172A]">Total (IVA incl.): $${(order.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
+          <h2 class="text-sm font-semibold text-[#0F172A] uppercase tracking-wider">Piezas de esta orden</h2>
+          <span class="text-sm font-bold text-[#0F172A]">Total (IVA incl.): $${(order.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
         </div>
         <div class="space-y-3">
           ${(order.items || []).map(item => `
@@ -515,11 +515,11 @@ const TrackingView = {
                 <img src="${item.imageLocal || 'assets/img/cards/card-back.png'}" alt="${item.name}" class="w-12 h-16 object-contain bg-white rounded-lg border border-slate-200 p-0.5"
                   onerror="this.onerror=null; this.src='${item.imageFallback || 'assets/img/cards/card-back.png'}'" />
                 <div>
-                  <h3 class="text-sm font-extrabold text-[#0F172A]">${item.name}</h3>
+                  <h3 class="text-sm font-semibold text-[#0F172A]">${item.name}</h3>
                   <span class="text-xs text-slate-500">${item.condition || ''} • Cantidad: ${item.quantity || 1}</span>
                 </div>
               </div>
-              <span class="text-sm font-black text-[#0F172A]">$${((item.price || 0) * (item.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span class="text-sm font-bold text-[#0F172A]">$${((item.price || 0) * (item.quantity || 1)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
           `).join('')}
         </div>

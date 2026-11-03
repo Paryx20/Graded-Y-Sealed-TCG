@@ -57,6 +57,7 @@ function setupPDPRenderer() {
     app: {
       renderCurrentView: () => {},
       showToast: (msg, type) => { toastHistory.push({ msg, type }); },
+      refreshIcons: () => {},
       addToCart: (sku, name, label, price, img, fallback, qty) => {
         cartHistory.push({ sku, name, label, price, img, fallback, qty });
       },
@@ -557,7 +558,7 @@ test('Requirement R1 [Unit]: PDP Condition Buttons - Exclusive checkmark across 
       }
     },
     lucide: lucideMock,
-    app: { showToast: () => {} }
+    app: { showToast: () => {}, refreshIcons: () => {} }
   };
   sandbox.globalThis = sandbox;
   sandbox.window = sandbox;

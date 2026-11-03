@@ -31,6 +31,8 @@ const CatalogView = {
 
       if (f.edition === 'special' && !card.edicionEspecial) return false;
 
+      if (f.onlyFavorites && !Store.isFavorite(card.id)) return false;
+
       if (f.type !== 'all' && card.tipo !== f.type) return false;
 
       const refPrice = card.precios.raw;
@@ -96,27 +98,29 @@ const CatalogView = {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div class="bg-[#0F172A] text-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-800 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div class="inline-flex items-center gap-2 text-xs font-extrabold text-[#FEF3C7] uppercase tracking-wider mb-1">
-              <i data-lucide="compass" class="w-3.5 h-3.5 text-[#B45309]"></i>
-              <span>Exploración Libre y Filtrado Multicriterio</span>
+            <div class="inline-flex items-center gap-2 text-xs font-semibold text-[#FEF3C7] uppercase tracking-wider mb-1.5">
+              <i data-lucide="compass" class="w-4 h-4"></i>
+              <span>Exploración libre y filtrado multicriterio</span>
             </div>
-            <h1 id="catalog-main-title" class="text-2xl sm:text-3xl font-black tracking-tight">${this.getActiveTitle()}</h1>
-            <p class="text-xs sm:text-sm text-slate-300 mt-1">
+            <h1 id="catalog-main-title" class="text-2xl sm:text-3xl font-bold">${this.getActiveTitle()}</h1>
+            <p class="text-sm text-slate-300 mt-1.5">
               Filtra en tiempo real por edición, rango de precio, energía y rendimiento anual.
             </p>
           </div>
 
           <div class="flex items-center gap-3 self-start md:self-center">
-            <button 
-              type="button" 
-              onclick="CatalogView.toggleMobileFilters()" 
-              class="lg:hidden px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold flex items-center gap-2 border border-white/15"
+            <button
+              type="button"
+              onclick="CatalogView.toggleMobileFilters()"
+              aria-controls="catalog-sidebar-filters"
+              aria-expanded="${this.mobileFiltersOpen ? 'true' : 'false'}"
+              class="lg:hidden px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold flex items-center gap-2 border border-white/15 touch-target"
             >
               <i data-lucide="sliders-horizontal" class="w-4 h-4 text-[#FEF3C7]"></i>
               <span>Mostrar / Ocultar Filtros</span>
             </button>
-            <div class="px-4 py-2.5 rounded-xl bg-[#1E293B] border border-slate-700 text-xs font-bold text-slate-200">
-              <span id="catalog-count-badge" class="text-[#FEF3C7] font-black">${filtered.length}</span> piezas encontradas
+            <div class="px-4 py-2.5 rounded-xl bg-[#1E293B] border border-slate-700 text-xs font-semibold text-slate-200">
+              <span id="catalog-count-badge" class="text-[#FEF3C7] font-bold">${filtered.length}</span> piezas encontradas
             </div>
           </div>
         </div>
@@ -130,25 +134,26 @@ const CatalogView = {
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
               <div class="flex items-center gap-2">
                 <i data-lucide="filter" class="w-4 h-4 text-[#BE123C]"></i>
-                <h2 class="text-sm font-black text-[#0F172A] uppercase tracking-wider">Filtros en Vivo</h2>
+                <h2 class="text-sm font-bold text-[#0F172A] uppercase tracking-wider">Filtros en vivo</h2>
               </div>
               <button 
                 type="button" 
                 onclick="CatalogView.resetFilters()" 
-                class="text-xs font-extrabold text-[#BE123C] hover:text-[#9F1239] underline"
+                class="text-xs font-semibold text-[#BE123C] hover:text-[#9F1239] underline"
               >
                 Limpiar filtros
               </button>
             </div>
 
             <div>
-              <label for="cat-filter-collection" class="block text-xs font-extrabold text-[#0F172A] uppercase tracking-wider mb-1.5">
+              <label for="cat-filter-collection" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+                <i data-lucide="tag" class="w-4 h-4 text-slate-500"></i>
                 Categoría Principal
               </label>
               <select 
                 id="cat-filter-collection" 
                 onchange="CatalogView.updateFilter('category', this.value)"
-                class="w-full px-3 py-2 text-xs font-bold bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A] focus:bg-white"
+                class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A] focus:bg-white"
               >
                 <option value="all" ${f.category === 'all' ? 'selected' : ''}>Todas las Categorías</option>
                 <option value="psa" ${f.category === 'psa' ? 'selected' : ''}>Slabs Certificados PSA</option>
@@ -158,13 +163,14 @@ const CatalogView = {
             </div>
 
             <div>
-              <label for="cat-filter-era" class="block text-xs font-extrabold text-[#0F172A] uppercase tracking-wider mb-1.5">
+              <label for="cat-filter-era" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+                <i data-lucide="calendar" class="w-4 h-4 text-slate-500"></i>
                 Era de Lanzamiento
               </label>
               <select 
                 id="cat-filter-era" 
                 onchange="CatalogView.updateFilter('era', this.value)"
-                class="w-full px-3 py-2 text-xs font-bold bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A] focus:bg-white"
+                class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A] focus:bg-white"
               >
                 <option value="all" ${f.era === 'all' ? 'selected' : ''}>Todas las Eras</option>
                 <option value="vintage" ${f.era === 'vintage' ? 'selected' : ''}>Era Clásica WotC (1999-2002)</option>
@@ -173,7 +179,8 @@ const CatalogView = {
             </div>
 
             <div>
-              <span class="block text-xs font-extrabold text-[#0F172A] uppercase tracking-wider mb-2">
+              <span class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-2">
+                <i data-lucide="star" class="w-4 h-4 text-slate-500"></i>
                 Edición
               </span>
               <div class="space-y-1.5 text-xs">
@@ -197,13 +204,28 @@ const CatalogView = {
             </div>
 
             <div>
-              <label for="cat-filter-type" class="block text-xs font-extrabold text-[#0F172A] uppercase tracking-wider mb-1.5">
+              <label class="flex items-center gap-2.5 cursor-pointer p-1.5 rounded-lg hover:bg-slate-50 text-xs">
+                <input
+                  type="checkbox"
+                  id="cat-filter-favorites"
+                  ${f.onlyFavorites ? 'checked' : ''}
+                  onchange="CatalogView.updateFilter('onlyFavorites', this.checked)"
+                  class="w-4 h-4 text-[#BE123C]"
+                />
+                <i data-lucide="heart" class="w-4 h-4 text-[#BE123C]"></i>
+                <span class="font-semibold text-[#0F172A]">Solo mis favoritos</span>
+              </label>
+            </div>
+
+            <div>
+              <label for="cat-filter-type" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+                <i data-lucide="zap" class="w-4 h-4 text-slate-500"></i>
                 Tipo de Energía
               </label>
               <select 
                 id="cat-filter-type" 
                 onchange="CatalogView.updateFilter('type', this.value)"
-                class="w-full px-3 py-2 text-xs font-bold bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A] focus:bg-white"
+                class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A] focus:bg-white"
               >
                 <option value="all" ${f.type === 'all' ? 'selected' : ''}>Todos los Tipos</option>
                 <option value="Fuego" ${f.type === 'Fuego' ? 'selected' : ''}>Fuego</option>
@@ -215,7 +237,8 @@ const CatalogView = {
             </div>
 
             <div>
-              <span class="block text-xs font-extrabold text-[#0F172A] uppercase tracking-wider mb-1.5">
+              <span class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+                <i data-lucide="dollar-sign" class="w-4 h-4 text-slate-500"></i>
                 Rango de Precio (USD)
               </span>
               <div class="grid grid-cols-2 gap-2">
@@ -227,7 +250,7 @@ const CatalogView = {
                     placeholder="0" 
                     value="${f.minPrice}"
                     oninput="CatalogView.updatePriceRange()"
-                    class="w-full px-2.5 py-2 text-xs font-bold bg-[#F8FAFC] border border-slate-300 rounded-lg text-[#0F172A]"
+                    class="w-full px-2.5 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-lg text-[#0F172A]"
                   />
                 </div>
                 <div>
@@ -238,7 +261,7 @@ const CatalogView = {
                     placeholder="25000" 
                     value="${f.maxPrice}"
                     oninput="CatalogView.updatePriceRange()"
-                    class="w-full px-2.5 py-2 text-xs font-bold bg-[#F8FAFC] border border-slate-300 rounded-lg text-[#0F172A]"
+                    class="w-full px-2.5 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-lg text-[#0F172A]"
                   />
                 </div>
               </div>
@@ -247,7 +270,7 @@ const CatalogView = {
             <button 
               type="button" 
               onclick="CatalogView.resetFilters()" 
-              class="w-full py-2.5 border border-slate-300 hover:bg-slate-100 text-[#0F172A] text-xs font-extrabold rounded-xl transition"
+              class="w-full py-2.5 border border-slate-300 hover:bg-slate-100 text-[#0F172A] text-xs font-semibold rounded-xl transition touch-target"
             >
               Limpiar filtros
             </button>
@@ -257,22 +280,22 @@ const CatalogView = {
             <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
                 <span>Mostrando <strong id="catalog-inline-count" class="text-[#0F172A]">${filtered.length}</strong> de ${PRODUCTS.length} activos en bóveda</span>
-                ${this.isVaultFallback ? `<span class="px-2 py-0.5 rounded text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Búsqueda en toda la Bóveda</span>` : ''}
+                ${this.isVaultFallback ? `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">Búsqueda en toda la Bóveda</span>` : ''}
                 ${f.searchQuery ? `
                   <a href="${app.url('catalog', f.category !== 'all' ? { cat: f.category } : (f.era !== 'all' ? { era: f.era } : null))}"
                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#0F172A] text-white text-xs font-bold hover:bg-[#1E293B]"
                      aria-label="Quitar la búsqueda ${f.searchQuery} y ver todo el catálogo">
                     <span>Búsqueda: “${f.searchQuery}”</span>
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="x" class="w-4 h-4"></i>
                   </a>` : ''}
               </div>
 
               <div class="flex items-center gap-2">
-                <label for="cat-sort-select" class="text-xs font-extrabold text-[#0F172A]">Ordenar por:</label>
+                <label for="cat-sort-select" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A]"><i data-lucide="arrow-up-down" class="w-4 h-4 text-slate-500"></i>Ordenar por:</label>
                 <select 
                   id="cat-sort-select" 
                   onchange="CatalogView.updateFilter('sortBy', this.value)"
-                  class="px-3 py-2 text-xs font-bold bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A]"
+                  class="px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A]"
                 >
                   <option value="featured" ${f.sortBy === 'featured' ? 'selected' : ''}>Destacados de Bóveda</option>
                   <option value="price-asc" ${f.sortBy === 'price-asc' ? 'selected' : ''}>Precio: Menor a Mayor</option>
@@ -297,14 +320,16 @@ const CatalogView = {
       return `
         <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3">
           <div class="w-14 h-14 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
-            <i data-lucide="search-x" class="w-7 h-7"></i>
+            <i data-lucide="${f.onlyFavorites ? 'heart-off' : 'search-x'}" class="w-7 h-7"></i>
           </div>
-          <h3 class="text-base font-black text-[#0F172A]">No encontramos piezas con esos criterios</h3>
-          <p class="text-xs text-slate-500 max-w-sm mx-auto">Ajusta el rango de precios o limpia los filtros activos para explorar todo el inventario.</p>
-          <button 
-            type="button" 
-            onclick="CatalogView.resetFilters()" 
-            class="px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-extrabold rounded-xl transition shadow"
+          <h3 class="text-base font-bold text-[#0F172A]">${f.onlyFavorites ? 'Aún no tienes favoritos con esos criterios' : 'No encontramos piezas con esos criterios'}</h3>
+          <p class="text-sm text-slate-500 max-w-sm mx-auto">${f.onlyFavorites
+            ? 'Marca piezas con el corazón para guardarlas aquí, o limpia los filtros para ver todo el inventario.'
+            : 'Ajusta el rango de precios o limpia los filtros activos para explorar todo el inventario.'}</p>
+          <button
+            type="button"
+            onclick="CatalogView.resetFilters()"
+            class="px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold rounded-xl transition shadow touch-target"
           >
             Limpiar filtros
           </button>
@@ -313,66 +338,104 @@ const CatalogView = {
     }
 
     return items.map(card => {
-      const displayCond = card.categoria === 'sealed' ? 'Sellado de Fábrica'
-        : card.categoria === 'psa' ? 'Desde Raw / PSA'
-        : 'Raw Near Mint';
-
-      const displayPrice = card.precios.raw;
+      const { grade, price } = this.getQuickAddOption(card);
+      const gradeInfo = card.categoria === 'sealed'
+        ? { icon: 'package', label: 'Sellado de fábrica' }
+        : card.categoria === 'psa'
+          ? { icon: 'shield-check', label: 'Desde Raw NM' }
+          : { icon: 'layers', label: 'Raw Near Mint' };
 
       const badgeHtml = card.edicionEspecial
-        ? `<span class="px-2.5 py-0.5 text-xs font-black bg-[#E11D48] text-white rounded">EDICIÓN ESPECIAL</span>`
+        ? `<span class="px-2.5 py-0.5 text-xs font-bold bg-[#E11D48] text-white rounded">EDICIÓN ESPECIAL</span>`
         : card.categoria === 'psa'
-        ? `<span class="px-2.5 py-0.5 text-xs font-black bg-[#FEF3C7] text-[#B45309] rounded">GRADO INVERSIÓN • PSA</span>`
+        ? `<span class="px-2.5 py-0.5 text-xs font-bold bg-[#FEF3C7] text-[#B45309] rounded">GRADO INVERSIÓN • PSA</span>`
         : card.categoria === 'sealed'
-          ? `<span class="px-2.5 py-0.5 text-xs font-black bg-[#0F172A] text-[#FEF3C7] rounded">${card.era === 'vintage' ? 'SELLADO WOTC' : 'SELLADO DE FÁBRICA'}</span>`
-          : `<span class="px-2.5 py-0.5 text-xs font-black bg-slate-100 text-[#0F172A] rounded">SINGLE RAW NM</span>`;
+          ? `<span class="px-2.5 py-0.5 text-xs font-bold bg-[#0F172A] text-[#FEF3C7] rounded">${card.era === 'vintage' ? 'SELLADO WOTC' : 'SELLADO DE FÁBRICA'}</span>`
+          : `<span class="px-2.5 py-0.5 text-xs font-bold bg-slate-100 text-[#0F172A] rounded">SINGLE RAW NM</span>`;
+
+      const isFav = Store.isFavorite(card.id);
 
       return `
-        <article 
-          onclick="app.openProductPDP('${card.id}')" 
-          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();app.openProductPDP('${card.id}');}"
-          role="button"
-          tabindex="0"
-          aria-label="Inspeccionar ${card.nombre}"
-          class="cursor-pointer bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-[#0F172A] transition-all flex flex-col justify-between group"
-        >
-          <div>
+        <article class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-[#0F172A] transition-all flex flex-col justify-between group">
+          <a href="${app.url('pdp', { id: card.id })}" class="block rounded-xl" aria-label="Ver ficha de ${card.nombre}">
             <div class="flex items-center justify-between gap-1 mb-2.5">
               ${badgeHtml}
-              <span class="text-xs font-extrabold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded flex items-center gap-0.5">
+              <span class="text-xs font-semibold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded flex items-center gap-1">
+                <i data-lucide="trending-up" class="w-4 h-4"></i>
                 <span>${card.tendencia12m}</span>
               </span>
             </div>
 
             <div class="aspect-[3/4] bg-[#F8FAFC] rounded-xl border border-slate-200 overflow-hidden flex items-center justify-center p-4 relative">
-              <img 
-                src="${card.imagenLocal}" 
-                alt="${card.nombre}" 
-                class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" 
+              <img
+                src="${card.imagenLocal}"
+                alt="${card.nombre}"
+                width="240"
+                height="320"
+                loading="lazy"
+                class="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 group-hover:scale-105"
                 onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
               />
             </div>
 
             <div class="mt-3">
-              <span class="inline-block text-xs font-bold text-slate-500 uppercase tracking-wider">${card.set} • ${card.tipo}</span>
-              <h3 class="font-extrabold text-sm sm:text-base text-[#0F172A] group-hover:text-[#BE123C] transition mt-0.5 line-clamp-1">${card.nombre}</h3>
+              <span class="inline-block text-xs font-medium text-slate-500 uppercase tracking-wider">${card.set} • ${card.tipo}</span>
+              <h3 class="font-bold text-sm sm:text-base text-[#0F172A] group-hover:text-[#BE123C] transition mt-0.5 line-clamp-1">${card.nombre}</h3>
               <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">${card.rareza} • Cert #${card.certNumber}</p>
             </div>
-          </div>
+          </a>
 
-          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-            <div>
-              <span class="text-xs font-bold text-slate-500 block">${displayCond}</span>
-              <span class="text-base font-black text-[#0F172A]">$${Number(displayPrice || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <span class="text-xs font-medium text-slate-500 flex items-center gap-1">
+                <i data-lucide="${gradeInfo.icon}" class="w-4 h-4"></i>
+                <span class="truncate">${gradeInfo.label}</span>
+              </span>
+              <span class="font-display text-lg font-bold text-[#0F172A]">$${Number(price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
             </div>
-            <span class="px-3.5 py-1.5 text-xs font-extrabold text-white bg-[#0F172A] group-hover:bg-[#E11D48] rounded-xl transition inline-flex items-center gap-1">
-              <span>Ver Ficha</span>
-              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-            </span>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button
+                type="button"
+                class="icon-btn"
+                data-favorite-id="${card.id}"
+                aria-pressed="${isFav ? 'true' : 'false'}"
+                aria-label="${isFav ? 'Quitar de favoritos' : 'Añadir a favoritos'}: ${card.nombre}"
+                onclick="app.toggleFavorite('${card.id}')"
+              >
+                <i data-lucide="heart" class="w-5 h-5"></i>
+              </button>
+              <button
+                type="button"
+                onclick="CatalogView.quickAdd('${card.id}')"
+                class="h-10 px-3.5 text-xs font-semibold text-white bg-[#0F172A] hover:bg-[#E11D48] rounded-xl transition inline-flex items-center gap-1.5"
+                aria-label="Añadir ${card.nombre} (${grade === 'sealed' ? 'sellado' : 'raw'}) a la bolsa"
+              >
+                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                <span>Añadir</span>
+              </button>
+            </div>
           </div>
         </article>
       `;
     }).join('');
+  },
+
+  // Grado y precio que se muestran en la tarjeta y que añade el botón rápido
+  getQuickAddOption(card) {
+    const isSealed = card.categoria === 'sealed' || card.tipo_discriminador === 'PRODUCTO_SELLADO';
+    if (isSealed) {
+      return { grade: 'sealed', price: card.precioUnitario || card.precios.sealed || card.precios.raw };
+    }
+    return { grade: 'raw', price: card.precios.raw };
+  },
+
+  quickAdd(productId) {
+    const card = PRODUCTS.find(p => p.id === productId);
+    if (!card) return;
+    const { grade, price } = this.getQuickAddOption(card);
+    const label = grade === 'sealed' ? 'Sellado de Fábrica (Caja Intacta)' : 'Sin Gradear (Raw NM)';
+    const image = (grade === 'sealed' && card.galeria_sellada && card.galeria_sellada.frontal) || card.imagenLocal;
+    app.addToCart(`${card.id}-${grade}`, card.nombre, label, price, image, card.imagenFallbackUrl, 1);
   },
 
   updateFilter(key, value) {
@@ -397,7 +460,8 @@ const CatalogView = {
       minPrice: '',
       maxPrice: '',
       sortBy: 'featured',
-      searchQuery: ''
+      searchQuery: '',
+      onlyFavorites: false
     };
     const searchInput = document.getElementById('global-search');
     if (searchInput) searchInput.value = '';
@@ -413,6 +477,8 @@ const CatalogView = {
       sidebar.classList.toggle('hidden', !this.mobileFiltersOpen);
       sidebar.classList.toggle('block', this.mobileFiltersOpen);
     }
+    const toggle = document.querySelector('[aria-controls="catalog-sidebar-filters"]');
+    if (toggle) toggle.setAttribute('aria-expanded', this.mobileFiltersOpen ? 'true' : 'false');
   },
 
   refreshGridOnly() {
@@ -425,9 +491,7 @@ const CatalogView = {
     if (grid) grid.innerHTML = this.renderCardsGrid(filtered);
     if (countBadge) countBadge.innerText = filtered.length;
     if (inlineCount) inlineCount.innerText = filtered.length;
-    if (typeof lucide !== 'undefined' && lucide.createIcons) {
-      lucide.createIcons();
-    }
+    app.refreshIcons();
   }
 };
 

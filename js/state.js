@@ -22,8 +22,10 @@ const Store = {
       minPrice: '',
       maxPrice: '',
       sortBy: 'featured',
-      searchQuery: ''
+      searchQuery: '',
+      onlyFavorites: false
     },
+    favorites: [],
     profileActiveTab: 'personal',
     apiCardsCache: {}
   },
@@ -51,6 +53,9 @@ const Store = {
 
       const savedCart = localStorage.getItem('gstcg_cart');
       if (savedCart) this.data.cart = JSON.parse(savedCart);
+
+      const savedFavorites = localStorage.getItem('gstcg_favorites');
+      if (savedFavorites) this.data.favorites = JSON.parse(savedFavorites);
 
       const savedOrders = localStorage.getItem('gstcg_orders');
       if (savedOrders) {
@@ -92,6 +97,26 @@ const Store = {
     try {
       localStorage.setItem('gstcg_cart', JSON.stringify(this.data.cart));
     } catch (e) {}
+  },
+
+  saveFavorites() {
+    try {
+      localStorage.setItem('gstcg_favorites', JSON.stringify(this.data.favorites));
+    } catch (e) {}
+  },
+
+  isFavorite(productId) {
+    return (this.data.favorites || []).includes(productId);
+  },
+
+  // Devuelve true si el producto quedó marcado como favorito
+  toggleFavorite(productId) {
+    if (!Array.isArray(this.data.favorites)) this.data.favorites = [];
+    const idx = this.data.favorites.indexOf(productId);
+    if (idx === -1) this.data.favorites.push(productId);
+    else this.data.favorites.splice(idx, 1);
+    this.saveFavorites();
+    return idx === -1;
   },
 
   saveUserSession() {

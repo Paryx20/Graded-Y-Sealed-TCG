@@ -38,10 +38,37 @@ const app = {
 
     const container = document.getElementById('app-view');
     if (container) container.setAttribute('aria-busy', 'true');
-    Store.loadCatalogFromServer().finally(() => {
-      if (container) container.removeAttribute('aria-busy');
-      this.handleRoute();
-    });
+    Store.loadCatalogFromServer()
+      .then(ok => { if (!ok) this.showOfflineNotice(); })
+      .finally(() => {
+        if (container) container.removeAttribute('aria-busy');
+        this.handleRoute();
+      });
+  },
+
+  // Iconos Lucide decorativos: ocultos para lectores de pantalla y con el mismo grosor
+  refreshIcons() {
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+      lucide.createIcons({ attrs: { 'aria-hidden': 'true', 'stroke-width': 2 } });
+    }
+  },
+
+  // Supabase no respondió: se muestra el catálogo de respaldo de data.js
+  showOfflineNotice() {
+    const main = document.getElementById('app-view');
+    if (!main || document.getElementById('offline-notice')) return;
+    const notice = document.createElement('div');
+    notice.id = 'offline-notice';
+    notice.setAttribute('role', 'status');
+    notice.className = 'bg-amber-50 border-b border-amber-200 text-amber-900 px-4 py-2.5';
+    notice.innerHTML = `
+      <div class="max-w-7xl mx-auto flex items-center gap-2 text-xs sm:text-sm font-medium">
+        <i data-lucide="wifi-off" class="w-4 h-4"></i>
+        <span>Mostrando el catálogo sin conexión: los precios y el stock pueden no estar actualizados.</span>
+      </div>
+    `;
+    main.parentNode.insertBefore(notice, main);
+    this.refreshIcons();
   },
 
   // Cada vista es una página HTML independiente
@@ -180,9 +207,7 @@ const app = {
     }
 
     container.innerHTML = html;
-    if (typeof lucide !== 'undefined' && lucide.createIcons) {
-      lucide.createIcons();
-    }
+    this.refreshIcons();
 
     if (view === 'pdp') {
       PDPView.afterRender();
@@ -213,6 +238,20 @@ const app = {
 
   openOrderTracking(orderId) {
     this.go('tracking', { order: orderId });
+  },
+
+  toggleFavorite(productId) {
+    const product = PRODUCTS.find(p => p.id === productId);
+    const name = product ? product.nombre : 'La pieza';
+    const added = Store.toggleFavorite(productId);
+    document.querySelectorAll(`[data-favorite-id="${productId}"]`).forEach(btn => {
+      btn.setAttribute('aria-pressed', added ? 'true' : 'false');
+      btn.setAttribute('aria-label', `${added ? 'Quitar de favoritos' : 'Añadir a favoritos'}: ${name}`);
+    });
+    if (!added && Store.data.currentView === 'catalog' && Store.data.catalogFilters.onlyFavorites) {
+      CatalogView.refreshGridOnly();
+    }
+    this.showToast(added ? `"${name}" guardado en favoritos` : `"${name}" quitado de favoritos`, added ? 'success' : 'info');
   },
 
   addToCart(id, name, condition, price, imageLocal, imageFallback, qty = 1) {
@@ -281,9 +320,7 @@ const app = {
     }
     if (modal) {
       modal.classList.add('active');
-      if (typeof lucide !== 'undefined' && lucide.createIcons) {
-        lucide.createIcons();
-      }
+      this.refreshIcons();
     }
   },
 
@@ -316,9 +353,7 @@ const app = {
     if (banner && text) {
       text.innerText = `Ítem "${removed.name}" eliminado de la bolsa.`;
       banner.classList.remove('hidden');
-      if (typeof lucide !== 'undefined' && lucide.createIcons) {
-        lucide.createIcons();
-      }
+      this.refreshIcons();
     }
   },
 
@@ -357,9 +392,7 @@ const app = {
       if (typeof document !== 'undefined' && document.body && document.body.classList) {
         document.body.classList.add('overflow-hidden');
       }
-      if (typeof lucide !== 'undefined' && lucide.createIcons) {
-        lucide.createIcons();
-      }
+      this.refreshIcons();
       const closeBtn = (typeof modal.querySelector === 'function') ? (modal.querySelector('button[aria-label="Cerrar guía PSA"]') || modal.querySelector('button')) : null;
       if (closeBtn && typeof closeBtn.focus === 'function') {
         closeBtn.focus();
@@ -533,19 +566,19 @@ const app = {
                 onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
               />
               <div>
-                <h4 class="text-xs font-extrabold text-[#0F172A] group-hover:text-[#BE123C] transition">${card.nombre}</h4>
+                <h4 class="text-xs font-semibold text-[#0F172A] group-hover:text-[#BE123C] transition">${card.nombre}</h4>
                 <span class="text-xs text-slate-500">${card.set} • ${card.rareza}</span>
               </div>
             </div>
             <div class="text-right">
-              <span class="text-xs font-black text-[#0F172A]">$${Number((card.precios && (card.precios.psa10 || card.precios.raw)) || card.precioEstimado || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span class="text-xs font-bold text-[#0F172A]">$${Number((card.precios && (card.precios.psa10 || card.precios.raw)) || card.precioEstimado || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
               <span class="block text-xs text-[#B45309] font-bold">PSA 10</span>
             </div>
           </div>
         `).join('')}
       </div>
       <div class="p-2 border-t border-slate-100 flex items-center justify-between text-xs">
-        <button type="button" onclick="app.executeGlobalSearch('${q.replace(/'/g, '')}')" class="font-extrabold text-[#BE123C] hover:text-[#9F1239] flex items-center gap-1">
+        <button type="button" onclick="app.executeGlobalSearch('${q.replace(/'/g, '')}')" class="font-semibold text-[#BE123C] hover:text-[#9F1239] flex items-center gap-1">
           <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
           <span>Búsqueda Multifuente en Tiempo Real →</span>
         </button>
@@ -555,7 +588,7 @@ const app = {
       </div>
     `;
     dropdown.classList.remove('hidden');
-    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    this.refreshIcons();
   },
 
   selectSpotlightProduct(cardId) {
@@ -612,9 +645,7 @@ const app = {
     `;
 
     container.appendChild(toast);
-    if (typeof lucide !== 'undefined' && lucide.createIcons) {
-      lucide.createIcons();
-    }
+    this.refreshIcons();
 
     if (typeof requestAnimationFrame !== 'undefined') {
       requestAnimationFrame(() => {
