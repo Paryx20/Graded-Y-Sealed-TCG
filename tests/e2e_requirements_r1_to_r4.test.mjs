@@ -319,13 +319,13 @@ test('TC-T1-R2-05 [R2]: Empty search state suppresses automated timeline progres
 
 // --- Requirement R3: Catalog Image Updates in data.js (5 tests) ---
 
-test('TC-T1-R3-01 [R3]: Product gengar-scarlet-violet specifies assets/img/cards/gengar-holo-scarlet.png in js/data.js', () => {
+test('TC-T1-R3-01 [R3]: Product gengar-scarlet-violet specifies its pokemontcg.io image in js/data.js', () => {
   const dataPath = path.join(ROOT_DIR, 'js/data.js');
   const code = fs.readFileSync(dataPath, 'utf8');
 
   assert.ok(
-    code.includes('assets/img/cards/gengar-holo-scarlet.png'),
-    'js/data.js must reference assets/img/cards/gengar-holo-scarlet.png'
+    code.includes('https://images.pokemontcg.io/sv3pt5/94.png'),
+    'js/data.js must reference https://images.pokemontcg.io/sv3pt5/94.png'
   );
   assert.ok(
     !code.includes('img/gengar-vmax.png'),
@@ -333,13 +333,13 @@ test('TC-T1-R3-01 [R3]: Product gengar-scarlet-violet specifies assets/img/cards
   );
 });
 
-test('TC-T1-R3-02 [R3]: Product mewtwo-151 specifies assets/img/cards/mewto-holo-rare.png in js/data.js', () => {
+test('TC-T1-R3-02 [R3]: Product mewtwo-151 specifies its pokemontcg.io image in js/data.js', () => {
   const dataPath = path.join(ROOT_DIR, 'js/data.js');
   const code = fs.readFileSync(dataPath, 'utf8');
 
   assert.ok(
-    code.includes('assets/img/cards/mewto-holo-rare.png'),
-    'js/data.js must reference assets/img/cards/mewto-holo-rare.png'
+    code.includes('https://images.pokemontcg.io/sv3pt5/150.png'),
+    'js/data.js must reference https://images.pokemontcg.io/sv3pt5/150.png'
   );
   assert.ok(
     !code.includes('img/mewtwo-base.png'),
@@ -347,13 +347,13 @@ test('TC-T1-R3-02 [R3]: Product mewtwo-151 specifies assets/img/cards/mewto-holo
   );
 });
 
-test('TC-T1-R3-03 [R3]: Product mimikyu-paldean specifies assets/img/cards/mimikyu-rare.png in js/data.js', () => {
+test('TC-T1-R3-03 [R3]: Product mimikyu-paldean specifies its pokemontcg.io image in js/data.js', () => {
   const dataPath = path.join(ROOT_DIR, 'js/data.js');
   const code = fs.readFileSync(dataPath, 'utf8');
 
   assert.ok(
-    code.includes('assets/img/cards/mimikyu-rare.png'),
-    'js/data.js must reference assets/img/cards/mimikyu-rare.png'
+    code.includes('https://images.pokemontcg.io/sv4pt5/160.png'),
+    'js/data.js must reference https://images.pokemontcg.io/sv4pt5/160.png'
   );
   assert.ok(
     !code.includes('img/umbreon-vmax.png'),
@@ -375,11 +375,9 @@ test('TC-T1-R3-04 [R3]: Product booster-box-fossil-1999 specifies assets/img/sea
   );
 });
 
-test('TC-T1-R3-05 [R3]: All four newly linked image assets exist physically on disk with non-zero byte size', () => {
+test('TC-T1-R3-05 [R3]: Local image fallbacks exist physically on disk with non-zero byte size', () => {
   const requiredAssets = [
-    'assets/img/cards/gengar-holo-scarlet.png',
-    'assets/img/cards/mewto-holo-rare.png',
-    'assets/img/cards/mimikyu-rare.png',
+    'assets/img/cards/card-back.png',
     'assets/img/sealed/paquete-fossil.png'
   ];
 
@@ -643,8 +641,8 @@ test('TC-T3-R3-02 [R3 Boundary]: Simulated image 404 triggers onerror fallback t
   const cardHtml = CatalogView.renderProductCard({
     id: 'test-card',
     nombre: 'Test Card',
-    imagenLocal: 'assets/img/cards/gengar-holo-scarlet.png',
-    imagenFallbackUrl: 'https://images.pokemontcg.io/fallback.png',
+    imagenLocal: 'https://images.pokemontcg.io/sv3pt5/94.png',
+    imagenFallbackUrl: 'assets/img/cards/card-back.png',
     precios: { raw: 10 }
   });
 
@@ -876,7 +874,7 @@ test('TC-T4-01 [Real-World]: Collector Dynamic Onboarding & First Order Journey'
   // Step 2: Browses catalog, selects Gengar Holo card
   const gengar = PRODUCTS.find(p => p.id === 'gengar-scarlet-violet');
   assert.ok(gengar);
-  assert.equal(gengar.imagenLocal, 'assets/img/cards/gengar-holo-scarlet.png');
+  assert.equal(gengar.imagenLocal, 'https://images.pokemontcg.io/sv3pt5/94.png');
 
   // Step 3: Adds PSA 10 grade to cart
   const psa10Price = gengar.precios?.psa10 || 28.00;
@@ -960,10 +958,10 @@ test('TC-T4-03 [Real-World]: Payment Decline Recovery & Safe Completion Journey'
   const mewtwo = PRODUCTS.find(p => p.id === 'mewtwo-151') || {
     id: 'mewtwo-151',
     nombre: 'Mewtwo 151 Holo Rare',
-    imagenLocal: 'assets/img/cards/mewto-holo-rare.png',
+    imagenLocal: 'https://images.pokemontcg.io/sv3pt5/150.png',
     precios: { raw: 45.00 }
   };
-  assert.equal(mewtwo.imagenLocal, 'assets/img/cards/mewto-holo-rare.png');
+  assert.equal(mewtwo.imagenLocal, 'https://images.pokemontcg.io/sv3pt5/150.png');
 
   Store.data.cart = [{
     id: mewtwo.id,

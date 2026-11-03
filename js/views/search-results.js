@@ -415,8 +415,11 @@ const SearchResultsView = {
           >
             <img 
               src="${card.imagen || 'assets/img/cards/card-back.png'}" 
-              alt="${this._escapeHtml(card.nombre)}" 
-              class="max-h-48 w-auto object-contain drop-shadow group-hover:scale-105 transition-transform duration-300"
+              alt="${this._escapeHtml(card.nombre)}"
+              width="245"
+              height="342"
+              decoding="async"
+              class="max-h-48 w-auto h-auto object-contain drop-shadow group-hover:scale-105 transition-transform duration-300"
               onerror="this.onerror=null; this.src='assets/img/cards/card-back.png'"
               loading="lazy"
             />

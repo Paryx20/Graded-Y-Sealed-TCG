@@ -77,7 +77,25 @@ const Store = {
       if (this.data.orders.length > 0 && !this.data.activeTrackingOrderId) {
         this.data.activeTrackingOrderId = this.data.orders[0].orderId;
       }
+
+      this.refreshCartImages();
     } catch (e) {}
+  },
+
+  // Bolsas guardadas con versiones anteriores pueden tener rutas de imagen que ya no existen
+  refreshCartImages() {
+    const cardBack = 'assets/img/cards/card-back.png';
+    this.data.cart.forEach(item => {
+      const product = this.getProduct(this.parseCartItemId(item.id).sku) || this.getProduct(item.id);
+      if (product) {
+        const sealed = product.tipo_discriminador === 'PRODUCTO_SELLADO';
+        item.imageLocal = (sealed && product.galeria_sellada && product.galeria_sellada.frontal) || product.imagenLocal;
+        item.imageFallback = product.imagenFallbackUrl || cardBack;
+      } else if (/^img\//.test(item.imageLocal || '')) {
+        item.imageLocal = cardBack;
+        item.imageFallback = cardBack;
+      }
+    });
   },
 
   saveDelivery() {
@@ -237,8 +255,8 @@ const Store = {
           condition: 'PSA 10 GEM MT',
           price: 18500.00,
           quantity: 1,
-          imageLocal: 'assets/img/cards/card-back.png',
-          imageFallback: 'https://images.pokemontcg.io/base1/4_hires.png'
+          imageLocal: 'https://images.pokemontcg.io/base1/4.png',
+          imageFallback: 'assets/img/cards/card-back.png'
         }
       ]
     };
@@ -283,7 +301,11 @@ const Store = {
         product.precios = { ...product.precios, ...row.precios };
         if (row.precios.sealed) product.precioUnitario = row.precios.sealed;
         product.stock = row.stock || {};
-        if (row.imagen_url) {
+        const isCard = product.tipo_discriminador === 'CARTA_INDIVIDUAL';
+        if (isCard) {
+          // Cartas: solo imágenes externas de la API; el reverso local queda como respaldo
+          if (/^https:\/\//.test(row.imagen_url || '')) product.imagenLocal = row.imagen_url;
+        } else if (row.imagen_url) {
           // Filas antiguas guardan la ruta previa a assets/ (img/...)
           const imageUrl = row.imagen_url
             .replace(/^img\/sealed\/Paquete fossil\.png$/, 'img/sealed/paquete-fossil.png')

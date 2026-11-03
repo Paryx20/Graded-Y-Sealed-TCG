@@ -755,7 +755,7 @@ const CheckoutView = {
       const sessionUser = Store.data.currentUser;
       const items = Store.data.cart.map(c => {
         const { sku, grade } = Store.parseCartItemId(c.id);
-        return { sku, grado: grade, cantidad: c.quantity, precio: c.price, nombre: c.name, imagen: c.imageFallback || c.imageLocal };
+        return { sku, grado: grade, cantidad: c.quantity, precio: c.price, nombre: c.name, imagen: [c.imageLocal, c.imageFallback].find(u => /^https?:/.test(u || '')) || c.imageLocal };
       });
       try {
         await SupabaseAPI.saveOrder(sessionUser.token, orderRecord, items, cardInfo && {

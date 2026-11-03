@@ -247,10 +247,9 @@ test('Feature 2 [Tier 1]: Card Assets - Raichu GX front asset is specified', () 
   const { PRODUCTS, PDPView } = setupPDPRenderer();
   const raichu = PRODUCTS.find(p => p.id === 'raichu-gx');
   assert.ok(raichu, 'raichu-gx should be present in catalog');
-  assert.equal(raichu.imagenLocal, 'assets/img/cards/raichu-gx.png');
+  assert.equal(raichu.imagenLocal, 'https://images.pokemontcg.io/sm35/29.png');
   const html = PDPView.renderInspectorStage(raichu, 'psa10', 'front');
-  assert.ok(html.includes('assets/img/cards/raichu-gx.png'));
-  assert.ok(fs.existsSync(path.join(process.cwd(), 'assets/img/cards/raichu-gx.png')));
+  assert.ok(html.includes('https://images.pokemontcg.io/sm35/29_hires.png'), 'PDP must load the hi-res API image');
 });
 
 test('Feature 2 [Tier 1]: Card Assets - Supports standard card ratio aspect styling', () => {
@@ -265,7 +264,8 @@ test('Feature 2 [Tier 1]: Card Assets - Supports standard card ratio aspect styl
 test('Feature 2 [Tier 1]: Card Assets - Provides fallback URL when local asset is missing', () => {
   const { PRODUCTS, PDPView } = setupPDPRenderer();
   const card = PRODUCTS.find(p => p.categoria === 'psa');
-  assert.ok(card.imagenFallbackUrl.startsWith('https://'));
+  assert.equal(card.imagenFallbackUrl, 'assets/img/cards/card-back.png');
+  assert.ok(fs.existsSync(path.join(process.cwd(), card.imagenFallbackUrl)));
   const html = PDPView.renderInspectorStage(card, 'psa10', 'front');
   assert.ok(html.includes(`onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"`));
 });

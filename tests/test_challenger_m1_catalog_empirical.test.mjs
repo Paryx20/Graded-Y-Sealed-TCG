@@ -158,11 +158,9 @@ function createChallengeSandbox() {
 // 1. PHYSICAL ASSET DISK & BYTE-LEVEL VERIFICATION
 // ==============================================================================
 
-test('CHALLENGE-1.1 [Assets]: 4 updated image files physically exist on disk', () => {
+test('CHALLENGE-1.1 [Assets]: Local fallback image files physically exist on disk', () => {
   const assets = [
-    'assets/img/cards/gengar-holo-scarlet.png',
-    'assets/img/cards/mewto-holo-rare.png',
-    'assets/img/cards/mimikyu-rare.png',
+    'assets/img/cards/card-back.png',
     'assets/img/sealed/paquete-fossil.png'
   ];
 
@@ -172,11 +170,9 @@ test('CHALLENGE-1.1 [Assets]: 4 updated image files physically exist on disk', (
   }
 });
 
-test('CHALLENGE-1.2 [Assets]: 4 updated image files exceed 100KB minimum size threshold', () => {
+test('CHALLENGE-1.2 [Assets]: Local fallback image files exceed 100KB minimum size threshold', () => {
   const assets = [
-    { relPath: 'assets/img/cards/gengar-holo-scarlet.png', minBytes: 100 * 1024 },
-    { relPath: 'assets/img/cards/mewto-holo-rare.png', minBytes: 100 * 1024 },
-    { relPath: 'assets/img/cards/mimikyu-rare.png', minBytes: 100 * 1024 },
+    { relPath: 'assets/img/cards/card-back.png', minBytes: 100 * 1024 },
     { relPath: 'assets/img/sealed/paquete-fossil.png', minBytes: 100 * 1024 }
   ];
 
@@ -190,11 +186,9 @@ test('CHALLENGE-1.2 [Assets]: 4 updated image files exceed 100KB minimum size th
   }
 });
 
-test('CHALLENGE-1.3 [Assets]: 4 updated image files are authentic valid PNGs with magic header', () => {
+test('CHALLENGE-1.3 [Assets]: Local fallback image files are authentic valid PNGs with magic header', () => {
   const assets = [
-    'assets/img/cards/gengar-holo-scarlet.png',
-    'assets/img/cards/mewto-holo-rare.png',
-    'assets/img/cards/mimikyu-rare.png',
+    'assets/img/cards/card-back.png',
     'assets/img/sealed/paquete-fossil.png'
   ];
 

@@ -512,7 +512,7 @@ const TrackingView = {
           ${(order.items || []).map(item => `
             <div class="flex items-center justify-between p-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl">
               <div class="flex items-center gap-3">
-                <img src="${item.imageLocal || 'assets/img/cards/card-back.png'}" alt="${item.name}" class="w-12 h-16 object-contain bg-white rounded-lg border border-slate-200 p-0.5"
+                <img src="${item.imageLocal || 'assets/img/cards/card-back.png'}" alt="${item.name}" width="48" height="64" loading="lazy" decoding="async" class="w-12 h-16 object-contain bg-white rounded-lg border border-slate-200 p-0.5"
                   onerror="this.onerror=null; this.src='${item.imageFallback || 'assets/img/cards/card-back.png'}'" />
                 <div>
                   <h3 class="text-sm font-semibold text-[#0F172A]">${item.name}</h3>

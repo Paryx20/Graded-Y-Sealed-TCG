@@ -216,15 +216,12 @@ test('CH-05: `PDPView.renderSealedGalleryStage()` quotes image src across all ga
 // CHALLENGE 2: Spelling of Mewtwo file (`mewto-holo-rare.png`)
 // ============================================================================
 
-test('CH-06: Physical disk file is strictly `mewto-holo-rare.png` (without `w` after `t`)', () => {
-  const correctDiskPath = path.join(ROOT_DIR, 'assets/img/cards/mewto-holo-rare.png');
-  const incorrectDiskPath = path.join(ROOT_DIR, 'assets/img/cards/mewtwo-holo-rare.png');
-
-  assert.ok(fs.existsSync(correctDiskPath), 'File assets/img/cards/mewto-holo-rare.png must exist');
-  assert.ok(!fs.existsSync(incorrectDiskPath), 'File assets/img/cards/mewtwo-holo-rare.png must NOT exist on disk');
+test('CH-06: Mewtwo uses its pokemontcg.io image and no stale local PNG remains on disk', () => {
+  const code = fs.readFileSync(path.join(ROOT_DIR, 'js/data.js'), 'utf8');
+  assert.ok(code.includes('https://images.pokemontcg.io/sv3pt5/150.png'), 'mewtwo-151 must use the API image');
 
   const files = fs.readdirSync(path.join(ROOT_DIR, 'assets/img/cards'));
-  assert.ok(files.includes('mewto-holo-rare.png'), 'Exact directory entry must be mewto-holo-rare.png');
+  assert.ok(!files.includes('mewto-holo-rare.png'), 'Local mewto-holo-rare.png must be removed');
   assert.ok(!files.includes('mewtwo-holo-rare.png'), 'Directory must NOT contain mewtwo-holo-rare.png');
 });
 

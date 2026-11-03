@@ -370,9 +370,10 @@ const CatalogView = {
               <img
                 src="${card.imagenLocal}"
                 alt="${card.nombre}"
-                width="240"
-                height="320"
+                width="245"
+                height="342"
                 loading="lazy"
+                decoding="async"
                 class="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 group-hover:scale-105"
                 onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
               />

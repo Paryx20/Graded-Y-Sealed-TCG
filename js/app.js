@@ -561,7 +561,11 @@ const app = {
             <div class="flex items-center gap-3">
               <img 
                 src="${card.imagenLocal}" 
-                alt="${card.nombre}" 
+                alt="${card.nombre}"
+                width="36"
+                height="48"
+                loading="lazy"
+                decoding="async"
                 class="w-9 h-12 object-contain bg-[#F8FAFC] border border-slate-200 rounded p-0.5" 
                 onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
               />

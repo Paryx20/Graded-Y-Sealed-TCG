@@ -19,9 +19,17 @@ const PDPView = {
     return map[condition] || 'PSA 10 GEM MT';
   },
 
+  // La ficha usa la versión grande de pokemontcg.io; la cuadrícula carga la pequeña
+  hiresImage(url) {
+    return /^https:\/\/images\.pokemontcg\.io\/.+(?<!_hires)\.png$/.test(url || '')
+      ? url.replace(/\.png$/, '_hires.png')
+      : url;
+  },
+
   renderInspectorStage(product, condition, mode) {
     const certCode = product.certNumber || '48291034';
     const gradeLabel = this.getGradeLabel(condition);
+    const mainImage = this.hiresImage(product.imagenLocal);
 
     if (mode === 'slab') {
       const cardNumMatch = (product.nombre || '').match(/#(\d+)(?:\/\d+)?/);
@@ -73,8 +81,12 @@ const PDPView = {
 
             <!-- Centered Card Artwork without artificial overlay sticker -->
             <img 
-              src="${product.imagenLocal}" 
-              alt="${product.nombre} encapsulada en Slab PSA" 
+              src="${mainImage}"
+              alt="${product.nombre} encapsulada en Slab PSA"
+              width="245"
+              height="342"
+              fetchpriority="high"
+              decoding="async"
               class="max-h-full max-w-full object-contain filter drop-shadow-2xl rounded-xs select-none"
               onerror="this.onerror=null; this.src='${product.imagenFallbackUrl}'"
             />
@@ -101,9 +113,13 @@ const PDPView = {
             <div class="relative inline-flex items-center justify-center max-h-[350px]">
               <img 
                 id="pdp-main-image"
-                src="${product.imagenLocal}" 
-                alt="${product.nombre}" 
-                class="max-h-[340px] max-w-full object-contain filter drop-shadow-2xl rounded-xl pointer-events-none select-none"
+                src="${mainImage}"
+                alt="${product.nombre}"
+                width="245"
+                height="342"
+                fetchpriority="high"
+                decoding="async"
+                class="max-h-[340px] w-auto h-auto max-w-full object-contain filter drop-shadow-2xl rounded-xl pointer-events-none select-none"
                 draggable="false"
                 onerror="this.onerror=null; this.src='${product.imagenFallbackUrl}'"
               />
@@ -208,7 +224,7 @@ const PDPView = {
                 <i data-lucide="${ang.icon}" class="w-4 h-4 ${isActive ? 'text-[#B45309]' : 'text-slate-500'}"></i>
               </div>
               <div class="w-full h-16 rounded-lg bg-white border border-slate-200 flex items-center justify-center overflow-hidden mb-1.5">
-                <img src="${thumbImg}" alt="${ang.title}" class="max-h-full max-w-full object-contain p-1" />
+                <img src="${thumbImg}" alt="${ang.title}" loading="lazy" decoding="async" class="max-h-full max-w-full object-contain p-1" />
               </div>
               <span class="text-xs text-slate-500 line-clamp-1">${ang.sub}</span>
             </button>

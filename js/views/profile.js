@@ -257,7 +257,11 @@ const ProfileView = {
                     <div class="flex items-center gap-3 p-2.5 rounded-xl bg-[#F8FAFC] border border-slate-200">
                       <img 
                         src="${item.imageLocal}" 
-                        alt="${item.name}" 
+                        alt="${item.name}"
+                        width="44"
+                        height="56"
+                        loading="lazy"
+                        decoding="async"
                         class="w-11 h-14 object-contain bg-white rounded-lg border border-slate-200 p-0.5 flex-shrink-0" 
                         onerror="this.onerror=null; this.src='${item.imageFallback}'"
                       />

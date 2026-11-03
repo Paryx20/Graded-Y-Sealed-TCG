@@ -37,7 +37,11 @@ const CartView = {
                   <div class="flex items-center gap-3.5 flex-1">
                     <img 
                       src="${item.imageLocal}" 
-                      alt="${item.name}" 
+                      alt="${item.name}"
+                      width="64"
+                      height="80"
+                      loading="lazy"
+                      decoding="async"
                       class="w-16 h-20 object-contain bg-[#F8FAFC] border border-slate-200 rounded-xl p-1" 
                       onerror="this.onerror=null; this.src='${item.imageFallback}'"
                     />

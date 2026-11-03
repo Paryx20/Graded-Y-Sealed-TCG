@@ -103,10 +103,14 @@ const HomeView = {
                 <div class="aspect-square bg-[#0F172A] rounded-xl border border-slate-700 flex items-center justify-center p-4 overflow-hidden relative">
                   <div class="holo-sheen-layer"></div>
                   <img 
-                    src="img/charizard-base.png" 
-                    alt="Charizard Base Set 1999 #4/102 PSA 10" 
-                    class="max-h-52 object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-2xl" 
-                    onerror="this.onerror=null; this.src='https://images.pokemontcg.io/base1/4_hires.png'"
+                    src="https://images.pokemontcg.io/base1/4.png"
+                    alt="Charizard Base Set 1999 #4/102 PSA 10"
+                    width="245"
+                    height="342"
+                    fetchpriority="high"
+                    decoding="async"
+                    class="max-h-52 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-2xl"
+                    onerror="this.onerror=null; this.src='assets/img/cards/card-back.png'"
                   />
                 </div>
 
@@ -249,9 +253,13 @@ const HomeView = {
                   </div>
                   <div class="aspect-[3/4] bg-[#F8FAFC] rounded-xl border border-slate-200 overflow-hidden flex items-center justify-center p-3 relative">
                     <img 
-                      src="${card.imagenLocal}" 
-                      alt="${card.nombre}" 
-                      class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" 
+                      src="${card.imagenLocal}"
+                      alt="${card.nombre}"
+                      width="245"
+                      height="342"
+                      loading="lazy"
+                      decoding="async"
+                      class="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 group-hover:scale-105" 
                       onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
                     />
                   </div>
@@ -321,8 +329,10 @@ const HomeView = {
                   </div>
                   <div class="h-44 bg-[#0F172A] rounded-xl border border-slate-700 flex items-center justify-center p-3 overflow-hidden">
                     <img 
-                      src="${pack.imagenLocal}" 
-                      alt="${pack.nombre}" 
+                      src="${pack.imagenLocal}"
+                      alt="${pack.nombre}"
+                      loading="lazy"
+                      decoding="async"
                       class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" 
                       onerror="this.onerror=null; this.src='${pack.imagenFallbackUrl}'"
                     />
