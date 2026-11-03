@@ -39,7 +39,8 @@
 }
 
 html, body {
-  overflow-x: hidden;
+  /* clip (no hidden): hidden convierte al body en contenedor de scroll y rompe position: sticky */
+  overflow-x: clip;
   width: 100%;
   background-color: var(--bg-gallery);
   color: var(--vault-navy);

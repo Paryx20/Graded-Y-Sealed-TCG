@@ -362,6 +362,7 @@ const SEALED_PRODUCTS = [
     set: 'Base Set 1999',
     rareza: 'Sellado de Fábrica',
     tipo: 'Fuego',
+    categoria: 'sealed',
     tipo_discriminador: 'PRODUCTO_SELLADO',
     tipo_item: 'PRODUCTO_SELLADO',
     era: 'vintage',

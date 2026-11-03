@@ -304,10 +304,9 @@ test('R4 Challenger [2.1b]: Empirical Forensic Audit: Category bleed on boosterB
   const { CatalogView, Store } = sandbox;
 
   const boosterBox = Store.getProduct('booster-team-rocket');
-  // Forensic check: Notice CatalogView.matchesCategory for 'psa' does NOT check card.categoria !== 'sealed',
-  // whereas for 'raw' it does. This causes booster-team-rocket (with legacy precios.psa10) to match PSA.
+  // Las cajas selladas tienen precios psa heredados, pero no deben aparecer en Slabs PSA
   const matchesPsa = CatalogView.matchesCategory(boosterBox, 'psa');
-  assert.equal(matchesPsa, true, 'Empirically confirms booster-team-rocket matches psa due to legacy precios.psa10');
+  assert.equal(matchesPsa, false, 'booster-team-rocket must not leak into the PSA category');
 });
 
 test('R4 Challenger [2.2]: Fuzzing queries across categories - vault fallback activates without blocking card names', () => {

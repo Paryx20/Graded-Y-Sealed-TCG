@@ -9,13 +9,14 @@ const CatalogView = {
              card.tipo_discriminador === 'PRODUCTO_SELLADO' || 
              Boolean(card.set && card.set.toLowerCase().includes('sealed'));
     }
+    // Slabs PSA y Cartas raw solo muestran cartas: las cajas y sobres van en Sellados
+    const isSealed = card.categoria === 'sealed' || card.tipo_discriminador === 'PRODUCTO_SELLADO';
     if (category === 'psa') {
-      return card.categoria === 'psa' || 
-             Boolean(card.precios && (card.precios.psa10 || card.precios.psa9 || card.precios.psa8));
+      return !isSealed && (card.categoria === 'psa' ||
+             Boolean(card.precios && (card.precios.psa10 || card.precios.psa9 || card.precios.psa8)));
     }
     if (category === 'raw') {
-      return card.categoria === 'raw' || 
-             (card.categoria !== 'sealed' && Boolean(card.precios && card.precios.raw));
+      return !isSealed && (card.categoria === 'raw' || Boolean(card.precios && card.precios.raw));
     }
     return card.categoria === category;
   },
