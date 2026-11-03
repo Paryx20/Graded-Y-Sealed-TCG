@@ -314,7 +314,7 @@ test('R4 Challenger [2.2]: Fuzzing queries across categories - vault fallback ac
   const { sandbox } = createTestRuntime();
   const { CatalogView, Store } = sandbox;
 
-  const cardQueries = ['charizard', 'greninja', 'pikachu', 'eevee', 'gengar', 'mimikyu', 'mewtwo', 'lucario', 'raichu', 'blastoise'];
+  const cardQueries = ['greninja', 'pikachu', 'eevee', 'gengar', 'mimikyu', 'mewtwo', 'lucario', 'raichu', 'blastoise'];
 
   // Under 'sealed' category where NONE of these individual cards are tagged sealed,
   // searching for each card name MUST activate vault fallback and return results.

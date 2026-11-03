@@ -22,29 +22,17 @@ const CatalogView = {
 
   getFilteredProducts() {
     const f = Store.data.catalogFilters;
-    const condKey = (f.condition && f.condition !== 'all' && f.condition !== 'sealed') ? f.condition : 'raw';
+    const condKey = 'raw';
 
     const testCard = (card, useCategoryFilter, useEraFilter) => {
       if (useCategoryFilter && !this.matchesCategory(card, f.category)) return false;
       if (useEraFilter && f.era !== 'all' && card.era !== f.era) return false;
 
-      if (f.condition !== 'all') {
-        if (f.condition === 'sealed' && card.categoria !== 'sealed') return false;
-        if (f.condition === 'raw' && (card.categoria === 'sealed' || !card.precios?.raw)) return false;
-        if ((f.condition === 'psa8' || f.condition === 'psa9' || f.condition === 'psa10') && (!card.precios || !card.precios[f.condition])) {
-          return false;
-        }
-      }
+      if (f.edition === 'special' && !card.edicionEspecial) return false;
 
       if (f.type !== 'all' && card.tipo !== f.type) return false;
 
-      const refPrice = f.condition === 'psa10'
-        ? card.precios.psa10
-        : f.condition === 'psa9'
-          ? card.precios.psa9
-          : f.condition === 'psa8'
-            ? card.precios.psa8
-            : card.precios.raw;
+      const refPrice = card.precios.raw;
 
       const min = f.minPrice !== '' && f.minPrice !== null ? parseFloat(f.minPrice) : null;
       const max = f.maxPrice !== '' && f.maxPrice !== null ? parseFloat(f.maxPrice) : null;
@@ -113,7 +101,7 @@ const CatalogView = {
             </div>
             <h1 id="catalog-main-title" class="text-2xl sm:text-3xl font-black tracking-tight">${this.getActiveTitle()}</h1>
             <p class="text-xs sm:text-sm text-slate-300 mt-1">
-              Filtra en tiempo real por grado de certificación, rango de inversión, energía y rendimiento anual.
+              Filtra en tiempo real por edición, rango de precio, energía y rendimiento anual.
             </p>
           </div>
 
@@ -185,24 +173,20 @@ const CatalogView = {
 
             <div>
               <span class="block text-xs font-extrabold text-[#0F172A] uppercase tracking-wider mb-2">
-                Condición / Grado
+                Edición
               </span>
               <div class="space-y-1.5 text-xs">
                 ${[
-                  { id: 'all', label: 'Todos los Grados' },
-                  { id: 'raw', label: 'Raw / Near Mint' },
-                  { id: 'psa8', label: 'PSA 8 NM-MT' },
-                  { id: 'psa9', label: 'PSA 9 MINT' },
-                  { id: 'psa10', label: 'PSA 10 GEM MT' },
-                  { id: 'sealed', label: 'Sellado de Fábrica' }
+                  { id: 'all', label: 'Todas las cartas' },
+                  { id: 'special', label: 'Ediciones especiales' }
                 ].map(opt => `
                   <label class="flex items-center gap-2.5 cursor-pointer p-1.5 rounded-lg hover:bg-slate-50">
-                    <input 
-                      type="radio" 
-                      name="cat-cond-radio" 
-                      value="${opt.id}" 
-                      ${f.condition === opt.id ? 'checked' : ''} 
-                      onchange="CatalogView.updateFilter('condition', '${opt.id}')"
+                    <input
+                      type="radio"
+                      name="cat-edition-radio"
+                      value="${opt.id}"
+                      ${f.edition === opt.id ? 'checked' : ''}
+                      onchange="CatalogView.updateFilter('edition', '${opt.id}')"
                       class="text-[#E11D48]"
                     />
                     <span class="font-semibold text-[#0F172A]">${opt.label}</span>
@@ -328,19 +312,15 @@ const CatalogView = {
     }
 
     return items.map(card => {
-      const displayCond = f.condition === 'psa10' ? 'PSA 10 GEM MT'
-        : f.condition === 'psa9' ? 'PSA 9 MINT'
-        : f.condition === 'psa8' ? 'PSA 8 NM-MT'
-        : card.categoria === 'sealed' ? 'Sellado de Fábrica'
+      const displayCond = card.categoria === 'sealed' ? 'Sellado de Fábrica'
         : card.categoria === 'psa' ? 'Desde Raw / PSA'
         : 'Raw Near Mint';
 
-      const displayPrice = f.condition === 'psa10' ? card.precios.psa10
-        : f.condition === 'psa9' ? card.precios.psa9
-        : f.condition === 'psa8' ? card.precios.psa8
-        : card.precios.raw;
+      const displayPrice = card.precios.raw;
 
-      const badgeHtml = card.categoria === 'psa'
+      const badgeHtml = card.edicionEspecial
+        ? `<span class="px-2.5 py-0.5 text-[10px] font-black bg-[#E11D48] text-white rounded">EDICIÓN ESPECIAL</span>`
+        : card.categoria === 'psa'
         ? `<span class="px-2.5 py-0.5 text-[10px] font-black bg-[#FEF3C7] text-[#D97706] rounded">GRADO INVERSIÓN • OFICIAL PSA</span>`
         : card.categoria === 'sealed'
           ? `<span class="px-2.5 py-0.5 text-[10px] font-black bg-[#0F172A] text-[#FEF3C7] rounded">SELLADO WOTC</span>`
@@ -411,7 +391,7 @@ const CatalogView = {
     Store.data.catalogFilters = {
       category: 'all',
       era: 'all',
-      condition: 'all',
+      edition: 'all',
       type: 'all',
       minPrice: '',
       maxPrice: '',

@@ -15,7 +15,10 @@ insert into sets_expansiones (codigo_set, nombre_set, era, anio_lanzamiento) val
   ('leyendas-luminosas-2017', 'Leyendas Luminosas 2017', 'modern', 2017),
   ('team-rocket-1999', 'Team Rocket 1999', 'vintage', 1999),
   ('fossil-wotc-1999', 'Fossil WotC 1999', 'vintage', 1999),
-  ('base-set-1999', 'Base Set 1999', 'vintage', 1999);
+  ('base-set-1999', 'Base Set 1999', 'vintage', 1999),
+  ('prismatic-evolutions-2025', 'Prismatic Evolutions 2025', 'modern', 2025),
+  ('charizard-ex-collection-2024', 'Charizard ex Collection 2024', 'modern', 2024),
+  ('ascended-heroes-2026', 'Ascended Heroes 2026', 'modern', 2026);
 
 insert into productos (sku, nombre, tipo_discriminador, slug_categoria, codigo_set, descripcion, imagen_url, rendimiento_anual) values
   ('pikachu-crown-zenith', 'Pikachu Secret Rare #160/159', 'CARTA_INDIVIDUAL', 'psa', 'crown-zenith-2023', 'Pikachu Secret Rare #160/159 • Zenit Supremo 2023 • Certificación Bóveda PSA', 'https://images.pokemontcg.io/swsh12pt5/160_hires.png', 11.5),
@@ -30,7 +33,12 @@ insert into productos (sku, nombre, tipo_discriminador, slug_categoria, codigo_s
   ('blastoise-ex-151', 'Blastoise ex Double Rare #009/165', 'CARTA_INDIVIDUAL', 'psa', 'pokemon-151-2023', 'Blastoise ex #009/165 • Pokémon 151 • Bóveda PSA oficial', 'https://images.pokemontcg.io/sv3pt5/9_hires.png', 12.3),
   ('booster-team-rocket', 'Booster Box Team Rocket 1999 Sealed', 'PRODUCTO_SELLADO', 'sealed', 'team-rocket-1999', 'Display original Team Rocket 1999 de 36 sobres sellado de fábrica con celofán original Wizards of the Coast', 'img/sealed/team-rocket-box-front.png', 18.4),
   ('booster-box-fossil-1999', 'Caja Sellada Booster Box Fossil 1999 (36 Packs)', 'PRODUCTO_SELLADO', 'sealed', 'fossil-wotc-1999', 'Display original de 36 sobres con celofán de fábrica Wizards of the Coast', 'img/sealed/Paquete fossil.png', 24.1),
-  ('booster-pack-base-1999', 'Booster Pack Base Set 1999 1st Edition', 'PRODUCTO_SELLADO', 'sealed', 'base-set-1999', 'Sobre individual 1999 1st Edition • Estuche magnético UV incluido', 'img/booster-team-rocket.png', 19.5);
+  ('booster-pack-base-1999', 'Booster Pack Base Set 1999 1st Edition', 'PRODUCTO_SELLADO', 'sealed', 'base-set-1999', 'Sobre individual 1999 1st Edition • Estuche magnético UV incluido', 'img/booster-team-rocket.png', 19.5),
+  ('upc-pokemon-151', 'Pokémon 151 Ultra-Premium Collection', 'PRODUCTO_SELLADO', 'sealed', 'pokemon-151-2023', 'Colección Ultra-Premium de Pokémon 151: 16 sobres, carta metálica de Mew ex, 3 promos foil, playmat y accesorios premium', 'img/sealed/upc-pokemon-151.svg', 21.6),
+  ('etb-prismatic-evolutions', 'Prismatic Evolutions Elite Trainer Box', 'PRODUCTO_SELLADO', 'sealed', 'prismatic-evolutions-2025', 'Elite Trainer Box de Evoluciones Prismáticas con 9 sobres, carta promo de Eevee, 65 fundas, dados y marcadores', 'img/sealed/etb-prismatic-evolutions.svg', 26.3),
+  ('spc-charizard-ex', 'Charizard ex Super-Premium Collection', 'PRODUCTO_SELLADO', 'sealed', 'charizard-ex-collection-2024', 'Colección Super-Premium de Charizard ex: 10 sobres, 3 cartas promo foil, figura y accesorios de colección', 'img/sealed/spc-charizard-ex.svg', 17.9),
+  ('etb-crown-zenith', 'Crown Zenith Elite Trainer Box', 'PRODUCTO_SELLADO', 'sealed', 'crown-zenith-2023', 'Elite Trainer Box de Zenit Supremo con 10 sobres, carta promo foil, fundas y accesorios del entrenador', 'img/sealed/etb-crown-zenith.svg', 14.2),
+  ('etb-ascended-heroes', 'Ascended Heroes Elite Trainer Box', 'PRODUCTO_SELLADO', 'sealed', 'ascended-heroes-2026', 'Elite Trainer Box de Ascended Heroes (Mega Evolución 2026) con 9 sobres, promo foil, fundas y accesorios', 'img/sealed/etb-ascended-heroes.svg', 12.5);
 
 insert into detalles_cartas (producto_sku, numero_carta, rareza, tipo_energia) values
   ('pikachu-crown-zenith', '160/159', 'Secret Rare', 'Eléctrico'),
@@ -47,7 +55,12 @@ insert into detalles_cartas (producto_sku, numero_carta, rareza, tipo_energia) v
 insert into detalles_sellados (producto_sku, gramaje_gramos, cantidad_sobres_interior, tiene_celofan, es_pesado_verificado, estado_sellado) values
   ('booster-team-rocket', 750, 36, true, true, 'Sin pesar / Unweighed • Sellado de Fábrica Intacto'),
   ('booster-box-fossil-1999', 745, 36, true, true, 'Sin pesar / Unweighed • Sellado de Fábrica Intacto'),
-  ('booster-pack-base-1999', 21.2, 1, true, true, 'Sin pesar / Heavy Pack Candidate • Bóveda UV');
+  ('booster-pack-base-1999', 21.2, 1, true, true, 'Sin pesar / Heavy Pack Candidate • Bóveda UV'),
+  ('upc-pokemon-151', 1800, 16, true, true, 'Sellado de Fábrica Intacto'),
+  ('etb-prismatic-evolutions', 950, 9, true, true, 'Sellado de Fábrica Intacto'),
+  ('spc-charizard-ex', 1200, 10, true, true, 'Sellado de Fábrica Intacto'),
+  ('etb-crown-zenith', 950, 10, true, true, 'Sellado de Fábrica Intacto'),
+  ('etb-ascended-heroes', 950, 9, true, true, 'Sellado de Fábrica Intacto');
 
 insert into certificaciones_psa (producto_sku, grado, numero_certificacion, precio, stock_disponible) values
   ('pikachu-crown-zenith', 'raw', null, 12, 6),
@@ -92,7 +105,12 @@ insert into certificaciones_psa (producto_sku, grado, numero_certificacion, prec
   ('blastoise-ex-151', 'psa10', '84920120', 42, 2),
   ('booster-team-rocket', 'sealed', null, 3500, 2),
   ('booster-box-fossil-1999', 'sealed', null, 8400, 2),
-  ('booster-pack-base-1999', 'sealed', null, 1450, 2);
+  ('booster-pack-base-1999', 'sealed', null, 1450, 2),
+  ('upc-pokemon-151', 'sealed', null, 219.99, 2),
+  ('etb-prismatic-evolutions', 'sealed', null, 119.99, 2),
+  ('spc-charizard-ex', 'sealed', null, 129.99, 2),
+  ('etb-crown-zenith', 'sealed', null, 89.99, 2),
+  ('etb-ascended-heroes', 'sealed', null, 99.99, 2);
 
 insert into historial_precios (producto_sku, grado, mes, precio_usd) values
   ('pikachu-crown-zenith', 'psa10', '2025-12-01', 42.72),
@@ -250,4 +268,64 @@ insert into historial_precios (producto_sku, grado, mes, precio_usd) values
   ('booster-pack-base-1999', 'sealed', '2026-08-01', 1392.00),
   ('booster-pack-base-1999', 'sealed', '2026-09-01', 1421.00),
   ('booster-pack-base-1999', 'sealed', '2026-10-01', 1435.50),
-  ('booster-pack-base-1999', 'sealed', '2026-11-01', 1450.00);
+  ('booster-pack-base-1999', 'sealed', '2026-11-01', 1450.00),
+  ('upc-pokemon-151', 'sealed', '2025-12-01', 184.79),
+  ('upc-pokemon-151', 'sealed', '2026-01-01', 186.99),
+  ('upc-pokemon-151', 'sealed', '2026-02-01', 191.39),
+  ('upc-pokemon-151', 'sealed', '2026-03-01', 193.59),
+  ('upc-pokemon-151', 'sealed', '2026-04-01', 197.99),
+  ('upc-pokemon-151', 'sealed', '2026-05-01', 200.19),
+  ('upc-pokemon-151', 'sealed', '2026-06-01', 204.59),
+  ('upc-pokemon-151', 'sealed', '2026-07-01', 206.79),
+  ('upc-pokemon-151', 'sealed', '2026-08-01', 211.19),
+  ('upc-pokemon-151', 'sealed', '2026-09-01', 213.39),
+  ('upc-pokemon-151', 'sealed', '2026-10-01', 217.79),
+  ('upc-pokemon-151', 'sealed', '2026-11-01', 219.99),
+  ('etb-prismatic-evolutions', 'sealed', '2025-12-01', 100.79),
+  ('etb-prismatic-evolutions', 'sealed', '2026-01-01', 101.99),
+  ('etb-prismatic-evolutions', 'sealed', '2026-02-01', 104.39),
+  ('etb-prismatic-evolutions', 'sealed', '2026-03-01', 105.59),
+  ('etb-prismatic-evolutions', 'sealed', '2026-04-01', 107.99),
+  ('etb-prismatic-evolutions', 'sealed', '2026-05-01', 109.19),
+  ('etb-prismatic-evolutions', 'sealed', '2026-06-01', 111.59),
+  ('etb-prismatic-evolutions', 'sealed', '2026-07-01', 112.79),
+  ('etb-prismatic-evolutions', 'sealed', '2026-08-01', 115.19),
+  ('etb-prismatic-evolutions', 'sealed', '2026-09-01', 116.39),
+  ('etb-prismatic-evolutions', 'sealed', '2026-10-01', 118.79),
+  ('etb-prismatic-evolutions', 'sealed', '2026-11-01', 119.99),
+  ('spc-charizard-ex', 'sealed', '2025-12-01', 109.19),
+  ('spc-charizard-ex', 'sealed', '2026-01-01', 110.49),
+  ('spc-charizard-ex', 'sealed', '2026-02-01', 113.09),
+  ('spc-charizard-ex', 'sealed', '2026-03-01', 114.39),
+  ('spc-charizard-ex', 'sealed', '2026-04-01', 116.99),
+  ('spc-charizard-ex', 'sealed', '2026-05-01', 118.29),
+  ('spc-charizard-ex', 'sealed', '2026-06-01', 120.89),
+  ('spc-charizard-ex', 'sealed', '2026-07-01', 122.19),
+  ('spc-charizard-ex', 'sealed', '2026-08-01', 124.79),
+  ('spc-charizard-ex', 'sealed', '2026-09-01', 126.09),
+  ('spc-charizard-ex', 'sealed', '2026-10-01', 128.69),
+  ('spc-charizard-ex', 'sealed', '2026-11-01', 129.99),
+  ('etb-crown-zenith', 'sealed', '2025-12-01', 75.59),
+  ('etb-crown-zenith', 'sealed', '2026-01-01', 76.49),
+  ('etb-crown-zenith', 'sealed', '2026-02-01', 78.29),
+  ('etb-crown-zenith', 'sealed', '2026-03-01', 79.19),
+  ('etb-crown-zenith', 'sealed', '2026-04-01', 80.99),
+  ('etb-crown-zenith', 'sealed', '2026-05-01', 81.89),
+  ('etb-crown-zenith', 'sealed', '2026-06-01', 83.69),
+  ('etb-crown-zenith', 'sealed', '2026-07-01', 84.59),
+  ('etb-crown-zenith', 'sealed', '2026-08-01', 86.39),
+  ('etb-crown-zenith', 'sealed', '2026-09-01', 87.29),
+  ('etb-crown-zenith', 'sealed', '2026-10-01', 89.09),
+  ('etb-crown-zenith', 'sealed', '2026-11-01', 89.99),
+  ('etb-ascended-heroes', 'sealed', '2025-12-01', 83.99),
+  ('etb-ascended-heroes', 'sealed', '2026-01-01', 84.99),
+  ('etb-ascended-heroes', 'sealed', '2026-02-01', 86.99),
+  ('etb-ascended-heroes', 'sealed', '2026-03-01', 87.99),
+  ('etb-ascended-heroes', 'sealed', '2026-04-01', 89.99),
+  ('etb-ascended-heroes', 'sealed', '2026-05-01', 90.99),
+  ('etb-ascended-heroes', 'sealed', '2026-06-01', 92.99),
+  ('etb-ascended-heroes', 'sealed', '2026-07-01', 93.99),
+  ('etb-ascended-heroes', 'sealed', '2026-08-01', 95.99),
+  ('etb-ascended-heroes', 'sealed', '2026-09-01', 96.99),
+  ('etb-ascended-heroes', 'sealed', '2026-10-01', 98.99),
+  ('etb-ascended-heroes', 'sealed', '2026-11-01', 99.99);

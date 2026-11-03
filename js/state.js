@@ -17,7 +17,7 @@ const Store = {
     catalogFilters: {
       category: 'all',
       era: 'all',
-      condition: 'all',
+      edition: 'all',
       type: 'all',
       minPrice: '',
       maxPrice: '',

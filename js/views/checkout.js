@@ -16,7 +16,7 @@ const CheckoutView = {
             <i data-lucide="lock" class="w-4 h-4 text-[#059669]"></i>
             <span>Checkout Seguro TLS 256-bit • Graded &amp; Sealed TCG</span>
           </div>
-          <span class="text-[11px] text-slate-300">Cumplimiento PCI-DSS</span>
+          <span class="text-[11px] text-slate-300">Conexión cifrada HTTPS</span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -189,7 +189,7 @@ const CheckoutView = {
                       <input type="radio" name="payment-method" value="card" checked class="text-[#E11D48]" />
                       <div>
                         <span class="text-sm font-bold text-[#0F172A]">Tarjeta de Crédito / Débito</span>
-                        <span class="text-xs text-slate-500 block">Visa, Mastercard (Validación Luhn &amp; 3D Secure)</span>
+                        <span class="text-xs text-slate-500 block">Visa, Mastercard</span>
                       </div>
                     </div>
                     <i data-lucide="credit-card" class="w-5 h-5 text-slate-500"></i>
@@ -203,7 +203,7 @@ const CheckoutView = {
                     <div class="sm:col-span-3">
                       <label for="card-number" class="block text-xs font-bold text-slate-700 mb-1">Número de tarjeta:</label>
                       <div data-field class="flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden">
-                        <input type="text" id="card-number" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="4111 1111 1111 1111" oninput="CheckoutView.formatCardNumber(this)" class="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none font-mono tracking-wide" />
+                        <input type="text" id="card-number" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000" oninput="CheckoutView.formatCardNumber(this)" class="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none font-mono tracking-wide" />
                         <span id="card-brand" class="px-3 text-[11px] font-black text-slate-400 uppercase"></span>
                       </div>
                     </div>
@@ -215,19 +215,6 @@ const CheckoutView = {
                       <label for="card-cvv" class="block text-xs font-bold text-slate-700 mb-1">CVV/CVC:</label>
                       <input type="password" id="card-cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="•••" maxlength="3" oninput="this.value = this.value.replace(/\\D/g, '')" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
                     </div>
-                    <details class="sm:col-span-3 text-[11px] text-slate-500">
-                      <summary class="cursor-pointer font-bold text-slate-600 select-none">Tarjetas de prueba para la demostración</summary>
-                      <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 font-mono">
-                        <span>4111 1111 1111 1111 → Aprobada</span>
-                        <span>5555 5555 5555 4444 → Aprobada</span>
-                        <span>4000 0000 0000 0002 → No existe / cancelada</span>
-                        <span>4000 0000 0000 0069 → Caducada (banco)</span>
-                        <span>4000 0000 0000 9995 → Fondos insuficientes</span>
-                        <span>4100 0000 0000 0019 → Bloqueada (robo)</span>
-                        <span>4000 0000 0000 0127 → CVV incorrecto</span>
-                        <span>Fecha pasada (ej. 09/24) → Caducada</span>
-                      </div>
-                    </details>
                   </div>
                 </div>
 
@@ -253,6 +240,10 @@ const CheckoutView = {
                 <i data-lucide="lock" class="w-5 h-5"></i>
                 <span>Proceder al Pago ($${total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD)</span>
               </button>
+              <p class="text-center text-[11px] text-slate-400 mt-3 flex items-center justify-center gap-1.5">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                <span>Proyecto académico: el pago es simulado y no se realiza ningún cargo real.</span>
+              </p>
             </div>
           </div>
         </div>
@@ -473,19 +464,11 @@ const CheckoutView = {
                 <label for="reg-pass" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña: *</label>
                 <input type="password" id="reg-pass" autocomplete="new-password" placeholder="Mínimo 8 caracteres, con letras y números" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
-              <label class="flex items-start gap-2 text-xs text-slate-600 cursor-pointer pt-1">
-                <input type="checkbox" id="reg-terms" class="mt-0.5 rounded text-[#E11D48]" />
-                <span>Acepto los protocolos de custodia y términos de Graded &amp; Sealed TCG</span>
-              </label>
               <button type="submit" class="w-full py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-extrabold rounded-xl transition shadow touch-target">
                 Registrar mi Cuenta
               </button>
             </form>
           `}
-          <p class="text-center text-[11px] text-slate-400 mt-5 flex items-center justify-center gap-1.5">
-            <i data-lucide="database" class="w-3.5 h-3.5"></i>
-            <span>${SupabaseAPI.isOnline() ? 'Cuentas almacenadas de forma segura en Supabase' : 'Sin conexión con la base de datos'}</span>
-          </p>
         </div>
       </div>
     `;
@@ -608,11 +591,6 @@ const CheckoutView = {
       app.showToast('Revisa los campos marcados en rojo.', 'error');
       return;
     }
-    if (!document.getElementById('reg-terms')?.checked) {
-      app.showToast('Debes aceptar los términos de custodia para registrarte.', 'error');
-      return;
-    }
-
     const val = id => document.getElementById(id).value.trim();
     try {
       const user = await SupabaseAPI.register({

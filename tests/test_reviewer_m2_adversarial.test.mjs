@@ -342,12 +342,12 @@ test('R4 Adversarial [4.2]: Searching card name within sealed category triggers 
   const { CatalogView, Store } = sandbox;
 
   Store.data.catalogFilters.category = 'sealed';
-  Store.data.catalogFilters.searchQuery = 'charizard';
+  Store.data.catalogFilters.searchQuery = 'greninja';
 
   const results = CatalogView.getFilteredProducts();
-  assert.ok(results.length > 0, 'Searching charizard in sealed category must return cards via vault fallback');
+  assert.ok(results.length > 0, 'Searching greninja in sealed category must return cards via vault fallback');
   assert.equal(CatalogView.isVaultFallback, true, 'isVaultFallback flag must be active');
-  assert.ok(results.some(c => c.nombre.toLowerCase().includes('charizard')));
+  assert.ok(results.some(c => c.nombre.toLowerCase().includes('greninja')));
 });
 
 test('R4 Adversarial [4.3]: Searching nonexistent query returns 0 results cleanly without errors', () => {

@@ -12,6 +12,7 @@ const APP_CONFIG = {
 const POKEMON_CARDS_CATALOG_10 = [
   {
     id: 'pikachu-crown-zenith',
+    edicionEspecial: true,
     nombre: 'Pikachu Secret Rare #160/159',
     set: 'Crown Zenith 2023',
     rareza: 'Secret Rare',
@@ -187,6 +188,7 @@ const POKEMON_CARDS_CATALOG_10 = [
   },
   {
     id: 'lucario-vstar-zenith',
+    edicionEspecial: true,
     nombre: 'Lucario VSTAR Promo SWSH291',
     set: 'Crown Zenith Promos 2023',
     rareza: 'Promo Holo',
@@ -354,6 +356,7 @@ const SEALED_PRODUCTS = [
   },
   {
     id: 'booster-pack-base-1999',
+    edicionEspecial: true,
     nombre: 'Booster Pack Base Set 1999 1st Edition',
     set: 'Base Set 1999',
     rareza: 'Sellado de Fábrica',
@@ -393,7 +396,116 @@ const SEALED_PRODUCTS = [
     tendencia12m: '+19.5%',
     rendimientoAnual: 19.5,
     historialBase: [0.83, 0.85, 0.87, 0.88, 0.90, 0.91, 0.93, 0.95, 0.96, 0.98, 0.99, 1.00]
-  }
+  },
+  ...[
+    {
+      id: 'upc-pokemon-151',
+      nombre: 'Pokémon 151 Ultra-Premium Collection',
+      set: 'Pokemon 151 2023',
+      tipo: 'Psíquico',
+      era: 'modern',
+      certNumber: '48292151',
+      gramos: 1800,
+      sobres: 16,
+      packs: '16 Sobres de 10 Cartas + Mew metálica + 3 promos foil',
+      precio: 219.99,
+      descripcion: 'Colección Ultra-Premium de Pokémon 151: 16 sobres, carta metálica de Mew ex, 3 promos foil, playmat y accesorios premium',
+      rendimientoAnual: 21.6
+    },
+    {
+      id: 'etb-prismatic-evolutions',
+      nombre: 'Prismatic Evolutions Elite Trainer Box',
+      set: 'Prismatic Evolutions 2025',
+      tipo: 'Incoloro',
+      era: 'modern',
+      certNumber: '48292025',
+      gramos: 950,
+      sobres: 9,
+      packs: '9 Sobres de 10 Cartas + promo de Eevee',
+      precio: 119.99,
+      descripcion: 'Elite Trainer Box de Evoluciones Prismáticas con 9 sobres, carta promo de Eevee, 65 fundas, dados y marcadores',
+      rendimientoAnual: 26.3
+    },
+    {
+      id: 'spc-charizard-ex',
+      nombre: 'Charizard ex Super-Premium Collection',
+      set: 'Charizard ex Collection 2024',
+      tipo: 'Fuego',
+      era: 'modern',
+      certNumber: '48292024',
+      gramos: 1200,
+      sobres: 10,
+      packs: '10 Sobres + 3 promos foil de Charizard',
+      precio: 129.99,
+      descripcion: 'Colección Super-Premium de Charizard ex: 10 sobres, 3 cartas promo foil, figura y accesorios de colección',
+      rendimientoAnual: 17.9
+    },
+    {
+      id: 'etb-crown-zenith',
+      nombre: 'Crown Zenith Elite Trainer Box',
+      set: 'Crown Zenith 2023',
+      tipo: 'Incoloro',
+      era: 'modern',
+      certNumber: '48292023',
+      gramos: 950,
+      sobres: 10,
+      packs: '10 Sobres de 10 Cartas + promo foil',
+      precio: 89.99,
+      descripcion: 'Elite Trainer Box de Zenit Supremo con 10 sobres, carta promo foil, fundas y accesorios del entrenador',
+      rendimientoAnual: 14.2
+    },
+    {
+      id: 'etb-ascended-heroes',
+      nombre: 'Ascended Heroes Elite Trainer Box',
+      set: 'Ascended Heroes 2026',
+      tipo: 'Psíquico',
+      era: 'modern',
+      certNumber: '48292026',
+      gramos: 950,
+      sobres: 9,
+      packs: '9 Sobres • Expansión Mega Evolution',
+      precio: 99.99,
+      descripcion: 'Elite Trainer Box de Ascended Heroes (Mega Evolución 2026) con 9 sobres, promo foil, fundas y accesorios',
+      rendimientoAnual: 12.5
+    }
+  ].map(p => ({
+    id: p.id,
+    nombre: p.nombre,
+    set: p.set,
+    rareza: 'Edición Especial Sellada',
+    tipo: p.tipo,
+    categoria: 'sealed',
+    tipo_discriminador: 'PRODUCTO_SELLADO',
+    tipo_item: 'PRODUCTO_SELLADO',
+    era: p.era,
+    edicionEspecial: true,
+    condicionPrincipal: 'sealed',
+    certNumber: p.certNumber,
+    imagenLocal: `img/sealed/${p.id}.svg`,
+    imagenFallbackUrl: `img/sealed/${p.id}.svg`,
+    galeria_sellada: {
+      frontal: `img/sealed/${p.id}.svg`,
+      perspectiva: `img/sealed/${p.id}.svg`,
+      lateral: `img/sealed/${p.id}.svg`
+    },
+    detalles_sellados: {
+      gramaje: `${p.gramos}g (Caja Completa)`,
+      gramaje_gramos: p.gramos,
+      cantidad_sobres_interior: p.sobres,
+      es_pesado_verificado: true,
+      sellos: 'Celofán original de fábrica The Pokémon Company International',
+      sello_fabrica: 'Factory Sealed Shrinkwrap',
+      packs: p.packs,
+      estado: 'Sellado de Fábrica Intacto',
+      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+    },
+    precios: { raw: p.precio, sealed: p.precio },
+    precioUnitario: p.precio,
+    descripcion: p.descripcion,
+    tendencia12m: `+${p.rendimientoAnual.toFixed(1)}%`,
+    rendimientoAnual: p.rendimientoAnual,
+    historialBase: [0.84, 0.85, 0.87, 0.88, 0.90, 0.91, 0.93, 0.94, 0.96, 0.97, 0.99, 1.00]
+  }))
 ];
 
 /**
