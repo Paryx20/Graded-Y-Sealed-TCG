@@ -6,7 +6,7 @@ const ProfileView = {
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
           <div class="bg-white border border-slate-200 rounded-2xl p-8 sm:p-10 text-center shadow-sm space-y-6">
             <div class="w-16 h-16 rounded-full bg-slate-100 text-[#0F172A] flex items-center justify-center mx-auto shadow-inner">
-              <i data-lucide="shield-check" class="w-8 h-8 text-[#059669]"></i>
+              <i data-lucide="shield-check" class="w-8 h-8 text-[#047857]"></i>
             </div>
             
             <div class="space-y-2">
@@ -30,7 +30,7 @@ const ProfileView = {
 
             <div class="pt-4 border-t border-slate-100 text-xs text-slate-500">
               ¿No tienes cuenta?
-              <a href="login.html?tab=register" class="font-extrabold text-[#E11D48] hover:text-[#BE123C]">Crear una cuenta</a>
+              <a href="pages/login.html?tab=register" class="font-extrabold text-[#BE123C] hover:text-[#9F1239]">Crear una cuenta</a>
             </div>
           </div>
         </div>
@@ -50,7 +50,7 @@ const ProfileView = {
               ${userInitial}
             </div>
             <div>
-              <div class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-[#D1FAE5] bg-[#059669]/30 px-2.5 py-0.5 rounded mb-1">
+              <div class="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#D1FAE5] bg-[#059669]/30 px-2.5 py-0.5 rounded mb-1">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                 <span>Titular de Bóveda Verificado</span>
               </div>
@@ -118,7 +118,7 @@ const ProfileView = {
                     readonly
                     class="w-full px-3.5 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-semibold cursor-not-allowed"
                   />
-                  <p class="text-[10px] text-slate-400 mt-1">La cédula identifica tu cuenta y no se puede cambiar.</p>
+                  <p class="text-xs text-slate-500 mt-1">La cédula identifica tu cuenta y no se puede cambiar.</p>
                 </div>
 
                 <div>
@@ -143,7 +143,7 @@ const ProfileView = {
                     placeholder="••••••••"
                     class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-[#0F172A] font-semibold"
                   />
-                  <p class="text-[10px] text-slate-500 mt-1">A partir del cambio inicias sesión con el nuevo correo.</p>
+                  <p class="text-xs text-slate-500 mt-1">A partir del cambio inicias sesión con el nuevo correo.</p>
                 </div>
 
                 <div>
@@ -215,7 +215,7 @@ const ProfileView = {
                 <p class="text-xs text-slate-500 max-w-md mx-auto">
                   Tus adquisiciones de Slabs PSA y Cajas Selladas aparecerán aquí con desglose tributario y acceso directo al seguimiento en vivo.
                 </p>
-                <a href="catalogo.html" class="mt-2 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-extrabold rounded-xl shadow transition">
+                <a href="pages/catalogo.html" class="mt-2 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-extrabold rounded-xl shadow transition">
                   <i data-lucide="shopping-bag" class="w-4 h-4"></i>
                   <span>Explorar Bóveda</span>
                 </a>
@@ -226,7 +226,7 @@ const ProfileView = {
                   <div>
                     <div class="flex items-center gap-2.5">
                       <span class="font-mono text-sm font-black text-[#0F172A]">${order.orderId}</span>
-                      <span class="px-2.5 py-0.5 text-[11px] font-extrabold bg-[#D1FAE5] text-[#059669] rounded-md">
+                      <span class="px-2.5 py-0.5 text-xs font-extrabold bg-[#D1FAE5] text-[#047857] rounded-md">
                         ${order.status || 'En Preparación / En Custodia'}
                       </span>
                     </div>
@@ -237,7 +237,7 @@ const ProfileView = {
 
                   <div class="flex items-center gap-3">
                     <div class="text-right">
-                      <span class="text-[10px] text-slate-500 block">Total (IVA 15%: $${(order.tax || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })})</span>
+                      <span class="text-xs text-slate-500 block">Total (IVA 15%: $${(order.tax || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })})</span>
                       <span class="text-lg font-black text-[#0F172A]">$${(order.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
                     </div>
 
@@ -263,7 +263,7 @@ const ProfileView = {
                       />
                       <div class="min-w-0 flex-1">
                         <h3 class="text-xs font-extrabold text-[#0F172A] truncate">${item.name}</h3>
-                        <span class="text-[10px] text-slate-500 block">${item.condition} • Cant: ${item.quantity}</span>
+                        <span class="text-xs text-slate-500 block">${item.condition} • Cant: ${item.quantity}</span>
                         <span class="text-xs font-black text-[#0F172A]">$${(item.price * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                       </div>
                     </div>

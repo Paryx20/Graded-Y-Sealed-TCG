@@ -180,27 +180,27 @@ test('Feature 1 [Tier 1]: Team Rocket Box - Specifies front angle image path', (
   const { PRODUCTS, PDPView } = setupPDPRenderer();
   const sealedItem = PRODUCTS.find(p => p.id === 'booster-team-rocket');
   assert.ok(sealedItem, 'Sealed item booster-team-rocket should exist in catalog');
-  assert.equal(sealedItem.galeria_sellada.frontal, 'img/sealed/team-rocket-box-front.png');
+  assert.equal(sealedItem.galeria_sellada.frontal, 'assets/img/sealed/team-rocket-box-front.png');
   const html = PDPView.renderSealedGalleryStage(sealedItem, 'frontal');
-  assert.ok(html.includes('img/sealed/team-rocket-box-front.png'));
+  assert.ok(html.includes('assets/img/sealed/team-rocket-box-front.png'));
   assert.ok(fs.existsSync(path.join(process.cwd(), sealedItem.galeria_sellada.frontal)));
 });
 
 test('Feature 1 [Tier 1]: Team Rocket Box - Specifies 3/4 perspective angle image path', () => {
   const { PRODUCTS, PDPView } = setupPDPRenderer();
   const sealedItem = PRODUCTS.find(p => p.id === 'booster-team-rocket');
-  assert.equal(sealedItem.galeria_sellada.perspectiva, 'img/sealed/team-rocket-box-perspective.png');
+  assert.equal(sealedItem.galeria_sellada.perspectiva, 'assets/img/sealed/team-rocket-box-perspective.png');
   const html = PDPView.renderSealedGalleryStage(sealedItem, 'perspectiva');
-  assert.ok(html.includes('img/sealed/team-rocket-box-perspective.png'));
+  assert.ok(html.includes('assets/img/sealed/team-rocket-box-perspective.png'));
   assert.ok(fs.existsSync(path.join(process.cwd(), sealedItem.galeria_sellada.perspectiva)));
 });
 
 test('Feature 1 [Tier 1]: Team Rocket Box - Specifies side profile image path', () => {
   const { PRODUCTS, PDPView } = setupPDPRenderer();
   const sealedItem = PRODUCTS.find(p => p.id === 'booster-team-rocket');
-  assert.equal(sealedItem.galeria_sellada.lateral, 'img/sealed/team-rocket-box-side.png');
+  assert.equal(sealedItem.galeria_sellada.lateral, 'assets/img/sealed/team-rocket-box-side.png');
   const html = PDPView.renderSealedGalleryStage(sealedItem, 'lateral');
-  assert.ok(html.includes('img/sealed/team-rocket-box-side.png'));
+  assert.ok(html.includes('assets/img/sealed/team-rocket-box-side.png'));
   assert.ok(fs.existsSync(path.join(process.cwd(), sealedItem.galeria_sellada.lateral)));
 });
 
@@ -212,12 +212,12 @@ test('Feature 1 [Tier 1]: Team Rocket Box - Gallery switcher toggles active prev
   PDPView.setSealedAngle('perspectiva');
   assert.equal(Store.data.pdpSealedAngle, 'perspectiva');
   const htmlPersp = PDPView.render();
-  assert.ok(htmlPersp.includes('img/sealed/team-rocket-box-perspective.png'));
+  assert.ok(htmlPersp.includes('assets/img/sealed/team-rocket-box-perspective.png'));
 
   PDPView.setSealedAngle('lateral');
   assert.equal(Store.data.pdpSealedAngle, 'lateral');
   const htmlLat = PDPView.render();
-  assert.ok(htmlLat.includes('img/sealed/team-rocket-box-side.png'));
+  assert.ok(htmlLat.includes('assets/img/sealed/team-rocket-box-side.png'));
 });
 
 test('Feature 1 [Tier 1]: Team Rocket Box - Preserves factory seal description metadata', () => {
@@ -238,18 +238,18 @@ test('Feature 2 [Tier 1]: Card Assets - Official card back image asset is specif
   const { PRODUCTS, PDPView } = setupPDPRenderer();
   const card = PRODUCTS.find(p => p.categoria === 'psa');
   const html = PDPView.renderInspectorStage(card, 'psa10', 'back');
-  assert.ok(html.includes('img/cards/card-back.png'));
-  assert.ok(fs.existsSync(path.join(process.cwd(), 'img/cards/card-back.png')));
+  assert.ok(html.includes('assets/img/cards/card-back.png'));
+  assert.ok(fs.existsSync(path.join(process.cwd(), 'assets/img/cards/card-back.png')));
 });
 
 test('Feature 2 [Tier 1]: Card Assets - Raichu GX front asset is specified', () => {
   const { PRODUCTS, PDPView } = setupPDPRenderer();
   const raichu = PRODUCTS.find(p => p.id === 'raichu-gx');
   assert.ok(raichu, 'raichu-gx should be present in catalog');
-  assert.equal(raichu.imagenLocal, 'img/cards/raichu-gx.png');
+  assert.equal(raichu.imagenLocal, 'assets/img/cards/raichu-gx.png');
   const html = PDPView.renderInspectorStage(raichu, 'psa10', 'front');
-  assert.ok(html.includes('img/cards/raichu-gx.png'));
-  assert.ok(fs.existsSync(path.join(process.cwd(), 'img/cards/raichu-gx.png')));
+  assert.ok(html.includes('assets/img/cards/raichu-gx.png'));
+  assert.ok(fs.existsSync(path.join(process.cwd(), 'assets/img/cards/raichu-gx.png')));
 });
 
 test('Feature 2 [Tier 1]: Card Assets - Supports standard card ratio aspect styling', () => {
@@ -337,14 +337,14 @@ test('Feature 4 [Tier 1]: 3D Inspector Back - Renders official Pocket Monsters c
   const card = PRODUCTS.find(p => p.categoria === 'psa');
   const html = PDPView.renderInspectorStage(card, 'psa10', 'back');
   assert.ok(html.includes('card-3d-back'));
-  assert.ok(html.includes('img/cards/card-back.png'));
+  assert.ok(html.includes('assets/img/cards/card-back.png'));
 });
 
 test('Feature 4 [Tier 1]: 3D Inspector Back - Clean reverse side without centering grid overlay (Requirement R3)', () => {
   const { PRODUCTS, PDPView } = setupPDPRenderer();
   const card = PRODUCTS.find(p => p.categoria === 'psa');
   const html = PDPView.renderInspectorStage(card, 'psa10', 'back');
-  assert.ok(html.includes('img/cards/card-back.png'), 'Card back image must be present');
+  assert.ok(html.includes('assets/img/cards/card-back.png'), 'Card back image must be present');
   assert.ok(!html.includes('centering-grid-overlay'), 'centering-grid-overlay must NOT be present');
 });
 

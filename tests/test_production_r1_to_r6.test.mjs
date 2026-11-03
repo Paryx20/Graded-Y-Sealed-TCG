@@ -533,7 +533,7 @@ test('R6 Catalog [6.6]: 10 Pokémon cards strictly bounded between $5.00 and $80
 });
 
 test('R6 Plan [6.7]: PLAN_DE_TRABAJO.md marks FASE 8 and all 5 checklist items with [X]', () => {
-  const plan = fs.readFileSync(path.join(ROOT_DIR, 'PLAN_DE_TRABAJO.md'), 'utf8');
+  const plan = fs.readFileSync(path.join(ROOT_DIR, 'docs/PLAN_DE_TRABAJO.md'), 'utf8');
 
   assert.ok(plan.includes('### [X] FASE 8: Migración a Supabase (PostgreSQL en la Nube) y Backend Real'), 'FASE 8 header must be marked [X]');
   assert.ok(plan.includes('- [X] Extraer el modelo de datos a un archivo `js/db/schema.sql`'), 'Item 1 must be marked [X]');

@@ -406,8 +406,8 @@ test('PDPView.render: Custom products missing era do NOT throw unhandled errors'
       tipo_discriminador: 'PRODUCTO_SELLADO',
       tipo_item: 'PRODUCTO_SELLADO',
       // era completely omitted
-      imagenLocal: 'img/sealed/team-rocket-box-front.png',
-      imagenFallbackUrl: 'img/sealed/team-rocket-box-perspective.png',
+      imagenLocal: 'assets/img/sealed/team-rocket-box-front.png',
+      imagenFallbackUrl: 'assets/img/sealed/team-rocket-box-perspective.png',
       precios: { sealed: 2500 }
     },
     {
@@ -418,8 +418,8 @@ test('PDPView.render: Custom products missing era do NOT throw unhandled errors'
       categoria: 'sealed',
       tipo_discriminador: 'PRODUCTO_SELLADO',
       era: undefined,
-      imagenLocal: 'img/sealed/team-rocket-box-front.png',
-      imagenFallbackUrl: 'img/sealed/team-rocket-box-perspective.png',
+      imagenLocal: 'assets/img/sealed/team-rocket-box-front.png',
+      imagenFallbackUrl: 'assets/img/sealed/team-rocket-box-perspective.png',
       precios: { sealed: 3000 }
     },
     {
@@ -430,8 +430,8 @@ test('PDPView.render: Custom products missing era do NOT throw unhandled errors'
       categoria: 'sealed',
       tipo_discriminador: 'PRODUCTO_SELLADO',
       era: null,
-      imagenLocal: 'img/sealed/team-rocket-box-front.png',
-      imagenFallbackUrl: 'img/sealed/team-rocket-box-perspective.png',
+      imagenLocal: 'assets/img/sealed/team-rocket-box-front.png',
+      imagenFallbackUrl: 'assets/img/sealed/team-rocket-box-perspective.png',
       precios: { sealed: 3200 }
     },
     {
@@ -442,8 +442,8 @@ test('PDPView.render: Custom products missing era do NOT throw unhandled errors'
       categoria: 'sealed',
       tipo_discriminador: 'PRODUCTO_SELLADO',
       era: '',
-      imagenLocal: 'img/sealed/team-rocket-box-front.png',
-      imagenFallbackUrl: 'img/sealed/team-rocket-box-perspective.png',
+      imagenLocal: 'assets/img/sealed/team-rocket-box-front.png',
+      imagenFallbackUrl: 'assets/img/sealed/team-rocket-box-perspective.png',
       precios: { sealed: 4000 }
     },
     {

@@ -131,7 +131,7 @@ test('R1 3D Drag [Test 1.1]: PDPView.render() produces complete 3D viewer markup
   assert.ok(html.includes('card-3d-front'), 'Must contain .card-3d-front');
   assert.ok(html.includes('card-3d-back'), 'Must contain .card-3d-back');
   assert.ok(html.includes('id="pdp-holo-layer"'), 'Must contain #pdp-holo-layer');
-  assert.ok(html.includes('img/cards/card-back.png'), 'Must render official card back artwork');
+  assert.ok(html.includes('assets/img/cards/card-back.png'), 'Must render official card back artwork');
   assert.ok(html.includes('pointer-events-none'), 'Card images must have pointer-events-none to prevent ghost drag');
 });
 

@@ -421,7 +421,7 @@ test('R6 Adversarial [6.2]: 10 Pokémon cards strictly bounded between $5.00 and
 });
 
 test('R6 Adversarial [6.3]: PLAN_DE_TRABAJO.md marks FASE 8 with [X]', () => {
-  const plan = fs.readFileSync(path.join(ROOT_DIR, 'PLAN_DE_TRABAJO.md'), 'utf8');
+  const plan = fs.readFileSync(path.join(ROOT_DIR, 'docs/PLAN_DE_TRABAJO.md'), 'utf8');
   assert.ok(plan.includes('### [X] FASE 8: Migración a Supabase'), 'FASE 8 header must be marked [X]');
   assert.ok(!plan.includes('### [ ] FASE 8: Migración a Supabase'), 'FASE 8 header must not be uncompleted');
 });

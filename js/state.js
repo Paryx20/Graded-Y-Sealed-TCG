@@ -32,7 +32,7 @@ const Store = {
     try {
       const savedUser = localStorage.getItem('gstcg_user');
       if (savedUser) this.data.currentUser = JSON.parse(savedUser);
-      // Sesiones antiguas (Google simulado o sin token de Supabase) dejan de ser válidas
+      // Sesiones guardadas sin token de Supabase dejan de ser válidas
       if (this.data.currentUser && !this.data.currentUser.token) {
         this.data.currentUser = null;
         localStorage.removeItem('gstcg_user');
@@ -81,7 +81,7 @@ const Store = {
     } catch (e) {}
   },
 
-  // El detalle del rechazo se muestra en otra página (pago-rechazado.html)
+  // El detalle del rechazo se muestra en otra página (pages/pago-rechazado.html)
   savePaymentError() {
     try {
       sessionStorage.setItem('gstcg_payment_error', JSON.stringify(this.data.lastPaymentError));
@@ -212,7 +212,7 @@ const Store = {
           condition: 'PSA 10 GEM MT',
           price: 18500.00,
           quantity: 1,
-          imageLocal: 'img/cards/card-back.png',
+          imageLocal: 'assets/img/cards/card-back.png',
           imageFallback: 'https://images.pokemontcg.io/base1/4_hires.png'
         }
       ]
@@ -259,8 +259,13 @@ const Store = {
         if (row.precios.sealed) product.precioUnitario = row.precios.sealed;
         product.stock = row.stock || {};
         if (row.imagen_url) {
-          product.imagenLocal = row.imagen_url;
-          if (!product.imagenFallbackUrl || !/^https?:/.test(product.imagenFallbackUrl)) product.imagenFallbackUrl = row.imagen_url;
+          // Filas antiguas guardan la ruta previa a assets/ (img/...)
+          const imageUrl = row.imagen_url
+            .replace(/^img\/sealed\/Paquete fossil\.png$/, 'img/sealed/paquete-fossil.png')
+            .replace(/^img\/booster-team-rocket\.png$/, 'img/packs/booster-team-rocket.png')
+            .replace(/^img\//, 'assets/img/');
+          product.imagenLocal = imageUrl;
+          if (!product.imagenFallbackUrl || !/^https?:/.test(product.imagenFallbackUrl)) product.imagenFallbackUrl = imageUrl;
         }
         if (Array.isArray(row.historial) && row.historial.length) {
           const last = row.historial[row.historial.length - 1];
@@ -359,13 +364,6 @@ const Store = {
     return digitoVerificador === digitoValidar;
   },
 
-  isValidEcuadorianPhone(phone) {
-    if (!phone || typeof phone !== 'string') return false;
-    const trimmed = phone.trim();
-    const regex = /^\+593[\s-]?[0-9]{9}$/;
-    return regex.test(trimmed);
-  },
-
   registerApiCard(card) {
     if (!card || !card.id) return null;
     if (!this.data.apiCardsCache) {
@@ -393,8 +391,8 @@ const Store = {
       era: (/base|jungle|fossil|rocket|gym|neo|1999|2000/i.test(setStr)) ? 'vintage' : 'modern',
       condicionPrincipal: 'psa10',
       certNumber: certCode,
-      imagenLocal: card.imagen || 'img/cards/card-back.png',
-      imagenFallbackUrl: card.imagen || 'img/cards/card-back.png',
+      imagenLocal: card.imagen || 'assets/img/cards/card-back.png',
+      imagenFallbackUrl: card.imagen || 'assets/img/cards/card-back.png',
       precioEstimado: basePrice,
       precios: {
         raw: Math.round(basePrice),

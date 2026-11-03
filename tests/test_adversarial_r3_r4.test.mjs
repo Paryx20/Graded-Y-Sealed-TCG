@@ -6,7 +6,7 @@
  * Objectives:
  * 1. R3 API Search Images, Pricing & Store Integration:
  *    - Verify zero broken card image paths (no charizard-base.png fallbacks,
- *      valid /high.webp formatting for TCGdex assets, fallback to img/cards/card-back.png).
+ *      valid /high.webp formatting for TCGdex assets, fallback to assets/img/cards/card-back.png).
  *    - Stress test pricing engine across 2,000+ randomized/adversarial card definitions:
  *      no static $15.00 placeholder, natural market tiers, vintage era and star character bonuses.
  *    - Verify end-to-end store integration: API search card -> Store registration ->
@@ -223,8 +223,8 @@ function createAdversarialEnvironment(options = {}) {
 // ==============================================================================
 
 test('R3 Adversarial [Suite 1.1]: card-back.png asset exists on disk and has non-zero byte size', () => {
-  const cardBackPath = path.join(process.cwd(), 'img/cards/card-back.png');
-  assert.ok(fs.existsSync(cardBackPath), `Asset img/cards/card-back.png must exist at: ${cardBackPath}`);
+  const cardBackPath = path.join(process.cwd(), 'assets/img/cards/card-back.png');
+  assert.ok(fs.existsSync(cardBackPath), `Asset assets/img/cards/card-back.png must exist at: ${cardBackPath}`);
   const stat = fs.statSync(cardBackPath);
   assert.ok(stat.size > 1000, `card-back.png must have valid non-trivial size, got: ${stat.size} bytes`);
 });
@@ -260,10 +260,10 @@ test('R3 Adversarial [Suite 1.3]: TCGdex image URL sanitation fuzzer across 500 
     { input: 'https://images.pokemontcg.io/base1/4.jpg', expected: 'https://images.pokemontcg.io/base1/4.jpg' },
 
     // 3. Falsy/Missing image -> fallback to verified card-back.png
-    { input: null, expected: 'img/cards/card-back.png' },
-    { input: undefined, expected: 'img/cards/card-back.png' },
-    { input: '', expected: 'img/cards/card-back.png' },
-    { input: false, expected: 'img/cards/card-back.png' }
+    { input: null, expected: 'assets/img/cards/card-back.png' },
+    { input: undefined, expected: 'assets/img/cards/card-back.png' },
+    { input: '', expected: 'assets/img/cards/card-back.png' },
+    { input: false, expected: 'assets/img/cards/card-back.png' }
   ];
 
   edgeCases.forEach(({ input, expected }, idx) => {
@@ -291,7 +291,7 @@ test('R3 Adversarial [Suite 1.3]: TCGdex image URL sanitation fuzzer across 500 
     assert.ok(typeof resultImg === 'string', 'Image must be string');
     assert.ok(!resultImg.includes('charizard-base.png'), 'Must never output charizard-base.png');
     if (isMissing) {
-      assert.equal(resultImg, 'img/cards/card-back.png');
+      assert.equal(resultImg, 'assets/img/cards/card-back.png');
     } else if (hasExt) {
       assert.ok(resultImg.endsWith(ext));
       assert.ok(!resultImg.endsWith(`${ext}/high.webp`), 'Must not double-append extension');
@@ -317,20 +317,20 @@ test('R3 Adversarial [Suite 1.4]: Primary source pokemontcg.io normalizer fallba
 
   assert.equal(normalized[0].imagen, 'https://images.pokemontcg.io/sm1/small.png');
   assert.equal(normalized[1].imagen, 'https://images.pokemontcg.io/sm2/large.png');
-  assert.equal(normalized[2].imagen, 'img/cards/card-back.png');
-  assert.equal(normalized[3].imagen, 'img/cards/card-back.png');
-  assert.equal(normalized[4].imagen, 'img/cards/card-back.png');
+  assert.equal(normalized[2].imagen, 'assets/img/cards/card-back.png');
+  assert.equal(normalized[3].imagen, 'assets/img/cards/card-back.png');
+  assert.equal(normalized[4].imagen, 'assets/img/cards/card-back.png');
 });
 
 test('R3 Adversarial [Suite 1.5]: SearchResultsView HTML renderer guarantees onerror fallback on all card items', () => {
   const { SearchResultsView } = createAdversarialEnvironment();
   const cards = [
     { id: 'c-1', nombre: 'Pikachu', set: 'Paldea', rareza: 'Common', imagen: 'https://assets.tcgdex.net/pika/high.webp', precioEstimado: 8.50, fuente: 'tcgdex.net' },
-    { id: 'c-2', nombre: 'Mew', set: '151', rareza: 'Ultra Rare', imagen: 'img/cards/card-back.png', precioEstimado: 45.00, fuente: 'pokemontcg.io' }
+    { id: 'c-2', nombre: 'Mew', set: '151', rareza: 'Ultra Rare', imagen: 'assets/img/cards/card-back.png', precioEstimado: 45.00, fuente: 'pokemontcg.io' }
   ];
 
   const html = SearchResultsView.renderResultsGrid(cards, 'Test');
-  assert.ok(html.includes("onerror=\"this.onerror=null; this.src='img/cards/card-back.png'\""), 'Must contain safe self-cancelling onerror handler');
+  assert.ok(html.includes("onerror=\"this.onerror=null; this.src='assets/img/cards/card-back.png'\""), 'Must contain safe self-cancelling onerror handler');
   assert.ok(!html.includes('charizard-base.png'), 'Must not reference charizard-base.png');
 });
 

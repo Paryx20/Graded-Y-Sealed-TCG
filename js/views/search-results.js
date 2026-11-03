@@ -33,7 +33,7 @@ const SearchResultsView = {
         <div class="bg-[#0F172A] text-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-800 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div class="inline-flex items-center gap-2 text-xs font-extrabold text-[#FEF3C7] uppercase tracking-wider mb-1">
-              <i data-lucide="cpu" class="w-3.5 h-3.5 text-[#D97706]"></i>
+              <i data-lucide="cpu" class="w-3.5 h-3.5 text-[#B45309]"></i>
               <span>Doble API con Failover Automático • 3-Tier Cascade</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black tracking-tight">Búsqueda Multifuente en Tiempo Real</h1>
@@ -42,7 +42,7 @@ const SearchResultsView = {
             </p>
           </div>
 
-          <div class="flex items-center gap-2 text-xs text-slate-400">
+          <div class="flex items-center gap-2 text-xs text-slate-500">
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1E293B] border border-slate-700 rounded-xl font-bold text-slate-200">
               <span class="w-2 h-2 rounded-full bg-[#059669] animate-ping"></span>
               <span>API Gateway Activo</span>
@@ -53,7 +53,7 @@ const SearchResultsView = {
         <!-- Search Bar with 400ms Debounce Input -->
         <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-xs border border-slate-200 mb-8">
           <form onsubmit="event.preventDefault(); SearchResultsView.submitForm();" class="relative flex items-center w-full" role="search">
-            <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-4 pointer-events-none"></i>
+            <i data-lucide="search" class="w-5 h-5 text-slate-500 absolute left-4 pointer-events-none"></i>
             <input 
               id="search-view-input"
               type="search"
@@ -74,7 +74,7 @@ const SearchResultsView = {
 
           <!-- Quick Suggestion Tags -->
           <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-            <span class="font-bold text-slate-400">Búsquedas rápidas:</span>
+            <span class="font-bold text-slate-500">Búsquedas rápidas:</span>
             <button type="button" onclick="SearchResultsView.quickSearch('Charizard')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Charizard</button>
             <button type="button" onclick="SearchResultsView.quickSearch('Umbreon')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Umbreon</button>
             <button type="button" onclick="SearchResultsView.quickSearch('Lugia')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Lugia</button>
@@ -278,8 +278,8 @@ const SearchResultsView = {
     const qEscaped = this._escapeHtml(query);
     return `
       <div id="search-zero-state" class="text-center py-16 px-4 bg-white rounded-2xl border border-slate-200 shadow-xs max-w-2xl mx-auto">
-        <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4">
-          <i data-lucide="search-x" class="w-8 h-8 text-[#E11D48]"></i>
+        <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="search-x" class="w-8 h-8 text-[#BE123C]"></i>
         </div>
         <h2 class="text-xl sm:text-2xl font-black text-[#0F172A] mb-2">No encontramos resultados para "${qEscaped}"</h2>
         <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-6">
@@ -288,7 +288,7 @@ const SearchResultsView = {
 
         <div class="bg-slate-50 rounded-xl p-4 text-left text-xs text-slate-600 border border-slate-100 mb-6 space-y-2">
           <p class="font-bold text-[#0F172A] flex items-center gap-1.5">
-            <i data-lucide="help-circle" class="w-4 h-4 text-[#D97706]"></i>
+            <i data-lucide="help-circle" class="w-4 h-4 text-[#B45309]"></i>
             <span>Recomendaciones para afinar tu búsqueda:</span>
           </p>
           <ul class="list-disc list-inside space-y-1 text-slate-500 pl-1">
@@ -299,11 +299,11 @@ const SearchResultsView = {
         </div>
 
         <div class="flex flex-wrap items-center justify-center gap-2">
-          <span class="text-xs text-slate-400 font-bold mr-1">Sugerencias:</span>
-          <button type="button" onclick="SearchResultsView.quickSearch('Charizard')" class="text-xs font-bold text-[#E11D48] hover:bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 transition">Charizard Base Set</button>
-          <button type="button" onclick="SearchResultsView.quickSearch('Umbreon')" class="text-xs font-bold text-[#E11D48] hover:bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 transition">Moonbreon Alt Art</button>
-          <button type="button" onclick="SearchResultsView.quickSearch('Lugia')" class="text-xs font-bold text-[#E11D48] hover:bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 transition">Lugia 1st Edition</button>
-          <a href="catalogo.html" class="text-xs font-bold text-slate-700 hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300 transition">Ver Catálogo Completo →</a>
+          <span class="text-xs text-slate-500 font-bold mr-1">Sugerencias:</span>
+          <button type="button" onclick="SearchResultsView.quickSearch('Charizard')" class="text-xs font-bold text-[#BE123C] hover:bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 transition">Charizard Base Set</button>
+          <button type="button" onclick="SearchResultsView.quickSearch('Umbreon')" class="text-xs font-bold text-[#BE123C] hover:bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 transition">Moonbreon Alt Art</button>
+          <button type="button" onclick="SearchResultsView.quickSearch('Lugia')" class="text-xs font-bold text-[#BE123C] hover:bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200 transition">Lugia 1st Edition</button>
+          <a href="pages/catalogo.html" class="text-xs font-bold text-slate-700 hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300 transition">Ver Catálogo Completo →</a>
         </div>
       </div>
     `;
@@ -317,7 +317,7 @@ const SearchResultsView = {
     return `
       <div class="text-center py-16 px-4 bg-white rounded-2xl border border-slate-200 shadow-xs max-w-xl mx-auto">
         <div class="w-16 h-16 rounded-full bg-slate-100 text-[#0F172A] flex items-center justify-center mx-auto mb-4">
-          <i data-lucide="sparkles" class="w-8 h-8 text-[#D97706]"></i>
+          <i data-lucide="sparkles" class="w-8 h-8 text-[#B45309]"></i>
         </div>
         <h2 class="text-xl font-black text-[#0F172A] mb-2">Comienza a escribir para buscar</h2>
         <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-6">
@@ -351,9 +351,9 @@ const SearchResultsView = {
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-600 bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-2xs">
           <div class="flex items-center gap-2">
             <span class="font-extrabold text-[#0F172A]">${total} ${total === 1 ? 'carta encontrada' : 'cartas encontradas'}</span>
-            ${query ? `<span class="text-slate-400">para "${qEscaped}"</span>` : ''}
+            ${query ? `<span class="text-slate-500">para "${qEscaped}"</span>` : ''}
           </div>
-          <div class="flex items-center gap-3 text-[11px] font-semibold text-slate-500">
+          <div class="flex items-center gap-3 text-xs font-semibold text-slate-500">
             <span class="flex items-center gap-1">
               <span class="w-2 h-2 rounded-full bg-[#059669]"></span>
               <span>pokemontcg.io</span>
@@ -403,7 +403,7 @@ const SearchResultsView = {
       <div class="card-item bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
         <div>
           <!-- Card Header / Source Badge -->
-          <div class="p-3 pb-0 flex items-center justify-between text-[10px]">
+          <div class="p-3 pb-0 flex items-center justify-between text-xs">
             <span class="font-extrabold uppercase px-2 py-0.5 rounded-full border ${badgeClass}">
               ${badgeText}
             </span>
@@ -416,10 +416,10 @@ const SearchResultsView = {
             class="p-4 flex items-center justify-center bg-gradient-to-b from-slate-50 to-white min-h-[220px] cursor-pointer"
           >
             <img 
-              src="${card.imagen || 'img/cards/card-back.png'}" 
+              src="${card.imagen || 'assets/img/cards/card-back.png'}" 
               alt="${this._escapeHtml(card.nombre)}" 
               class="max-h-48 w-auto object-contain drop-shadow group-hover:scale-105 transition-transform duration-300"
-              onerror="this.onerror=null; this.src='img/cards/card-back.png'"
+              onerror="this.onerror=null; this.src='assets/img/cards/card-back.png'"
               loading="lazy"
             />
           </div>
@@ -429,7 +429,7 @@ const SearchResultsView = {
             onclick="app.openProductPDP('${card.id}')"
             class="px-4 pb-2 cursor-pointer"
           >
-            <h3 class="text-sm font-extrabold text-[#0F172A] line-clamp-1 group-hover:text-[#E11D48] transition">
+            <h3 class="text-sm font-extrabold text-[#0F172A] line-clamp-1 group-hover:text-[#BE123C] transition">
               ${this._escapeHtml(card.nombre)}
             </h3>
             <p class="text-xs text-slate-500 mt-0.5">${this._escapeHtml(card.set || 'Expansión')}</p>
@@ -440,15 +440,15 @@ const SearchResultsView = {
         <div class="p-4 pt-3 border-t border-slate-100 bg-slate-50/60">
           <div class="flex items-baseline justify-between mb-3">
             <div>
-              <span class="text-[10px] uppercase font-bold text-slate-400 block">Cotización Est.</span>
+              <span class="text-xs uppercase font-bold text-slate-500 block">Cotización Est.</span>
               <span class="text-base font-black text-[#0F172A]">$${formattedPrice}</span>
             </div>
             ${matchedVaultProduct ? `
-              <span class="text-[10px] font-bold text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded">
+              <span class="text-xs font-bold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded">
                 En Custodia
               </span>
             ` : `
-              <span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded">
+              <span class="text-xs font-bold text-slate-600 bg-slate-200 px-2 py-0.5 rounded">
                 Mercado Global
               </span>
             `}

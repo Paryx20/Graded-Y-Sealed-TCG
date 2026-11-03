@@ -97,7 +97,7 @@ const CatalogView = {
         <div class="bg-[#0F172A] text-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-800 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div class="inline-flex items-center gap-2 text-xs font-extrabold text-[#FEF3C7] uppercase tracking-wider mb-1">
-              <i data-lucide="compass" class="w-3.5 h-3.5 text-[#D97706]"></i>
+              <i data-lucide="compass" class="w-3.5 h-3.5 text-[#B45309]"></i>
               <span>Exploración Libre y Filtrado Multicriterio</span>
             </div>
             <h1 id="catalog-main-title" class="text-2xl sm:text-3xl font-black tracking-tight">${this.getActiveTitle()}</h1>
@@ -129,13 +129,13 @@ const CatalogView = {
           >
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
               <div class="flex items-center gap-2">
-                <i data-lucide="filter" class="w-4 h-4 text-[#E11D48]"></i>
+                <i data-lucide="filter" class="w-4 h-4 text-[#BE123C]"></i>
                 <h2 class="text-sm font-black text-[#0F172A] uppercase tracking-wider">Filtros en Vivo</h2>
               </div>
               <button 
                 type="button" 
                 onclick="CatalogView.resetFilters()" 
-                class="text-xs font-extrabold text-[#E11D48] hover:text-[#BE123C] underline"
+                class="text-xs font-extrabold text-[#BE123C] hover:text-[#9F1239] underline"
               >
                 Limpiar filtros
               </button>
@@ -188,7 +188,7 @@ const CatalogView = {
                       value="${opt.id}"
                       ${f.edition === opt.id ? 'checked' : ''}
                       onchange="CatalogView.updateFilter('edition', '${opt.id}')"
-                      class="text-[#E11D48]"
+                      class="text-[#BE123C]"
                     />
                     <span class="font-semibold text-[#0F172A]">${opt.label}</span>
                   </label>
@@ -220,7 +220,7 @@ const CatalogView = {
               </span>
               <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label for="cat-min-price" class="text-[10px] font-bold text-slate-500 block mb-0.5">Desde $</label>
+                  <label for="cat-min-price" class="text-xs font-bold text-slate-500 block mb-0.5">Desde $</label>
                   <input 
                     type="number" 
                     id="cat-min-price" 
@@ -231,7 +231,7 @@ const CatalogView = {
                   />
                 </div>
                 <div>
-                  <label for="cat-max-price" class="text-[10px] font-bold text-slate-500 block mb-0.5">Hasta $</label>
+                  <label for="cat-max-price" class="text-xs font-bold text-slate-500 block mb-0.5">Hasta $</label>
                   <input 
                     type="number" 
                     id="cat-max-price" 
@@ -257,10 +257,10 @@ const CatalogView = {
             <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
                 <span>Mostrando <strong id="catalog-inline-count" class="text-[#0F172A]">${filtered.length}</strong> de ${PRODUCTS.length} activos en bóveda</span>
-                ${this.isVaultFallback ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Búsqueda en toda la Bóveda</span>` : ''}
+                ${this.isVaultFallback ? `<span class="px-2 py-0.5 rounded text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Búsqueda en toda la Bóveda</span>` : ''}
                 ${f.searchQuery ? `
                   <a href="${app.url('catalog', f.category !== 'all' ? { cat: f.category } : (f.era !== 'all' ? { era: f.era } : null))}"
-                     class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#0F172A] text-white text-[11px] font-bold hover:bg-[#1E293B]"
+                     class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#0F172A] text-white text-xs font-bold hover:bg-[#1E293B]"
                      aria-label="Quitar la búsqueda ${f.searchQuery} y ver todo el catálogo">
                     <span>Búsqueda: “${f.searchQuery}”</span>
                     <i data-lucide="x" class="w-3.5 h-3.5"></i>
@@ -296,7 +296,7 @@ const CatalogView = {
     if (items.length === 0) {
       return `
         <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3">
-          <div class="w-14 h-14 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+          <div class="w-14 h-14 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
             <i data-lucide="search-x" class="w-7 h-7"></i>
           </div>
           <h3 class="text-base font-black text-[#0F172A]">No encontramos piezas con esos criterios</h3>
@@ -320,12 +320,12 @@ const CatalogView = {
       const displayPrice = card.precios.raw;
 
       const badgeHtml = card.edicionEspecial
-        ? `<span class="px-2.5 py-0.5 text-[10px] font-black bg-[#E11D48] text-white rounded">EDICIÓN ESPECIAL</span>`
+        ? `<span class="px-2.5 py-0.5 text-xs font-black bg-[#E11D48] text-white rounded">EDICIÓN ESPECIAL</span>`
         : card.categoria === 'psa'
-        ? `<span class="px-2.5 py-0.5 text-[10px] font-black bg-[#FEF3C7] text-[#D97706] rounded">GRADO INVERSIÓN • OFICIAL PSA</span>`
+        ? `<span class="px-2.5 py-0.5 text-xs font-black bg-[#FEF3C7] text-[#B45309] rounded">GRADO INVERSIÓN • PSA</span>`
         : card.categoria === 'sealed'
-          ? `<span class="px-2.5 py-0.5 text-[10px] font-black bg-[#0F172A] text-[#FEF3C7] rounded">${card.era === 'vintage' ? 'SELLADO WOTC' : 'SELLADO DE FÁBRICA'}</span>`
-          : `<span class="px-2.5 py-0.5 text-[10px] font-black bg-slate-100 text-[#0F172A] rounded">SINGLE RAW NM</span>`;
+          ? `<span class="px-2.5 py-0.5 text-xs font-black bg-[#0F172A] text-[#FEF3C7] rounded">${card.era === 'vintage' ? 'SELLADO WOTC' : 'SELLADO DE FÁBRICA'}</span>`
+          : `<span class="px-2.5 py-0.5 text-xs font-black bg-slate-100 text-[#0F172A] rounded">SINGLE RAW NM</span>`;
 
       return `
         <article 
@@ -339,7 +339,7 @@ const CatalogView = {
           <div>
             <div class="flex items-center justify-between gap-1 mb-2.5">
               ${badgeHtml}
-              <span class="text-[11px] font-extrabold text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded flex items-center gap-0.5">
+              <span class="text-xs font-extrabold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded flex items-center gap-0.5">
                 <span>${card.tendencia12m}</span>
               </span>
             </div>
@@ -354,15 +354,15 @@ const CatalogView = {
             </div>
 
             <div class="mt-3">
-              <span class="inline-block text-[10px] font-bold text-slate-500 uppercase tracking-wider">${card.set} • ${card.tipo}</span>
-              <h3 class="font-extrabold text-sm sm:text-base text-[#0F172A] group-hover:text-[#E11D48] transition mt-0.5 line-clamp-1">${card.nombre}</h3>
+              <span class="inline-block text-xs font-bold text-slate-500 uppercase tracking-wider">${card.set} • ${card.tipo}</span>
+              <h3 class="font-extrabold text-sm sm:text-base text-[#0F172A] group-hover:text-[#BE123C] transition mt-0.5 line-clamp-1">${card.nombre}</h3>
               <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">${card.rareza} • Cert #${card.certNumber}</p>
             </div>
           </div>
 
           <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
             <div>
-              <span class="text-[10px] font-bold text-slate-500 block">${displayCond}</span>
+              <span class="text-xs font-bold text-slate-500 block">${displayCond}</span>
               <span class="text-base font-black text-[#0F172A]">$${Number(displayPrice || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
             </div>
             <span class="px-3.5 py-1.5 text-xs font-extrabold text-white bg-[#0F172A] group-hover:bg-[#E11D48] rounded-xl transition inline-flex items-center gap-1">

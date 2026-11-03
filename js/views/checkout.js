@@ -13,17 +13,17 @@ const CheckoutView = {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div class="bg-[#0F172A] text-white rounded-xl px-4 py-3 flex items-center justify-between mb-6 shadow-sm">
           <div class="flex items-center gap-2 text-xs font-bold">
-            <i data-lucide="lock" class="w-4 h-4 text-[#059669]"></i>
+            <i data-lucide="lock" class="w-4 h-4 text-[#047857]"></i>
             <span>Checkout Seguro TLS 256-bit • Graded &amp; Sealed TCG</span>
           </div>
-          <span class="text-[11px] text-slate-300">Conexión cifrada HTTPS</span>
+          <span class="text-xs text-slate-300">Conexión cifrada HTTPS</span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div class="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
               <h2 class="text-base font-black text-[#0F172A]">${user ? 'Sesión Activa' : 'Cuenta de Coleccionista'}</h2>
-              <span class="text-[10px] font-bold text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded">${user ? 'Verificado' : 'Obligatorio'}</span>
+              <span class="text-xs font-bold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded">${user ? 'Verificado' : 'Obligatorio'}</span>
             </div>
 
             ${user ? `
@@ -35,7 +35,7 @@ const CheckoutView = {
                   <div class="text-slate-500">Cédula/RUC: ${user.idCard || user.cedula_ruc || 'No registrada'}</div>
                   <div class="text-slate-500">Tel: ${user.phone || user.telefono || 'No registrado'}</div>
                 </div>
-                <a href="perfil.html" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
+                <a href="pages/perfil.html" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
                   <i data-lucide="user-check" class="w-4 h-4"></i>
                   <span>Ver Mi Perfil e Historial</span>
                 </a>
@@ -56,7 +56,7 @@ const CheckoutView = {
                     Iniciar Sesión y Precargar
                   </button>
                 </form>
-                <p class="text-[11px] text-slate-500">¿Primera compra? Completa el formulario de la derecha y tu cuenta se crea automáticamente.</p>
+                <p class="text-xs text-slate-500">¿Primera compra? Completa el formulario de la derecha y tu cuenta se crea automáticamente.</p>
               </div>
             `}
           </div>
@@ -67,7 +67,7 @@ const CheckoutView = {
                 <h1 class="text-lg font-black text-[#0F172A]">Datos de Facturación y Creación de Cuenta</h1>
                 <p class="text-xs text-slate-500 mt-0.5">Completa los datos para emitir tu factura electrónica y orden de custodia</p>
               </div>
-              <span class="text-[10px] font-bold text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded">Custodia Asegurada</span>
+              <span class="text-xs font-bold text-[#B45309] bg-[#FEF3C7] px-2 py-0.5 rounded">Custodia Asegurada</span>
             </div>
 
             <fieldset class="space-y-4">
@@ -136,7 +136,7 @@ const CheckoutView = {
                   <div class="sm:col-span-2">
                     <label for="checkout-password" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña para tu cuenta Graded &amp; Sealed: *</label>
                     <input type="password" id="checkout-password" autocomplete="new-password" placeholder="Mínimo 8 caracteres, con letras y números" minlength="8" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
-                    <span class="text-[10px] text-slate-500 mt-1 block">El checkout requiere cuenta registrada para emisión de comprobante fiscal y custodia certificada.</span>
+                    <span class="text-xs text-slate-500 mt-1 block">El checkout requiere cuenta registrada para emisión de comprobante fiscal y custodia certificada.</span>
                   </div>
                 `}
               </div>
@@ -147,33 +147,33 @@ const CheckoutView = {
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <label class="p-3.5 rounded-xl cursor-pointer flex flex-col justify-between transition ${isCourier ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
                   <div class="flex items-start gap-2.5">
-                    <input type="radio" name="delivery-method" value="courier" ${isCourier ? 'checked' : ''} onchange="CheckoutView.setDelivery('courier')" class="mt-0.5 text-[#E11D48]" />
+                    <input type="radio" name="delivery-method" value="courier" ${isCourier ? 'checked' : ''} onchange="CheckoutView.setDelivery('courier')" class="mt-0.5 text-[#BE123C]" />
                     <div>
                       <div class="text-xs font-bold text-[#0F172A]">Envío Nacional Blindado</div>
-                      <span class="text-xs font-black text-[#E11D48]">$5.00</span>
-                      <p class="text-[10px] text-slate-500 mt-0.5">Todo el Ecuador con empaque rígido y UV.</p>
+                      <span class="text-xs font-black text-[#BE123C]">$5.00</span>
+                      <p class="text-xs text-slate-500 mt-0.5">Todo el Ecuador con empaque rígido y UV.</p>
                     </div>
                   </div>
                 </label>
 
                 <label class="p-3.5 rounded-xl cursor-pointer flex flex-col justify-between transition ${isQuito ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
                   <div class="flex items-start gap-2.5">
-                    <input type="radio" name="delivery-method" value="quito" ${isQuito ? 'checked' : ''} onchange="CheckoutView.setDelivery('quito')" class="mt-0.5 text-[#E11D48]" />
+                    <input type="radio" name="delivery-method" value="quito" ${isQuito ? 'checked' : ''} onchange="CheckoutView.setDelivery('quito')" class="mt-0.5 text-[#BE123C]" />
                     <div>
                       <div class="text-xs font-bold text-[#0F172A]">Local Express (Quito)</div>
-                      <span class="text-xs font-black text-[#E11D48]">$3.00</span>
-                      <p class="text-[10px] text-slate-500 mt-0.5">Entrega express en el DMQ (24h).</p>
+                      <span class="text-xs font-black text-[#BE123C]">$3.00</span>
+                      <p class="text-xs text-slate-500 mt-0.5">Entrega express en el DMQ (24h).</p>
                     </div>
                   </div>
                 </label>
 
                 <label class="p-3.5 rounded-xl cursor-pointer flex flex-col justify-between transition ${isPickup ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
                   <div class="flex items-start gap-2.5">
-                    <input type="radio" name="delivery-method" value="pickup" ${isPickup ? 'checked' : ''} onchange="CheckoutView.setDelivery('pickup')" class="mt-0.5 text-[#E11D48]" />
+                    <input type="radio" name="delivery-method" value="pickup" ${isPickup ? 'checked' : ''} onchange="CheckoutView.setDelivery('pickup')" class="mt-0.5 text-[#BE123C]" />
                     <div>
                       <div class="text-xs font-bold text-[#0F172A]">Retiro en Local Físico</div>
-                      <span class="text-xs font-black text-[#059669]">$0.00 (Gratis)</span>
-                      <p class="text-[10px] text-slate-500 mt-0.5">Sucursal Central Quito. Pago en efectivo disponible.</p>
+                      <span class="text-xs font-black text-[#047857]">$0.00 (Gratis)</span>
+                      <p class="text-xs text-slate-500 mt-0.5">Sucursal Central Quito. Pago en efectivo disponible.</p>
                     </div>
                   </div>
                 </label>
@@ -186,7 +186,7 @@ const CheckoutView = {
                 <div class="p-4 rounded-xl border border-[#0F172A] bg-[#F8FAFC] space-y-3">
                   <label class="flex items-center justify-between cursor-pointer">
                     <div class="flex items-center gap-3">
-                      <input type="radio" name="payment-method" value="card" checked class="text-[#E11D48]" />
+                      <input type="radio" name="payment-method" value="card" checked class="text-[#BE123C]" />
                       <div>
                         <span class="text-sm font-bold text-[#0F172A]">Tarjeta de Crédito / Débito</span>
                         <span class="text-xs text-slate-500 block">Visa, Mastercard</span>
@@ -204,7 +204,7 @@ const CheckoutView = {
                       <label for="card-number" class="block text-xs font-bold text-slate-700 mb-1">Número de tarjeta:</label>
                       <div data-field class="flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden">
                         <input type="text" id="card-number" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000" oninput="CheckoutView.formatCardNumber(this)" class="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none font-mono tracking-wide" />
-                        <span id="card-brand" class="px-3 text-[11px] font-black text-slate-400 uppercase"></span>
+                        <span id="card-brand" class="px-3 text-xs font-black text-slate-500 uppercase"></span>
                       </div>
                     </div>
                     <div>
@@ -220,13 +220,13 @@ const CheckoutView = {
 
                 <label class="p-3.5 rounded-xl border flex items-center justify-between transition ${isPickup ? 'border-slate-300 bg-white cursor-pointer hover:bg-slate-50' : 'border-slate-200 bg-slate-100 opacity-60 cursor-not-allowed'}">
                   <div class="flex items-center gap-3">
-                    <input type="radio" name="payment-method" id="payment-cash-input" value="cash" ${isPickup ? '' : 'disabled'} class="text-[#E11D48]" />
+                    <input type="radio" name="payment-method" id="payment-cash-input" value="cash" ${isPickup ? '' : 'disabled'} class="text-[#BE123C]" />
                     <div>
-                      <span class="text-sm font-bold ${isPickup ? 'text-[#0F172A]' : 'text-slate-500'}">Efectivo al retirar en tienda (Cash)</span>
-                      <span class="text-xs text-slate-400 block">${isPickup ? 'Paga directamente en ventanilla de bóveda al retirar' : 'Solo disponible seleccionando "Retiro en Local Físico"'}</span>
+                      <span class="text-sm font-bold ${isPickup ? 'text-[#0F172A]' : 'text-slate-600'}">Efectivo al retirar en tienda (Cash)</span>
+                      <span class="text-xs text-slate-600 block">${isPickup ? 'Paga directamente en ventanilla de bóveda al retirar' : 'Solo disponible seleccionando "Retiro en Local Físico"'}</span>
                     </div>
                   </div>
-                  <i data-lucide="banknote" class="w-5 h-5 text-slate-400"></i>
+                  <i data-lucide="banknote" class="w-5 h-5 text-slate-500"></i>
                 </label>
               </div>
             </fieldset>
@@ -240,7 +240,7 @@ const CheckoutView = {
                 <i data-lucide="lock" class="w-5 h-5"></i>
                 <span>Proceder al Pago ($${total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD)</span>
               </button>
-              <p class="text-center text-[11px] text-slate-400 mt-3 flex items-center justify-center gap-1.5">
+              <p class="text-center text-xs text-slate-500 mt-3 flex items-center justify-center gap-1.5">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                 <span>Proyecto académico: el pago es simulado y no se realiza ningún cargo real.</span>
               </p>
@@ -258,7 +258,7 @@ const CheckoutView = {
         <div class="max-w-3xl mx-auto px-4 pt-10 text-center">
           <h1 class="text-lg font-black text-[#0F172A]">No hay una orden recién procesada</h1>
           <p class="text-sm text-slate-600 mt-1">Cuando completes una compra verás aquí su resumen.</p>
-          <a href="catalogo.html" class="mt-4 inline-block px-5 py-2.5 bg-[#E11D48] text-white text-xs font-bold rounded-xl">Ir al Catálogo</a>
+          <a href="pages/catalogo.html" class="mt-4 inline-block px-5 py-2.5 bg-[#E11D48] text-white text-xs font-bold rounded-xl">Ir al Catálogo</a>
         </div>
       `;
     }
@@ -268,18 +268,18 @@ const CheckoutView = {
     return `
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm text-center">
-          <div class="w-16 h-16 rounded-full bg-[#D1FAE5] text-[#059669] flex items-center justify-center mx-auto mb-4">
+          <div class="w-16 h-16 rounded-full bg-[#D1FAE5] text-[#047857] flex items-center justify-center mx-auto mb-4">
             <i data-lucide="check-circle-2" class="w-10 h-10"></i>
           </div>
 
           <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">¡Orden confirmada con éxito!</h1>
-          <div class="inline-block px-3 py-1 bg-[#FEF3C7] text-[#D97706] font-mono font-bold text-sm rounded-md mt-2">
+          <div class="inline-block px-3 py-1 bg-[#FEF3C7] text-[#B45309] font-mono font-bold text-sm rounded-md mt-2">
             Número de Orden: ${order.orderId}
           </div>
 
           ${isCash ? `
             <div class="my-4 p-4 bg-[#FEF3C7]/60 border border-[#D97706]/40 rounded-xl text-[#0F172A] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2">
-              <i data-lucide="store" class="w-5 h-5 text-[#D97706] flex-shrink-0"></i>
+              <i data-lucide="store" class="w-5 h-5 text-[#B45309] flex-shrink-0"></i>
               <span>Orden reservada. Realiza el pago en ventanilla al retirar en Sucursal Central Quito.</span>
             </div>
           ` : ''}
@@ -307,7 +307,7 @@ const CheckoutView = {
             </div>
             <div class="flex justify-between font-black text-base text-[#0F172A] border-t border-slate-300 pt-2">
               <span>Total Pagado (${order.paymentMethod}):</span>
-              <span class="text-[#E11D48]">$${order.total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
+              <span class="text-[#BE123C]">$${order.total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
             </div>
           </div>
 
@@ -321,7 +321,7 @@ const CheckoutView = {
               <span>Ver Seguimiento del Pedido</span>
             </button>
             <a 
-              href="perfil.html" 
+              href="pages/perfil.html" 
               class="px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-[#0F172A] text-xs sm:text-sm font-bold rounded-xl transition flex items-center gap-2 touch-target"
             >
               <i data-lucide="history" class="w-4 h-4"></i>
@@ -342,12 +342,12 @@ const CheckoutView = {
     return `
       <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm text-center">
-          <div class="w-16 h-16 rounded-full bg-rose-100 text-[#E11D48] flex items-center justify-center mx-auto mb-4">
+          <div class="w-16 h-16 rounded-full bg-rose-100 text-[#BE123C] flex items-center justify-center mx-auto mb-4">
             <i data-lucide="credit-card" class="w-9 h-9"></i>
           </div>
 
           <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">No pudimos procesar tu pago</h1>
-          <div class="inline-block px-3 py-1 bg-rose-100 text-[#E11D48] font-mono font-bold text-xs rounded-md mt-2">
+          <div class="inline-block px-3 py-1 bg-rose-100 text-[#BE123C] font-mono font-bold text-xs rounded-md mt-2">
             Código bancario: ${err.code}
           </div>
 
@@ -355,7 +355,7 @@ const CheckoutView = {
             <h2 class="text-xs font-black text-rose-900 uppercase tracking-wider">${err.title}</h2>
             <p class="text-xs sm:text-sm text-rose-800 leading-relaxed">${err.message}</p>
             ${err.cardLast4 ? `<p class="text-xs text-rose-700">Tarjeta ${err.brand || ''} terminada en <strong>${err.cardLast4}</strong></p>` : ''}
-            <div class="flex items-center gap-1.5 text-[#059669] text-xs font-bold pt-1">
+            <div class="flex items-center gap-1.5 text-[#047857] text-xs font-bold pt-1">
               <i data-lucide="shield-check" class="w-4 h-4"></i>
               <span>No se realizó ningún cargo y la orden no fue creada. Tu bolsa sigue intacta.</span>
             </div>
@@ -363,7 +363,7 @@ const CheckoutView = {
 
           <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="checkout.html"
+              href="pages/checkout.html"
               class="px-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
             >
               <i data-lucide="credit-card" class="w-4 h-4"></i>
@@ -399,14 +399,14 @@ const CheckoutView = {
             <button 
               type="button" 
               onclick="CheckoutView.switchAuthTab('login')" 
-              class="flex-1 py-2.5 text-xs font-extrabold border-b-2 transition ${isLogin ? 'border-[#E11D48] text-[#0F172A]' : 'border-transparent text-slate-400 hover:text-[#0F172A]'}"
+              class="flex-1 py-2.5 text-xs font-extrabold border-b-2 transition ${isLogin ? 'border-[#E11D48] text-[#0F172A]' : 'border-transparent text-slate-500 hover:text-[#0F172A]'}"
             >
               Iniciar Sesión
             </button>
             <button 
               type="button" 
               onclick="CheckoutView.switchAuthTab('register')" 
-              class="flex-1 py-2.5 text-xs font-extrabold border-b-2 transition ${!isLogin ? 'border-[#E11D48] text-[#0F172A]' : 'border-transparent text-slate-400 hover:text-[#0F172A]'}"
+              class="flex-1 py-2.5 text-xs font-extrabold border-b-2 transition ${!isLogin ? 'border-[#E11D48] text-[#0F172A]' : 'border-transparent text-slate-500 hover:text-[#0F172A]'}"
             >
               Crear Cuenta
             </button>
@@ -428,7 +428,7 @@ const CheckoutView = {
             </form>
             <p class="text-center text-xs text-slate-500 mt-4">
               ¿Aún no tienes cuenta?
-              <button type="button" onclick="CheckoutView.switchAuthTab('register')" class="font-extrabold text-[#E11D48] hover:underline">Regístrate aquí</button>
+              <button type="button" onclick="CheckoutView.switchAuthTab('register')" class="font-extrabold text-[#BE123C] hover:underline">Regístrate aquí</button>
             </p>
           ` : `
             <form onsubmit="event.preventDefault(); CheckoutView.submitRegister();" class="space-y-3.5" novalidate>

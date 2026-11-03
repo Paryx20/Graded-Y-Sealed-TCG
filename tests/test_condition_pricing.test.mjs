@@ -218,7 +218,7 @@ test('R2 Pricing [Test 2.3]: Defensive pricing engine calculates deterministic c
     set: 'Neo Genesis',
     rareza: 'Holo Rare',
     precioEstimado: 100, // Base Price = 100
-    imagen: 'img/cards/card-back.png'
+    imagen: 'assets/img/cards/card-back.png'
   };
 
   const registeredProduct = Store.registerApiCard(apiCard);

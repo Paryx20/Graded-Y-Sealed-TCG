@@ -319,13 +319,13 @@ test('TC-T1-R2-05 [R2]: Empty search state suppresses automated timeline progres
 
 // --- Requirement R3: Catalog Image Updates in data.js (5 tests) ---
 
-test('TC-T1-R3-01 [R3]: Product gengar-scarlet-violet specifies img/cards/gengar-holo-scarlet.png in js/data.js', () => {
+test('TC-T1-R3-01 [R3]: Product gengar-scarlet-violet specifies assets/img/cards/gengar-holo-scarlet.png in js/data.js', () => {
   const dataPath = path.join(ROOT_DIR, 'js/data.js');
   const code = fs.readFileSync(dataPath, 'utf8');
 
   assert.ok(
-    code.includes('img/cards/gengar-holo-scarlet.png'),
-    'js/data.js must reference img/cards/gengar-holo-scarlet.png'
+    code.includes('assets/img/cards/gengar-holo-scarlet.png'),
+    'js/data.js must reference assets/img/cards/gengar-holo-scarlet.png'
   );
   assert.ok(
     !code.includes('img/gengar-vmax.png'),
@@ -333,13 +333,13 @@ test('TC-T1-R3-01 [R3]: Product gengar-scarlet-violet specifies img/cards/gengar
   );
 });
 
-test('TC-T1-R3-02 [R3]: Product mewtwo-151 specifies img/cards/mewto-holo-rare.png in js/data.js', () => {
+test('TC-T1-R3-02 [R3]: Product mewtwo-151 specifies assets/img/cards/mewto-holo-rare.png in js/data.js', () => {
   const dataPath = path.join(ROOT_DIR, 'js/data.js');
   const code = fs.readFileSync(dataPath, 'utf8');
 
   assert.ok(
-    code.includes('img/cards/mewto-holo-rare.png'),
-    'js/data.js must reference img/cards/mewto-holo-rare.png'
+    code.includes('assets/img/cards/mewto-holo-rare.png'),
+    'js/data.js must reference assets/img/cards/mewto-holo-rare.png'
   );
   assert.ok(
     !code.includes('img/mewtwo-base.png'),
@@ -347,13 +347,13 @@ test('TC-T1-R3-02 [R3]: Product mewtwo-151 specifies img/cards/mewto-holo-rare.p
   );
 });
 
-test('TC-T1-R3-03 [R3]: Product mimikyu-paldean specifies img/cards/mimikyu-rare.png in js/data.js', () => {
+test('TC-T1-R3-03 [R3]: Product mimikyu-paldean specifies assets/img/cards/mimikyu-rare.png in js/data.js', () => {
   const dataPath = path.join(ROOT_DIR, 'js/data.js');
   const code = fs.readFileSync(dataPath, 'utf8');
 
   assert.ok(
-    code.includes('img/cards/mimikyu-rare.png'),
-    'js/data.js must reference img/cards/mimikyu-rare.png'
+    code.includes('assets/img/cards/mimikyu-rare.png'),
+    'js/data.js must reference assets/img/cards/mimikyu-rare.png'
   );
   assert.ok(
     !code.includes('img/umbreon-vmax.png'),
@@ -361,26 +361,26 @@ test('TC-T1-R3-03 [R3]: Product mimikyu-paldean specifies img/cards/mimikyu-rare
   );
 });
 
-test('TC-T1-R3-04 [R3]: Product booster-box-fossil-1999 specifies img/sealed/Paquete fossil.png in js/data.js', () => {
+test('TC-T1-R3-04 [R3]: Product booster-box-fossil-1999 specifies assets/img/sealed/paquete-fossil.png in js/data.js', () => {
   const dataPath = path.join(ROOT_DIR, 'js/data.js');
   const code = fs.readFileSync(dataPath, 'utf8');
 
   assert.ok(
-    code.includes('img/sealed/Paquete fossil.png'),
-    'js/data.js must reference img/sealed/Paquete fossil.png'
+    code.includes('assets/img/sealed/paquete-fossil.png'),
+    'js/data.js must reference assets/img/sealed/paquete-fossil.png'
   );
   assert.ok(
-    !code.includes('img/sealed/team-rocket-box-front.png'),
-    'js/data.js must not reference old placeholder img/sealed/team-rocket-box-front.png'
+    !code.includes('assets/img/sealed/team-rocket-box-front.png'),
+    'js/data.js must not reference old placeholder assets/img/sealed/team-rocket-box-front.png'
   );
 });
 
 test('TC-T1-R3-05 [R3]: All four newly linked image assets exist physically on disk with non-zero byte size', () => {
   const requiredAssets = [
-    'img/cards/gengar-holo-scarlet.png',
-    'img/cards/mewto-holo-rare.png',
-    'img/cards/mimikyu-rare.png',
-    'img/sealed/Paquete fossil.png'
+    'assets/img/cards/gengar-holo-scarlet.png',
+    'assets/img/cards/mewto-holo-rare.png',
+    'assets/img/cards/mimikyu-rare.png',
+    'assets/img/sealed/paquete-fossil.png'
   ];
 
   for (const assetRelPath of requiredAssets) {
@@ -628,13 +628,13 @@ test('TC-T3-R3-01 [R3 Boundary]: Asset path containing spaces renders valid HTML
   const fossilProduct = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999') || {
     id: 'booster-box-fossil-1999',
     nombre: 'Booster Pack Fossil 1999',
-    imagenLocal: 'img/sealed/Paquete fossil.png',
+    imagenLocal: 'assets/img/sealed/paquete-fossil.png',
     categoria: 'sealed'
   };
 
   const cardHtml = CatalogView.renderProductCard(fossilProduct);
-  assert.ok(cardHtml.includes('Paquete fossil.png'), 'Card HTML must include asset path with space');
-  assert.ok(cardHtml.includes('src="img/sealed/Paquete fossil.png"') || cardHtml.includes("src='img/sealed/Paquete fossil.png'"),
+  assert.ok(cardHtml.includes('paquete-fossil.png'), 'Card HTML must include asset path with space');
+  assert.ok(cardHtml.includes('src="assets/img/sealed/paquete-fossil.png"') || cardHtml.includes("src='assets/img/sealed/paquete-fossil.png'"),
     'src attribute must be properly quoted');
 });
 
@@ -643,7 +643,7 @@ test('TC-T3-R3-02 [R3 Boundary]: Simulated image 404 triggers onerror fallback t
   const cardHtml = CatalogView.renderProductCard({
     id: 'test-card',
     nombre: 'Test Card',
-    imagenLocal: 'img/cards/gengar-holo-scarlet.png',
+    imagenLocal: 'assets/img/cards/gengar-holo-scarlet.png',
     imagenFallbackUrl: 'https://images.pokemontcg.io/fallback.png',
     precios: { raw: 10 }
   });
@@ -656,7 +656,7 @@ test('TC-T3-R3-03 [R3 Boundary]: Product database sync in js/db/db-client.js mat
   if (fs.existsSync(dbClientPath)) {
     const code = fs.readFileSync(dbClientPath, 'utf8');
     assert.ok(
-      code.includes('img/cards/gengar-holo-scarlet.png') || !code.includes('gengar-vmax.png'),
+      code.includes('assets/img/cards/gengar-holo-scarlet.png') || !code.includes('gengar-vmax.png'),
       'db-client.js must synchronize new Gengar asset or eliminate old placeholder'
     );
   }
@@ -667,10 +667,10 @@ test('TC-T3-R3-04 [R3 Boundary]: Sealed product multi-angle gallery specifies va
   const fossilProduct = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999');
 
   if (fossilProduct && fossilProduct.galeria_sellada) {
-    assert.equal(fossilProduct.galeria_sellada.frontal, 'img/sealed/booster-box-fossil-1999/frontal.svg');
-    assert.equal(fossilProduct.galeria_sellada.perspectiva, 'img/sealed/Paquete fossil.png');
-    assert.equal(fossilProduct.galeria_sellada.lateral, 'img/sealed/booster-box-fossil-1999/lateral.svg');
-    assert.equal(fossilProduct.galeria_sellada.superior, 'img/sealed/booster-box-fossil-1999/superior.svg');
+    assert.equal(fossilProduct.galeria_sellada.frontal, 'assets/img/sealed/booster-box-fossil-1999/frontal.svg');
+    assert.equal(fossilProduct.galeria_sellada.perspectiva, 'assets/img/sealed/paquete-fossil.png');
+    assert.equal(fossilProduct.galeria_sellada.lateral, 'assets/img/sealed/booster-box-fossil-1999/lateral.svg');
+    assert.equal(fossilProduct.galeria_sellada.superior, 'assets/img/sealed/booster-box-fossil-1999/superior.svg');
   }
 });
 
@@ -790,7 +790,7 @@ test('TC-T3-02 [Cross-Feature]: Catalog Image Assets + PDP Multi-Angle Gallery +
   // 1. Find Fossil sealed item and verify updated image
   const fossil = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999');
   assert.ok(fossil, 'Fossil booster must exist in catalog');
-  assert.equal(fossil.imagenLocal, 'img/sealed/Paquete fossil.png', 'Catalog must link new Fossil asset');
+  assert.equal(fossil.imagenLocal, 'assets/img/sealed/paquete-fossil.png', 'Catalog must link new Fossil asset');
 
   // 2. Add item to cart
   Store.data.cart = [{
@@ -876,7 +876,7 @@ test('TC-T4-01 [Real-World]: Collector Dynamic Onboarding & First Order Journey'
   // Step 2: Browses catalog, selects Gengar Holo card
   const gengar = PRODUCTS.find(p => p.id === 'gengar-scarlet-violet');
   assert.ok(gengar);
-  assert.equal(gengar.imagenLocal, 'img/cards/gengar-holo-scarlet.png');
+  assert.equal(gengar.imagenLocal, 'assets/img/cards/gengar-holo-scarlet.png');
 
   // Step 3: Adds PSA 10 grade to cart
   const psa10Price = gengar.precios?.psa10 || 28.00;
@@ -960,10 +960,10 @@ test('TC-T4-03 [Real-World]: Payment Decline Recovery & Safe Completion Journey'
   const mewtwo = PRODUCTS.find(p => p.id === 'mewtwo-151') || {
     id: 'mewtwo-151',
     nombre: 'Mewtwo 151 Holo Rare',
-    imagenLocal: 'img/cards/mewto-holo-rare.png',
+    imagenLocal: 'assets/img/cards/mewto-holo-rare.png',
     precios: { raw: 45.00 }
   };
-  assert.equal(mewtwo.imagenLocal, 'img/cards/mewto-holo-rare.png');
+  assert.equal(mewtwo.imagenLocal, 'assets/img/cards/mewto-holo-rare.png');
 
   Store.data.cart = [{
     id: mewtwo.id,

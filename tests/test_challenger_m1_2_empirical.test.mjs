@@ -4,7 +4,7 @@
  * File: tests/test_challenger_m1_2_empirical.test.mjs
  * 
  * Challenge Scope:
- * 1. File path with space: `img/sealed/Paquete fossil.png` URI encoding & HTML quotes
+ * 1. File path with space: `assets/img/sealed/paquete-fossil.png` URI encoding & HTML quotes
  * 2. Spelling of Mewtwo file: `mewto-holo-rare.png` exact disk match vs codebase
  * 3. Fallback simulation: `onerror` execution, recursion immunity, and fallback paths
  * 4. Cart addition & removal: thumbnail path preservation across lifecycles
@@ -123,25 +123,25 @@ function createSandbox() {
 }
 
 // ============================================================================
-// CHALLENGE 1: File path with space (`img/sealed/Paquete fossil.png`)
+// CHALLENGE 1: File path with space (`assets/img/sealed/paquete-fossil.png`)
 // ============================================================================
 
-test('CH-01: Asset file `img/sealed/Paquete fossil.png` exists with correct casing and non-zero bytes', () => {
-  const filePath = path.join(ROOT_DIR, 'img/sealed/Paquete fossil.png');
-  assert.ok(fs.existsSync(filePath), 'File `img/sealed/Paquete fossil.png` must exist physically on disk');
+test('CH-01: Asset file `assets/img/sealed/paquete-fossil.png` exists with correct casing and non-zero bytes', () => {
+  const filePath = path.join(ROOT_DIR, 'assets/img/sealed/paquete-fossil.png');
+  assert.ok(fs.existsSync(filePath), 'File `assets/img/sealed/paquete-fossil.png` must exist physically on disk');
   
   const stats = fs.statSync(filePath);
   assert.ok(stats.size > 500000, `File size (${stats.size} bytes) must be substantial for a high-res image`);
 
   // Verify exact casing in directory listing
-  const dirFiles = fs.readdirSync(path.join(ROOT_DIR, 'img/sealed'));
-  assert.ok(dirFiles.includes('Paquete fossil.png'), 'Directory must contain exact casing `Paquete fossil.png`');
+  const dirFiles = fs.readdirSync(path.join(ROOT_DIR, 'assets/img/sealed'));
+  assert.ok(dirFiles.includes('paquete-fossil.png'), 'Directory must contain exact casing `Paquete fossil.png`');
 });
 
-test('CH-02: `img/sealed/Paquete fossil.png` URL round-trip encoding does not corrupt disk resolution', () => {
-  const relPath = 'img/sealed/Paquete fossil.png';
+test('CH-02: `assets/img/sealed/paquete-fossil.png` URL round-trip encoding does not corrupt disk resolution', () => {
+  const relPath = 'assets/img/sealed/paquete-fossil.png';
   const encoded = encodeURI(relPath);
-  assert.equal(encoded, 'img/sealed/Paquete%20fossil.png', 'Space must encode to %20');
+  assert.equal(encoded, 'assets/img/sealed/paquete-fossil.png', 'Space must encode to %20');
 
   const decoded = decodeURIComponent(encoded);
   assert.equal(decoded, relPath, 'Decoded URI must match original disk path exactly');
@@ -155,16 +155,16 @@ test('CH-03: `js/data.js` product `booster-box-fossil-1999` specifies space path
   const fossil = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999');
   assert.ok(fossil, 'Product booster-box-fossil-1999 must exist in catalog');
 
-  assert.equal(fossil.imagenLocal, 'img/sealed/Paquete fossil.png');
-  assert.equal(fossil.imagenFallbackUrl, 'img/sealed/Paquete fossil.png');
+  assert.equal(fossil.imagenLocal, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(fossil.imagenFallbackUrl, 'assets/img/sealed/paquete-fossil.png');
   assert.ok(fossil.galeria_sellada, 'Must have galeria_sellada');
-  assert.equal(fossil.galeria_sellada.frontal, 'img/sealed/booster-box-fossil-1999/frontal.svg');
-  assert.equal(fossil.galeria_sellada.perspectiva, 'img/sealed/Paquete fossil.png');
-  assert.equal(fossil.galeria_sellada.lateral, 'img/sealed/booster-box-fossil-1999/lateral.svg');
-  assert.equal(fossil.galeria_sellada.superior, 'img/sealed/booster-box-fossil-1999/superior.svg');
+  assert.equal(fossil.galeria_sellada.frontal, 'assets/img/sealed/booster-box-fossil-1999/frontal.svg');
+  assert.equal(fossil.galeria_sellada.perspectiva, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(fossil.galeria_sellada.lateral, 'assets/img/sealed/booster-box-fossil-1999/lateral.svg');
+  assert.equal(fossil.galeria_sellada.superior, 'assets/img/sealed/booster-box-fossil-1999/superior.svg');
 });
 
-test('CH-04: `CatalogView.render()` quotes `src="img/sealed/Paquete fossil.png"` preventing attribute truncation', () => {
+test('CH-04: `CatalogView.render()` quotes `src="assets/img/sealed/paquete-fossil.png"` preventing attribute truncation', () => {
   const { CatalogView, Store } = createSandbox();
   Store.data.catalogFilters = {
     category: 'all',
@@ -178,17 +178,17 @@ test('CH-04: `CatalogView.render()` quotes `src="img/sealed/Paquete fossil.png"`
   };
 
   const html = CatalogView.render();
-  assert.ok(html.includes('Paquete fossil.png'), 'CatalogView output must include Paquete fossil.png');
+  assert.ok(html.includes('paquete-fossil.png'), 'CatalogView output must include Paquete fossil.png');
 
   // Verify that the src attribute is strictly quoted with double quotes
   assert.ok(
-    html.includes('src="img/sealed/Paquete fossil.png"'),
+    html.includes('src="assets/img/sealed/paquete-fossil.png"'),
     'src attribute must be strictly double-quoted to prevent space from terminating attribute'
   );
 
-  // Verify no unquoted space truncation occurred (e.g. src=img/sealed/Paquete fossil.png)
+  // Verify no unquoted space truncation occurred (e.g. src=assets/img/sealed/paquete-fossil.png)
   assert.ok(
-    !html.includes('src=img/sealed/Paquete fossil.png'),
+    !html.includes('src=assets/img/sealed/paquete-fossil.png'),
     'Must NOT contain unquoted attribute with space'
   );
 });
@@ -202,11 +202,11 @@ test('CH-05: `PDPView.renderSealedGalleryStage()` quotes image src across all ga
   for (const angle of angles) {
     const html = PDPView.renderSealedGalleryStage(fossil, angle);
     assert.ok(
-      html.includes('src="img/sealed/Paquete fossil.png"'),
-      `Angle ${angle} must render double-quoted src="img/sealed/Paquete fossil.png"`
+      html.includes('src="assets/img/sealed/paquete-fossil.png"'),
+      `Angle ${angle} must render double-quoted src="assets/img/sealed/paquete-fossil.png"`
     );
     assert.ok(
-      html.includes("onerror=\"this.onerror=null; this.src='img/sealed/Paquete fossil.png'\""),
+      html.includes("onerror=\"this.onerror=null; this.src='assets/img/sealed/paquete-fossil.png'\""),
       `Angle ${angle} onerror handler must be properly quoted without syntax errors`
     );
   }
@@ -217,13 +217,13 @@ test('CH-05: `PDPView.renderSealedGalleryStage()` quotes image src across all ga
 // ============================================================================
 
 test('CH-06: Physical disk file is strictly `mewto-holo-rare.png` (without `w` after `t`)', () => {
-  const correctDiskPath = path.join(ROOT_DIR, 'img/cards/mewto-holo-rare.png');
-  const incorrectDiskPath = path.join(ROOT_DIR, 'img/cards/mewtwo-holo-rare.png');
+  const correctDiskPath = path.join(ROOT_DIR, 'assets/img/cards/mewto-holo-rare.png');
+  const incorrectDiskPath = path.join(ROOT_DIR, 'assets/img/cards/mewtwo-holo-rare.png');
 
-  assert.ok(fs.existsSync(correctDiskPath), 'File img/cards/mewto-holo-rare.png must exist');
-  assert.ok(!fs.existsSync(incorrectDiskPath), 'File img/cards/mewtwo-holo-rare.png must NOT exist on disk');
+  assert.ok(fs.existsSync(correctDiskPath), 'File assets/img/cards/mewto-holo-rare.png must exist');
+  assert.ok(!fs.existsSync(incorrectDiskPath), 'File assets/img/cards/mewtwo-holo-rare.png must NOT exist on disk');
 
-  const files = fs.readdirSync(path.join(ROOT_DIR, 'img/cards'));
+  const files = fs.readdirSync(path.join(ROOT_DIR, 'assets/img/cards'));
   assert.ok(files.includes('mewto-holo-rare.png'), 'Exact directory entry must be mewto-holo-rare.png');
   assert.ok(!files.includes('mewtwo-holo-rare.png'), 'Directory must NOT contain mewtwo-holo-rare.png');
 });
@@ -232,13 +232,13 @@ test('CH-07: Product `mewtwo-151` in `js/data.js` and `js/db/db-client.js` use e
   const { PRODUCTS } = createSandbox();
   const mewtwo = PRODUCTS.find(p => p.id === 'mewtwo-151');
   assert.ok(mewtwo, 'Product mewtwo-151 must exist in catalog');
-  assert.equal(mewtwo.imagenLocal, 'img/cards/mewto-holo-rare.png');
+  assert.equal(mewtwo.imagenLocal, 'assets/img/cards/mewto-holo-rare.png');
 
   // Verify db-client.js
   const dbCode = fs.readFileSync(path.join(ROOT_DIR, 'js/db/db-client.js'), 'utf8');
   assert.ok(
-    dbCode.includes("'img/cards/mewto-holo-rare.png'"),
-    'db-client.js must reference exact spelling img/cards/mewto-holo-rare.png'
+    dbCode.includes("'assets/img/cards/mewto-holo-rare.png'"),
+    'db-client.js must reference exact spelling assets/img/cards/mewto-holo-rare.png'
   );
 });
 
@@ -318,9 +318,9 @@ test('CH-10: Simulated execution of `onerror` clears handler and applies fallbac
     }
   }
 
-  const fallbackTarget = 'img/cards/card-back.png';
+  const fallbackTarget = 'assets/img/cards/card-back.png';
   const img = new SimulatedImage(
-    'img/cards/non-existent-card.png',
+    'assets/img/cards/non-existent-card.png',
     `this.onerror=null; this.src='${fallbackTarget}';`
   );
 
@@ -335,9 +335,9 @@ test('CH-10: Simulated execution of `onerror` clears handler and applies fallbac
   assert.equal(img.onerror, null, 'img.onerror remains null, preventing recursion');
 });
 
-test('CH-11: Resilient fallback asset `img/cards/card-back.png` exists on disk', () => {
-  const cardBackPath = path.join(ROOT_DIR, 'img/cards/card-back.png');
-  assert.ok(fs.existsSync(cardBackPath), 'Universal fallback img/cards/card-back.png must exist');
+test('CH-11: Resilient fallback asset `assets/img/cards/card-back.png` exists on disk', () => {
+  const cardBackPath = path.join(ROOT_DIR, 'assets/img/cards/card-back.png');
+  assert.ok(fs.existsSync(cardBackPath), 'Universal fallback assets/img/cards/card-back.png must exist');
   assert.ok(fs.statSync(cardBackPath).size > 10000, 'Universal fallback card-back.png must have valid size');
 });
 
@@ -359,7 +359,7 @@ test('CH-12: Adding Gengar to cart via PDP retains valid thumbnail path', () => 
   const item = Store.data.cart[0];
   assert.equal(item.id, 'gengar-scarlet-violet-psa10');
   assert.equal(item.quantity, 2);
-  assert.equal(item.imageLocal, 'img/cards/gengar-holo-scarlet.png');
+  assert.equal(item.imageLocal, 'assets/img/cards/gengar-holo-scarlet.png');
   assert.ok(fs.existsSync(path.join(ROOT_DIR, item.imageLocal)), 'Cart item imageLocal must exist on disk');
 });
 
@@ -376,7 +376,7 @@ test('CH-13: Adding Mewtwo to cart via PDP retains valid thumbnail path', () => 
   assert.equal(Store.data.cart.length, 1);
   const item = Store.data.cart[0];
   assert.equal(item.id, 'mewtwo-151-psa9');
-  assert.equal(item.imageLocal, 'img/cards/mewto-holo-rare.png');
+  assert.equal(item.imageLocal, 'assets/img/cards/mewto-holo-rare.png');
   assert.ok(fs.existsSync(path.join(ROOT_DIR, item.imageLocal)), 'Cart item imageLocal must exist on disk');
 });
 
@@ -394,7 +394,7 @@ test('CH-14: Adding Mimikyu to cart via PDP retains valid thumbnail path', () =>
   const item = Store.data.cart[0];
   assert.equal(item.id, 'mimikyu-paldean-raw');
   assert.equal(item.quantity, 3);
-  assert.equal(item.imageLocal, 'img/cards/mimikyu-rare.png');
+  assert.equal(item.imageLocal, 'assets/img/cards/mimikyu-rare.png');
   assert.ok(fs.existsSync(path.join(ROOT_DIR, item.imageLocal)), 'Cart item imageLocal must exist on disk');
 });
 
@@ -410,7 +410,7 @@ test('CH-15: Adding Fossil to cart via PDP retains space path and sealed frontal
   assert.equal(Store.data.cart.length, 1);
   const item = Store.data.cart[0];
   assert.equal(item.id, 'booster-box-fossil-1999-sealed');
-  assert.equal(item.imageLocal, 'img/sealed/Paquete fossil.png');
+  assert.equal(item.imageLocal, 'assets/img/sealed/paquete-fossil.png');
   assert.ok(fs.existsSync(path.join(ROOT_DIR, item.imageLocal)), 'Cart item imageLocal must exist on disk');
 });
 
@@ -436,10 +436,10 @@ test('CH-16: `CartView.render()` renders all 4 items with valid image paths and 
 
   const cartHtml = CartView.render();
 
-  assert.ok(cartHtml.includes('src="img/cards/gengar-holo-scarlet.png"'), 'Gengar thumbnail rendered');
-  assert.ok(cartHtml.includes('src="img/cards/mewto-holo-rare.png"'), 'Mewtwo thumbnail rendered');
-  assert.ok(cartHtml.includes('src="img/cards/mimikyu-rare.png"'), 'Mimikyu thumbnail rendered');
-  assert.ok(cartHtml.includes('src="img/sealed/Paquete fossil.png"'), 'Fossil thumbnail rendered with space');
+  assert.ok(cartHtml.includes('src="assets/img/cards/gengar-holo-scarlet.png"'), 'Gengar thumbnail rendered');
+  assert.ok(cartHtml.includes('src="assets/img/cards/mewto-holo-rare.png"'), 'Mewtwo thumbnail rendered');
+  assert.ok(cartHtml.includes('src="assets/img/cards/mimikyu-rare.png"'), 'Mimikyu thumbnail rendered');
+  assert.ok(cartHtml.includes('src="assets/img/sealed/paquete-fossil.png"'), 'Fossil thumbnail rendered with space');
 
   // Verify none of the src attributes are broken or unquoted
   const srcMatches = cartHtml.match(/src="[^"]+"/g) || [];
@@ -461,7 +461,7 @@ test('CH-17: Cart quantity adjustments and item removals preserve remaining thum
   app.updateCartQuantity('gengar-scarlet-violet-psa10', 2);
   const gengarItem = Store.data.cart.find(c => c.id === 'gengar-scarlet-violet-psa10');
   assert.equal(gengarItem.quantity, 3);
-  assert.equal(gengarItem.imageLocal, 'img/cards/gengar-holo-scarlet.png');
+  assert.equal(gengarItem.imageLocal, 'assets/img/cards/gengar-holo-scarlet.png');
 
   // Remove Mewtwo directly from cart
   app.removeFromCart('mewtwo-151-psa10');
@@ -469,9 +469,9 @@ test('CH-17: Cart quantity adjustments and item removals preserve remaining thum
   assert.ok(!Store.data.cart.some(c => c.id === 'mewtwo-151-psa10'));
 
   // Remaining items still retain correct paths
-  assert.equal(Store.data.cart.find(c => c.id === 'gengar-scarlet-violet-psa10').imageLocal, 'img/cards/gengar-holo-scarlet.png');
-  assert.equal(Store.data.cart.find(c => c.id === 'mimikyu-paldean-psa10').imageLocal, 'img/cards/mimikyu-rare.png');
-  assert.equal(Store.data.cart.find(c => c.id === 'booster-box-fossil-1999-sealed').imageLocal, 'img/sealed/Paquete fossil.png');
+  assert.equal(Store.data.cart.find(c => c.id === 'gengar-scarlet-violet-psa10').imageLocal, 'assets/img/cards/gengar-holo-scarlet.png');
+  assert.equal(Store.data.cart.find(c => c.id === 'mimikyu-paldean-psa10').imageLocal, 'assets/img/cards/mimikyu-rare.png');
+  assert.equal(Store.data.cart.find(c => c.id === 'booster-box-fossil-1999-sealed').imageLocal, 'assets/img/sealed/paquete-fossil.png');
 
   // Remove Fossil
   app.removeFromCart('booster-box-fossil-1999-sealed');
@@ -494,7 +494,7 @@ test('CH-18: Cart serialization to localStorage preserves spaces and special pat
   Store.saveCart();
   const serialized = sandbox1.localStorage.getItem('gstcg_cart');
   assert.ok(serialized, 'Cart data must be serialized in localStorage');
-  assert.ok(serialized.includes('img/sealed/Paquete fossil.png'), 'Serialized JSON must preserve space in path');
+  assert.ok(serialized.includes('assets/img/sealed/paquete-fossil.png'), 'Serialized JSON must preserve space in path');
 
   // Simulate new page load with saved cart
   const sandbox2 = createSandbox();
@@ -504,6 +504,6 @@ test('CH-18: Cart serialization to localStorage preserves spaces and special pat
   assert.equal(sandbox2.Store.data.cart.length, 2);
   const reloadedFossil = sandbox2.Store.data.cart.find(c => c.id === 'booster-box-fossil-1999-sealed');
   assert.ok(reloadedFossil, 'Fossil item reloaded from localStorage');
-  assert.equal(reloadedFossil.imageLocal, 'img/sealed/Paquete fossil.png');
+  assert.equal(reloadedFossil.imageLocal, 'assets/img/sealed/paquete-fossil.png');
   assert.ok(fs.existsSync(path.join(ROOT_DIR, reloadedFossil.imageLocal)), 'Reloaded path must exist on disk');
 });

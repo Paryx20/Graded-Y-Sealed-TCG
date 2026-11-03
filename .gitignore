@@ -1,0 +1,20 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno
+.env
+.env.*
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editores y configuración local
+.vscode/
+.idea/
+.claude/settings.local.json

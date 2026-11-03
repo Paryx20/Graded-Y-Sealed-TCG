@@ -172,7 +172,7 @@ test('R3 API Search [Test 3.1]: TCGdex image normalizer formats /high.webp and r
   assert.equal(normalized[1].imagen, 'https://images.pokemontcg.io/base1/4.png');
 
   // Assert fallback to verified local asset, NEVER nonexistent charizard-base.png
-  assert.equal(normalized[2].imagen, 'img/cards/card-back.png');
+  assert.equal(normalized[2].imagen, 'assets/img/cards/card-back.png');
   assert.ok(!JSON.stringify(normalized).includes('charizard-base.png'), 'Must never reference nonexistent charizard-base.png');
 });
 
@@ -288,7 +288,7 @@ test('R3 API Search [Test 3.5]: SearchResultsView pre-registers cards and routes
 
   // Verify image does not use charizard-base.png
   assert.ok(!html.includes('charizard-base.png'));
-  assert.ok(html.includes('img/cards/card-back.png'));
+  assert.ok(html.includes('assets/img/cards/card-back.png'));
 });
 
 test('R3 API Search [Test 3.6]: app.openProductPDP loads API-discovered card with 3D viewer and renders view', () => {

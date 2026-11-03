@@ -212,7 +212,7 @@ class PokemonAPI {
       nombre: c.name || 'Sin Nombre',
       set: c.set?.name || 'Expansion',
       rareza: c.rarity || 'Coleccionable',
-      imagen: c.images?.small || c.images?.large || 'img/cards/card-back.png',
+      imagen: c.images?.small || c.images?.large || 'assets/img/cards/card-back.png',
       precioEstimado: this.calculateRealisticPrice(c),
       fuente: 'pokemontcg.io'
     }));
@@ -231,7 +231,7 @@ class PokemonAPI {
     });
 
     return sorted.slice(0, 12).map(c => {
-      let img = 'img/cards/card-back.png';
+      let img = 'assets/img/cards/card-back.png';
       if (c.image) {
         img = (c.image.endsWith('.webp') || c.image.endsWith('.png') || c.image.endsWith('.jpg'))
           ? c.image
@@ -266,7 +266,7 @@ class PokemonAPI {
       nombre: p.nombre || 'Pieza de Bóveda',
       set: p.set || 'Bóveda Local',
       rareza: p.rareza || 'Vault Asset',
-      imagen: p.imagenLocal || p.imagenFallbackUrl || 'img/cards/card-back.png',
+      imagen: p.imagenLocal || p.imagenFallbackUrl || 'assets/img/cards/card-back.png',
       precioEstimado: p.precios
         ? (p.precios.psa10 || p.precios.raw || 50.00)
         : 50.00,

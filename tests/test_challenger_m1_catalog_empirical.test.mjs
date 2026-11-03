@@ -160,10 +160,10 @@ function createChallengeSandbox() {
 
 test('CHALLENGE-1.1 [Assets]: 4 updated image files physically exist on disk', () => {
   const assets = [
-    'img/cards/gengar-holo-scarlet.png',
-    'img/cards/mewto-holo-rare.png',
-    'img/cards/mimikyu-rare.png',
-    'img/sealed/Paquete fossil.png'
+    'assets/img/cards/gengar-holo-scarlet.png',
+    'assets/img/cards/mewto-holo-rare.png',
+    'assets/img/cards/mimikyu-rare.png',
+    'assets/img/sealed/paquete-fossil.png'
   ];
 
   for (const relPath of assets) {
@@ -174,10 +174,10 @@ test('CHALLENGE-1.1 [Assets]: 4 updated image files physically exist on disk', (
 
 test('CHALLENGE-1.2 [Assets]: 4 updated image files exceed 100KB minimum size threshold', () => {
   const assets = [
-    { relPath: 'img/cards/gengar-holo-scarlet.png', minBytes: 100 * 1024 },
-    { relPath: 'img/cards/mewto-holo-rare.png', minBytes: 100 * 1024 },
-    { relPath: 'img/cards/mimikyu-rare.png', minBytes: 100 * 1024 },
-    { relPath: 'img/sealed/Paquete fossil.png', minBytes: 100 * 1024 }
+    { relPath: 'assets/img/cards/gengar-holo-scarlet.png', minBytes: 100 * 1024 },
+    { relPath: 'assets/img/cards/mewto-holo-rare.png', minBytes: 100 * 1024 },
+    { relPath: 'assets/img/cards/mimikyu-rare.png', minBytes: 100 * 1024 },
+    { relPath: 'assets/img/sealed/paquete-fossil.png', minBytes: 100 * 1024 }
   ];
 
   for (const { relPath, minBytes } of assets) {
@@ -192,10 +192,10 @@ test('CHALLENGE-1.2 [Assets]: 4 updated image files exceed 100KB minimum size th
 
 test('CHALLENGE-1.3 [Assets]: 4 updated image files are authentic valid PNGs with magic header', () => {
   const assets = [
-    'img/cards/gengar-holo-scarlet.png',
-    'img/cards/mewto-holo-rare.png',
-    'img/cards/mimikyu-rare.png',
-    'img/sealed/Paquete fossil.png'
+    'assets/img/cards/gengar-holo-scarlet.png',
+    'assets/img/cards/mewto-holo-rare.png',
+    'assets/img/cards/mimikyu-rare.png',
+    'assets/img/sealed/paquete-fossil.png'
   ];
 
   for (const relPath of assets) {
@@ -214,36 +214,36 @@ test('CHALLENGE-2.1 [Data]: Gengar, Mewtwo, Mimikyu, Fossil specify exact asset 
 
   const gengar = PRODUCTS.find(p => p.id === 'gengar-scarlet-violet');
   assert.ok(gengar, 'gengar-scarlet-violet must exist in PRODUCTS');
-  assert.equal(gengar.imagenLocal, 'img/cards/gengar-holo-scarlet.png');
-  assert.equal(gengar.imagenFallbackUrl, 'img/cards/gengar-holo-scarlet.png');
+  assert.equal(gengar.imagenLocal, 'assets/img/cards/gengar-holo-scarlet.png');
+  assert.equal(gengar.imagenFallbackUrl, 'assets/img/cards/gengar-holo-scarlet.png');
 
   const mewtwo = PRODUCTS.find(p => p.id === 'mewtwo-151');
   assert.ok(mewtwo, 'mewtwo-151 must exist in PRODUCTS');
-  assert.equal(mewtwo.imagenLocal, 'img/cards/mewto-holo-rare.png');
-  assert.equal(mewtwo.imagenFallbackUrl, 'img/cards/mewto-holo-rare.png');
+  assert.equal(mewtwo.imagenLocal, 'assets/img/cards/mewto-holo-rare.png');
+  assert.equal(mewtwo.imagenFallbackUrl, 'assets/img/cards/mewto-holo-rare.png');
 
   const mimikyu = PRODUCTS.find(p => p.id === 'mimikyu-paldean');
   assert.ok(mimikyu, 'mimikyu-paldean must exist in PRODUCTS');
-  assert.equal(mimikyu.imagenLocal, 'img/cards/mimikyu-rare.png');
-  assert.equal(mimikyu.imagenFallbackUrl, 'img/cards/mimikyu-rare.png');
+  assert.equal(mimikyu.imagenLocal, 'assets/img/cards/mimikyu-rare.png');
+  assert.equal(mimikyu.imagenFallbackUrl, 'assets/img/cards/mimikyu-rare.png');
 
   const fossil = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999');
   assert.ok(fossil, 'booster-box-fossil-1999 must exist in PRODUCTS');
-  assert.equal(fossil.imagenLocal, 'img/sealed/Paquete fossil.png');
-  assert.equal(fossil.imagenFallbackUrl, 'img/sealed/Paquete fossil.png');
+  assert.equal(fossil.imagenLocal, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(fossil.imagenFallbackUrl, 'assets/img/sealed/paquete-fossil.png');
   assert.ok(fossil.galeria_sellada, 'fossil must have galeria_sellada object');
-  assert.equal(fossil.galeria_sellada.frontal, 'img/sealed/Paquete fossil.png');
-  assert.equal(fossil.galeria_sellada.perspectiva, 'img/sealed/Paquete fossil.png');
-  assert.equal(fossil.galeria_sellada.lateral, 'img/sealed/Paquete fossil.png');
+  assert.equal(fossil.galeria_sellada.frontal, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(fossil.galeria_sellada.perspectiva, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(fossil.galeria_sellada.lateral, 'assets/img/sealed/paquete-fossil.png');
 });
 
 test('CHALLENGE-2.2 [Data]: js/db/db-client.js synchronizes initial seed records with updated images', () => {
   const dbClientPath = path.join(ROOT_DIR, 'js/db/db-client.js');
   const code = fs.readFileSync(dbClientPath, 'utf8');
 
-  assert.ok(code.includes('img/cards/gengar-holo-scarlet.png'), 'db-client.js must include gengar asset');
-  assert.ok(code.includes('img/cards/mewto-holo-rare.png'), 'db-client.js must include mewto asset');
-  assert.ok(code.includes('img/cards/mimikyu-rare.png'), 'db-client.js must include mimikyu asset');
+  assert.ok(code.includes('assets/img/cards/gengar-holo-scarlet.png'), 'db-client.js must include gengar asset');
+  assert.ok(code.includes('assets/img/cards/mewto-holo-rare.png'), 'db-client.js must include mewto asset');
+  assert.ok(code.includes('assets/img/cards/mimikyu-rare.png'), 'db-client.js must include mimikyu asset');
 });
 
 // ==============================================================================
@@ -264,10 +264,10 @@ test('CHALLENGE-3.1 [DOM - Catalog Grid]: CatalogView.renderCardsGrid renders al
   assert.ok(!gridHtml.includes('src=""'), 'Grid HTML must never have empty src=""');
   assert.ok(!gridHtml.includes('alt="undefined"'), 'Grid HTML must never have alt="undefined"');
 
-  assert.ok(gridHtml.includes('src="img/cards/gengar-holo-scarlet.png"'), 'Must render Gengar card image');
-  assert.ok(gridHtml.includes('src="img/cards/mewto-holo-rare.png"'), 'Must render Mewtwo card image');
-  assert.ok(gridHtml.includes('src="img/cards/mimikyu-rare.png"'), 'Must render Mimikyu card image');
-  assert.ok(gridHtml.includes('src="img/sealed/Paquete fossil.png"'), 'Must render Fossil booster pack image with space');
+  assert.ok(gridHtml.includes('src="assets/img/cards/gengar-holo-scarlet.png"'), 'Must render Gengar card image');
+  assert.ok(gridHtml.includes('src="assets/img/cards/mewto-holo-rare.png"'), 'Must render Mewtwo card image');
+  assert.ok(gridHtml.includes('src="assets/img/cards/mimikyu-rare.png"'), 'Must render Mimikyu card image');
+  assert.ok(gridHtml.includes('src="assets/img/sealed/paquete-fossil.png"'), 'Must render Fossil booster pack image with space');
 });
 
 test('CHALLENGE-3.2 [DOM - PDP Single Card 3D Inspector]: Raw condition renders 3D card front and authentic back', () => {
@@ -277,7 +277,7 @@ test('CHALLENGE-3.2 [DOM - PDP Single Card 3D Inspector]: Raw condition renders 
   for (const card of singleCards) {
     const rawStageHtml = PDPView.renderInspectorStage(card, 'raw', 'raw');
     assert.ok(rawStageHtml.includes(`src="${card.imagenLocal}"`), `Stage must render ${card.imagenLocal}`);
-    assert.ok(rawStageHtml.includes('img/cards/card-back.png'), 'Stage must render authentic card back');
+    assert.ok(rawStageHtml.includes('assets/img/cards/card-back.png'), 'Stage must render authentic card back');
     assert.ok(!rawStageHtml.includes('undefined'), 'Stage must contain zero undefined strings');
   }
 });
@@ -302,14 +302,14 @@ test('CHALLENGE-3.4 [DOM - PDP Sealed Gallery]: Multi-angle gallery renders fron
   const angles = ['frontal', 'perspectiva', 'lateral'];
   for (const angle of angles) {
     const galleryHtml = PDPView.renderSealedGalleryStage(fossil, angle);
-    assert.ok(galleryHtml.includes('src="img/sealed/Paquete fossil.png"'), `Gallery angle ${angle} must render image`);
+    assert.ok(galleryHtml.includes('src="assets/img/sealed/paquete-fossil.png"'), `Gallery angle ${angle} must render image`);
     assert.ok(!galleryHtml.includes('undefined'), `Gallery angle ${angle} must contain zero undefined strings`);
     assert.ok(!galleryHtml.includes('src=""'), `Gallery angle ${angle} must not have empty src`);
   }
 
   // Boundary check: invalid angle falls back safely to frontal image
   const fallbackHtml = PDPView.renderSealedGalleryStage(fossil, 'unknown_angle');
-  assert.ok(fallbackHtml.includes('src="img/sealed/Paquete fossil.png"'), 'Invalid angle must fallback to frontal asset');
+  assert.ok(fallbackHtml.includes('src="assets/img/sealed/paquete-fossil.png"'), 'Invalid angle must fallback to frontal asset');
 });
 
 test('CHALLENGE-3.5 [DOM - Spotlight Search]: renderLiveSearchDropdown renders thumbnails for all 4 products', () => {
@@ -317,10 +317,10 @@ test('CHALLENGE-3.5 [DOM - Spotlight Search]: renderLiveSearchDropdown renders t
   const dropdown = elements.get('search-live-dropdown');
 
   const searchCases = [
-    { query: 'gengar', expectedSrc: 'img/cards/gengar-holo-scarlet.png' },
-    { query: 'mewtwo', expectedSrc: 'img/cards/mewto-holo-rare.png' },
-    { query: 'mimikyu', expectedSrc: 'img/cards/mimikyu-rare.png' },
-    { query: 'fossil', expectedSrc: 'img/sealed/Paquete fossil.png' }
+    { query: 'gengar', expectedSrc: 'assets/img/cards/gengar-holo-scarlet.png' },
+    { query: 'mewtwo', expectedSrc: 'assets/img/cards/mewto-holo-rare.png' },
+    { query: 'mimikyu', expectedSrc: 'assets/img/cards/mimikyu-rare.png' },
+    { query: 'fossil', expectedSrc: 'assets/img/sealed/paquete-fossil.png' }
   ];
 
   for (const { query, expectedSrc } of searchCases) {
@@ -361,10 +361,10 @@ test('CHALLENGE-3.6 [DOM - Cart]: CartView.render accurately renders added items
 
   const cartHtml = CartView.render();
 
-  assert.ok(cartHtml.includes('src="img/cards/gengar-holo-scarlet.png"'), 'Cart must render Gengar image');
-  assert.ok(cartHtml.includes('src="img/cards/mewto-holo-rare.png"'), 'Cart must render Mewtwo image');
-  assert.ok(cartHtml.includes('src="img/cards/mimikyu-rare.png"'), 'Cart must render Mimikyu image');
-  assert.ok(cartHtml.includes('src="img/sealed/Paquete fossil.png"'), 'Cart must render Fossil image');
+  assert.ok(cartHtml.includes('src="assets/img/cards/gengar-holo-scarlet.png"'), 'Cart must render Gengar image');
+  assert.ok(cartHtml.includes('src="assets/img/cards/mewto-holo-rare.png"'), 'Cart must render Mewtwo image');
+  assert.ok(cartHtml.includes('src="assets/img/cards/mimikyu-rare.png"'), 'Cart must render Mimikyu image');
+  assert.ok(cartHtml.includes('src="assets/img/sealed/paquete-fossil.png"'), 'Cart must render Fossil image');
 
   assert.ok(!cartHtml.includes('src="undefined"'), 'Cart must not contain src="undefined"');
   assert.ok(!cartHtml.includes('alt="undefined"'), 'Cart must not contain alt="undefined"');
@@ -386,10 +386,10 @@ test('CHALLENGE-4.1 [Stress - Space in Filename]: Space in "Paquete fossil.png" 
   const srcRegex = /src="([^"]+)"/g;
   
   const gridMatches = [...gridHtml.matchAll(srcRegex)].map(m => m[1]);
-  assert.ok(gridMatches.some(s => s === 'img/sealed/Paquete fossil.png'), 'Grid must contain exactly quoted path');
+  assert.ok(gridMatches.some(s => s === 'assets/img/sealed/paquete-fossil.png'), 'Grid must contain exactly quoted path');
 
   const pdpMatches = [...pdpHtml.matchAll(srcRegex)].map(m => m[1]);
-  assert.ok(pdpMatches.some(s => s === 'img/sealed/Paquete fossil.png'), 'PDP gallery must contain exactly quoted path');
+  assert.ok(pdpMatches.some(s => s === 'assets/img/sealed/paquete-fossil.png'), 'PDP gallery must contain exactly quoted path');
 });
 
 test('CHALLENGE-4.2 [Stress - onerror Recursion Defense]: All img elements have onerror nullification to prevent infinite loops', () => {
@@ -442,10 +442,10 @@ test('CHALLENGE-4.3 [Stress - Extreme Cart Operations]: Rapid addition, quantity
 
   assert.equal(gengarCart.quantity, 50);
   assert.equal(fossilCart.quantity, 100);
-  assert.equal(gengarCart.imageLocal, 'img/cards/gengar-holo-scarlet.png');
-  assert.equal(fossilCart.imageLocal, 'img/sealed/Paquete fossil.png');
+  assert.equal(gengarCart.imageLocal, 'assets/img/cards/gengar-holo-scarlet.png');
+  assert.equal(fossilCart.imageLocal, 'assets/img/sealed/paquete-fossil.png');
 
   const renderedCart = CartView.render();
-  assert.ok(renderedCart.includes('src="img/cards/gengar-holo-scarlet.png"'));
-  assert.ok(renderedCart.includes('src="img/sealed/Paquete fossil.png"'));
+  assert.ok(renderedCart.includes('src="assets/img/cards/gengar-holo-scarlet.png"'));
+  assert.ok(renderedCart.includes('src="assets/img/sealed/paquete-fossil.png"'));
 });

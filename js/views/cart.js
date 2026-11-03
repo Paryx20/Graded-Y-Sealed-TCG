@@ -11,8 +11,8 @@ const CartView = {
             <p class="text-xs text-slate-500 mt-0.5">Revisa tus piezas certificadas antes de proceder al pago</p>
           </div>
           <a 
-            href="catalogo.html" 
-            class="text-xs font-extrabold text-[#E11D48] hover:text-[#BE123C] flex items-center gap-1"
+            href="pages/catalogo.html" 
+            class="text-xs font-extrabold text-[#BE123C] hover:text-[#9F1239] flex items-center gap-1"
           >
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
             <span>Continuar explorando</span>
@@ -27,7 +27,7 @@ const CartView = {
                   <i data-lucide="shopping-bag" class="w-14 h-14 mx-auto mb-3 text-slate-300"></i>
                   <h2 class="font-extrabold text-base text-[#0F172A]">Tu bolsa de compras está vacía</h2>
                   <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Añade cartas coleccionables, slabs PSA o booster packs para iniciar tu orden.</p>
-                  <a href="catalogo.html" class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-extrabold rounded-xl shadow-sm transition">
+                  <a href="pages/catalogo.html" class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-extrabold rounded-xl shadow-sm transition">
                     <i data-lucide="compass" class="w-4 h-4"></i>
                     <span>Explorar Catálogo</span>
                   </a>
@@ -43,7 +43,7 @@ const CartView = {
                     />
                     <div>
                       <h3 class="font-extrabold text-sm text-[#0F172A]">${item.name}</h3>
-                      <span class="text-xs text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded font-bold inline-block mt-1">${item.condition}</span>
+                      <span class="text-xs text-[#B45309] bg-[#FEF3C7] px-2 py-0.5 rounded font-bold inline-block mt-1">${item.condition}</span>
                       <span class="text-xs font-black text-[#0F172A] block sm:hidden mt-1.5">$${(item.price * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                     </div>
                   </div>
@@ -72,7 +72,7 @@ const CartView = {
                     <button 
                       type="button" 
                       onclick="app.requestRemoveItem('${item.id}')" 
-                      class="p-2 text-[#E11D48] hover:text-[#BE123C] hover:bg-rose-50 rounded-xl transition"
+                      class="p-2 text-[#BE123C] hover:text-[#9F1239] hover:bg-rose-50 rounded-xl transition"
                       aria-label="Eliminar ${item.name} de la bolsa"
                     >
                       <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -83,7 +83,7 @@ const CartView = {
             </div>
 
             <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start gap-4 shadow-sm">
-              <div class="w-12 h-12 rounded-xl bg-[#FEF3C7] border border-[#D97706]/30 flex items-center justify-center flex-shrink-0 text-[#D97706]">
+              <div class="w-12 h-12 rounded-xl bg-[#FEF3C7] border border-[#D97706]/30 flex items-center justify-center flex-shrink-0 text-[#B45309]">
                 <i data-lucide="package" class="w-6 h-6"></i>
               </div>
               <div>
@@ -112,7 +112,7 @@ const CartView = {
                 <span class="font-bold text-[#0F172A]">$${tax.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
               </div>
 
-              <div class="flex justify-between text-[#059669] text-xs font-extrabold">
+              <div class="flex justify-between text-[#047857] text-xs font-extrabold">
                 <span>Seguro de custodia y bóveda:</span>
                 <span>GRATIS</span>
               </div>
@@ -124,14 +124,14 @@ const CartView = {
             </div>
 
             <a 
-              href="checkout.html" 
+              href="pages/checkout.html" 
               class="w-full mt-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-extrabold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
             >
               <span>Proceder al Pago</span>
               <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
 
-            <p class="text-[11px] text-slate-500 text-center mt-3 flex items-center justify-center gap-1">
+            <p class="text-xs text-slate-500 text-center mt-3 flex items-center justify-center gap-1">
               <i data-lucide="lock" class="w-3 h-3"></i>
               <span>Transacción encriptada TLS 256-bit</span>
             </p>

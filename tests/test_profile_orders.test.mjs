@@ -480,7 +480,7 @@ test('Feature 24 [R5]: Real Checkout Order Attaches Tracking Metadata and Takes 
       { title: '4. Entregado', subtitle: 'Recepción', date: 'Pendiente', status: 'pending' }
     ],
     items: [
-      { name: 'Pikachu Illustrator', condition: 'PSA 10', quantity: 1, price: 750, imageLocal: 'img/cards/card-back.png' }
+      { name: 'Pikachu Illustrator', condition: 'PSA 10', quantity: 1, price: 750, imageLocal: 'assets/img/cards/card-back.png' }
     ]
   };
 

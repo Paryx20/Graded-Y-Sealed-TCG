@@ -36,12 +36,6 @@ const app = {
       });
     }
 
-    // Enlaces antiguos del sitio de una sola página (index.html#catalog?cat=psa)
-    const legacy = window.location.hash.match(/^#([a-z-]+)(?:\?(.*))?$/);
-    if (legacy && this.PAGES[legacy[1]]) {
-      window.location.replace(this.url(legacy[1], legacy[2] || ''));
-      return;
-    }
     const container = document.getElementById('app-view');
     if (container) container.setAttribute('aria-busy', 'true');
     Store.loadCatalogFromServer().finally(() => {
@@ -53,16 +47,16 @@ const app = {
   // Cada vista es una página HTML independiente
   PAGES: {
     home: 'index.html',
-    catalog: 'catalogo.html',
-    pdp: 'producto.html',
-    cart: 'carrito.html',
-    checkout: 'checkout.html',
-    confirmation: 'confirmacion.html',
-    error: 'pago-rechazado.html',
-    auth: 'login.html',
-    profile: 'perfil.html',
-    tracking: 'tracking.html',
-    'search-results': 'busqueda.html'
+    catalog: 'pages/catalogo.html',
+    pdp: 'pages/producto.html',
+    cart: 'pages/carrito.html',
+    checkout: 'pages/checkout.html',
+    confirmation: 'pages/confirmacion.html',
+    error: 'pages/pago-rechazado.html',
+    auth: 'pages/login.html',
+    profile: 'pages/perfil.html',
+    tracking: 'pages/seguimiento.html',
+    'search-results': 'pages/busqueda.html'
   },
 
   url(route, params) {
@@ -241,8 +235,8 @@ const app = {
         condition,
         price,
         quantity: units,
-        imageLocal: imageLocal || 'img/cards/card-back.png',
-        imageFallback: imageFallback || 'img/cards/card-back.png'
+        imageLocal: imageLocal || 'assets/img/cards/card-back.png',
+        imageFallback: imageFallback || 'assets/img/cards/card-back.png'
       });
     }
 
@@ -524,7 +518,7 @@ const app = {
     }
 
     dropdown.innerHTML = `
-      <div class="p-2 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex justify-between items-center">
+      <div class="p-2 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider flex justify-between items-center">
         <span>Resultados en Bóveda</span>
         <span>${matches.length} coincidencias</span>
       </div>
@@ -539,23 +533,23 @@ const app = {
                 onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
               />
               <div>
-                <h4 class="text-xs font-extrabold text-[#0F172A] group-hover:text-[#E11D48] transition">${card.nombre}</h4>
-                <span class="text-[10px] text-slate-500">${card.set} • ${card.rareza}</span>
+                <h4 class="text-xs font-extrabold text-[#0F172A] group-hover:text-[#BE123C] transition">${card.nombre}</h4>
+                <span class="text-xs text-slate-500">${card.set} • ${card.rareza}</span>
               </div>
             </div>
             <div class="text-right">
               <span class="text-xs font-black text-[#0F172A]">$${Number((card.precios && (card.precios.psa10 || card.precios.raw)) || card.precioEstimado || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-              <span class="block text-[9px] text-[#D97706] font-bold">PSA 10</span>
+              <span class="block text-xs text-[#B45309] font-bold">PSA 10</span>
             </div>
           </div>
         `).join('')}
       </div>
       <div class="p-2 border-t border-slate-100 flex items-center justify-between text-xs">
-        <button type="button" onclick="app.executeGlobalSearch('${q.replace(/'/g, '')}')" class="font-extrabold text-[#E11D48] hover:text-[#BE123C] flex items-center gap-1">
+        <button type="button" onclick="app.executeGlobalSearch('${q.replace(/'/g, '')}')" class="font-extrabold text-[#BE123C] hover:text-[#9F1239] flex items-center gap-1">
           <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
           <span>Búsqueda Multifuente en Tiempo Real →</span>
         </button>
-        <a href="${this.url('catalog', { q })}" class="text-slate-500 hover:text-slate-800 font-semibold text-[11px]">
+        <a href="${this.url('catalog', { q })}" class="text-slate-500 hover:text-slate-800 font-semibold text-xs">
           Catálogo Tradicional
         </a>
       </div>

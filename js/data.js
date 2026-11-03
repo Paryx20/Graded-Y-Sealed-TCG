@@ -98,8 +98,8 @@ const POKEMON_CARDS_CATALOG_10 = [
     era: 'modern',
     condicionPrincipal: 'raw',
     certNumber: '84920114',
-    imagenLocal: 'img/cards/gengar-holo-scarlet.png',
-    imagenFallbackUrl: 'img/cards/gengar-holo-scarlet.png',
+    imagenLocal: 'assets/img/cards/gengar-holo-scarlet.png',
+    imagenFallbackUrl: 'assets/img/cards/gengar-holo-scarlet.png',
     precios: {
       raw: 5.00,
       psa8: 9.00,
@@ -148,8 +148,8 @@ const POKEMON_CARDS_CATALOG_10 = [
     era: 'modern',
     condicionPrincipal: 'raw',
     certNumber: '84920116',
-    imagenLocal: 'img/cards/mimikyu-rare.png',
-    imagenFallbackUrl: 'img/cards/mimikyu-rare.png',
+    imagenLocal: 'assets/img/cards/mimikyu-rare.png',
+    imagenFallbackUrl: 'assets/img/cards/mimikyu-rare.png',
     precios: {
       raw: 14.00,
       psa8: 20.00,
@@ -173,8 +173,8 @@ const POKEMON_CARDS_CATALOG_10 = [
     era: 'modern',
     condicionPrincipal: 'psa10',
     certNumber: '84920117',
-    imagenLocal: 'img/cards/mewto-holo-rare.png',
-    imagenFallbackUrl: 'img/cards/mewto-holo-rare.png',
+    imagenLocal: 'assets/img/cards/mewto-holo-rare.png',
+    imagenFallbackUrl: 'assets/img/cards/mewto-holo-rare.png',
     precios: {
       raw: 6.00,
       psa8: 11.00,
@@ -224,8 +224,8 @@ const POKEMON_CARDS_CATALOG_10 = [
     era: 'modern',
     condicionPrincipal: 'psa10',
     certNumber: '48291077',
-    imagenLocal: 'img/cards/raichu-gx.png',
-    imagenFallbackUrl: 'img/cards/raichu-gx.png',
+    imagenLocal: 'assets/img/cards/raichu-gx.png',
+    imagenFallbackUrl: 'assets/img/cards/raichu-gx.png',
     precios: {
       raw: 6.50,
       psa8: 12.00,
@@ -280,12 +280,12 @@ const SEALED_PRODUCTS = [
     era: 'vintage',
     condicionPrincipal: 'sealed',
     certNumber: '48291901',
-    imagenLocal: 'img/sealed/team-rocket-box-front.png',
-    imagenFallbackUrl: 'img/sealed/team-rocket-box-perspective.png',
+    imagenLocal: 'assets/img/sealed/team-rocket-box-front.png',
+    imagenFallbackUrl: 'assets/img/sealed/team-rocket-box-perspective.png',
     galeria_sellada: {
-      frontal: 'img/sealed/team-rocket-box-front.png',
-      perspectiva: 'img/sealed/team-rocket-box-perspective.png',
-      lateral: 'img/sealed/team-rocket-box-side.png'
+      frontal: 'assets/img/sealed/team-rocket-box-front.png',
+      perspectiva: 'assets/img/sealed/team-rocket-box-perspective.png',
+      lateral: 'assets/img/sealed/team-rocket-box-side.png'
     },
     detalles_sellados: {
       gramaje: '750g (Caja Completa)',
@@ -323,13 +323,13 @@ const SEALED_PRODUCTS = [
     era: 'vintage',
     condicionPrincipal: 'sealed',
     certNumber: '48291955',
-    imagenLocal: 'img/sealed/Paquete fossil.png',
-    imagenFallbackUrl: 'img/sealed/Paquete fossil.png',
+    imagenLocal: 'assets/img/sealed/paquete-fossil.png',
+    imagenFallbackUrl: 'assets/img/sealed/paquete-fossil.png',
     galeria_sellada: {
-      perspectiva: 'img/sealed/Paquete fossil.png',
-      frontal: 'img/sealed/booster-box-fossil-1999/frontal.svg',
-      lateral: 'img/sealed/booster-box-fossil-1999/lateral.svg',
-      superior: 'img/sealed/booster-box-fossil-1999/superior.svg'
+      perspectiva: 'assets/img/sealed/paquete-fossil.png',
+      frontal: 'assets/img/sealed/booster-box-fossil-1999/frontal.svg',
+      lateral: 'assets/img/sealed/booster-box-fossil-1999/lateral.svg',
+      superior: 'assets/img/sealed/booster-box-fossil-1999/superior.svg'
     },
     detalles_sellados: {
       gramaje: '745g (Caja Completa)',
@@ -368,12 +368,12 @@ const SEALED_PRODUCTS = [
     era: 'vintage',
     condicionPrincipal: 'sealed',
     certNumber: '48291999',
-    imagenLocal: 'img/booster-team-rocket.png',
+    imagenLocal: 'assets/img/packs/booster-team-rocket.png',
     imagenFallbackUrl: 'https://images.pokemontcg.io/base1/4_hires.png',
     galeria_sellada: {
-      frontal: 'img/booster-team-rocket.png',
-      perspectiva: 'img/booster-team-rocket.png',
-      lateral: 'img/booster-team-rocket.png'
+      frontal: 'assets/img/packs/booster-team-rocket.png',
+      perspectiva: 'assets/img/packs/booster-team-rocket.png',
+      lateral: 'assets/img/packs/booster-team-rocket.png'
     },
     detalles_sellados: {
       gramaje: '21.2g (Sobre Individual)',
@@ -486,14 +486,14 @@ const SEALED_PRODUCTS = [
     condicionPrincipal: 'sealed',
     certNumber: p.certNumber,
     // foto.png: foto oficial de pokemon.com · contenido.png: qué trae la caja (si existe)
-    imagenLocal: `img/sealed/${p.id}/foto.png`,
-    imagenFallbackUrl: `img/sealed/${p.id}/frontal.svg`,
+    imagenLocal: `assets/img/sealed/${p.id}/foto.png`,
+    imagenFallbackUrl: `assets/img/sealed/${p.id}/frontal.svg`,
     galeria_sellada: {
-      perspectiva: `img/sealed/${p.id}/foto.png`,
-      ...(p.conContenido ? { contenido: `img/sealed/${p.id}/contenido.png` } : {}),
-      frontal: `img/sealed/${p.id}/frontal.svg`,
-      lateral: `img/sealed/${p.id}/lateral.svg`,
-      superior: `img/sealed/${p.id}/superior.svg`
+      perspectiva: `assets/img/sealed/${p.id}/foto.png`,
+      ...(p.conContenido ? { contenido: `assets/img/sealed/${p.id}/contenido.png` } : {}),
+      frontal: `assets/img/sealed/${p.id}/frontal.svg`,
+      lateral: `assets/img/sealed/${p.id}/lateral.svg`,
+      superior: `assets/img/sealed/${p.id}/superior.svg`
     },
     detalles_sellados: {
       gramaje: `${p.gramos}g (Caja Completa)`,

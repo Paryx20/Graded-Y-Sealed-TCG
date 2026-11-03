@@ -58,7 +58,7 @@ function parseChecklistTasks(markdown, phaseTitle) {
 }
 
 test('Feature 26 [Tier 1]: Work Plan Checklist - FASE 4 tasks contract definition is parseable', () => {
-  const planPath = path.join(ROOT_DIR, 'PLAN_DE_TRABAJO.md');
+  const planPath = path.join(ROOT_DIR, 'docs/PLAN_DE_TRABAJO.md');
   assert.ok(fs.existsSync(planPath));
   const content = fs.readFileSync(planPath, 'utf8');
   assert.ok(content.includes('FASE 4: Ficha de Producto (PDP)'));
@@ -67,7 +67,7 @@ test('Feature 26 [Tier 1]: Work Plan Checklist - FASE 4 tasks contract definitio
 });
 
 test('Feature 26 [Tier 1]: Work Plan Checklist - FASE 5 tasks contract definition is parseable', () => {
-  const planPath = path.join(ROOT_DIR, 'PLAN_DE_TRABAJO.md');
+  const planPath = path.join(ROOT_DIR, 'docs/PLAN_DE_TRABAJO.md');
   const content = fs.readFileSync(planPath, 'utf8');
   assert.ok(content.includes('FASE 5: Carrito, Checkout'));
   assert.ok(content.includes('Módulo 10'));
@@ -76,7 +76,7 @@ test('Feature 26 [Tier 1]: Work Plan Checklist - FASE 5 tasks contract definitio
 });
 
 test('Feature 26 [Tier 1]: Work Plan Checklist - FASE 6 tasks contract definition is parseable', () => {
-  const planPath = path.join(ROOT_DIR, 'PLAN_DE_TRABAJO.md');
+  const planPath = path.join(ROOT_DIR, 'docs/PLAN_DE_TRABAJO.md');
   const content = fs.readFileSync(planPath, 'utf8');
   assert.ok(content.includes('FASE 6: Doble API de Búsqueda con Failover'));
   assert.ok(content.includes('pokemontcg.io'));
@@ -84,7 +84,7 @@ test('Feature 26 [Tier 1]: Work Plan Checklist - FASE 6 tasks contract definitio
 });
 
 test('Feature 26 [Tier 1]: Work Plan Checklist - FASE 7 tasks contract definition is parseable', () => {
-  const planPath = path.join(ROOT_DIR, 'PLAN_DE_TRABAJO.md');
+  const planPath = path.join(ROOT_DIR, 'docs/PLAN_DE_TRABAJO.md');
   const content = fs.readFileSync(planPath, 'utf8');
   assert.ok(content.includes('FASE 7: Perfil de Usuario'));
   assert.ok(content.includes('Mis Últimas Compras'));
@@ -350,9 +350,9 @@ test('Tier 4 Scenario 2: Sealed Product Investor Journey (Team Rocket Booster Bo
     categoria: 'sealed',
     precioUnitario: 3500.00,
     galeria_sellada: {
-      frontal: 'img/sealed/team-rocket-box-front.png',
-      perspectiva: 'img/sealed/team-rocket-box-perspective.png',
-      lateral: 'img/sealed/team-rocket-box-side.png'
+      frontal: 'assets/img/sealed/team-rocket-box-front.png',
+      perspectiva: 'assets/img/sealed/team-rocket-box-perspective.png',
+      lateral: 'assets/img/sealed/team-rocket-box-side.png'
     }
   };
 

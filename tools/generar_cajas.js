@@ -1,5 +1,5 @@
 /**
- * Genera las ilustraciones de los productos sellados en img/sealed/<id>/:
+ * Genera las ilustraciones de los productos sellados en assets/img/sealed/<id>/:
  * frontal.svg, lateral.svg, superior.svg y perspectiva.svg (vista 3D).
  *
  * Uso (desde la raíz del proyecto):  node tools/generar_cajas.js

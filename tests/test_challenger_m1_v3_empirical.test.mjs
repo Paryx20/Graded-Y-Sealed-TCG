@@ -482,8 +482,8 @@ test('R2 Empirical Verification [2.2]: PDPView.render() across 100 arbitrary API
       rareza: rarities[i % rarities.length],
       tipo_discriminador: 'CARTA_INDIVIDUAL',
       precioEstimado: basePrice,
-      imagenLocal: 'img/cards/card-back.png',
-      imagenFallbackUrl: 'img/cards/card-back.png'
+      imagenLocal: 'assets/img/cards/card-back.png',
+      imagenFallbackUrl: 'assets/img/cards/card-back.png'
     };
 
     Store.data.currentPdpProduct = arbitraryApiCard;
@@ -585,15 +585,15 @@ test('R3 Empirical Verification [3.1]: PDPView.renderInspectorStage in back mode
       // Assert presence of 3D flipped state and authentic card back image
       assert.ok(html.includes('is-flipped-y'), `3D object in back mode must include "is-flipped-y" class`);
       assert.ok(html.includes('card-3d-face card-3d-back'), `Must include backface container`);
-      assert.ok(html.includes('src="img/cards/card-back.png"'), `Must reference authentic card-back.png asset`);
+      assert.ok(html.includes('src="assets/img/cards/card-back.png"'), `Must reference authentic card-back.png asset`);
       assert.ok(html.includes('alt="Reverso de carta Pokémon"'), `Must provide accessible alt text for card back`);
     }
   }
 });
 
 test('R3 Empirical Verification [3.2]: Physical card-back.png asset integrity on disk and CSS stylesheet clean overlay suppression', () => {
-  const cardBackPath = path.join(ROOT_DIR, 'img/cards/card-back.png');
-  assert.ok(fs.existsSync(cardBackPath), 'Physical asset img/cards/card-back.png must exist on disk');
+  const cardBackPath = path.join(ROOT_DIR, 'assets/img/cards/card-back.png');
+  assert.ok(fs.existsSync(cardBackPath), 'Physical asset assets/img/cards/card-back.png must exist on disk');
 
   const stat = fs.statSync(cardBackPath);
   assert.ok(stat.size > 50000, `card-back.png must be non-zero and high-resolution (${stat.size} bytes > 50KB)`);
@@ -625,6 +625,6 @@ test('R3 Empirical Verification [3.3]: Arbitrary API cards with apostrophes, for
     assert.equal(html.includes('EJE X'), false);
     assert.equal(html.includes('EJE Y'), false);
     assert.equal(html.includes('50.0%'), false);
-    assert.ok(html.includes('img/cards/card-back.png'));
+    assert.ok(html.includes('assets/img/cards/card-back.png'));
   }
 });

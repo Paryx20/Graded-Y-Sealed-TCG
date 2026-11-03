@@ -499,7 +499,7 @@ test('R5 Adversarial [2.3]: Placing real order updates tracking with real purcha
         condition: 'PSA 10 GEM MT',
         price: 4850.00,
         quantity: 1,
-        imageLocal: 'img/cards/card-back.png'
+        imageLocal: 'assets/img/cards/card-back.png'
       }
     ]
   };

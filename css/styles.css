@@ -337,7 +337,7 @@ html, body {
   right: 14px;
   font-family: 'Inter', system-ui, sans-serif;
   font-weight: 900;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 1.5px;
   color: rgba(255, 255, 255, 0.45);
   text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8), -1px -1px 1px rgba(15, 23, 42, 0.25);
@@ -414,13 +414,13 @@ html, body {
   border-bottom-color: #E11D48;
 }
 .category-meta {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  color: #64748b;
+  color: #94a3b8;
 }
 .category-link.is-active .category-meta,
 .category-link:hover .category-meta {
-  color: #94a3b8;
+  color: #cbd5e1;
 }
 .category-divider {
   width: 1px;

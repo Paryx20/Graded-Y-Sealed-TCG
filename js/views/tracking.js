@@ -283,12 +283,12 @@ const TrackingView = {
 
         ${this.lookupError ? `
           <div class="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-800 flex items-start gap-2" role="alert">
-            <i data-lucide="shield-alert" class="w-4 h-4 text-[#E11D48] flex-shrink-0 mt-0.5"></i>
+            <i data-lucide="shield-alert" class="w-4 h-4 text-[#BE123C] flex-shrink-0 mt-0.5"></i>
             <span>${this.lookupError}</span>
           </div>
         ` : ''}
 
-        <p class="mt-4 text-[11px] text-slate-400">
+        <p class="mt-4 text-xs text-slate-500">
           Pedido de demostración: orden <span class="font-mono font-bold text-slate-500">GS-2026-9481</span> con cédula <span class="font-mono font-bold text-slate-500">1710034065</span>.
         </p>
       </section>
@@ -319,7 +319,7 @@ const TrackingView = {
       const isCompleted = stg.status === 'completed';
       const isActive = stg.status === 'active';
       const isFailed = stg.status === 'failed';
-      let iconClass = 'bg-slate-200 text-slate-500';
+      let iconClass = 'bg-slate-200 text-slate-600';
       let iconContent = String(idx + 1);
 
       if (isCompleted) {
@@ -336,16 +336,16 @@ const TrackingView = {
       const boxClass = isActive
         ? 'bg-amber-50/60 border border-amber-200/80 ring-1 ring-amber-300/50'
         : (isFailed ? 'bg-rose-50 border border-rose-200' : 'bg-slate-50/40 border border-slate-100');
-      const subClass = isActive ? 'text-[#D97706] font-bold' : (isCompleted ? 'text-[#059669] font-semibold' : (isFailed ? 'text-[#E11D48] font-bold' : 'text-slate-400'));
+      const subClass = isActive ? 'text-[#B45309] font-bold' : (isCompleted ? 'text-[#047857] font-semibold' : (isFailed ? 'text-[#BE123C] font-bold' : 'text-slate-500'));
 
       return `
         <div class="flex sm:flex-col items-center sm:text-center gap-3 p-3 rounded-xl transition-all ${boxClass}">
           <div class="w-10 h-10 rounded-full ${iconClass} flex items-center justify-center font-bold text-sm flex-shrink-0">${iconContent}</div>
           <div>
             <span class="text-xs font-extrabold text-[#0F172A] block">${stg.title}</span>
-            <span class="text-[11px] ${subClass} block">${stg.subtitle}</span>
-            ${stg.date ? `<span class="text-[10px] text-slate-400 block mt-0.5">${stg.date}</span>` : ''}
-            <p class="text-[10px] text-slate-500 mt-1 hidden sm:block">${stg.detail}</p>
+            <span class="text-xs ${subClass} block">${stg.subtitle}</span>
+            ${stg.date ? `<span class="text-xs text-slate-500 block mt-0.5">${stg.date}</span>` : ''}
+            <p class="text-xs text-slate-500 mt-1 hidden sm:block">${stg.detail}</p>
           </div>
         </div>
       `;
@@ -365,10 +365,10 @@ const TrackingView = {
             </div>
             <div>
               <h3 class="text-sm font-black text-[#FEF3C7]">Transporte blindado</h3>
-              <span class="text-[11px] text-slate-400">${order.courierName || 'Servientrega Blindado • Bóveda G&S'}</span>
+              <span class="text-xs text-slate-400">${order.courierName || 'Servientrega Blindado • Bóveda G&S'}</span>
             </div>
           </div>
-          <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-lg self-start sm:self-center">GPS activo</span>
+          <span class="text-xs font-mono text-emerald-400 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-lg self-start sm:self-center">GPS activo</span>
         </div>
         <div class="pt-4 space-y-2">
           <div class="flex items-center justify-between text-xs text-slate-300">
@@ -389,14 +389,14 @@ const TrackingView = {
       <div class="mt-6 p-5 sm:p-6 bg-emerald-50/70 border border-emerald-200 rounded-2xl">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div class="p-3 bg-white border border-emerald-100 rounded-xl">
-            <span class="text-slate-400 block text-[10px] uppercase font-bold">Dirección de retiro</span>
+            <span class="text-slate-500 block text-xs uppercase font-bold">Dirección de retiro</span>
             <strong class="text-[#0F172A] block mt-0.5">Av. República del Salvador N34-183 y Moscú</strong>
-            <span class="text-slate-500 text-[11px] block">Edificio Bóveda Central, Piso 2, Quito</span>
+            <span class="text-slate-500 text-xs block">Edificio Bóveda Central, Piso 2, Quito</span>
           </div>
           <div class="p-3 bg-white border border-emerald-100 rounded-xl">
-            <span class="text-slate-400 block text-[10px] uppercase font-bold">Horario</span>
+            <span class="text-slate-500 block text-xs uppercase font-bold">Horario</span>
             <strong class="text-[#0F172A] block mt-0.5">Lunes a sábado: 09:00 - 18:00</strong>
-            <span class="text-slate-500 text-[11px] block">Titular: ${order.buyerName || 'Coleccionista'}</span>
+            <span class="text-slate-500 text-xs block">Titular: ${order.buyerName || 'Coleccionista'}</span>
           </div>
         </div>
       </div>
@@ -428,7 +428,7 @@ const TrackingView = {
                 </div>
                 <button type="submit" class="px-5 py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-extrabold rounded-lg transition touch-target">Verificar y entregar</button>
               </form>
-              ${order.idAttempts ? `<p class="text-[11px] text-[#E11D48] font-semibold mt-2">Cédula incorrecta. Intentos restantes: ${attemptsLeft}</p>` : ''}
+              ${order.idAttempts ? `<p class="text-xs text-[#BE123C] font-semibold mt-2">Cédula incorrecta. Intentos restantes: ${attemptsLeft}</p>` : ''}
             </div>
           </div>
         </div>
@@ -438,7 +438,7 @@ const TrackingView = {
     if (step === 4) {
       return `
         <div class="mt-6 p-5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3">
-          <i data-lucide="badge-check" class="w-6 h-6 text-[#059669] flex-shrink-0"></i>
+          <i data-lucide="badge-check" class="w-6 h-6 text-[#047857] flex-shrink-0"></i>
           <div class="text-xs text-emerald-900">
             <strong class="block text-sm">${pickup ? 'Retirado en bóveda' : 'Entregado'} a ${order.deliveredTo || order.buyerName}</strong>
             Identidad verificada con cédula ${this.maskId(order.buyerId)} • ${(order.stepDates || {})[4] || ''}
@@ -450,7 +450,7 @@ const TrackingView = {
     if (step === -1) {
       return `
         <div class="mt-6 p-5 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-3" role="alert">
-          <i data-lucide="shield-x" class="w-6 h-6 text-[#E11D48] flex-shrink-0"></i>
+          <i data-lucide="shield-x" class="w-6 h-6 text-[#BE123C] flex-shrink-0"></i>
           <div class="text-xs text-rose-900">
             <strong class="block text-sm">Entrega retenida por seguridad</strong>
             Se presentaron ${this.MAX_ID_ATTEMPTS} cédulas que no coinciden con el titular. La pieza regresa a Bóveda Central Quito;
@@ -470,8 +470,8 @@ const TrackingView = {
       <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
           <div class="flex flex-wrap items-center gap-2">
-            <span class="text-xs font-mono font-black text-[#D97706] bg-[#FEF3C7] px-2.5 py-0.5 rounded">ORDEN ${order.orderId}</span>
-            <span class="text-xs font-extrabold ${this.getStep(order) === -1 ? 'text-[#E11D48] bg-rose-100' : 'text-[#059669] bg-[#D1FAE5]'} px-2.5 py-0.5 rounded">${this.statusLabel(order)}</span>
+            <span class="text-xs font-mono font-black text-[#B45309] bg-[#FEF3C7] px-2.5 py-0.5 rounded">ORDEN ${order.orderId}</span>
+            <span class="text-xs font-extrabold ${this.getStep(order) === -1 ? 'text-[#BE123C] bg-rose-100' : 'text-[#047857] bg-[#D1FAE5]'} px-2.5 py-0.5 rounded">${this.statusLabel(order)}</span>
             ${trackingNumber ? `<span class="text-xs font-mono font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded">${pickup ? 'Código de retiro' : 'Guía'}: ${trackingNumber}</span>` : ''}
           </div>
           <h1 class="text-2xl font-black text-[#0F172A] tracking-tight mt-2">Seguimiento de tu pedido</h1>
@@ -490,11 +490,11 @@ const TrackingView = {
       <div class="py-8" role="region" aria-label="Etapas de entrega del pedido" aria-live="polite">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xs font-extrabold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
-            <i data-lucide="route" class="w-4 h-4 text-[#059669]"></i>
+            <i data-lucide="route" class="w-4 h-4 text-[#047857]"></i>
             <span>Etapas de custodia y despacho</span>
           </h2>
           ${[1, 2].includes(this.getStep(order)) ? `
-            <span class="text-[11px] font-bold text-slate-500 flex items-center gap-1.5">
+            <span class="text-xs font-bold text-slate-500 flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-[#059669] animate-pulse"></span>Simulación en vivo
             </span>` : ''}
         </div>
@@ -512,8 +512,8 @@ const TrackingView = {
           ${(order.items || []).map(item => `
             <div class="flex items-center justify-between p-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl">
               <div class="flex items-center gap-3">
-                <img src="${item.imageLocal || 'img/cards/card-back.png'}" alt="${item.name}" class="w-12 h-16 object-contain bg-white rounded-lg border border-slate-200 p-0.5"
-                  onerror="this.onerror=null; this.src='${item.imageFallback || 'img/cards/card-back.png'}'" />
+                <img src="${item.imageLocal || 'assets/img/cards/card-back.png'}" alt="${item.name}" class="w-12 h-16 object-contain bg-white rounded-lg border border-slate-200 p-0.5"
+                  onerror="this.onerror=null; this.src='${item.imageFallback || 'assets/img/cards/card-back.png'}'" />
                 <div>
                   <h3 class="text-sm font-extrabold text-[#0F172A]">${item.name}</h3>
                   <span class="text-xs text-slate-500">${item.condition || ''} • Cantidad: ${item.quantity || 1}</span>

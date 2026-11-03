@@ -735,7 +735,7 @@ test('R6 Challenger [4.4]: DB client seed data contains 10 Pokémon cards and 40
 });
 
 test('R6 Challenger [4.5]: PLAN_DE_TRABAJO.md marks FASE 8 with [X] on the header and all 5 checklist items', () => {
-  const plan = fs.readFileSync(path.join(ROOT_DIR, 'PLAN_DE_TRABAJO.md'), 'utf8');
+  const plan = fs.readFileSync(path.join(ROOT_DIR, 'docs/PLAN_DE_TRABAJO.md'), 'utf8');
 
   // Verify header line
   assert.ok(
