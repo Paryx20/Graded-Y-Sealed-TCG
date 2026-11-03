@@ -101,16 +101,62 @@ begin
   return public._usuario_json(u.cedula_ruc);
 end $$;
 
+/*
+  Actualiza los datos del perfil. Para cambiar el correo (p_email distinto al
+  actual) se exige la contraseña actual (p_password) y que el nuevo correo no
+  esté registrado por otra cuenta.
+*/
+drop function if exists public.actualizar_perfil(uuid, text, text, text, text);
 create or replace function public.actualizar_perfil(
-  p_token uuid, p_nombre text, p_telefono text, p_ciudad text, p_direccion text)
+  p_token uuid, p_nombre text, p_telefono text, p_ciudad text, p_direccion text,
+  p_email text default null, p_password text default null)
 returns jsonb language plpgsql security definer set search_path = '' as $$
-declare v_cedula text;
+declare
+  u public.usuarios;
+  v_email text := lower(trim(coalesce(p_email, '')));
 begin
-  update public.usuarios set nombre = trim(p_nombre), telefono = p_telefono, actualizado_en = now()
-   where token_sesion = p_token returning cedula_ruc into v_cedula;
-  if v_cedula is null then raise exception 'SESION_INVALIDA'; end if;
-  perform public._guardar_direccion(v_cedula, p_direccion, p_ciudad);
-  return public._usuario_json(v_cedula);
+  select * into u from public.usuarios where token_sesion = p_token;
+  if u.cedula_ruc is null then raise exception 'SESION_INVALIDA'; end if;
+
+  if v_email <> '' and v_email <> lower(u.email) then
+    if p_password is null or u.password_hash <> extensions.crypt(p_password, u.password_hash) then
+      raise exception 'PASSWORD_INCORRECTA';
+    end if;
+    if v_email !~* '^[^@\s]+@[^@\s]+\.[a-z]{2,}$' then raise exception 'EMAIL_INVALIDO'; end if;
+    if exists (select 1 from public.usuarios where lower(email) = v_email and cedula_ruc <> u.cedula_ruc) then
+      raise exception 'EMAIL_EXISTE';
+    end if;
+  else
+    v_email := lower(u.email);
+  end if;
+
+  update public.usuarios
+     set nombre = trim(p_nombre), telefono = p_telefono, email = v_email, actualizado_en = now()
+   where cedula_ruc = u.cedula_ruc;
+  perform public._guardar_direccion(u.cedula_ruc, p_direccion, p_ciudad);
+  return public._usuario_json(u.cedula_ruc);
+end $$;
+
+-- ------------------------------------------------------------- Inventario
+
+/*
+  Repone (o descuenta, con cantidad negativa) el stock de un producto en un
+  grado. Solo para el administrador: se ejecuta desde el SQL Editor de
+  Supabase y no está disponible para los visitantes de la web.
+    select public.reponer_stock('pikachu-crown-zenith', 'psa10', 5);
+*/
+create or replace function public.reponer_stock(p_sku text, p_grado text, p_cantidad integer)
+returns integer language plpgsql security definer set search_path = '' as $$
+declare v_stock integer;
+begin
+  update public.certificaciones_psa
+     set stock_disponible = stock_disponible + p_cantidad
+   where producto_sku = p_sku and grado = p_grado
+  returning stock_disponible into v_stock;
+  if v_stock is null then
+    raise exception 'No existe el producto % con grado %', p_sku, p_grado;
+  end if;
+  return v_stock;
 end $$;
 
 -- ------------------------------------------------------------------ Compras
@@ -259,13 +305,14 @@ end $$;
 -- ------------------------------------------------------------------ Permisos
 
 revoke all on function public._cedula_valida(text) from public, anon, authenticated;
+revoke all on function public.reponer_stock(text, text, integer) from public, anon, authenticated;
 revoke all on function public._usuario_json(text) from public, anon, authenticated;
 revoke all on function public._guardar_direccion(text, text, text) from public, anon, authenticated;
 revoke all on function public._orden_json(public.ordenes_compra) from public, anon, authenticated;
 
 grant execute on function public.registrar_usuario(text, text, text, text, text, text, text) to anon, authenticated;
 grant execute on function public.iniciar_sesion(text, text) to anon, authenticated;
-grant execute on function public.actualizar_perfil(uuid, text, text, text, text) to anon, authenticated;
+grant execute on function public.actualizar_perfil(uuid, text, text, text, text, text, text) to anon, authenticated;
 grant execute on function public.guardar_orden(uuid, jsonb, jsonb, jsonb) to anon, authenticated;
 grant execute on function public.listar_mis_ordenes(uuid) to anon, authenticated;
 grant execute on function public.rastrear_orden(text, text) to anon, authenticated;

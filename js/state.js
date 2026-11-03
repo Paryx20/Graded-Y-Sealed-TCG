@@ -221,12 +221,14 @@ const Store = {
 
   updateProfile(updatedFields) {
     if (!this.data.currentUser) return null;
+    // Se busca con el correo anterior: el usuario puede haberlo cambiado
+    const previousEmail = (this.data.currentUser.email || '').toLowerCase();
     this.data.currentUser = {
       ...this.data.currentUser,
       ...updatedFields
     };
     const idx = this.data.users.findIndex(
-      u => u.email.toLowerCase() === this.data.currentUser.email.toLowerCase()
+      u => (u.email || '').toLowerCase() === previousEmail
     );
     if (idx !== -1) {
       this.data.users[idx] = { ...this.data.currentUser };

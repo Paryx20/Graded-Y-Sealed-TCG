@@ -12,6 +12,8 @@ const SupabaseAPI = {
     PASSWORD_CORTA: 'La contraseña debe tener al menos 8 caracteres.',
     SESION_INVALIDA: 'Tu sesión expiró. Vuelve a iniciar sesión.',
     CEDULA_INVALIDA: 'La cédula o RUC no es válida (Módulo 10).',
+    PASSWORD_INCORRECTA: 'La contraseña actual no es correcta. No se cambió el correo.',
+    EMAIL_INVALIDO: 'El nuevo correo no tiene un formato válido.',
     ORDEN_VACIA: 'Tu bolsa está vacía.',
     SIN_STOCK: pieza => `No hay stock suficiente de "${pieza}". Ajusta la cantidad en tu bolsa.`,
     PRECIO_CAMBIO: pieza => `El precio de "${pieza}" cambió. Revisa tu bolsa antes de pagar.`,
@@ -73,13 +75,16 @@ const SupabaseAPI = {
     return this.toUser(row);
   },
 
-  async updateProfile(token, { name, phone, city, address }) {
+  // email y currentPassword solo se envían cuando el usuario cambia su correo
+  async updateProfile(token, { name, phone, city, address, email, currentPassword }) {
     const row = await this.rpc('actualizar_perfil', {
       p_token: token,
       p_nombre: name,
       p_telefono: phone,
       p_ciudad: city,
-      p_direccion: address
+      p_direccion: address,
+      p_email: email || null,
+      p_password: currentPassword || null
     });
     return this.toUser(row);
   },

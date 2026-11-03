@@ -123,13 +123,27 @@ const ProfileView = {
 
                 <div>
                   <label for="prof-email" class="block text-xs font-extrabold text-[#0F172A] mb-1">Correo Electrónico: *</label>
-                  <input 
-                    type="email" 
-                    id="prof-email" 
-                    value="${user.email || ''}" 
-                    readonly
-                    class="w-full px-3.5 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-semibold cursor-not-allowed"
+                  <input
+                    type="email"
+                    id="prof-email"
+                    value="${user.email || ''}"
+                    autocomplete="email"
+                    oninput="ProfileView.toggleEmailPassword()"
+                    required
+                    class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-xl focus:bg-white text-[#0F172A] font-semibold"
                   />
+                </div>
+
+                <div id="prof-email-pass-row" class="hidden sm:col-span-2 p-3.5 rounded-xl bg-amber-50 border border-amber-200">
+                  <label for="prof-email-pass" class="block text-xs font-extrabold text-[#0F172A] mb-1">Contraseña actual (para confirmar el cambio de correo): *</label>
+                  <input
+                    type="password"
+                    id="prof-email-pass"
+                    autocomplete="current-password"
+                    placeholder="••••••••"
+                    class="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-[#0F172A] font-semibold"
+                  />
+                  <p class="text-[10px] text-slate-500 mt-1">A partir del cambio inicias sesión con el nuevo correo.</p>
                 </div>
 
                 <div>
@@ -265,6 +279,7 @@ const ProfileView = {
 
   PROFILE_RULES: {
     'prof-name': v => Validators.name(v),
+    'prof-email': v => Validators.email(v),
     'prof-phone': v => Validators.phone(v),
     'prof-city': v => Validators.city(v),
     'prof-address': v => Validators.address(v)
@@ -274,6 +289,18 @@ const ProfileView = {
     if (Store.data.currentUser) {
       Validators.attach(this.PROFILE_RULES);
     }
+  },
+
+  emailChanged() {
+    const input = document.getElementById('prof-email');
+    const user = Store.data.currentUser;
+    return !!(input && user && input.value.trim().toLowerCase() !== (user.email || '').toLowerCase());
+  },
+
+  // Muestra la contraseña actual solo si el correo cambió
+  toggleEmailPassword() {
+    const row = document.getElementById('prof-email-pass-row');
+    if (row) row.classList.toggle('hidden', !this.emailChanged());
   },
 
   switchTab(tabName) {
@@ -296,6 +323,18 @@ const ProfileView = {
       city: val('prof-city'),
       address: val('prof-address')
     };
+
+    if (this.emailChanged()) {
+      const passEl = document.getElementById('prof-email-pass');
+      if (!passEl.value) {
+        Validators.showError(passEl, 'Ingresa tu contraseña actual para cambiar el correo.');
+        app.showToast('Confirma el cambio de correo con tu contraseña actual.', 'error');
+        return;
+      }
+      Validators.showError(passEl, '');
+      fields.email = val('prof-email').toLowerCase();
+      fields.currentPassword = passEl.value;
+    }
 
     try {
       const updated = await SupabaseAPI.updateProfile(user.token, fields);

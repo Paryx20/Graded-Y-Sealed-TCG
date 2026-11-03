@@ -165,7 +165,8 @@ const PDPView = {
   },
 
   SEALED_ANGLES: [
-    { key: 'perspectiva', title: 'Perspectiva 3D', sub: 'Vista completa de la caja', icon: 'box' },
+    { key: 'perspectiva', title: 'Foto principal', sub: 'Vista completa de la caja', icon: 'camera' },
+    { key: 'contenido', title: 'Contenido', sub: 'Lo que trae la caja', icon: 'package-open' },
     { key: 'frontal', title: 'Frontal', sub: 'Sello y arte principal', icon: 'square' },
     { key: 'lateral', title: 'Lateral', sub: 'Costado y código de barras', icon: 'align-justify' },
     { key: 'superior', title: 'Superior', sub: 'Tapa de la caja', icon: 'layers' }
@@ -223,7 +224,7 @@ const PDPView = {
     const angles = this.SEALED_ANGLES.filter(a => gallery[a.key]);
 
     return `
-      <div class="grid grid-cols-2 ${angles.length > 3 ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-3 mt-4" role="tablist" aria-label="Ángulos del empaque sellado">
+      <div class="grid grid-cols-2 ${['sm:grid-cols-3', 'sm:grid-cols-3', 'sm:grid-cols-3', 'sm:grid-cols-3', 'sm:grid-cols-4', 'sm:grid-cols-5'][angles.length] || 'sm:grid-cols-5'} gap-3 mt-4" role="tablist" aria-label="Ángulos del empaque sellado">
         ${angles.map(ang => {
           const isActive = activeAngle === ang.key;
           const thumbImg = gallery[ang.key] || product.imagenLocal;

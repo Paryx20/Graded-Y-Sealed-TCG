@@ -439,7 +439,8 @@ const SEALED_PRODUCTS = [
       packs: '10 Sobres + 3 promos foil de Charizard',
       precio: 129.99,
       descripcion: 'Colección Super-Premium de Charizard ex: 10 sobres, 3 cartas promo foil, figura y accesorios de colección',
-      rendimientoAnual: 17.9
+      rendimientoAnual: 17.9,
+      conContenido: true
     },
     {
       id: 'etb-crown-zenith',
@@ -467,7 +468,8 @@ const SEALED_PRODUCTS = [
       packs: '9 Sobres • Expansión Mega Evolution',
       precio: 99.99,
       descripcion: 'Elite Trainer Box de Ascended Heroes (Mega Evolución 2026) con 9 sobres, promo foil, fundas y accesorios',
-      rendimientoAnual: 12.5
+      rendimientoAnual: 12.5,
+      conContenido: true
     }
   ].map(p => ({
     id: p.id,
@@ -482,10 +484,12 @@ const SEALED_PRODUCTS = [
     edicionEspecial: true,
     condicionPrincipal: 'sealed',
     certNumber: p.certNumber,
-    imagenLocal: `img/sealed/${p.id}/perspectiva.svg`,
+    // foto.png: foto oficial de pokemon.com · contenido.png: qué trae la caja (si existe)
+    imagenLocal: `img/sealed/${p.id}/foto.png`,
     imagenFallbackUrl: `img/sealed/${p.id}/frontal.svg`,
     galeria_sellada: {
-      perspectiva: `img/sealed/${p.id}/perspectiva.svg`,
+      perspectiva: `img/sealed/${p.id}/foto.png`,
+      ...(p.conContenido ? { contenido: `img/sealed/${p.id}/contenido.png` } : {}),
       frontal: `img/sealed/${p.id}/frontal.svg`,
       lateral: `img/sealed/${p.id}/lateral.svg`,
       superior: `img/sealed/${p.id}/superior.svg`
