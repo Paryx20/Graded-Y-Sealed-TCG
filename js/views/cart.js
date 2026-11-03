@@ -37,7 +37,7 @@ const CartView = {
                   <div class="flex items-center gap-3.5 flex-1">
                     <img 
                       src="${item.imageLocal}" 
-                      alt="${item.name}"
+                      alt=""
                       width="64"
                       height="80"
                       loading="lazy"
@@ -58,14 +58,14 @@ const CartView = {
                         type="button" 
                         onclick="app.updateCartQuantity('${item.id}', -1)" 
                         class="px-3 py-1.5 text-slate-700 hover:text-[#0F172A] font-bold text-sm"
-                        aria-label="Disminuir cantidad"
+                        aria-label="Disminuir cantidad de ${item.name}"
                       >−</button>
-                      <span class="px-3 py-1.5 text-xs font-bold text-[#0F172A] bg-white">${item.quantity}</span>
+                      <span class="px-3 py-1.5 text-xs font-bold text-[#0F172A] bg-white"><span class="sr-only">Cantidad: </span>${item.quantity}</span>
                       <button 
                         type="button" 
                         onclick="app.updateCartQuantity('${item.id}', 1)" 
                         class="px-3 py-1.5 text-slate-700 hover:text-[#0F172A] font-bold text-sm"
-                        aria-label="Aumentar cantidad"
+                        aria-label="Aumentar cantidad de ${item.name}"
                       >+</button>
                     </div>
 

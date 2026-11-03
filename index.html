@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es" class="motion-safe:scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -84,7 +84,7 @@
             type="search" 
             autocomplete="off"
             placeholder="Buscar Charizard, Moonbreon, Lugia, Base Set 1999..." 
-            class="w-full pl-4 pr-11 py-2 text-xs sm:text-sm bg-[#1E293B] border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:bg-white focus:text-[#0F172A] focus:border-[#D97706] transition"
+            class="w-full pl-4 pr-11 py-2 text-xs sm:text-sm bg-[#1E293B] border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:placeholder-slate-600 focus:bg-white focus:text-[#0F172A] focus:border-[#D97706] transition"
           />
           <button 
             type="submit" 
@@ -180,7 +180,7 @@
         <button 
           type="button" 
           onclick="document.getElementById('undo-banner').classList.add('hidden')" 
-          class="text-slate-400 hover:text-white"
+          class="inline-flex items-center justify-center min-w-6 min-h-6 p-1 rounded text-slate-400 hover:text-white"
           aria-label="Cerrar aviso"
         >
           <i data-lucide="x" class="w-4 h-4"></i>
@@ -189,7 +189,7 @@
     </div>
   </div>
 
-  <main id="app-view" tabindex="-1" class="flex-1 pb-16 focus:outline-none">
+  <main id="app-view" tabindex="-1" class="flex-1 pb-16">
     <div class="page-skeleton max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6" aria-hidden="true">
       <div class="skeleton h-28 mb-6"></div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -338,7 +338,7 @@
           <div class="flex items-center gap-2.5">
             <img 
               src="assets/img/logo/logo.png" 
-              alt="Graded and Sealed TCG" 
+              alt="" 
               width="37" 
               height="47"
               class="h-9 w-auto object-contain rounded bg-white p-0.5 shadow-xs brand-logo" 
@@ -353,7 +353,7 @@
           </p>
         </div>
 
-        <div class="flex flex-wrap items-center justify-center gap-2" aria-label="Métodos de pago aceptados">
+        <div class="flex flex-wrap items-center justify-center gap-2" role="group" aria-label="Métodos de pago aceptados">
           <span class="text-xs font-bold text-slate-400 mr-1">Métodos aceptados:</span>
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1E293B] border border-slate-700 text-xs font-black text-white">
             <i data-lucide="credit-card" class="w-3.5 h-3.5 text-[#FEF3C7]"></i>

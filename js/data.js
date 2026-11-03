@@ -24,7 +24,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     condicionPrincipal: 'psa10',
     certNumber: '84920111',
     imagenLocal: 'https://images.pokemontcg.io/swsh12pt5/160.png',
-    imagenFallbackUrl: 'assets/img/cards/card-back.png',
+    imagenFallbackUrl: 'assets/img/cards/pikachu-crown-zenith.webp',
     precios: {
       raw: 12.00,
       psa8: 18.00,
@@ -49,7 +49,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     condicionPrincipal: 'psa10',
     certNumber: '84920112',
     imagenLocal: 'https://images.pokemontcg.io/sv4pt5/54.png',
-    imagenFallbackUrl: 'assets/img/cards/card-back.png',
+    imagenFallbackUrl: 'assets/img/cards/charizard-ex-paldean.webp',
     precios: {
       raw: 10.00,
       psa8: 16.00,
@@ -74,7 +74,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     condicionPrincipal: 'raw',
     certNumber: '84920113',
     imagenLocal: 'https://images.pokemontcg.io/sv6/188.png',
-    imagenFallbackUrl: 'assets/img/cards/card-back.png',
+    imagenFallbackUrl: 'assets/img/cards/eevee-twilight.webp',
     precios: {
       raw: 38.00,
       psa8: 45.00,
@@ -99,7 +99,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     condicionPrincipal: 'raw',
     certNumber: '84920114',
     imagenLocal: 'https://images.pokemontcg.io/sv3pt5/94.png',
-    imagenFallbackUrl: 'assets/img/cards/card-back.png',
+    imagenFallbackUrl: 'assets/img/cards/gengar-scarlet-violet.webp',
     precios: {
       raw: 5.00,
       psa8: 9.00,
@@ -124,7 +124,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     condicionPrincipal: 'psa10',
     certNumber: '84920115',
     imagenLocal: 'https://images.pokemontcg.io/sv6/106.png',
-    imagenFallbackUrl: 'assets/img/cards/card-back.png',
+    imagenFallbackUrl: 'assets/img/cards/greninja-ex-twilight.webp',
     precios: {
       raw: 8.50,
       psa8: 14.00,
@@ -149,7 +149,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     condicionPrincipal: 'raw',
     certNumber: '84920116',
     imagenLocal: 'https://images.pokemontcg.io/sv4pt5/160.png',
-    imagenFallbackUrl: 'assets/img/cards/card-back.png',
+    imagenFallbackUrl: 'assets/img/cards/mimikyu-paldean.webp',
     precios: {
       raw: 14.00,
       psa8: 20.00,
@@ -174,7 +174,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     condicionPrincipal: 'psa10',
     certNumber: '84920117',
     imagenLocal: 'https://images.pokemontcg.io/sv3pt5/150.png',
-    imagenFallbackUrl: 'assets/img/cards/card-back.png',
+    imagenFallbackUrl: 'assets/img/cards/mewtwo-151.webp',
     precios: {
       raw: 6.00,
       psa8: 11.00,
@@ -200,7 +200,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     condicionPrincipal: 'psa10',
     certNumber: '84920118',
     imagenLocal: 'https://images.pokemontcg.io/swshp/SWSH291.png',
-    imagenFallbackUrl: 'assets/img/cards/card-back.png',
+    imagenFallbackUrl: 'assets/img/cards/lucario-vstar-zenith.webp',
     precios: {
       raw: 7.00,
       psa8: 12.00,
@@ -225,7 +225,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     condicionPrincipal: 'psa10',
     certNumber: '48291077',
     imagenLocal: 'https://images.pokemontcg.io/sm35/29.png',
-    imagenFallbackUrl: 'assets/img/cards/card-back.png',
+    imagenFallbackUrl: 'assets/img/cards/raichu-gx.webp',
     precios: {
       raw: 6.50,
       psa8: 12.00,
@@ -250,7 +250,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     condicionPrincipal: 'psa10',
     certNumber: '84920120',
     imagenLocal: 'https://images.pokemontcg.io/sv3pt5/9.png',
-    imagenFallbackUrl: 'assets/img/cards/card-back.png',
+    imagenFallbackUrl: 'assets/img/cards/blastoise-ex-151.webp',
     precios: {
       raw: 8.00,
       psa8: 14.00,
@@ -355,50 +355,120 @@ const SEALED_PRODUCTS = [
     rendimientoAnual: 24.1,
     historialBase: [0.80, 0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96, 0.97, 0.99, 1.00]
   },
-  {
-    id: 'booster-pack-base-1999',
+  // Sobres individuales: fotos de producto generadas con IA (docs/prompts-sobres-gemini.md)
+  ...[
+    {
+      id: 'booster-pack-base-1999',
+      nombre: 'Booster Pack Base Set 1999 1st Edition',
+      set: 'Base Set 1999',
+      tipo: 'Fuego',
+      era: 'vintage',
+      certNumber: '48291999',
+      gramos: 21.2,
+      cartas: 11,
+      estado: 'Sin pesar / Heavy Pack Candidate • Bóveda UV',
+      sello: 'Wizards of the Coast 1st Edition Foil Crimping',
+      precios: { raw: 1450.00, psa8: 1750.00, psa9: 2200.00, psa10: 3600.00, sealed: 1450.00 },
+      descripcion: 'Sobre individual 1999 1st Edition • Estuche magnético UV incluido',
+      rendimientoAnual: 19.5,
+      historialBase: [0.83, 0.85, 0.87, 0.88, 0.90, 0.91, 0.93, 0.95, 0.96, 0.98, 0.99, 1.00]
+    },
+    {
+      id: 'booster-pack-fossil-1999',
+      nombre: 'Booster Pack Fossil 1999 Unlimited',
+      set: 'Fossil WotC 1999',
+      tipo: 'Lucha',
+      era: 'vintage',
+      certNumber: '48291956',
+      gramos: 21,
+      cartas: 11,
+      estado: 'Sin pesar • Arte de Aerodactyl',
+      sello: 'Wizards of the Coast Foil Crimping',
+      precios: { sealed: 180.00 },
+      descripcion: 'Sobre individual Fossil 1999 de Wizards of the Coast con 11 cartas, sellado de fábrica',
+      rendimientoAnual: 15.8
+    },
+    {
+      id: 'booster-pack-team-rocket-1999',
+      nombre: 'Booster Pack Team Rocket 1999 Unlimited',
+      set: 'Team Rocket 1999',
+      tipo: 'Oscuridad',
+      era: 'vintage',
+      certNumber: '48291902',
+      gramos: 21,
+      cartas: 11,
+      estado: 'Sin pesar • Arte de Dark Charizard',
+      sello: 'Wizards of the Coast Foil Crimping',
+      precios: { sealed: 220.00 },
+      descripcion: 'Sobre individual Team Rocket 1999 de Wizards of the Coast con 11 cartas, sellado de fábrica',
+      rendimientoAnual: 17.2
+    },
+    {
+      id: 'booster-pack-151-2023',
+      nombre: 'Booster Pack Pokémon 151',
+      set: 'Pokemon 151 2023',
+      tipo: 'Psíquico',
+      era: 'modern',
+      certNumber: '48292152',
+      gramos: 16,
+      cartas: 10,
+      estado: 'Sellado de Fábrica Intacto',
+      sello: 'The Pokémon Company International Crimping',
+      precios: { sealed: 9.00 },
+      descripcion: 'Sobre individual de la expansión Pokémon 151 (Escarlata y Púrpura) con 10 cartas',
+      rendimientoAnual: 9.4
+    },
+    {
+      id: 'booster-pack-prismatic-evolutions-2025',
+      nombre: 'Booster Pack Prismatic Evolutions',
+      set: 'Prismatic Evolutions 2025',
+      tipo: 'Incoloro',
+      era: 'modern',
+      certNumber: '48292027',
+      gramos: 16,
+      cartas: 10,
+      estado: 'Sellado de Fábrica Intacto',
+      sello: 'The Pokémon Company International Crimping',
+      precios: { sealed: 14.00 },
+      descripcion: 'Sobre individual de Evoluciones Prismáticas con 10 cartas y posibilidad de Eeveelutions especiales',
+      rendimientoAnual: 22.7
+    }
+  ].map(p => ({
+    id: p.id,
     edicionEspecial: true,
-    nombre: 'Booster Pack Base Set 1999 1st Edition',
-    set: 'Base Set 1999',
+    nombre: p.nombre,
+    set: p.set,
     rareza: 'Sellado de Fábrica',
-    tipo: 'Fuego',
+    tipo: p.tipo,
     categoria: 'sealed',
     tipo_discriminador: 'PRODUCTO_SELLADO',
     tipo_item: 'PRODUCTO_SELLADO',
-    era: 'vintage',
+    era: p.era,
     condicionPrincipal: 'sealed',
-    certNumber: '48291999',
-    imagenLocal: 'assets/img/packs/booster-team-rocket.png',
-    imagenFallbackUrl: 'assets/img/packs/booster-team-rocket.png',
+    certNumber: p.certNumber,
+    imagenLocal: `assets/img/packs/${p.id}-frontal.webp`,
+    imagenFallbackUrl: 'assets/img/packs/placeholder-sobre.svg',
     galeria_sellada: {
-      frontal: 'assets/img/packs/booster-team-rocket.png',
-      perspectiva: 'assets/img/packs/booster-team-rocket.png',
-      lateral: 'assets/img/packs/booster-team-rocket.png'
+      frontal: `assets/img/packs/${p.id}-frontal.webp`
     },
     detalles_sellados: {
-      gramaje: '21.2g (Sobre Individual)',
-      gramaje_gramos: 21.2,
+      gramaje: `${p.gramos}g (Sobre Individual)`,
+      gramaje_gramos: p.gramos,
       cantidad_sobres_interior: 1,
       es_pesado_verificado: true,
-      sellos: 'Sello de calor original Wizards of the Coast 1999',
-      sello_fabrica: 'Wizards of the Coast 1st Edition Foil Crimping',
-      packs: '1 Sobre de 11 Cartas',
-      estado: 'Sin pesar / Heavy Pack Candidate • Bóveda UV',
+      sellos: `Sello de calor original ${p.era === 'vintage' ? 'Wizards of the Coast' : 'The Pokémon Company'}`,
+      sello_fabrica: p.sello,
+      packs: `1 Sobre de ${p.cartas} Cartas`,
+      estado: p.estado,
       conservacion: 'Bóveda climatizada a 19°C y 45% HR'
     },
-    precios: {
-      raw: 1450.00,
-      psa8: 1750.00,
-      psa9: 2200.00,
-      psa10: 3600.00,
-      sealed: 1450.00
-    },
-    precioUnitario: 1450.00,
-    descripcion: 'Sobre individual 1999 1st Edition • Estuche magnético UV incluido',
-    tendencia12m: '+19.5%',
-    rendimientoAnual: 19.5,
-    historialBase: [0.83, 0.85, 0.87, 0.88, 0.90, 0.91, 0.93, 0.95, 0.96, 0.98, 0.99, 1.00]
-  },
+    precios: p.precios.raw ? p.precios : { raw: p.precios.sealed, sealed: p.precios.sealed },
+    precioUnitario: p.precios.sealed,
+    descripcion: p.descripcion,
+    tendencia12m: `+${p.rendimientoAnual.toFixed(1)}%`,
+    rendimientoAnual: p.rendimientoAnual,
+    historialBase: p.historialBase || [0.85, 0.86, 0.88, 0.89, 0.90, 0.92, 0.93, 0.95, 0.96, 0.97, 0.99, 1.00]
+  })),
   ...[
     {
       id: 'upc-pokemon-151',

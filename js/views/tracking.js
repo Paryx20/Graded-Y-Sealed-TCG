@@ -274,7 +274,7 @@ const TrackingView = {
           </div>
           <div class="sm:col-span-2">
             <label for="track-id" class="block text-xs font-bold text-[#0F172A] mb-1">Cédula del titular</label>
-            <input id="track-id" type="text" inputmode="numeric" maxlength="13" placeholder="1710034065" oninput="this.value = this.value.replace(/\\D/g, '')" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" />
+            <input id="track-id" type="text" value="${(Store.data.currentUser && Store.data.currentUser.idCard) || ''}" inputmode="numeric" maxlength="13" autocomplete="off" placeholder="1710034065" oninput="this.value = this.value.replace(/\\D/g, '')" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" />
           </div>
           <div class="sm:pt-5">
             <button id="track-submit" type="submit" class="w-full py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-lg transition touch-target">Rastrear</button>

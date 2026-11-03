@@ -83,13 +83,11 @@ const HomeView = {
 
             <!-- Columna Derecha: Pieza Estelar de Inversión con Holograma y Badge -->
             <div class="lg:col-span-5 flex items-center justify-center">
-              <div 
-                onclick="app.openProductPDP('charizard-base')" 
-                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();app.openProductPDP('charizard-base');}"
-                role="button"
-                tabindex="0"
+              <div class="max-w-xs w-full">
+              <a
+                href="${app.url('pdp', { id: 'charizard-base' })}"
                 aria-label="Inspeccionar pieza estelar Charizard Base Set 1999 PSA 10"
-                class="cursor-pointer group relative bg-[#1E293B]/95 backdrop-blur-md border border-slate-700/80 hover:border-[#D97706] rounded-2xl p-5 shadow-2xl max-w-xs w-full transition-all duration-300 hover:-translate-y-1.5"
+                class="block h-full group relative bg-[#1E293B]/95 backdrop-blur-md border border-slate-700/80 hover:border-[#D97706] rounded-2xl p-5 shadow-2xl max-w-xs w-full transition-all duration-300 motion-safe:hover:-translate-y-1.5"
               >
                 <div class="flex items-center justify-between mb-3">
                   <span class="px-2.5 py-0.5 rounded text-xs font-bold bg-[#FEF3C7] text-[#B45309] border border-[#D97706]/40">
@@ -109,7 +107,7 @@ const HomeView = {
                     height="342"
                     fetchpriority="high"
                     decoding="async"
-                    class="max-h-52 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-2xl"
+                    class="max-h-52 w-auto object-contain transition-transform duration-300 motion-safe:group-hover:scale-105 filter drop-shadow-2xl"
                     onerror="this.onerror=null; this.src='assets/img/cards/card-back.png'"
                   />
                 </div>
@@ -135,7 +133,7 @@ const HomeView = {
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                   </span>
                 </div>
-              </div>
+              </a></div>
             </div>
           </div>
         </section>
@@ -234,13 +232,11 @@ const HomeView = {
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             ${featuredCards.map(card => `
-              <article 
-                onclick="app.openProductPDP('${card.id}')" 
-                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();app.openProductPDP('${card.id}');}"
-                role="button"
-                tabindex="0"
+              <article class="h-full">
+              <a
+                href="${app.url('pdp', { id: card.id })}"
                 aria-label="Ver detalles de ${card.nombre}"
-                class="cursor-pointer bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-[#0F172A] transition-all duration-200 flex flex-col justify-between group"
+                class="block h-full bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-[#0F172A] transition-all duration-200 flex flex-col justify-between group"
               >
                 <div>
                   <div class="flex items-center justify-between mb-2.5">
@@ -259,7 +255,7 @@ const HomeView = {
                       height="342"
                       loading="lazy"
                       decoding="async"
-                      class="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+                      class="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 motion-safe:group-hover:scale-105" 
                       onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
                     />
                   </div>
@@ -279,7 +275,7 @@ const HomeView = {
                     <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
                   </span>
                 </div>
-              </article>
+              </a></article>
             `).join('')}
           </div>
         </section>
@@ -312,13 +308,11 @@ const HomeView = {
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
             ${sealedProducts.map(pack => `
-              <article 
-                onclick="app.openProductPDP('${pack.id}')" 
-                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();app.openProductPDP('${pack.id}');}"
-                role="button"
-                tabindex="0"
+              <article class="h-full">
+              <a
+                href="${app.url('pdp', { id: pack.id })}"
                 aria-label="Ver producto sellado ${pack.nombre}"
-                class="cursor-pointer bg-slate-800/90 hover:bg-slate-800 border border-slate-700 hover:border-[#D97706] rounded-2xl p-4 flex flex-col justify-between transition-all group shadow-md"
+                class="block h-full bg-slate-800/90 hover:bg-slate-800 border border-slate-700 hover:border-[#D97706] rounded-2xl p-4 flex flex-col justify-between transition-all group shadow-md"
               >
                 <div>
                   <div class="flex items-center justify-between mb-3">
@@ -333,7 +327,7 @@ const HomeView = {
                       alt="${pack.nombre}"
                       loading="lazy"
                       decoding="async"
-                      class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105" 
+                      class="max-h-full max-w-full object-contain transition-transform duration-300 motion-safe:group-hover:scale-105" 
                       onerror="this.onerror=null; this.src='${pack.imagenFallbackUrl}'"
                     />
                   </div>
@@ -350,7 +344,7 @@ const HomeView = {
                     <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                   </span>
                 </div>
-              </article>
+              </a></article>
             `).join('')}
           </div>
         </section>

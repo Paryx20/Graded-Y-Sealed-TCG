@@ -1,6 +1,6 @@
 /**
  * Imágenes de cartas: URL real de images.pokemontcg.io, carga diferida,
- * tamaño definido y respaldo local (card-back.png) si falla la descarga.
+ * tamaño definido y copia local en assets/img/cards/ si falla la descarga.
  */
 
 import test from 'node:test';
@@ -24,12 +24,16 @@ function loadGlobals(files, names) {
 // Bloques <img ...> de una plantilla
 const imgTags = code => code.match(/<img[\s\S]*?\/?>/g) || [];
 
-test('Cada carta del catálogo usa una imagen de images.pokemontcg.io con respaldo local', () => {
+test('Cada carta del catálogo usa una imagen de images.pokemontcg.io con su copia local de respaldo', () => {
   const { POKEMON_CARDS_CATALOG_10 } = loadGlobals(['js/data.js'], ['POKEMON_CARDS_CATALOG_10']);
   assert.equal(POKEMON_CARDS_CATALOG_10.length, 10);
   for (const card of POKEMON_CARDS_CATALOG_10) {
     assert.match(card.imagenLocal, /^https:\/\/images\.pokemontcg\.io\/[\w-]+\/\w+\.png$/, `${card.id}: imagen de la API`);
-    assert.equal(card.imagenFallbackUrl, FALLBACK, `${card.id}: respaldo local`);
+    // Si la API cae, se muestra la foto real de la carta guardada en el proyecto
+    assert.equal(card.imagenFallbackUrl, `assets/img/cards/${card.id}.webp`, `${card.id}: respaldo local`);
+    const file = path.join(ROOT, card.imagenFallbackUrl);
+    assert.ok(fs.existsSync(file), `${card.imagenFallbackUrl} debe existir`);
+    assert.ok(fs.statSync(file).size < 300 * 1024, `${card.imagenFallbackUrl} debe pesar menos de 300 KB`);
   }
   assert.ok(fs.statSync(path.join(ROOT, FALLBACK)).size > 0, 'card-back.png debe existir');
 });
@@ -62,7 +66,7 @@ test('La ficha de producto usa la versión _hires sin carga diferida', () => {
   const { PDPView } = loadGlobals(['js/views/pdp.js'], ['PDPView']);
   assert.equal(PDPView.hiresImage('https://images.pokemontcg.io/sv6/188.png'), 'https://images.pokemontcg.io/sv6/188_hires.png');
   assert.equal(PDPView.hiresImage('https://images.pokemontcg.io/sv6/188_hires.png'), 'https://images.pokemontcg.io/sv6/188_hires.png');
-  assert.equal(PDPView.hiresImage('assets/img/packs/booster-team-rocket.png'), 'assets/img/packs/booster-team-rocket.png');
+  assert.equal(PDPView.hiresImage('assets/img/packs/booster-pack-base-1999-frontal.webp'), 'assets/img/packs/booster-pack-base-1999-frontal.webp');
 
   const card = { id: 'x', nombre: 'Eevee', imagenLocal: 'https://images.pokemontcg.io/sv6/188.png', imagenFallbackUrl: FALLBACK };
   for (const mode of ['front', 'slab']) {
@@ -90,7 +94,7 @@ test('Una bolsa guardada con rutas viejas recupera las imágenes del catálogo a
   Store.init();
   const [gengar, etb, api] = Store.data.cart;
   assert.equal(gengar.imageLocal, 'https://images.pokemontcg.io/sv3pt5/94.png');
-  assert.equal(gengar.imageFallback, FALLBACK);
+  assert.equal(gengar.imageFallback, 'assets/img/cards/gengar-scarlet-violet.webp');
   assert.equal(etb.imageLocal, 'assets/img/sealed/etb-crown-zenith/frontal.svg');
   assert.equal(api.imageLocal, FALLBACK);
 });

@@ -11,6 +11,7 @@ const CheckoutView = {
 
     return `
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <h1 class="sr-only">Finalizar compra</h1>
         <div class="bg-[#0F172A] text-white rounded-xl px-4 py-3 flex items-center justify-between mb-6 shadow-sm">
           <div class="flex items-center gap-2 text-xs font-bold">
             <i data-lucide="lock" class="w-4 h-4 text-[#047857]"></i>
@@ -50,8 +51,9 @@ const CheckoutView = {
                   </div>
                   <div>
                     <label for="login-pass-checkout" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña:</label>
-                    <input type="password" id="login-pass-checkout" placeholder="••••••••" class="w-full px-3 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                    <input type="password" id="login-pass-checkout" autocomplete="current-password" placeholder="••••••••" class="w-full px-3 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                   </div>
+                  <p data-form-error role="alert" class="hidden text-xs text-[#BE123C] font-semibold"></p>
                   <button type="submit" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-lg transition touch-target">
                     Iniciar Sesión y Precargar
                   </button>
@@ -64,7 +66,7 @@ const CheckoutView = {
           <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
-                <h1 class="text-lg font-bold text-[#0F172A]">Datos de Facturación y Creación de Cuenta</h1>
+                <h2 class="text-lg font-bold text-[#0F172A]">Datos de Facturación y Creación de Cuenta</h2>
                 <p class="text-xs text-slate-500 mt-0.5">Completa los datos para emitir tu factura electrónica y orden de custodia</p>
               </div>
               <span class="text-xs font-bold text-[#B45309] bg-[#FEF3C7] px-2 py-0.5 rounded">Custodia Asegurada</span>
@@ -75,7 +77,7 @@ const CheckoutView = {
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label for="guest-name" class="block text-xs font-bold text-[#0F172A] mb-1">Nombre Completo: *</label>
-                  <input type="text" id="guest-name" value="${user ? user.name : ''}" placeholder="Ej. Carlos Mendoza" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                  <input type="text" id="guest-name" value="${user ? user.name : ''}" autocomplete="name" placeholder="Ej. Carlos Mendoza" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                 </div>
 
                 <div>
@@ -84,7 +86,7 @@ const CheckoutView = {
                     type="text" 
                     id="guest-id" 
                     value="${user && (user.idCard || user.cedula_ruc) ? (user.idCard || user.cedula_ruc) : ''}" 
-                    placeholder="Ej. 1710034065 o 1710034065001" 
+                    autocomplete="off" placeholder="Ej. 1710034065 o 1710034065001" 
                     maxlength="13"
                     inputmode="numeric"
                     oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 13)"
@@ -95,7 +97,7 @@ const CheckoutView = {
 
                 <div>
                   <label for="guest-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo Electrónico: *</label>
-                  <input type="email" id="guest-email" value="${user ? user.email : ''}" placeholder="carlos@correo.com" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                  <input type="email" id="guest-email" value="${user ? user.email : ''}" autocomplete="email" placeholder="carlos@correo.com" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                 </div>
 
                 <div>
@@ -108,10 +110,10 @@ const CheckoutView = {
                       type="tel" 
                       id="guest-phone" inputmode="numeric" 
                       value="${rawPhone}" 
-                      placeholder="0991234567" 
+                      autocomplete="tel-national" placeholder="0991234567" 
                       maxlength="10" 
                       oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 10)"
-                      class="flex-1 px-3.5 py-2 text-sm bg-[#F8FAFC] focus:bg-white focus:outline-none" 
+                      class="flex-1 px-3.5 py-2 text-sm bg-[#F8FAFC] focus:bg-white" 
                       required 
                     />
                   </div>
@@ -119,12 +121,12 @@ const CheckoutView = {
 
                 <div>
                   <label for="guest-address" class="block text-xs font-bold text-[#0F172A] mb-1">Dirección de Entrega: *</label>
-                  <input type="text" id="guest-address" value="${user ? (user.address || user.direccion_principal || '') : ''}" placeholder="Av. República del Salvador N34-183" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                  <input type="text" id="guest-address" value="${user ? (user.address || user.direccion_principal || '') : ''}" autocomplete="street-address" placeholder="Av. República del Salvador N34-183" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                 </div>
 
                 <div>
                   <label for="guest-city" class="block text-xs font-bold text-[#0F172A] mb-1">Ciudad: *</label>
-                  <input type="text" id="guest-city" value="${user ? (user.city || user.ciudad || '') : ''}" placeholder="Quito" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
+                  <input type="text" id="guest-city" value="${user ? (user.city || user.ciudad || '') : ''}" autocomplete="address-level2" placeholder="Quito" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                 </div>
 
                 ${user ? `
@@ -198,22 +200,22 @@ const CheckoutView = {
                   <div id="card-fields" class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200">
                     <div class="sm:col-span-3">
                       <label for="card-holder" class="block text-xs font-bold text-slate-700 mb-1">Nombre del titular (como aparece en la tarjeta):</label>
-                      <input type="text" id="card-holder" autocomplete="cc-name" placeholder="CARLOS MENDOZA" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none uppercase" />
+                      <input type="text" id="card-holder" value="${user ? String(user.name || '').toUpperCase() : ''}" autocomplete="cc-name" placeholder="CARLOS MENDOZA" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg uppercase" />
                     </div>
                     <div class="sm:col-span-3">
                       <label for="card-number" class="block text-xs font-bold text-slate-700 mb-1">Número de tarjeta:</label>
                       <div data-field class="flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden">
-                        <input type="text" id="card-number" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000" oninput="CheckoutView.formatCardNumber(this)" class="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none font-mono tracking-wide" />
+                        <input type="text" id="card-number" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000" oninput="CheckoutView.formatCardNumber(this)" class="flex-1 px-3 py-2 text-sm bg-transparent font-mono tracking-wide" />
                         <span id="card-brand" class="px-3 text-xs font-bold text-slate-500 uppercase"></span>
                       </div>
                     </div>
                     <div>
                       <label for="card-exp" class="block text-xs font-bold text-slate-700 mb-1">Expiración:</label>
-                      <input type="text" id="card-exp" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA" oninput="CheckoutView.formatExpiry(this)" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
+                      <input type="text" id="card-exp" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA" oninput="CheckoutView.formatExpiry(this)" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg" />
                     </div>
                     <div>
                       <label for="card-cvv" class="block text-xs font-bold text-slate-700 mb-1">CVV/CVC:</label>
-                      <input type="password" id="card-cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="•••" maxlength="3" oninput="this.value = this.value.replace(/\\D/g, '')" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none" />
+                      <input type="password" id="card-cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="•••" maxlength="3" oninput="this.value = this.value.replace(/\\D/g, '')" class="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg" />
                     </div>
                   </div>
                 </div>
@@ -395,10 +397,11 @@ const CheckoutView = {
         </div>
 
         <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm max-w-lg mx-auto">
-          <div class="flex border-b border-slate-200 mb-6">
+          <div class="flex border-b border-slate-200 mb-6" role="group" aria-label="Acceso a tu cuenta">
             <button 
               type="button" 
               onclick="CheckoutView.switchAuthTab('login')" 
+              aria-pressed="${isLogin}"
               class="flex-1 py-2.5 text-xs font-semibold border-b-2 transition ${isLogin ? 'border-[#E11D48] text-[#0F172A]' : 'border-transparent text-slate-500 hover:text-[#0F172A]'}"
             >
               Iniciar Sesión
@@ -406,6 +409,7 @@ const CheckoutView = {
             <button 
               type="button" 
               onclick="CheckoutView.switchAuthTab('register')" 
+              aria-pressed="${!isLogin}"
               class="flex-1 py-2.5 text-xs font-semibold border-b-2 transition ${!isLogin ? 'border-[#E11D48] text-[#0F172A]' : 'border-transparent text-slate-500 hover:text-[#0F172A]'}"
             >
               Crear Cuenta
@@ -422,6 +426,7 @@ const CheckoutView = {
                 <label for="auth-password" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña: *</label>
                 <input type="password" id="auth-password" autocomplete="current-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
+              <p data-form-error role="alert" class="hidden text-xs text-[#BE123C] font-semibold"></p>
               <button type="submit" class="w-full py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-xl transition shadow touch-target">
                 Acceder a mi Cuenta
               </button>
@@ -439,7 +444,7 @@ const CheckoutView = {
                 </div>
                 <div>
                   <label for="reg-id" class="block text-xs font-bold text-[#0F172A] mb-1">Cédula o RUC: *</label>
-                  <input type="text" id="reg-id" inputmode="numeric" maxlength="13" oninput="this.value = this.value.replace(/\\D/g, '').slice(0,13)" placeholder="1710034065" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+                  <input type="text" id="reg-id" inputmode="numeric" maxlength="13" oninput="this.value = this.value.replace(/\\D/g, '').slice(0,13)" autocomplete="off" placeholder="1710034065" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
                 </div>
               </div>
               <div>
@@ -453,7 +458,7 @@ const CheckoutView = {
                 </div>
                 <div>
                   <label for="reg-phone" class="block text-xs font-bold text-[#0F172A] mb-1">Celular: *</label>
-                  <input type="tel" id="reg-phone" inputmode="numeric" maxlength="10" oninput="this.value = this.value.replace(/\\D/g, '').slice(0,10)" placeholder="0991234567" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+                  <input type="tel" id="reg-phone" inputmode="numeric" maxlength="10" oninput="this.value = this.value.replace(/\\D/g, '').slice(0,10)" autocomplete="tel-national" placeholder="0991234567" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
                 </div>
               </div>
               <div>
@@ -464,6 +469,7 @@ const CheckoutView = {
                 <label for="reg-pass" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña: *</label>
                 <input type="password" id="reg-pass" autocomplete="new-password" placeholder="Mínimo 8 caracteres, con letras y números" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
+              <p data-form-error role="alert" class="hidden text-xs text-[#BE123C] font-semibold"></p>
               <button type="submit" class="w-full py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-semibold rounded-xl transition shadow touch-target">
                 Registrar mi Cuenta
               </button>
@@ -606,6 +612,7 @@ const CheckoutView = {
       app.showToast(`¡Cuenta creada con éxito, ${user.name}!`, 'success');
       app.go('profile');
     } catch (err) {
+      app.showFormError(err.message);
       app.showToast(err.message, 'error');
     }
   },

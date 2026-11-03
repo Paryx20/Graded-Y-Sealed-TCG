@@ -26,6 +26,9 @@ const SearchResultsView = {
    */
   render(initialQuery = '') {
     this.currentQuery = (initialQuery || '').trim();
+    if (typeof document !== 'undefined' && this.currentQuery) {
+      document.title = `Búsqueda: ${this.currentQuery} | Graded & Sealed TCG`;
+    }
 
     return `
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16">
@@ -60,7 +63,7 @@ const SearchResultsView = {
               autocomplete="off"
               value="${this._escapeHtml(this.currentQuery)}"
               placeholder="Escribe el nombre de un Pokémon, carta, expansión (e.g. Charizard, Moonbreon, Base Set)..."
-              class="w-full pl-12 pr-28 py-3.5 text-sm sm:text-base bg-slate-50 border-2 border-slate-200 rounded-xl text-[#0F172A] placeholder-slate-400 font-medium focus:bg-white focus:border-[#E11D48] focus:outline-none transition shadow-inner"
+              class="w-full pl-12 pr-28 py-3.5 text-sm sm:text-base bg-slate-50 border-2 border-slate-200 rounded-xl text-[#0F172A] placeholder-slate-600 font-medium focus:bg-white focus:border-[#E11D48] transition shadow-inner"
               oninput="SearchResultsView.handleInput(this.value)"
             />
             <button 
@@ -75,12 +78,12 @@ const SearchResultsView = {
           <!-- Quick Suggestion Tags -->
           <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
             <span class="font-bold text-slate-500">Búsquedas rápidas:</span>
-            <button type="button" onclick="SearchResultsView.quickSearch('Charizard')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Charizard</button>
-            <button type="button" onclick="SearchResultsView.quickSearch('Umbreon')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Umbreon</button>
-            <button type="button" onclick="SearchResultsView.quickSearch('Lugia')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Lugia</button>
-            <button type="button" onclick="SearchResultsView.quickSearch('Pikachu')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Pikachu</button>
-            <button type="button" onclick="SearchResultsView.quickSearch('Base Set')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Base Set</button>
-            <button type="button" onclick="SearchResultsView.quickSearch('Team Rocket')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Team Rocket</button>
+            <button type="button" onclick="SearchResultsView.quickSearch('Charizard')" class="px-2.5 py-1 min-h-[28px] bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Charizard</button>
+            <button type="button" onclick="SearchResultsView.quickSearch('Umbreon')" class="px-2.5 py-1 min-h-[28px] bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Umbreon</button>
+            <button type="button" onclick="SearchResultsView.quickSearch('Lugia')" class="px-2.5 py-1 min-h-[28px] bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Lugia</button>
+            <button type="button" onclick="SearchResultsView.quickSearch('Pikachu')" class="px-2.5 py-1 min-h-[28px] bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Pikachu</button>
+            <button type="button" onclick="SearchResultsView.quickSearch('Base Set')" class="px-2.5 py-1 min-h-[28px] bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Base Set</button>
+            <button type="button" onclick="SearchResultsView.quickSearch('Team Rocket')" class="px-2.5 py-1 min-h-[28px] bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-semibold transition">Team Rocket</button>
           </div>
         </div>
 
@@ -348,7 +351,7 @@ const SearchResultsView = {
         <!-- Results stats bar -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-600 bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-2xs">
           <div class="flex items-center gap-2">
-            <span class="font-semibold text-[#0F172A]">${total} ${total === 1 ? 'carta encontrada' : 'cartas encontradas'}</span>
+            <span role="status" class="font-semibold text-[#0F172A]">${total} ${total === 1 ? 'carta encontrada' : 'cartas encontradas'}</span>
             ${query ? `<span class="text-slate-500">para "${qEscaped}"</span>` : ''}
           </div>
           <div class="flex items-center gap-3 text-xs font-semibold text-slate-500">
@@ -409,6 +412,7 @@ const SearchResultsView = {
           </div>
 
           <!-- Card Thumbnail -->
+          <!-- Atajo de ratón: el botón con el nombre es el equivalente accesible -->
           <div 
             onclick="app.openProductPDP('${card.id}')"
             class="p-4 flex items-center justify-center bg-gradient-to-b from-slate-50 to-white min-h-[220px] cursor-pointer"
@@ -419,19 +423,18 @@ const SearchResultsView = {
               width="245"
               height="342"
               decoding="async"
-              class="max-h-48 w-auto h-auto object-contain drop-shadow group-hover:scale-105 transition-transform duration-300"
+              class="max-h-48 w-auto h-auto object-contain drop-shadow motion-safe:group-hover:scale-105 transition-transform duration-300"
               onerror="this.onerror=null; this.src='assets/img/cards/card-back.png'"
               loading="lazy"
             />
           </div>
 
           <!-- Card Details -->
-          <div 
-            onclick="app.openProductPDP('${card.id}')"
-            class="px-4 pb-2 cursor-pointer"
-          >
+          <div class="px-4 pb-2">
             <h3 class="text-sm font-semibold text-[#0F172A] line-clamp-1 group-hover:text-[#BE123C] transition">
-              ${this._escapeHtml(card.nombre)}
+              <button type="button" onclick="app.openProductPDP('${card.id}')" class="text-left w-full">
+                ${this._escapeHtml(card.nombre)}
+              </button>
             </h3>
             <p class="text-xs text-slate-500 mt-0.5">${this._escapeHtml(card.set || 'Expansión')}</p>
           </div>

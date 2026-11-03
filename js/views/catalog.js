@@ -178,11 +178,11 @@ const CatalogView = {
               </select>
             </div>
 
-            <div>
-              <span class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-2">
+            <fieldset>
+              <legend class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-2">
                 <i data-lucide="star" class="w-4 h-4 text-slate-500"></i>
                 Edición
-              </span>
+              </legend>
               <div class="space-y-1.5 text-xs">
                 ${[
                   { id: 'all', label: 'Todas las cartas' },
@@ -201,7 +201,7 @@ const CatalogView = {
                   </label>
                 `).join('')}
               </div>
-            </div>
+            </fieldset>
 
             <div>
               <label class="flex items-center gap-2.5 cursor-pointer p-1.5 rounded-lg hover:bg-slate-50 text-xs">
@@ -236,11 +236,11 @@ const CatalogView = {
               </select>
             </div>
 
-            <div>
-              <span class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+            <fieldset>
+              <legend class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
                 <i data-lucide="dollar-sign" class="w-4 h-4 text-slate-500"></i>
                 Rango de Precio (USD)
-              </span>
+              </legend>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label for="cat-min-price" class="text-xs font-bold text-slate-500 block mb-0.5">Desde $</label>
@@ -265,7 +265,7 @@ const CatalogView = {
                   />
                 </div>
               </div>
-            </div>
+            </fieldset>
 
             <button 
               type="button" 
@@ -279,7 +279,7 @@ const CatalogView = {
           <div class="lg:col-span-9 space-y-5">
             <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
-                <span>Mostrando <strong id="catalog-inline-count" class="text-[#0F172A]">${filtered.length}</strong> de ${PRODUCTS.length} activos en bóveda</span>
+                <span role="status" aria-atomic="true">Mostrando <strong id="catalog-inline-count" class="text-[#0F172A]">${filtered.length}</strong> de ${PRODUCTS.length} activos en bóveda</span>
                 ${this.isVaultFallback ? `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">Búsqueda en toda la Bóveda</span>` : ''}
                 ${f.searchQuery ? `
                   <a href="${app.url('catalog', f.category !== 'all' ? { cat: f.category } : (f.era !== 'all' ? { era: f.era } : null))}"
@@ -374,7 +374,7 @@ const CatalogView = {
                 height="342"
                 loading="lazy"
                 decoding="async"
-                class="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                class="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 motion-safe:group-hover:scale-105"
                 onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
               />
             </div>

@@ -25,6 +25,7 @@ const ProfileView = {
                 <label for="prof-login-pass" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña</label>
                 <input type="password" id="prof-login-pass" autocomplete="current-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" />
               </div>
+              <p data-form-error role="alert" class="hidden text-xs text-[#BE123C] font-semibold"></p>
               <button type="submit" class="w-full py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-xl transition shadow touch-target">Iniciar sesión</button>
             </form>
 
@@ -69,10 +70,11 @@ const ProfileView = {
           </button>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3" role="tablist">
+        <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3" role="group" aria-label="Secciones del perfil">
           <button 
             type="button" 
             onclick="ProfileView.switchTab('personal')" 
+            aria-pressed="${activeTab === 'personal'}"
             class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 ${activeTab === 'personal' ? 'bg-[#0F172A] text-white shadow' : 'bg-white border border-slate-200 text-slate-600 hover:text-[#0F172A]'}"
           >
             <i data-lucide="user-cog" class="w-4 h-4"></i>
@@ -82,6 +84,7 @@ const ProfileView = {
           <button 
             type="button" 
             onclick="ProfileView.switchTab('orders')" 
+            aria-pressed="${activeTab === 'orders'}"
             class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 ${activeTab === 'orders' ? 'bg-[#0F172A] text-white shadow' : 'bg-white border border-slate-200 text-slate-600 hover:text-[#0F172A]'}"
           >
             <i data-lucide="package-check" class="w-4 h-4"></i>
@@ -102,7 +105,7 @@ const ProfileView = {
                   <label for="prof-name" class="block text-xs font-semibold text-[#0F172A] mb-1">Nombre Completo: *</label>
                   <input 
                     type="text" 
-                    id="prof-name" 
+                    id="prof-name" autocomplete="name" 
                     value="${user.name || ''}" 
                     required 
                     class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-xl focus:bg-white text-[#0F172A] font-semibold"
@@ -116,7 +119,7 @@ const ProfileView = {
                     id="prof-id" 
                     value="${user.idCard || ''}" 
                     readonly
-                    class="w-full px-3.5 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-semibold cursor-not-allowed"
+                    class="w-full px-3.5 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-600 font-semibold cursor-not-allowed"
                   />
                   <p class="text-xs text-slate-500 mt-1">La cédula identifica tu cuenta y no se puede cambiar.</p>
                 </div>
@@ -154,12 +157,12 @@ const ProfileView = {
                     </span>
                     <input 
                       type="tel" 
-                      id="prof-phone" 
+                      id="prof-phone" autocomplete="tel-national" 
                       value="${cleanPhone || ''}" 
                       maxlength="10"
                       oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 10)"
                       required 
-                      class="flex-1 px-3.5 py-2.5 text-sm bg-[#F8FAFC] focus:bg-white focus:outline-none text-[#0F172A] font-semibold"
+                      class="flex-1 px-3.5 py-2.5 text-sm bg-[#F8FAFC] focus:bg-white text-[#0F172A] font-semibold"
                     />
                   </div>
                 </div>
@@ -168,7 +171,7 @@ const ProfileView = {
                   <label for="prof-city" class="block text-xs font-semibold text-[#0F172A] mb-1">Ciudad: *</label>
                   <input 
                     type="text" 
-                    id="prof-city" 
+                    id="prof-city" autocomplete="address-level2" 
                     value="${user.city || ''}" 
                     required 
                     class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-xl focus:bg-white text-[#0F172A] font-semibold"
@@ -179,7 +182,7 @@ const ProfileView = {
                   <label for="prof-address" class="block text-xs font-semibold text-[#0F172A] mb-1">Dirección Predeterminada de Envío: *</label>
                   <input 
                     type="text" 
-                    id="prof-address" 
+                    id="prof-address" autocomplete="street-address" 
                     value="${user.address || ''}" 
                     required 
                     class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-xl focus:bg-white text-[#0F172A] font-semibold"

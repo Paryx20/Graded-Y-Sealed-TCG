@@ -264,7 +264,7 @@ test('Feature 2 [Tier 1]: Card Assets - Supports standard card ratio aspect styl
 test('Feature 2 [Tier 1]: Card Assets - Provides fallback URL when local asset is missing', () => {
   const { PRODUCTS, PDPView } = setupPDPRenderer();
   const card = PRODUCTS.find(p => p.categoria === 'psa');
-  assert.equal(card.imagenFallbackUrl, 'assets/img/cards/card-back.png');
+  assert.equal(card.imagenFallbackUrl, `assets/img/cards/${card.id}.webp`);
   assert.ok(fs.existsSync(path.join(process.cwd(), card.imagenFallbackUrl)));
   const html = PDPView.renderInspectorStage(card, 'psa10', 'front');
   assert.ok(html.includes(`onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"`));

@@ -309,10 +309,10 @@ const Store = {
           // Filas antiguas guardan la ruta previa a assets/ (img/...)
           const imageUrl = row.imagen_url
             .replace(/^img\/sealed\/Paquete fossil\.png$/, 'img/sealed/paquete-fossil.png')
-            .replace(/^img\/booster-team-rocket\.png$/, 'img/packs/booster-team-rocket.png')
+            .replace(/^(assets\/)?img\/(packs\/)?booster-team-rocket\.png$/, 'img/packs/booster-pack-base-1999-frontal.webp')
             .replace(/^img\//, 'assets/img/');
           product.imagenLocal = imageUrl;
-          if (!product.imagenFallbackUrl || !/^https?:/.test(product.imagenFallbackUrl)) product.imagenFallbackUrl = imageUrl;
+          if (!product.imagenFallbackUrl) product.imagenFallbackUrl = imageUrl;
         }
         if (Array.isArray(row.historial) && row.historial.length) {
           const last = row.historial[row.historial.length - 1];

@@ -424,12 +424,14 @@ const app = {
   async loginUser(email, password, redirectHome = true) {
     const emailMsg = Validators.email(email);
     if (emailMsg || !password) {
+      this.showFormError(emailMsg || 'Ingresa tu contraseña.');
       this.showToast(emailMsg || 'Ingresa tu contraseña.', 'error');
       return false;
     }
 
     try {
       const user = await SupabaseAPI.login(email, password);
+      this.showFormError('');
       this.startSession(user);
       this.showToast(`¡Bienvenido a la bóveda, ${user.name}!`, 'success');
       if (redirectHome) {
@@ -437,9 +439,19 @@ const app = {
       }
       return true;
     } catch (err) {
+      this.showFormError(err.message);
       this.showToast(err.message, 'error');
       return false;
     }
+  },
+
+  // Error persistente junto al formulario de acceso: el toast desaparece a los 2.5 s (WCAG 3.3.1)
+  showFormError(message) {
+    if (typeof document === 'undefined' || typeof document.querySelectorAll !== 'function') return;
+    document.querySelectorAll('[data-form-error]').forEach(el => {
+      el.textContent = message || '';
+      el.classList.toggle('hidden', !message);
+    });
   },
 
   // Guarda la sesión y trae desde Supabase el historial de órdenes del usuario
@@ -557,11 +569,11 @@ const app = {
       </div>
       <div class="divide-y divide-slate-100">
         ${matches.map(card => `
-          <div onclick="app.selectSpotlightProduct('${card.id}')" class="p-2.5 flex items-center justify-between hover:bg-slate-50 cursor-pointer rounded-lg transition group">
-            <div class="flex items-center gap-3">
+          <button type="button" onclick="app.selectSpotlightProduct('${card.id}')" class="w-full text-left p-2.5 flex items-center justify-between hover:bg-slate-50 cursor-pointer rounded-lg transition group">
+            <span class="flex items-center gap-3">
               <img 
                 src="${card.imagenLocal}" 
-                alt="${card.nombre}"
+                alt=""
                 width="36"
                 height="48"
                 loading="lazy"
@@ -569,16 +581,16 @@ const app = {
                 class="w-9 h-12 object-contain bg-[#F8FAFC] border border-slate-200 rounded p-0.5" 
                 onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
               />
-              <div>
-                <h4 class="text-xs font-semibold text-[#0F172A] group-hover:text-[#BE123C] transition">${card.nombre}</h4>
+              <span class="block">
+                <span class="block text-xs font-semibold text-[#0F172A] group-hover:text-[#BE123C] transition">${card.nombre}</span>
                 <span class="text-xs text-slate-500">${card.set} • ${card.rareza}</span>
-              </div>
-            </div>
-            <div class="text-right">
+              </span>
+            </span>
+            <span class="block text-right">
               <span class="text-xs font-bold text-[#0F172A]">$${Number((card.precios && (card.precios.psa10 || card.precios.raw)) || card.precioEstimado || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
               <span class="block text-xs text-[#B45309] font-bold">PSA 10</span>
-            </div>
-          </div>
+            </span>
+          </button>
         `).join('')}
       </div>
       <div class="p-2 border-t border-slate-100 flex items-center justify-between text-xs">

@@ -166,13 +166,19 @@ const Validators = {
       err = document.createElement('p');
       err.id = `${input.id}-error`;
       err.setAttribute('role', 'alert');
-      err.className = 'text-[11px] text-[#E11D48] font-semibold mt-1';
+      err.className = 'text-xs text-[#BE123C] font-semibold mt-1';
       anchor.insertAdjacentElement('afterend', err);
     }
     const box = input.closest('[data-field]') || input;
     err.textContent = message || '';
     err.classList.toggle('hidden', !message);
     input.setAttribute('aria-invalid', message ? 'true' : 'false');
+    // El lector de pantalla lee el error al volver al campo (WCAG 3.3.1), sin perder la ayuda que ya tuviera
+    const describedBy = ((input.getAttribute && input.getAttribute('aria-describedby')) || '')
+      .split(' ').filter(id => id && id !== err.id);
+    if (message) describedBy.push(err.id);
+    if (describedBy.length) input.setAttribute('aria-describedby', describedBy.join(' '));
+    else if (input.removeAttribute) input.removeAttribute('aria-describedby');
     box.classList.toggle('!border-[#E11D48]', !!message);
     box.classList.toggle('!border-[#059669]', !message && !!input.value);
   },

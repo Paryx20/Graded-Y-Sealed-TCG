@@ -55,9 +55,22 @@ h1, h2, h3 {
   box-shadow: none !important;
 }
 
+/* Foco visible en fondos claros y oscuros (WCAG 2.4.7 / 2.4.13): anillo dorado con halo navy */
 :focus-visible {
-  outline: 3px solid var(--vault-navy) !important;
+  outline: 3px solid #FACC15 !important;
   outline-offset: 2px !important;
+  box-shadow: 0 0 0 5px var(--vault-navy) !important;
+}
+
+/* El header sticky (~108px) no debe tapar el elemento enfocado (WCAG 2.4.11) */
+html {
+  scroll-padding-top: 8rem;
+}
+
+/* Placeholders con contraste suficiente (WCAG 1.4.3) */
+::placeholder {
+  color: #64748B;
+  opacity: 1;
 }
 
 html, body {
@@ -468,17 +481,6 @@ html, body {
   top: 0.75rem;
 }
 
-/* Foco visible para navegación con teclado (WCAG 2.4.7 / 2.4.11) */
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-summary:focus-visible,
-[tabindex]:focus-visible {
-  outline: 3px solid #D97706;
-  outline-offset: 2px;
-}
-
 /* Nombre de la tienda junto al logo */
 .brand-wordmark {
   display: block;
@@ -543,8 +545,10 @@ svg.lucide {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton {
-    animation: none;
+  .skeleton,
+  .animate-ping,
+  .animate-pulse {
+    animation: none !important;
   }
   *, *::before, *::after {
     transition-duration: 0.01ms !important;

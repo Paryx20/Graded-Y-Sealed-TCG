@@ -63,7 +63,7 @@ const PDPView = {
 
             <!-- Bottom Row: Barcode, Center Hologram Security Foil & Cert Number -->
             <div class="mt-2 pt-1 border-t border-slate-200 flex items-center justify-between gap-1">
-              <div class="psa-barcode flex-shrink-0" aria-label="Código de barras oficial"></div>
+              <div class="psa-barcode flex-shrink-0" role="img" aria-label="Código de barras oficial"></div>
               <div class="psa-hologram-emblem flex-shrink-0 flex items-center justify-center px-1.5 py-0.5 rounded bg-gradient-to-r from-slate-200 via-amber-100 to-slate-200 border border-slate-300 text-xs font-bold shadow-xs" title="PSA Authentic Security Hologram">
                 <span class="text-[#0284C7] font-bold">P</span><span class="text-[#D8232A] font-bold">S</span><span class="text-[#0F172A] font-bold">A</span>
               </div>
@@ -114,7 +114,7 @@ const PDPView = {
               <img 
                 id="pdp-main-image"
                 src="${mainImage}"
-                alt="${product.nombre}"
+                alt="${product.nombre}, ${gradeLabel}, vista frontal"
                 width="245"
                 height="342"
                 fetchpriority="high"
@@ -185,7 +185,7 @@ const PDPView = {
           <img 
             id="pdp-sealed-main-img"
             src="${currentImage}" 
-            alt="${product.nombre} (${currentLabel})" 
+            alt="${product.nombre}, vista ${currentLabel.toLowerCase()}" 
             class="max-h-[340px] max-w-full object-contain filter drop-shadow-2xl rounded-xl sealed-stage-img"
             onerror="this.onerror=null; this.src='${product.imagenFallbackUrl}'"
           />
@@ -208,7 +208,7 @@ const PDPView = {
     const angles = this.SEALED_ANGLES.filter(a => gallery[a.key]);
 
     return `
-      <div class="grid grid-cols-2 ${['sm:grid-cols-3', 'sm:grid-cols-3', 'sm:grid-cols-3', 'sm:grid-cols-3', 'sm:grid-cols-4', 'sm:grid-cols-5'][angles.length] || 'sm:grid-cols-5'} gap-3 mt-4" role="tablist" aria-label="Ángulos del empaque sellado">
+      <div class="grid grid-cols-2 ${['sm:grid-cols-3', 'sm:grid-cols-3', 'sm:grid-cols-3', 'sm:grid-cols-3', 'sm:grid-cols-4', 'sm:grid-cols-5'][angles.length] || 'sm:grid-cols-5'} gap-3 mt-4" role="group" aria-label="Ángulos del empaque sellado">
         ${angles.map(ang => {
           const isActive = activeAngle === ang.key;
           const thumbImg = gallery[ang.key] || product.imagenLocal;
@@ -217,14 +217,14 @@ const PDPView = {
               type="button" 
               onclick="PDPView.setSealedAngle('${ang.key}')" 
               class="p-3 rounded-xl border-2 text-left transition flex flex-col justify-between ${isActive ? 'border-[#D97706] bg-amber-50/50 shadow-sm' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
-              aria-selected="${isActive}"
+              aria-pressed="${isActive}"
             >
               <div class="flex items-center justify-between mb-1.5">
                 <span class="text-xs font-bold text-[#0F172A]">${ang.title}</span>
                 <i data-lucide="${ang.icon}" class="w-4 h-4 ${isActive ? 'text-[#B45309]' : 'text-slate-500'}"></i>
               </div>
               <div class="w-full h-16 rounded-lg bg-white border border-slate-200 flex items-center justify-center overflow-hidden mb-1.5">
-                <img src="${thumbImg}" alt="${ang.title}" loading="lazy" decoding="async" class="max-h-full max-w-full object-contain p-1" />
+                <img src="${thumbImg}" alt="" loading="lazy" decoding="async" class="max-h-full max-w-full object-contain p-1" />
               </div>
               <span class="text-xs text-slate-500 line-clamp-1">${ang.sub}</span>
             </button>
@@ -313,6 +313,7 @@ const PDPView = {
     const mode = Store.data.pdpInspectorMode || 'front';
     const activeAngle = Store.data.pdpSealedAngle || 'perspectiva';
     const qty = Store.data.pdpQuantity || 1;
+    if (typeof document !== 'undefined') document.title = `${product.nombre} | Graded & Sealed TCG`;
 
     let currentPrice;
     if (isSealed) {
@@ -348,12 +349,31 @@ const PDPView = {
             ${isSealed 
               ? this.renderSealedGalleryControls(product, activeAngle) 
               : `
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4" role="tablist" aria-label="Modos del inspector de carta">
+                ${mode !== 'slab' ? `
+                  <div class="flex flex-wrap items-center justify-center gap-2 mt-4" role="group" aria-label="Girar la carta sin arrastrar">
+                    <button type="button" onclick="PDPView.rotateCard3D(0, -30)" class="icon-btn" aria-label="Girar a la izquierda">
+                      <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" onclick="PDPView.rotateCard3D(0, 30)" class="icon-btn" aria-label="Girar a la derecha">
+                      <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" onclick="PDPView.rotateCard3D(-15, 0)" class="icon-btn" aria-label="Inclinar hacia arriba">
+                      <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" onclick="PDPView.rotateCard3D(15, 0)" class="icon-btn" aria-label="Inclinar hacia abajo">
+                      <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" onclick="PDPView.resetCard3D()" class="icon-btn" aria-label="Restablecer posición de la carta">
+                      <i data-lucide="locate-fixed" class="w-4 h-4"></i>
+                    </button>
+                  </div>
+                ` : ''}
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4" role="group" aria-label="Modos del inspector de carta">
                   <button 
                     type="button" 
                     onclick="PDPView.setInspectorMode('front')" 
                     class="p-3 rounded-xl border-2 text-left transition flex flex-col justify-between ${mode === 'front' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
-                    aria-selected="${mode === 'front'}"
+                    aria-pressed="${mode === 'front'}"
                   >
                     <div class="flex items-center justify-between">
                       <span class="text-xs font-bold text-[#0F172A]">Frontal Completo</span>
@@ -366,7 +386,7 @@ const PDPView = {
                     type="button" 
                     onclick="PDPView.setInspectorMode('back')" 
                     class="p-3 rounded-xl border-2 text-left transition flex flex-col justify-between ${mode === 'back' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
-                    aria-selected="${mode === 'back'}"
+                    aria-pressed="${mode === 'back'}"
                   >
                     <div class="flex items-center justify-between">
                       <span class="text-xs font-bold text-[#0F172A]">Reverso y Bordes</span>
@@ -379,7 +399,7 @@ const PDPView = {
                     type="button" 
                     onclick="PDPView.setInspectorMode('slab')" 
                     class="p-3 rounded-xl border-2 text-left transition flex flex-col justify-between ${mode === 'slab' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
-                    aria-selected="${mode === 'slab'}"
+                    aria-pressed="${mode === 'slab'}"
                   >
                     <div class="flex items-center justify-between">
                       <span class="text-xs font-bold text-[#0F172A]">Slab &amp; Empaque</span>
@@ -431,6 +451,8 @@ const PDPView = {
                         <button 
                           type="button" 
                           onclick="PDPView.selectCondition('${item.key}')" 
+                          role="radio"
+                          aria-checked="${isActive}"
                           class="p-3 rounded-xl text-left transition ${isActive ? 'bg-[#0F172A] text-white shadow-md border-2 border-[#0F172A]' : 'bg-white border border-slate-200 hover:border-slate-400 text-[#0F172A]'}"
                         >
                           <div class="text-xs font-bold flex items-center justify-between ${isActive ? 'text-white' : 'text-[#0F172A]'}">
@@ -460,7 +482,7 @@ const PDPView = {
               </p>
 
               <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <div class="flex items-center justify-between border-2 border-slate-300 rounded-xl bg-[#F8FAFC] px-2 py-1.5 sm:w-36" aria-label="Selector de cantidad de unidades">
+                <div class="flex items-center justify-between border-2 border-slate-300 rounded-xl bg-[#F8FAFC] px-2 py-1.5 sm:w-36" role="group" aria-label="Selector de cantidad de unidades">
                   <button 
                     type="button" 
                     onclick="PDPView.updateQuantity(-1)" 
@@ -675,9 +697,9 @@ const PDPView = {
         try { scene.releasePointerCapture(e.pointerId); } catch (_) {}
       }
 
-      // Smooth deceleration / momentum flick
+      // Smooth deceleration / momentum flick (sin inercia si el usuario pide menos movimiento)
       const vx = this._card3D.velocityX || 0;
-      if (Math.abs(vx) > 0.15) {
+      if (Math.abs(vx) > 0.15 && !this.prefersReducedMotion()) {
         const momentumY = Math.max(-60, Math.min(60, vx * 80));
         this._card3D.rotY += momentumY;
       }
@@ -709,6 +731,28 @@ const PDPView = {
     scene.addEventListener('touchend', (e) => {
       onPointerUp(e);
     }, touchOpts);
+  },
+
+  prefersReducedMotion() {
+    return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  },
+
+  // Alternativa sin arrastre al visor 3D (WCAG 2.5.7)
+  rotateCard3D(deltaX, deltaY) {
+    if (!this._card3D) return;
+    this._card3D.rotX = Math.max(-40, Math.min(40, this._card3D.rotX + deltaX));
+    this._card3D.rotY += deltaY;
+    const card = document.getElementById('pdp-3d-object');
+    if (card) card.style.transition = this.prefersReducedMotion() ? 'none' : 'transform 0.4s ease';
+    this.applyCard3DTransform();
+  },
+
+  resetCard3D() {
+    if (!this._card3D) return;
+    this._card3D.rotX = 0;
+    this._card3D.rotY = this._card3D.mode === 'back' ? 180 : 0;
+    this.rotateCard3D(0, 0);
   },
 
   applyCard3DTransform() {
@@ -1042,9 +1086,9 @@ const PDPView = {
       const isUp = !nearest.pt.trend.startsWith('-');
       tooltip.innerHTML = `
         <div class="px-2.5 py-1.5 bg-[#0F172A] text-white rounded-lg shadow-xl text-xs border border-slate-700 whitespace-nowrap">
-          <div class="text-xs text-slate-500 font-bold">${nearest.pt.month}</div>
+          <div class="text-xs text-slate-300 font-bold">${nearest.pt.month}</div>
           <div class="font-bold text-xs text-white mt-0.5">$${nearest.pt.price.toLocaleString('en-US')} USD</div>
-          <div class="text-xs font-bold ${isUp ? 'text-[#047857]' : 'text-[#BE123C]'} flex items-center gap-1 mt-0.5">
+          <div class="text-xs font-bold ${isUp ? 'text-[#34D399]' : 'text-[#FB7185]'} flex items-center gap-1 mt-0.5">
             <span>${nearest.pt.trend}</span>
             <span>${isUp ? '▲' : '▼'}</span>
           </div>
