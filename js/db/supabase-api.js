@@ -1,6 +1,6 @@
 /**
  * Graded & Sealed TCG — Capa de acceso a Supabase (usuarios, órdenes y tracking)
- * Todas las operaciones pasan por funciones RPC (ver js/db/schema_auth_rpc.sql):
+ * Todas las operaciones pasan por funciones RPC (ver js/db/funciones_rpc.sql):
  * las contraseñas se cifran con bcrypt en el servidor y las tablas no son
  * legibles directamente desde el navegador.
  */
@@ -10,7 +10,12 @@ const SupabaseAPI = {
     CEDULA_EXISTE: 'Ya existe una cuenta registrada con esa cédula.',
     CREDENCIALES_INVALIDAS: 'Correo o contraseña incorrectos.',
     PASSWORD_CORTA: 'La contraseña debe tener al menos 8 caracteres.',
-    SESION_INVALIDA: 'Tu sesión expiró. Vuelve a iniciar sesión.'
+    SESION_INVALIDA: 'Tu sesión expiró. Vuelve a iniciar sesión.',
+    CEDULA_INVALIDA: 'La cédula o RUC no es válida (Módulo 10).',
+    ORDEN_VACIA: 'Tu bolsa está vacía.',
+    SIN_STOCK: pieza => `No hay stock suficiente de "${pieza}". Ajusta la cantidad en tu bolsa.`,
+    PRECIO_CAMBIO: pieza => `El precio de "${pieza}" cambió. Revisa tu bolsa antes de pagar.`,
+    GRADO_NO_DISPONIBLE: pieza => `El grado elegido de "${pieza}" ya no está disponible.`
   },
 
   client() {
@@ -26,8 +31,12 @@ const SupabaseAPI = {
     if (!sb) throw new Error('Sin conexión con la base de datos (Supabase).');
     const { data, error } = await sb.rpc(fn, args);
     if (error) {
-      const code = Object.keys(this.ERRORS).find(k => (error.message || '').includes(k));
-      throw new Error(code ? this.ERRORS[code] : (error.message || 'Error de base de datos'));
+      const msg = error.message || '';
+      const code = Object.keys(this.ERRORS).find(k => msg.startsWith(k) || msg.includes(k));
+      const text = this.ERRORS[code];
+      const err = new Error(typeof text === 'function' ? text(msg.split(':').slice(1).join(':')) : (text || msg || 'Error de base de datos'));
+      err.code = code;
+      throw err;
     }
     return data;
   },
@@ -75,8 +84,18 @@ const SupabaseAPI = {
     return this.toUser(row);
   },
 
-  async saveOrder(token, order) {
-    return this.rpc('guardar_orden', { p_token: token, p_orden: order });
+  // items: [{ sku, grado, cantidad, precio, nombre, imagen }] · card: { marca, ultimos4, titular, mes, anio } o null
+  async saveOrder(token, order, items, card) {
+    return this.rpc('guardar_orden', { p_token: token, p_orden: order, p_items: items, p_tarjeta: card || null });
+  },
+
+  // Catálogo público (vista v_catalogo): precios, stock por grado e historial de 12 meses
+  async loadCatalog() {
+    const sb = this.client();
+    if (!sb) throw new Error('Sin conexión con la base de datos (Supabase).');
+    const { data, error } = await sb.from('v_catalogo').select('*');
+    if (error) throw new Error(error.message);
+    return data || [];
   },
 
   async listOrders(token) {

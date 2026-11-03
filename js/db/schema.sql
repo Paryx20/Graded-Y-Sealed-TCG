@@ -1,228 +1,223 @@
 -- ==============================================================================
--- Graded & Sealed TCG - Esquema Relacional de Base de Datos (FASE 8: Supabase)
--- Archivo: js/db/schema.sql
--- Motor: PostgreSQL 15+ / Supabase
--- Descripción: Definición formal DDL de 12 entidades relacionales de negocio,
---              restricciones de integridad referencial, índices B-Tree,
---              claves compuestas y Políticas de Seguridad de Filas (RLS).
+-- Graded & Sealed TCG - Esquema de base de datos (Supabase / PostgreSQL 17)
+-- Archivo: js/db/schema.sql  ·  Versión 2
+--
+-- 13 tablas:
+--   Catálogo .... categorias_producto, sets_expansiones, productos,
+--                 detalles_cartas, detalles_sellados, certificaciones_psa
+--                 (precio y stock por grado), historial_precios
+--   Clientes .... usuarios, direcciones_envio, metodos_pago_tokenizados
+--   Ventas ...... ordenes_compra, items_orden, eventos_tracking
+--
+-- Seguridad:
+--   * El catálogo es de lectura pública (vista v_catalogo).
+--   * Usuarios, direcciones, tarjetas y órdenes NO se pueden leer ni escribir
+--     directamente con la clave pública: solo mediante las funciones RPC de
+--     js/db/funciones_rpc.sql, que validan la sesión o la cédula del titular.
+--   * Nunca se guarda el número completo de la tarjeta ni el CVV.
+-- Datos iniciales del catálogo: js/db/seed_catalogo.sql
 -- ==============================================================================
 
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- ---------------------------------------------------------------- Catálogo
 
--- 1. Tabla: usuarios
-CREATE TABLE IF NOT EXISTS usuarios (
-    cedula_ruc VARCHAR(20) PRIMARY KEY,
-    nombre VARCHAR(150) NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE,
-    telefono VARCHAR(30),
-    ciudad VARCHAR(100),
-    direccion_principal TEXT,
-    rol VARCHAR(50) DEFAULT 'CLIENTE_REGISTRADO',
-    auth_provider VARCHAR(50) DEFAULT 'local',
-    auth_provider_id VARCHAR(100),
-    creado_en TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW()),
-    actualizado_en TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+create table categorias_producto (
+  slug_categoria   varchar(20) primary key,
+  nombre_categoria varchar(80) not null,
+  descripcion      text,
+  orden            smallint not null default 0
 );
 
--- 2. Tabla: direcciones_envio
-CREATE TABLE IF NOT EXISTS direcciones_envio (
-    direccion_id SERIAL PRIMARY KEY,
-    usuario_cedula VARCHAR(20) NOT NULL REFERENCES usuarios(cedula_ruc) ON DELETE CASCADE,
-    calle_principal VARCHAR(150) NOT NULL,
-    calle_secundaria VARCHAR(150),
-    referencia TEXT,
-    ciudad VARCHAR(100) NOT NULL,
-    provincia VARCHAR(100) NOT NULL,
-    codigo_postal VARCHAR(20),
-    es_predeterminada SMALLINT DEFAULT 0,
-    creado_en TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+create table sets_expansiones (
+  codigo_set       varchar(40) primary key,
+  nombre_set       varchar(120) not null unique,
+  era              varchar(10) not null check (era in ('vintage', 'modern')),
+  anio_lanzamiento smallint not null check (anio_lanzamiento between 1996 and 2100)
 );
 
--- 3. Tabla: categorias_producto
-CREATE TABLE IF NOT EXISTS categorias_producto (
-    slug_categoria VARCHAR(50) PRIMARY KEY,
-    nombre_categoria VARCHAR(100) NOT NULL,
-    descripcion TEXT,
-    orden INTEGER DEFAULT 0,
-    icono VARCHAR(50),
-    activo BOOLEAN DEFAULT TRUE
+create table productos (
+  sku                varchar(60) primary key,
+  nombre             varchar(160) not null,
+  tipo_discriminador varchar(20) not null check (tipo_discriminador in ('CARTA_INDIVIDUAL', 'PRODUCTO_SELLADO')),
+  slug_categoria     varchar(20) not null references categorias_producto (slug_categoria),
+  codigo_set         varchar(40) references sets_expansiones (codigo_set),
+  descripcion        text,
+  imagen_url         text,
+  rendimiento_anual  numeric(5, 2),
+  -- BOVEDA: inventario propio · API_TCG: carta pedida desde la búsqueda en la API Pokémon TCG
+  origen             varchar(10) not null default 'BOVEDA' check (origen in ('BOVEDA', 'API_TCG')),
+  activo             boolean not null default true,
+  creado_en          timestamptz not null default now()
+);
+create index idx_productos_categoria on productos (slug_categoria);
+create index idx_productos_set on productos (codigo_set);
+
+create table detalles_cartas (
+  producto_sku varchar(60) primary key references productos (sku) on delete cascade,
+  numero_carta varchar(20),
+  rareza       varchar(60) not null,
+  tipo_energia varchar(30) not null
 );
 
--- 4. Tabla: sets_expansiones
-CREATE TABLE IF NOT EXISTS sets_expansiones (
-    codigo_set VARCHAR(50) PRIMARY KEY,
-    nombre_set VARCHAR(150) NOT NULL,
-    era VARCHAR(50) NOT NULL,
-    anio_lanzamiento INTEGER NOT NULL,
-    total_cartas INTEGER,
-    logo_url TEXT,
-    simbolo_url TEXT
+create table detalles_sellados (
+  producto_sku             varchar(60) primary key references productos (sku) on delete cascade,
+  gramaje_gramos           numeric(7, 1) check (gramaje_gramos > 0),
+  cantidad_sobres_interior smallint not null default 1 check (cantidad_sobres_interior > 0),
+  tiene_celofan            boolean not null default true,
+  es_pesado_verificado     boolean not null default false,
+  estado_sellado           varchar(120) not null default 'Sellado de fábrica'
 );
 
--- 5. Tabla: productos
-CREATE TABLE IF NOT EXISTS productos (
-    sku VARCHAR(100) PRIMARY KEY,
-    nombre VARCHAR(200) NOT NULL,
-    tipo_discriminador VARCHAR(50) NOT NULL CHECK (tipo_discriminador IN ('CARTA_INDIVIDUAL', 'PRODUCTO_SELLADO')),
-    slug_categoria VARCHAR(50) NOT NULL REFERENCES categorias_producto(slug_categoria) ON DELETE RESTRICT,
-    codigo_set VARCHAR(50) REFERENCES sets_expansiones(codigo_set) ON DELETE SET NULL,
-    era VARCHAR(50) NOT NULL DEFAULT 'modern',
-    descripcion TEXT,
-    imagen_local TEXT,
-    imagen_fallback TEXT,
-    precio_base NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
-    stock_total INTEGER NOT NULL DEFAULT 0 CHECK (stock_total >= 0),
-    activo SMALLINT NOT NULL DEFAULT 1,
-    tendencia12m VARCHAR(20),
-    rendimiento_anual NUMERIC(6, 2),
-    creado_en TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+-- Una fila por producto y grado disponible: precio y stock reales de la bóveda
+create table certificaciones_psa (
+  producto_sku         varchar(60) not null references productos (sku) on delete cascade,
+  grado                varchar(10) not null check (grado in ('raw', 'psa8', 'psa9', 'psa10', 'sealed')),
+  numero_certificacion varchar(20) unique,
+  precio               numeric(10, 2) not null check (precio > 0),
+  stock_disponible     integer not null default 0 check (stock_disponible >= 0),
+  primary key (producto_sku, grado),
+  -- Solo los slabs PSA tienen número de certificado
+  check ((grado like 'psa%') = (numero_certificacion is not null))
 );
 
--- 6. Tabla: detalles_cartas
-CREATE TABLE IF NOT EXISTS detalles_cartas (
-    producto_sku VARCHAR(100) PRIMARY KEY REFERENCES productos(sku) ON DELETE CASCADE,
-    numero_carta VARCHAR(50),
-    rareza VARCHAR(100),
-    tipo_energia VARCHAR(50),
-    artista VARCHAR(150),
-    es_primera_edicion BOOLEAN DEFAULT FALSE,
-    es_shadowless BOOLEAN DEFAULT FALSE,
-    hp INTEGER,
-    super_tipo VARCHAR(50) DEFAULT 'Pokémon'
+create table historial_precios (
+  producto_sku varchar(60) not null references productos (sku) on delete cascade,
+  grado        varchar(10) not null,
+  mes          date not null check (extract(day from mes) = 1),
+  precio_usd   numeric(10, 2) not null check (precio_usd > 0),
+  primary key (producto_sku, grado, mes),
+  foreign key (producto_sku, grado) references certificaciones_psa (producto_sku, grado) on delete cascade
 );
 
--- 7. Tabla: detalles_sellados
-CREATE TABLE IF NOT EXISTS detalles_sellados (
-    producto_sku VARCHAR(100) PRIMARY KEY REFERENCES productos(sku) ON DELETE CASCADE,
-    gramaje_gramos NUMERIC(8, 2),
-    arte_sobre VARCHAR(150),
-    cantidad_sobres_interior INTEGER DEFAULT 1,
-    tiene_celofan BOOLEAN DEFAULT TRUE,
-    atributos_celofan TEXT,
-    es_pesado_verificado BOOLEAN DEFAULT FALSE,
-    estado_sellado VARCHAR(100) DEFAULT 'SELLADO_DE_FABRICA'
+-- ---------------------------------------------------------------- Clientes
+
+create table usuarios (
+  cedula_ruc     varchar(13) primary key check (cedula_ruc ~ '^\d{10}(\d{3})?$'),
+  nombre         varchar(80) not null check (length(trim(nombre)) >= 5),
+  email          varchar(150) not null unique check (email ~* '^[^@\s]+@[^@\s]+\.[a-z]{2,}$'),
+  telefono       varchar(20) check (telefono ~ '^\+593 9\d{8}$'),
+  rol            varchar(30) not null default 'CLIENTE_REGISTRADO',
+  password_hash  text not null,
+  token_sesion   uuid unique,
+  ultimo_acceso  timestamptz,
+  creado_en      timestamptz not null default now(),
+  actualizado_en timestamptz not null default now()
 );
 
--- 8. Tabla: certificaciones_psa
-CREATE TABLE IF NOT EXISTS certificaciones_psa (
-    numero_certificacion VARCHAR(50) PRIMARY KEY,
-    producto_sku VARCHAR(100) NOT NULL REFERENCES productos(sku) ON DELETE CASCADE,
-    grado VARCHAR(20) NOT NULL,
-    etiqueta_grado VARCHAR(50),
-    calificacion_centrado NUMERIC(3, 1),
-    calificacion_esquinas NUMERIC(3, 1),
-    calificacion_bordes NUMERIC(3, 1),
-    calificacion_superficie NUMERIC(3, 1),
-    precio NUMERIC(12, 2) NOT NULL CHECK (precio >= 0),
-    stock_disponible INTEGER NOT NULL DEFAULT 0 CHECK (stock_disponible >= 0),
-    creado_en TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+create table direcciones_envio (
+  direccion_id      serial primary key,
+  usuario_cedula    varchar(13) not null references usuarios (cedula_ruc) on delete cascade,
+  calle_principal   varchar(150) not null check (length(trim(calle_principal)) >= 8),
+  ciudad            varchar(60) not null,
+  es_predeterminada boolean not null default false,
+  creado_en         timestamptz not null default now()
+);
+-- Cada usuario tiene como máximo una dirección predeterminada
+create unique index ux_direccion_predeterminada on direcciones_envio (usuario_cedula) where es_predeterminada;
+
+create table metodos_pago_tokenizados (
+  token_tarjeta     varchar(40) primary key,
+  usuario_cedula    varchar(13) not null references usuarios (cedula_ruc) on delete cascade,
+  marca_tarjeta     varchar(20) not null check (marca_tarjeta in ('Visa', 'Mastercard')),
+  ultimos_4_digitos char(4) not null check (ultimos_4_digitos ~ '^\d{4}$'),
+  titular           varchar(80) not null,
+  mes_expiracion    smallint not null check (mes_expiracion between 1 and 12),
+  anio_expiracion   smallint not null check (anio_expiracion >= 2024),
+  creado_en         timestamptz not null default now(),
+  unique (usuario_cedula, marca_tarjeta, ultimos_4_digitos, mes_expiracion, anio_expiracion)
 );
 
--- 9. Tabla: historial_precios
-CREATE TABLE IF NOT EXISTS historial_precios (
-    registro_id SERIAL PRIMARY KEY,
-    producto_sku VARCHAR(100) NOT NULL REFERENCES productos(sku) ON DELETE CASCADE,
-    grado VARCHAR(20) NOT NULL DEFAULT 'PSA 10',
-    fecha_registro DATE NOT NULL,
-    mes_relativo INTEGER NOT NULL CHECK (mes_relativo BETWEEN 1 AND 12),
-    precio_usd NUMERIC(12, 2) NOT NULL,
-    volumen_transacciones INTEGER DEFAULT 1,
-    creado_en TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+-- ---------------------------------------------------------------- Ventas
+
+create table ordenes_compra (
+  numero_orden          varchar(30) primary key,
+  usuario_cedula        varchar(13) not null references usuarios (cedula_ruc),
+  fecha_creacion        timestamptz not null default now(),
+  estado                varchar(60) not null default 'En preparación',
+  subtotal              numeric(10, 2) not null check (subtotal >= 0),
+  impuesto_iva          numeric(10, 2) not null check (impuesto_iva >= 0),
+  tarifa_envio          numeric(6, 2) not null check (tarifa_envio >= 0),
+  total                 numeric(10, 2) not null check (total >= 0),
+  metodo_pago           varchar(10) not null check (metodo_pago in ('TARJETA', 'EFECTIVO')),
+  token_tarjeta         varchar(40) references metodos_pago_tokenizados (token_tarjeta),
+  metodo_entrega        varchar(10) not null check (metodo_entrega in ('courier', 'quito', 'pickup')),
+  direccion_envio_id    integer references direcciones_envio (direccion_id),
+  guia_tracking         varchar(30) unique,
+  -- 1 preparación · 2 en camino / listo · 3 verificando identidad · 4 entregado · -1 retenido
+  paso_tracking         smallint not null default 1 check (paso_tracking in (-1, 1, 2, 3, 4)),
+  intentos_verificacion smallint not null default 0 check (intentos_verificacion between 0 and 3),
+  detalle               jsonb not null,
+  check (metodo_pago = 'TARJETA' or token_tarjeta is null),
+  check (metodo_pago <> 'EFECTIVO' or metodo_entrega = 'pickup'),
+  check (metodo_entrega = 'pickup' or direccion_envio_id is not null)
 );
+create index idx_ordenes_usuario on ordenes_compra (usuario_cedula, fecha_creacion desc);
+create index idx_ordenes_direccion on ordenes_compra (direccion_envio_id);
+create index idx_ordenes_tarjeta on ordenes_compra (token_tarjeta);
 
--- 10. Tabla: metodos_pago_tokenizados
-CREATE TABLE IF NOT EXISTS metodos_pago_tokenizados (
-    token_tarjeta VARCHAR(100) PRIMARY KEY,
-    usuario_cedula VARCHAR(20) NOT NULL REFERENCES usuarios(cedula_ruc) ON DELETE CASCADE,
-    ultimos_4_digitos VARCHAR(4) NOT NULL,
-    marca_tarjeta VARCHAR(50) NOT NULL,
-    titular VARCHAR(150) NOT NULL,
-    mes_expiracion VARCHAR(2) NOT NULL,
-    anio_expiracion VARCHAR(4) NOT NULL,
-    activo SMALLINT DEFAULT 1,
-    creado_en TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+create table items_orden (
+  numero_orden    varchar(30) not null references ordenes_compra (numero_orden) on delete cascade,
+  sku             varchar(60) not null references productos (sku),
+  grado           varchar(10) not null check (grado in ('raw', 'psa8', 'psa9', 'psa10', 'sealed')),
+  cantidad        smallint not null check (cantidad > 0),
+  precio_unitario numeric(10, 2) not null check (precio_unitario > 0),
+  subtotal        numeric(10, 2) generated always as (cantidad * precio_unitario) stored,
+  primary key (numero_orden, sku, grado)
 );
+create index idx_items_sku on items_orden (sku);
 
--- 11. Tabla: ordenes_compra
-CREATE TABLE IF NOT EXISTS ordenes_compra (
-    numero_orden VARCHAR(50) PRIMARY KEY,
-    usuario_cedula VARCHAR(20) REFERENCES usuarios(cedula_ruc) ON DELETE SET NULL,
-    fecha_creacion TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW()),
-    estado VARCHAR(100) NOT NULL DEFAULT 'En Custodia / En Preparación',
-    subtotal NUMERIC(12, 2) NOT NULL,
-    impuesto_iva NUMERIC(12, 2) NOT NULL,
-    tarifa_envio NUMERIC(12, 2) NOT NULL,
-    total NUMERIC(12, 2) NOT NULL,
-    metodo_pago VARCHAR(100) NOT NULL,
-    metodo_entrega VARCHAR(50) NOT NULL DEFAULT 'courier',
-    direccion_envio_id INTEGER REFERENCES direcciones_envio(direccion_id) ON DELETE SET NULL,
-    transaccion_id VARCHAR(100),
-    guia_tracking VARCHAR(100),
-    notas TEXT
+-- Bitácora de la cadena de custodia: cada cambio de etapa y cada verificación de cédula
+create table eventos_tracking (
+  evento_id    bigserial primary key,
+  numero_orden varchar(30) not null references ordenes_compra (numero_orden) on delete cascade,
+  paso         smallint not null,
+  descripcion  varchar(200) not null,
+  creado_en    timestamptz not null default now()
 );
+create index idx_eventos_orden on eventos_tracking (numero_orden, creado_en);
 
--- 12. Tabla: items_orden (Clave Primaria Compuesta: numero_orden, sku, grado)
-CREATE TABLE IF NOT EXISTS items_orden (
-    numero_orden VARCHAR(50) NOT NULL REFERENCES ordenes_compra(numero_orden) ON DELETE CASCADE,
-    sku VARCHAR(100) NOT NULL REFERENCES productos(sku) ON DELETE RESTRICT,
-    grado VARCHAR(20) NOT NULL,
-    cantidad INTEGER NOT NULL DEFAULT 1 CHECK (cantidad > 0),
-    precio_unitario NUMERIC(12, 2) NOT NULL CHECK (precio_unitario >= 0),
-    subtotal NUMERIC(12, 2) NOT NULL CHECK (subtotal >= 0),
-    PRIMARY KEY (numero_orden, sku, grado)
-);
+-- ---------------------------------------------------------------- Vista pública del catálogo
 
--- ÍNDICES B-TREE
-CREATE INDEX IF NOT EXISTS idx_direcciones_usuario ON direcciones_envio(usuario_cedula);
-CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos(slug_categoria);
-CREATE INDEX IF NOT EXISTS idx_productos_set ON productos(codigo_set);
-CREATE INDEX IF NOT EXISTS idx_productos_tipo ON productos(tipo_discriminador);
-CREATE INDEX IF NOT EXISTS idx_certificaciones_sku ON certificaciones_psa(producto_sku);
-CREATE INDEX IF NOT EXISTS idx_certificaciones_grado ON certificaciones_psa(grado);
-CREATE INDEX IF NOT EXISTS idx_historial_sku_grado ON historial_precios(producto_sku, grado);
-CREATE INDEX IF NOT EXISTS idx_ordenes_usuario ON ordenes_compra(usuario_cedula);
-CREATE INDEX IF NOT EXISTS idx_ordenes_fecha ON ordenes_compra(fecha_creacion DESC);
-CREATE INDEX IF NOT EXISTS idx_items_orden_sku ON items_orden(sku);
+create view v_catalogo with (security_invoker = true) as
+select p.sku,
+       p.nombre,
+       p.slug_categoria,
+       p.tipo_discriminador,
+       s.nombre_set,
+       s.era,
+       p.imagen_url,
+       p.rendimiento_anual,
+       (select jsonb_object_agg(c.grado, c.precio) from certificaciones_psa c where c.producto_sku = p.sku) as precios,
+       (select jsonb_object_agg(c.grado, c.stock_disponible) from certificaciones_psa c where c.producto_sku = p.sku) as stock,
+       (select jsonb_agg(h.precio_usd order by h.mes) from historial_precios h
+         where h.producto_sku = p.sku and h.grado = case when p.tipo_discriminador = 'PRODUCTO_SELLADO' then 'sealed' else 'psa10' end) as historial
+  from productos p
+  left join sets_expansiones s on s.codigo_set = p.codigo_set
+ where p.activo and p.origen = 'BOVEDA';
 
--- ROW LEVEL SECURITY (RLS)
-ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
-ALTER TABLE direcciones_envio ENABLE ROW LEVEL SECURITY;
-ALTER TABLE categorias_producto ENABLE ROW LEVEL SECURITY;
-ALTER TABLE sets_expansiones ENABLE ROW LEVEL SECURITY;
-ALTER TABLE productos ENABLE ROW LEVEL SECURITY;
-ALTER TABLE detalles_cartas ENABLE ROW LEVEL SECURITY;
-ALTER TABLE detalles_sellados ENABLE ROW LEVEL SECURITY;
-ALTER TABLE certificaciones_psa ENABLE ROW LEVEL SECURITY;
-ALTER TABLE historial_precios ENABLE ROW LEVEL SECURITY;
-ALTER TABLE metodos_pago_tokenizados ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ordenes_compra ENABLE ROW LEVEL SECURITY;
-ALTER TABLE items_orden ENABLE ROW LEVEL SECURITY;
+-- ---------------------------------------------------------------- Seguridad (RLS)
 
--- Políticas de lectura pública
-CREATE POLICY "Public Read Categorias" ON categorias_producto FOR SELECT USING (true);
-CREATE POLICY "Public Read Sets" ON sets_expansiones FOR SELECT USING (true);
-CREATE POLICY "Public Read Productos" ON productos FOR SELECT USING (true);
-CREATE POLICY "Public Read Detalles Cartas" ON detalles_cartas FOR SELECT USING (true);
-CREATE POLICY "Public Read Detalles Sellados" ON detalles_sellados FOR SELECT USING (true);
-CREATE POLICY "Public Read Certificaciones PSA" ON certificaciones_psa FOR SELECT USING (true);
-CREATE POLICY "Public Read Historial Precios" ON historial_precios FOR SELECT USING (true);
+alter table categorias_producto enable row level security;
+alter table sets_expansiones enable row level security;
+alter table productos enable row level security;
+alter table detalles_cartas enable row level security;
+alter table detalles_sellados enable row level security;
+alter table certificaciones_psa enable row level security;
+alter table historial_precios enable row level security;
+alter table usuarios enable row level security;
+alter table direcciones_envio enable row level security;
+alter table metodos_pago_tokenizados enable row level security;
+alter table ordenes_compra enable row level security;
+alter table items_orden enable row level security;
+alter table eventos_tracking enable row level security;
 
--- Políticas de usuarios y direcciones
-CREATE POLICY "Allow All Users Select" ON usuarios FOR SELECT USING (true);
-CREATE POLICY "Allow All Users Insert" ON usuarios FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow All Users Update" ON usuarios FOR UPDATE USING (true);
+create policy "Lectura pública" on categorias_producto for select using (true);
+create policy "Lectura pública" on sets_expansiones for select using (true);
+create policy "Lectura pública" on productos for select using (activo);
+create policy "Lectura pública" on detalles_cartas for select using (true);
+create policy "Lectura pública" on detalles_sellados for select using (true);
+create policy "Lectura pública" on certificaciones_psa for select using (true);
+create policy "Lectura pública" on historial_precios for select using (true);
+-- usuarios, direcciones_envio, metodos_pago_tokenizados, ordenes_compra, items_orden
+-- y eventos_tracking no tienen políticas: solo se acceden con las funciones RPC.
 
-CREATE POLICY "Allow All Direcciones Select" ON direcciones_envio FOR SELECT USING (true);
-CREATE POLICY "Allow All Direcciones Insert" ON direcciones_envio FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow All Direcciones Update" ON direcciones_envio FOR UPDATE USING (true);
-
--- Políticas de métodos de pago
-CREATE POLICY "Allow All MetodosPago Select" ON metodos_pago_tokenizados FOR SELECT USING (true);
-CREATE POLICY "Allow All MetodosPago Insert" ON metodos_pago_tokenizados FOR INSERT WITH CHECK (true);
-
--- Políticas de órdenes comerciales
-CREATE POLICY "Public Read Ordenes" ON ordenes_compra FOR SELECT USING (true);
-CREATE POLICY "Public Insert Ordenes" ON ordenes_compra FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Public Read Items Orden" ON items_orden FOR SELECT USING (true);
-CREATE POLICY "Public Insert Items Orden" ON items_orden FOR INSERT WITH CHECK (true);
+grant select on v_catalogo to anon, authenticated;

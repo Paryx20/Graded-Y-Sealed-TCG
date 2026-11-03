@@ -639,6 +639,16 @@ const CheckoutView = {
       return;
     }
 
+    const soldOut = Store.data.cart.find(c => {
+      const { sku, grade } = Store.parseCartItemId(c.id);
+      const stock = Store.getStock(sku, grade);
+      return stock !== null && c.quantity > stock;
+    });
+    if (soldOut) {
+      app.showToast(`No hay stock suficiente de "${soldOut.name}". Ajusta la cantidad en tu bolsa.`, 'error');
+      return;
+    }
+
     const currentUser = Store.data.currentUser;
     if (!Validators.validateAll(this.billingRules(!currentUser))) {
       app.showToast('Revisa los datos de facturación marcados en rojo.', 'error');
@@ -672,7 +682,15 @@ const CheckoutView = {
         return;
       }
       const digits = val('card-number').replace(/\D/g, '');
-      cardInfo = { brand: Validators.cardBrand(digits), last4: digits.slice(-4), digits };
+      const [month, year] = val('card-exp').split('/').map(n => parseInt(n, 10));
+      cardInfo = {
+        brand: Validators.cardBrand(digits),
+        last4: digits.slice(-4),
+        digits,
+        holder: val('card-holder'),
+        month,
+        year: year < 100 ? 2000 + year : year
+      };
     }
 
     // Cuenta obligatoria: si no hay sesión se crea en Supabase antes de cobrar
@@ -715,15 +733,6 @@ const CheckoutView = {
         deliveryLabel = 'Local Express Quito ($3.00)';
       }
 
-      const userRecord = {
-        cedula_ruc: idCard,
-        nombre: name,
-        email,
-        telefono: formattedPhone,
-        ciudad: city,
-        direccion_principal: address
-      };
-
       const isPickupOrder = Store.data.deliveryMethod === 'pickup';
       const trackingCode = isPickupOrder
         ? `RET-UIO-${Math.floor(100000 + Math.random() * 900000)}`
@@ -747,6 +756,8 @@ const CheckoutView = {
         buyerEmail: email,
         buyerPhone: formattedPhone,
         shippingAddress: isPickupOrder ? 'Bóveda Central Quito' : `${address}, ${city}`,
+        shippingStreet: address,
+        shippingCity: city,
         fecha_creacion: now.toISOString(),
         date: formattedDate,
         subtotal,
@@ -762,35 +773,24 @@ const CheckoutView = {
         items: [...Store.data.cart]
       };
 
-      // Persistencia local (Dexie / localStorage) para funcionamiento sin conexión
-      const dbRef = (typeof GradedSealedDB !== 'undefined') ? GradedSealedDB : null;
-      if (dbRef && typeof dbRef.procesarOrdenTransaccional === 'function') {
-        try {
-          await dbRef.procesarOrdenTransaccional({
-            usuario: userRecord,
-            orden: orderRecord,
-            items: Store.data.cart.map(c => ({
-              sku: c.sku || c.id,
-              grado: c.condition || c.grado || 'PSA 10',
-              cantidad: c.quantity,
-              precio_unitario: c.price,
-              subtotal: c.price * c.quantity
-            }))
-          });
-        } catch (dbErr) {
-          console.warn('[CheckoutView] Advertencia al persistir localmente:', dbErr);
-        }
-      }
-
-      // Registro de la orden en Supabase, asociada a la cédula del usuario
+      // Supabase registra la orden, descuenta el stock y valida precios en una sola transacción
       const sessionUser = Store.data.currentUser;
-      if (sessionUser && sessionUser.token) {
-        try {
-          await SupabaseAPI.saveOrder(sessionUser.token, orderRecord);
-        } catch (err) {
-          console.warn('[CheckoutView] La orden no se pudo guardar en Supabase:', err.message);
-          app.showToast('La orden se guardó localmente, pero no en la base de datos.', 'error');
-        }
+      const items = Store.data.cart.map(c => {
+        const { sku, grade } = Store.parseCartItemId(c.id);
+        return { sku, grado: grade, cantidad: c.quantity, precio: c.price, nombre: c.name, imagen: c.imageFallback || c.imageLocal };
+      });
+      try {
+        await SupabaseAPI.saveOrder(sessionUser.token, orderRecord, items, cardInfo && {
+          marca: cardInfo.brand,
+          ultimos4: cardInfo.last4,
+          titular: cardInfo.holder,
+          mes: cardInfo.month,
+          anio: cardInfo.year
+        });
+      } catch (err) {
+        await Store.loadCatalogFromServer();
+        app.showToast(`${err.message} No se realizó ningún cargo.`, 'error');
+        return;
       }
 
       Store.addOrder(orderRecord);

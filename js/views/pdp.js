@@ -447,6 +447,7 @@ const PDPView = {
                           <div class="text-sm font-black mt-0.5 ${isActive ? 'text-[#FEF3C7]' : 'text-slate-600'}">
                             $${Number(item.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                           </div>
+                          ${Store.getStock(product.id, item.key) === 0 ? `<div class="text-[10px] font-extrabold uppercase tracking-wide mt-0.5 ${isActive ? 'text-rose-300' : 'text-[#BE123C]'}">Agotado</div>` : ''}
                         </button>
                       `;
                     }).join('');
@@ -458,9 +459,7 @@ const PDPView = {
             <div class="pt-3 border-t border-slate-200">
               <div class="flex items-baseline justify-between">
                 <span id="pdp-price" class="text-3xl font-black text-[#0F172A]">$${Number(currentPrice || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
-                <span class="text-xs font-bold text-[#059669] bg-[#D1FAE5] px-2.5 py-1 rounded-md">
-                  En Stock • Custodia Bóveda
-                </span>
+                ${this.renderStockBadge(product, isSealed ? 'sealed' : condition)}
               </div>
               <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#059669]"></i>
@@ -502,6 +501,21 @@ const PDPView = {
         </div>
       </div>
     `;
+  },
+
+  // Stock real por grado leído de Supabase (certificaciones_psa)
+  renderStockBadge(product, grade) {
+    const stock = Store.getStock(product.id, grade);
+    let text = 'Disponible bajo pedido';
+    let tone = 'text-slate-600 bg-slate-100';
+    if (stock === 0) {
+      text = 'Agotado en este grado';
+      tone = 'text-[#BE123C] bg-rose-100';
+    } else if (stock !== null) {
+      text = stock === 1 ? 'Última unidad en bóveda' : `${stock} unidades en bóveda`;
+      tone = stock <= 2 ? 'text-[#92400E] bg-[#FEF3C7]' : 'text-[#059669] bg-[#D1FAE5]';
+    }
+    return `<span id="pdp-stock-badge" aria-live="polite" class="text-xs font-bold px-2.5 py-1 rounded-md ${tone}">${text}</span>`;
   },
 
   afterRender() {
@@ -752,6 +766,12 @@ const PDPView = {
       certBadge.innerText = `${this.getConditionFullTitle(condKey)} • #${certCode}`;
     }
 
+    const stockBadge = document.getElementById('pdp-stock-badge');
+    if (stockBadge) stockBadge.outerHTML = this.renderStockBadge(product, condKey);
+    Store.data.pdpQuantity = 1;
+    const qtyEl = document.getElementById('pdp-quantity-value');
+    if (qtyEl) qtyEl.innerText = '1';
+
     // 3. Update condition radiogroup button styles
     const radiogroup = document.querySelector('[role="radiogroup"][aria-label="Condición de la carta"]');
     if (radiogroup) {
@@ -818,7 +838,14 @@ const PDPView = {
     if (isNaN(rawDelta)) return;
 
     const current = parseInt(Store.data.pdpQuantity, 10) || 1;
-    const next = Math.max(1, Math.min(10, current + rawDelta));
+    const product = Store.data.currentPdpProduct || PRODUCTS[0];
+    const isSealed = product.tipo_discriminador === 'PRODUCTO_SELLADO' || product.categoria === 'sealed';
+    const stock = Store.getStock(product.id, isSealed ? 'sealed' : (Store.data.pdpSelectedCondition || 'psa10'));
+    const max = stock === null ? 10 : Math.max(1, Math.min(10, stock));
+    if (rawDelta > 0 && current >= max && stock !== null) {
+      app.showToast(`Solo hay ${stock} unidades disponibles en este grado.`, 'info');
+    }
+    const next = Math.max(1, Math.min(max, current + rawDelta));
 
     Store.data.pdpQuantity = next;
     if (typeof document !== 'undefined') {

@@ -4,7 +4,7 @@ const app = {
     this.updateNavbarUserUI();
     if (Store.data.currentUser) {
       Store.syncOrdersFromServer().then(() => {
-        if (['profile', 'tracking'].includes(Store.data.currentView)) this.renderCurrentView();
+        if (['profile', 'tracking', 'checkout'].includes(Store.data.currentView)) this.renderCurrentView();
       });
     }
     this.updateCartBadge();
@@ -42,7 +42,12 @@ const app = {
       window.location.replace(this.url(legacy[1], legacy[2] || ''));
       return;
     }
-    this.handleRoute();
+    const container = document.getElementById('app-view');
+    if (container) container.setAttribute('aria-busy', 'true');
+    Store.loadCatalogFromServer().finally(() => {
+      if (container) container.removeAttribute('aria-busy');
+      this.handleRoute();
+    });
   },
 
   // Cada vista es una página HTML independiente
@@ -219,6 +224,14 @@ const app = {
   addToCart(id, name, condition, price, imageLocal, imageFallback, qty = 1) {
     const units = Math.max(1, parseInt(qty, 10) || 1);
     const existing = Store.data.cart.find(c => c.id === id);
+    const { sku, grade } = Store.parseCartItemId(id);
+    const stock = Store.getStock(sku, grade);
+    if (stock !== null && (existing ? existing.quantity : 0) + units > stock) {
+      this.showToast(stock === 0
+        ? `"${name}" está agotado en este grado.`
+        : `Solo quedan ${stock} unidades de "${name}" en este grado.`, 'error');
+      return;
+    }
     if (existing) {
       existing.quantity += units;
     } else {
@@ -247,6 +260,12 @@ const app = {
 
     if (item.quantity + delta <= 0) {
       this.requestRemoveItem(id);
+      return;
+    }
+    const { sku, grade } = Store.parseCartItemId(id);
+    const stock = Store.getStock(sku, grade);
+    if (delta > 0 && stock !== null && item.quantity + delta > stock) {
+      this.showToast(`Solo hay ${stock} unidades disponibles de "${item.name}".`, 'error');
       return;
     }
 

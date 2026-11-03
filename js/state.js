@@ -138,6 +138,18 @@ const Store = {
       }
       this.saveOrders();
     } catch (err) {
+      // La sesión ya no existe en la base (cuenta eliminada o sesión iniciada en otro dispositivo)
+      if (err.code === 'SESION_INVALIDA') {
+        this.data.currentUser = null;
+        this.data.orders = [];
+        this.saveUserSession();
+        this.saveOrders();
+        if (typeof app !== 'undefined') {
+          app.updateNavbarUserUI();
+          app.showToast('Tu sesión expiró. Vuelve a iniciar sesión.', 'info');
+        }
+        return;
+      }
       console.warn('[Store] No se pudo sincronizar el historial de órdenes:', err.message);
     }
   },
@@ -223,6 +235,60 @@ const Store = {
     }
     this.saveUserSession();
     return this.data.currentUser;
+  },
+
+  // Precios, stock e historial vienen de Supabase; data.js queda como respaldo sin conexión
+  async loadCatalogFromServer() {
+    if (typeof SupabaseAPI === 'undefined' || !SupabaseAPI.isOnline()) return false;
+    try {
+      const rows = await Promise.race([
+        SupabaseAPI.loadCatalog(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('tiempo de espera agotado')), 4000))
+      ]);
+      const bySku = new Map(rows.map(r => [r.sku, r]));
+      for (let i = PRODUCTS.length - 1; i >= 0; i--) {
+        const product = PRODUCTS[i];
+        const row = bySku.get(product.id);
+        if (!row) {
+          PRODUCTS.splice(i, 1); // retirado o inactivo en la base de datos
+          continue;
+        }
+        product.precios = { ...product.precios, ...row.precios };
+        if (row.precios.sealed) product.precioUnitario = row.precios.sealed;
+        product.stock = row.stock || {};
+        if (row.imagen_url) {
+          product.imagenLocal = row.imagen_url;
+          if (!product.imagenFallbackUrl || !/^https?:/.test(product.imagenFallbackUrl)) product.imagenFallbackUrl = row.imagen_url;
+        }
+        if (Array.isArray(row.historial) && row.historial.length) {
+          const last = row.historial[row.historial.length - 1];
+          product.historialBase = row.historial.map(v => Math.round((v / last) * 1000) / 1000);
+        }
+        if (row.rendimiento_anual !== null) {
+          product.rendimientoAnual = Number(row.rendimiento_anual);
+          product.tendencia12m = `+${Number(row.rendimiento_anual).toFixed(1)}%`;
+        }
+      }
+      this.data.catalogSource = 'supabase';
+      return true;
+    } catch (err) {
+      console.warn('[Store] Catálogo local en uso; no se pudo leer Supabase:', err.message);
+      this.data.catalogSource = 'local';
+      return false;
+    }
+  },
+
+  // Stock de un producto en un grado; null si no se conoce (cartas de la API o sin conexión)
+  getStock(productId, grade) {
+    const product = this.getProduct(productId);
+    if (!product || !product.stock || product.stock[grade] === undefined) return null;
+    return product.stock[grade];
+  },
+
+  // Los ítems de la bolsa usan el id "<sku>-<grado>"
+  parseCartItemId(itemId) {
+    const m = String(itemId).match(/^(.*)-(raw|psa8|psa9|psa10|sealed)$/);
+    return m ? { sku: m[1], grade: m[2] } : { sku: String(itemId), grade: 'psa10' };
   },
 
   getCartCount() {
