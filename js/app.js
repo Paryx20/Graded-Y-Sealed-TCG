@@ -11,21 +11,34 @@ const app = {
     this.setupSearchSpotlight();
 
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        const psaModal = document.getElementById('psa-guide-modal');
-        if (psaModal && psaModal.classList.contains('active')) {
-          this.closePSAGuideModal();
-        }
-        const delModal = document.getElementById('delete-confirm-modal');
-        if (delModal) delModal.classList.remove('active');
-        const payModal = document.getElementById('payment-modal');
-        if (payModal && !payModal.dataset.locked) payModal.classList.remove('active');
-        const spotlight = document.getElementById('search-spotlight-backdrop');
-        if (spotlight) spotlight.classList.remove('active');
-        const liveSearch = document.getElementById('search-live-dropdown');
-        if (liveSearch) liveSearch.classList.add('hidden');
+      if (e.key === 'Tab' && this._dialogStack.length) {
+        this.trapDialogFocus(e);
+        return;
       }
+      if (e.key !== 'Escape') return;
+
+      // Esc cierra solo la capa superior: diálogo, filtros móviles o buscador
+      const topId = this._dialogStack[this._dialogStack.length - 1];
+      if (topId) {
+        if (topId === 'psa-guide-modal') this.closePSAGuideModal();
+        else if (topId === 'delete-confirm-modal') this.cancelRemoveItem();
+        else {
+          const top = document.getElementById(topId);
+          if (!(top && top.dataset && top.dataset.locked)) this.closeDialog(topId);
+        }
+        return;
+      }
+      if (typeof CatalogView !== 'undefined' && CatalogView.mobileFiltersOpen && typeof CatalogView.toggleMobileFilters === 'function') {
+        CatalogView.toggleMobileFilters();
+        return;
+      }
+      const spotlight = document.getElementById('search-spotlight-backdrop');
+      if (spotlight) spotlight.classList.remove('active');
+      const liveSearch = document.getElementById('search-live-dropdown');
+      if (liveSearch) liveSearch.classList.add('hidden');
     });
+
+    this.setupSkipLink();
 
     const psaModal = document.getElementById('psa-guide-modal');
     if (psaModal && typeof psaModal.addEventListener === 'function') {
@@ -206,6 +219,7 @@ const app = {
       html = HomeView.render();
     }
 
+    const focusKey = this.getFocusKey(container);
     container.innerHTML = html;
     this.refreshIcons();
 
@@ -230,6 +244,48 @@ const app = {
         CheckoutView.afterRender();
       }
     }
+
+    if (focusKey) this.restoreFocus(focusKey);
+    else if (!this._firstRenderDone) this.focusHeadingAfterNavigation();
+    this._firstRenderDone = true;
+  },
+
+  // Re-renderizar reemplaza el HTML: se recuerda qué control tenía el foco para devolvérselo
+  getFocusKey(container) {
+    if (typeof document === 'undefined') return null;
+    const el = document.activeElement;
+    if (!el || el === container || typeof container.contains !== 'function' || !container.contains(el)) return null;
+    if (el.id) return { id: el.id };
+    const onclick = el.getAttribute && el.getAttribute('onclick');
+    if (onclick) return { onclick };
+    return { heading: true };
+  },
+
+  restoreFocus(key) {
+    let el = null;
+    if (key.id) el = document.getElementById(key.id);
+    else if (key.onclick) el = this.findByOnclick(key.onclick);
+    if (el && typeof el.focus === 'function') el.focus({ preventScroll: true });
+    else this.focusViewHeading();
+  },
+
+  findByOnclick(code) {
+    const main = document.getElementById('app-view');
+    if (!main || typeof main.querySelectorAll !== 'function') return null;
+    return Array.from(main.querySelectorAll('[onclick]')).find(el => el.getAttribute('onclick') === code) || null;
+  },
+
+  // Al llegar desde otra página del sitio, el foco empieza en el encabezado de la vista
+  focusHeadingAfterNavigation() {
+    if (typeof document === 'undefined' || !document.referrer || window.location.hash) return;
+    try {
+      if (new URL(document.referrer).origin !== window.location.origin) return;
+    } catch (_) {
+      return;
+    }
+    const active = document.activeElement;
+    if (active && active !== document.body) return;
+    this.focusViewHeading();
   },
 
   openProductPDP(productId) {
@@ -318,23 +374,18 @@ const app = {
     if (nameEl) {
       nameEl.innerText = `Se retirará "${item.name} (${item.condition})" de tu bolsa.`;
     }
-    if (modal) {
-      modal.classList.add('active');
-      this.refreshIcons();
-    }
+    if (modal) this.openDialog('delete-confirm-modal');
   },
 
   cancelRemoveItem() {
     Store.data.pendingDeleteItemId = null;
-    const modal = document.getElementById('delete-confirm-modal');
-    if (modal) modal.classList.remove('active');
+    this.closeDialog('delete-confirm-modal');
   },
 
   confirmRemoveItem() {
     const id = Store.data.pendingDeleteItemId;
     Store.data.pendingDeleteItemId = null;
-    const modal = document.getElementById('delete-confirm-modal');
-    if (modal) modal.classList.remove('active');
+    this.closeDialog('delete-confirm-modal');
     if (!id) return;
 
     const idx = Store.data.cart.findIndex(c => c.id === id);
@@ -354,6 +405,9 @@ const app = {
       text.innerText = `Ítem "${removed.name}" eliminado de la bolsa.`;
       banner.classList.remove('hidden');
       this.refreshIcons();
+      // El botón que abrió el diálogo desapareció con el ítem: el foco va a "Deshacer"
+      const undoBtn = document.getElementById('undo-action-btn');
+      if (undoBtn && typeof undoBtn.focus === 'function') undoBtn.focus();
     }
   },
 
@@ -369,6 +423,9 @@ const app = {
 
     this.updateCartBadge();
     this.renderCurrentView();
+    const restoredBtn = this.findByOnclick(`app.requestRemoveItem('${item.id}')`);
+    if (restoredBtn) restoredBtn.focus();
+    else this.focusViewHeading();
     this.showToast(`Ítem "${item.name}" restaurado a la bolsa`, 'success');
   },
 
@@ -379,42 +436,102 @@ const app = {
     }
   },
 
-  openPSAGuideModal() {
-    const modal = document.getElementById('psa-guide-modal');
+  // ---- Diálogos modales: foco inicial, trampa de Tab, Esc y retorno del foco ----
+  _dialogStack: [],
+  _dialogTriggers: {},
+
+  openDialog(id, initialFocusSelector) {
+    const modal = document.getElementById(id);
+    if (!modal) return null;
+    if (!this._dialogStack.includes(id)) {
+      this._dialogTriggers[id] = (typeof document !== 'undefined' && document.activeElement) || null;
+      this._dialogStack.push(id);
+    }
+    modal.classList.add('active');
+    if (typeof modal.setAttribute === 'function') modal.setAttribute('aria-hidden', 'false');
+    if (document.body && document.body.classList) document.body.classList.add('overflow-hidden');
+    this.refreshIcons();
+
+    let target = null;
+    if (typeof modal.querySelector === 'function') {
+      target = (initialFocusSelector && modal.querySelector(initialFocusSelector)) || modal.querySelector('button');
+    }
+    if (target && typeof target.focus === 'function') target.focus();
+    return modal;
+  },
+
+  closeDialog(id, returnFocusTo) {
+    const modal = document.getElementById(id);
     if (modal) {
-      if (typeof document !== 'undefined' && document.activeElement) {
-        this._psaModalTrigger = document.activeElement;
-      }
-      modal.classList.add('active');
-      if (typeof modal.setAttribute === 'function') {
-        modal.setAttribute('aria-hidden', 'false');
-      }
-      if (typeof document !== 'undefined' && document.body && document.body.classList) {
-        document.body.classList.add('overflow-hidden');
-      }
-      this.refreshIcons();
-      const closeBtn = (typeof modal.querySelector === 'function') ? (modal.querySelector('button[aria-label="Cerrar guía PSA"]') || modal.querySelector('button')) : null;
-      if (closeBtn && typeof closeBtn.focus === 'function') {
-        closeBtn.focus();
-      }
+      modal.classList.remove('active');
+      if (typeof modal.setAttribute === 'function') modal.setAttribute('aria-hidden', 'true');
+    }
+    const trigger = this._dialogTriggers[id];
+    delete this._dialogTriggers[id];
+    this._dialogStack = this._dialogStack.filter(d => d !== id);
+    if (!this._dialogStack.length && document.body && document.body.classList) {
+      document.body.classList.remove('overflow-hidden');
+    }
+    const target = returnFocusTo || trigger;
+    if (target && typeof target.focus === 'function' && target.isConnected !== false) target.focus();
+  },
+
+  getFocusable(container) {
+    if (!container || typeof container.querySelectorAll !== 'function') return [];
+    const selector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    return Array.from(container.querySelectorAll(selector))
+      .filter(el => !el.closest || !el.closest('.hidden'));
+  },
+
+  trapDialogFocus(e) {
+    const modal = document.getElementById(this._dialogStack[this._dialogStack.length - 1]);
+    if (!modal) return;
+    const items = this.getFocusable(modal);
+    const active = document.activeElement;
+    if (!items.length) {
+      // Diálogo sin controles (pago en curso): el foco se queda en su contenido
+      e.preventDefault();
+      return;
+    }
+    const first = items[0];
+    const last = items[items.length - 1];
+    const inside = typeof modal.contains === 'function' && modal.contains(active);
+    if (e.shiftKey && (active === first || !inside)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (active === last || !inside)) {
+      e.preventDefault();
+      first.focus();
     }
   },
 
+  openPSAGuideModal() {
+    this.openDialog('psa-guide-modal', 'button[aria-label="Cerrar guía PSA"]');
+  },
+
   closePSAGuideModal() {
-    const modal = document.getElementById('psa-guide-modal');
-    if (modal) {
-      modal.classList.remove('active');
-      if (typeof modal.setAttribute === 'function') {
-        modal.setAttribute('aria-hidden', 'true');
-      }
-    }
-    if (typeof document !== 'undefined' && document.body && document.body.classList) {
-      document.body.classList.remove('overflow-hidden');
-    }
-    if (this._psaModalTrigger && typeof this._psaModalTrigger.focus === 'function') {
-      this._psaModalTrigger.focus();
-      this._psaModalTrigger = null;
-    }
+    this.closeDialog('psa-guide-modal');
+  },
+
+  // "Saltar al contenido": con <base href="../"> el href recargaría la página y perdería ?id=
+  setupSkipLink() {
+    if (typeof document.querySelector !== 'function') return;
+    const link = document.querySelector('.skip-link');
+    if (!link) return;
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.focusViewHeading(true);
+    });
+  },
+
+  focusViewHeading(scroll) {
+    const main = document.getElementById('app-view');
+    if (!main) return;
+    const target = (typeof main.querySelector === 'function' && main.querySelector('h1')) || main;
+    if (typeof target.focus !== 'function') return;
+    if (typeof target.hasAttribute === 'function' && !target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: !scroll });
+    if (scroll && typeof target.scrollIntoView === 'function') target.scrollIntoView({ block: 'start' });
   },
 
   handleNavAccountClick() {
@@ -524,16 +641,61 @@ const app = {
       this.renderLiveSearchDropdown(e.target.value);
     });
 
+    const resultButtons = () => (dropdown && !dropdown.classList.contains('hidden'))
+      ? this.getFocusable(dropdown)
+      : [];
+
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        searchInput.blur();
+        // Cierra el desplegable sin sacar el foco del buscador
+        e.stopPropagation();
         closeSpotlight();
       } else if (e.key === 'Enter') {
         e.preventDefault();
         closeSpotlight();
         this.executeGlobalSearch(searchInput.value);
+      } else if (e.key === 'ArrowDown') {
+        if (dropdown && dropdown.classList.contains('hidden')) openSpotlight();
+        const items = resultButtons();
+        if (items.length) {
+          e.preventDefault();
+          items[0].focus();
+        }
       }
     });
+
+    // Flechas arriba/abajo recorren los resultados; Esc vuelve al buscador
+    if (dropdown) {
+      dropdown.addEventListener('keydown', (e) => {
+        const items = resultButtons();
+        const idx = items.indexOf(document.activeElement);
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
+          if (next < 0) searchInput.focus();
+          else items[Math.min(next, items.length - 1)].focus();
+        } else if (e.key === 'Escape') {
+          e.stopPropagation();
+          // Primero el foco (su listener reabre el desplegable) y luego se cierra
+          searchInput.focus();
+          closeSpotlight();
+        }
+      });
+    }
+
+    // Si el foco sale del buscador con Tab, se cierra el fondo oscurecido
+    // (un clic dentro del buscador no cuenta: Safari no enfoca botones al pulsarlos)
+    if (container) {
+      let pointerInside = false;
+      container.addEventListener('pointerdown', () => {
+        pointerInside = true;
+        setTimeout(() => { pointerInside = false; }, 0);
+      });
+      container.addEventListener('focusout', (e) => {
+        if (pointerInside) return;
+        if (!e.relatedTarget || !container.contains(e.relatedTarget)) closeSpotlight();
+      });
+    }
 
     backdrop.addEventListener('click', () => {
       searchInput.blur();

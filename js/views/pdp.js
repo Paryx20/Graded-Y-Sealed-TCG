@@ -101,7 +101,11 @@ const PDPView = {
     const isFlipped = mode === 'back';
     return `
       <div 
-        id="pdp-3d-scene" 
+        id="pdp-3d-scene"
+        tabindex="0"
+        role="group"
+        aria-roledescription="visor 3D"
+        aria-label="Carta en 3D. Usa las flechas para girarla e Inicio para restablecerla"
         onmousemove="PDPView.handleHoloMove(event)"
         ontouchstart="PDPView.handleHoloMove(event)"
         ontouchmove="PDPView.handleHoloMove(event)"
@@ -731,6 +735,26 @@ const PDPView = {
     scene.addEventListener('touchend', (e) => {
       onPointerUp(e);
     }, touchOpts);
+
+    scene.addEventListener('keydown', (e) => this.handleCard3DKey(e), listenerOpts);
+  },
+
+  // Visor girable con el teclado: flechas giran/inclinan, Inicio o 0 restablece
+  handleCard3DKey(e) {
+    const moves = {
+      ArrowLeft: [0, -15],
+      ArrowRight: [0, 15],
+      ArrowUp: [-10, 0],
+      ArrowDown: [10, 0]
+    };
+    if (moves[e.key]) {
+      this.rotateCard3D(moves[e.key][0], moves[e.key][1]);
+    } else if (e.key === 'Home' || e.key === '0') {
+      this.resetCard3D();
+    } else {
+      return;
+    }
+    if (typeof e.preventDefault === 'function') e.preventDefault();
   },
 
   prefersReducedMotion() {

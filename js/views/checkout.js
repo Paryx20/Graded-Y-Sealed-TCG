@@ -803,7 +803,7 @@ const CheckoutView = {
 
     if (modal) {
       modal.dataset.locked = '1';
-      modal.classList.add('active');
+      app.openDialog('payment-modal', '.modal-content');
     }
     step('25%', 'Conectando con la pasarela bancaria...');
     await wait(600);
@@ -816,8 +816,8 @@ const CheckoutView = {
       await wait(400);
     }
     if (modal) {
-      modal.classList.remove('active');
       delete modal.dataset.locked;
+      app.closeDialog('payment-modal');
     }
 
     if (!bank.approved) {

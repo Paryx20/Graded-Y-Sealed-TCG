@@ -480,6 +480,14 @@ const CatalogView = {
     }
     const toggle = document.querySelector('[aria-controls="catalog-sidebar-filters"]');
     if (toggle) toggle.setAttribute('aria-expanded', this.mobileFiltersOpen ? 'true' : 'false');
+
+    // Al abrir, el foco entra al panel; al cerrar (también con Esc) vuelve al botón "Filtros"
+    if (this.mobileFiltersOpen) {
+      const first = sidebar && app.getFocusable(sidebar)[0];
+      if (first) first.focus();
+    } else if (toggle && typeof toggle.focus === 'function') {
+      toggle.focus();
+    }
   },
 
   refreshGridOnly() {
