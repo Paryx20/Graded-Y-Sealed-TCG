@@ -326,9 +326,10 @@ const SEALED_PRODUCTS = [
     imagenLocal: 'img/sealed/Paquete fossil.png',
     imagenFallbackUrl: 'img/sealed/Paquete fossil.png',
     galeria_sellada: {
-      frontal: 'img/sealed/Paquete fossil.png',
       perspectiva: 'img/sealed/Paquete fossil.png',
-      lateral: 'img/sealed/Paquete fossil.png'
+      frontal: 'img/sealed/booster-box-fossil-1999/frontal.svg',
+      lateral: 'img/sealed/booster-box-fossil-1999/lateral.svg',
+      superior: 'img/sealed/booster-box-fossil-1999/superior.svg'
     },
     detalles_sellados: {
       gramaje: '745g (Caja Completa)',
@@ -481,12 +482,13 @@ const SEALED_PRODUCTS = [
     edicionEspecial: true,
     condicionPrincipal: 'sealed',
     certNumber: p.certNumber,
-    imagenLocal: `img/sealed/${p.id}.svg`,
-    imagenFallbackUrl: `img/sealed/${p.id}.svg`,
+    imagenLocal: `img/sealed/${p.id}/perspectiva.svg`,
+    imagenFallbackUrl: `img/sealed/${p.id}/frontal.svg`,
     galeria_sellada: {
-      frontal: `img/sealed/${p.id}.svg`,
-      perspectiva: `img/sealed/${p.id}.svg`,
-      lateral: `img/sealed/${p.id}.svg`
+      perspectiva: `img/sealed/${p.id}/perspectiva.svg`,
+      frontal: `img/sealed/${p.id}/frontal.svg`,
+      lateral: `img/sealed/${p.id}/lateral.svg`,
+      superior: `img/sealed/${p.id}/superior.svg`
     },
     detalles_sellados: {
       gramaje: `${p.gramos}g (Caja Completa)`,

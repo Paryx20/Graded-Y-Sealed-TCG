@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EA580C"/><stop offset="1" stop-color="#FACC15"/></linearGradient>
+  <linearGradient id="gs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9A3412"/><stop offset="1" stop-color="#EA580C"/></linearGradient>
+  <linearGradient id="brillo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <radialGradient id="sombra"><stop offset="0" stop-color="#0F172A" stop-opacity=".35"/><stop offset="1" stop-color="#0F172A" stop-opacity="0"/></radialGradient>
+</defs>
+<ellipse cx="400" cy="492.34375" rx="341" ry="24" fill="url(#sombra)"/>
+<g transform="translate(90.0 297.7) scale(1.938)">
+  <svg width="320" height="85" overflow="hidden"><rect width="320" height="85" fill="url(#g)"/>
+  <rect width="320" height="85" fill="#fff" fill-opacity=".12"/>
+  <circle cx="51.2" cy="42.5" r="22.1" fill="#fff" fill-opacity=".92" stroke="#0F172A" stroke-width="2"/>
+  <path d="M51.2 25.924999999999997 C63.355000000000004 38.08 64.46000000000001 50.235 51.2 57.97 C37.940000000000005 50.235 41.255 40.29 48.99 35.87 C48.99 42.5 52.305 44.71 51.2 25.924999999999997Z" fill="#EA580C" stroke="#0F172A" stroke-width="1.4"/>
+  <path d="M51.2 43.605 C56.725 48.025 55.620000000000005 54.655 51.2 55.318 C46.78 54.655 45.675000000000004 49.13 51.2 43.605Z" fill="#FACC15"/>
+  <text x="192" y="39.949999999999996" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="17.77777777777778" font-weight="900" fill="#fff" stroke="#0F172A" stroke-width="1">CHARIZARD ex</text>
+  <text x="192" y="52.699999999999996" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11.9" font-weight="900" fill="#fff" stroke="#0F172A" stroke-width=".7">SUPER-PREMIUM</text>
+  <text x="192" y="74.8" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="5.95" font-weight="900" fill="#0F172A">▲ ESTE LADO ARRIBA ▲</text>
+  <rect width="320" height="85" fill="none" stroke="#0F172A" stroke-width="1.7"/></svg>
+</g>
+</svg>

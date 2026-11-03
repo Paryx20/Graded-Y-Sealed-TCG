@@ -158,9 +158,10 @@ test('CH-03: `js/data.js` product `booster-box-fossil-1999` specifies space path
   assert.equal(fossil.imagenLocal, 'img/sealed/Paquete fossil.png');
   assert.equal(fossil.imagenFallbackUrl, 'img/sealed/Paquete fossil.png');
   assert.ok(fossil.galeria_sellada, 'Must have galeria_sellada');
-  assert.equal(fossil.galeria_sellada.frontal, 'img/sealed/Paquete fossil.png');
+  assert.equal(fossil.galeria_sellada.frontal, 'img/sealed/booster-box-fossil-1999/frontal.svg');
   assert.equal(fossil.galeria_sellada.perspectiva, 'img/sealed/Paquete fossil.png');
-  assert.equal(fossil.galeria_sellada.lateral, 'img/sealed/Paquete fossil.png');
+  assert.equal(fossil.galeria_sellada.lateral, 'img/sealed/booster-box-fossil-1999/lateral.svg');
+  assert.equal(fossil.galeria_sellada.superior, 'img/sealed/booster-box-fossil-1999/superior.svg');
 });
 
 test('CH-04: `CatalogView.render()` quotes `src="img/sealed/Paquete fossil.png"` preventing attribute truncation', () => {
@@ -196,7 +197,8 @@ test('CH-05: `PDPView.renderSealedGalleryStage()` quotes image src across all ga
   const { PDPView, PRODUCTS } = createSandbox();
   const fossil = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999');
 
-  const angles = ['frontal', 'perspectiva', 'lateral', 'unknown_angle'];
+  // La foto real es la vista en perspectiva; un ángulo desconocido cae en ella
+  const angles = ['perspectiva', 'unknown_angle'];
   for (const angle of angles) {
     const html = PDPView.renderSealedGalleryStage(fossil, angle);
     assert.ok(

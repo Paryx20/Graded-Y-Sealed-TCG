@@ -164,19 +164,35 @@ const PDPView = {
     `;
   },
 
-  renderSealedGalleryStage(product, activeAngle) {
-    const gallery = product.galeria_sellada || {
+  SEALED_ANGLES: [
+    { key: 'perspectiva', title: 'Perspectiva 3D', sub: 'Vista completa de la caja', icon: 'box' },
+    { key: 'frontal', title: 'Frontal', sub: 'Sello y arte principal', icon: 'square' },
+    { key: 'lateral', title: 'Lateral', sub: 'Costado y código de barras', icon: 'align-justify' },
+    { key: 'superior', title: 'Superior', sub: 'Tapa de la caja', icon: 'layers' }
+  ],
+
+  getSealedGallery(product) {
+    return product.galeria_sellada || {
       frontal: product.imagenLocal,
       perspectiva: product.imagenFallbackUrl || product.imagenLocal,
       lateral: product.imagenLocal
     };
-    const currentImage = gallery[activeAngle] || gallery.frontal || product.imagenLocal;
-    const angleLabels = {
-      frontal: 'Frontal',
-      perspectiva: 'Perspectiva 3/4',
-      lateral: 'Lateral'
-    };
-    const currentLabel = angleLabels[activeAngle] || 'Frontal';
+  },
+
+  // Ángulo válido para este producto (el guardado puede no existir en su galería)
+  resolveSealedAngle(product, angle) {
+    const gallery = this.getSealedGallery(product);
+    if (gallery[angle]) return angle;
+    const first = this.SEALED_ANGLES.find(a => gallery[a.key]);
+    return first ? first.key : 'frontal';
+  },
+
+  renderSealedGalleryStage(product, activeAngle) {
+    const gallery = this.getSealedGallery(product);
+    activeAngle = this.resolveSealedAngle(product, activeAngle);
+    const currentImage = gallery[activeAngle] || product.imagenLocal;
+    const currentLabel = (this.SEALED_ANGLES.find(a => a.key === activeAngle) || { title: 'Frontal' }).title;
+    const sealLabel = product.era === 'vintage' ? 'SELLADO ORIGINAL WOTC • BÓVEDA' : 'SELLADO DE FÁBRICA • BÓVEDA';
 
     return `
       <div id="pdp-sealed-stage" class="w-full h-full min-h-[370px] flex items-center justify-center relative p-4 select-none">
@@ -191,7 +207,7 @@ const PDPView = {
         </div>
         <div class="absolute top-3 left-3 bg-[#0F172A] text-white border border-slate-700 px-3 py-1 rounded-lg text-xs font-black shadow-md flex items-center gap-1.5 z-10">
           <i data-lucide="package-check" class="w-4 h-4 text-[#D97706]"></i>
-          <span>SELLADO ORIGINAL WOTC • BÓVEDA</span>
+          <span>${sealLabel}</span>
         </div>
         <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur border border-slate-300 px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-700 shadow-sm flex items-center gap-1">
           <i data-lucide="eye" class="w-3.5 h-3.5 text-[#0F172A]"></i>
@@ -202,20 +218,12 @@ const PDPView = {
   },
 
   renderSealedGalleryControls(product, activeAngle) {
-    const gallery = product.galeria_sellada || {
-      frontal: product.imagenLocal,
-      perspectiva: product.imagenFallbackUrl || product.imagenLocal,
-      lateral: product.imagenLocal
-    };
-
-    const angles = [
-      { key: 'frontal', title: 'Frontal', sub: 'Sello y arte principal', icon: 'box' },
-      { key: 'perspectiva', title: 'Perspectiva 3/4', sub: 'Profundidad de display', icon: 'layers' },
-      { key: 'lateral', title: 'Lateral', sub: 'Fila de sobres y celofán', icon: 'align-justify' }
-    ];
+    const gallery = this.getSealedGallery(product);
+    activeAngle = this.resolveSealedAngle(product, activeAngle);
+    const angles = this.SEALED_ANGLES.filter(a => gallery[a.key]);
 
     return `
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4" role="tablist" aria-label="Ángulos del empaque sellado">
+      <div class="grid grid-cols-2 ${angles.length > 3 ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-3 mt-4" role="tablist" aria-label="Ángulos del empaque sellado">
         ${angles.map(ang => {
           const isActive = activeAngle === ang.key;
           const thumbImg = gallery[ang.key] || product.imagenLocal;
@@ -259,7 +267,7 @@ const PDPView = {
         <div class="flex items-center justify-between pb-2 border-b border-slate-200">
           <span class="text-xs font-black text-[#0F172A] flex items-center gap-1.5 uppercase tracking-wide">
             <i data-lucide="file-check-2" class="w-4 h-4 text-[#D97706]"></i>
-            <span>Especificaciones de Fábrica Sellada WotC</span>
+            <span>Especificaciones de Fábrica Sellada${product.era === 'vintage' ? ' WotC' : ''}</span>
           </span>
           <span class="text-[10px] font-extrabold bg-[#D1FAE5] text-[#059669] px-2 py-0.5 rounded-full border border-[#059669]/20">
             VERIFICADO BÓVEDA
@@ -318,7 +326,7 @@ const PDPView = {
     const isSealed = product.tipo_discriminador === 'PRODUCTO_SELLADO' || product.categoria === 'sealed' || product.tipo_item === 'PRODUCTO_SELLADO';
     const condition = Store.data.pdpSelectedCondition || 'psa10';
     const mode = Store.data.pdpInspectorMode || 'front';
-    const activeAngle = Store.data.pdpSealedAngle || 'frontal';
+    const activeAngle = Store.data.pdpSealedAngle || 'perspectiva';
     const qty = Store.data.pdpQuantity || 1;
 
     let currentPrice;
@@ -402,7 +410,7 @@ const PDPView = {
             <div>
               <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-extrabold bg-[#FEF3C7] text-[#D97706] border border-[#D97706]/30">
                 <i data-lucide="${isSealed ? 'package-check' : 'award'}" class="w-3.5 h-3.5"></i>
-                <span>${isSealed ? 'PRODUCTO SELLADO DE COLECCIÓN • WOTC' : 'GRADO INVERSIÓN • OFICIAL PSA'}</span>
+                <span>${isSealed ? (product.era === 'vintage' ? 'PRODUCTO SELLADO DE COLECCIÓN • WOTC' : 'PRODUCTO SELLADO DE COLECCIÓN') : 'GRADO INVERSIÓN • OFICIAL PSA'}</span>
               </div>
               <h1 class="text-2xl sm:text-3xl font-black text-[#0F172A] mt-2 tracking-tight">${product.nombre}</h1>
               <p class="text-xs sm:text-sm text-slate-500 mt-1">${product.rareza || 'Coleccionable'} • ${product.set || 'EXP'} • ${isSealed ? `Era ${(product.era || 'vintage').toUpperCase()} • Display Sellado` : `${product.tipo || 'Carta'} • Cert #${product.certNumber || '00000000'}`}</p>

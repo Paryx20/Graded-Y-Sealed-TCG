@@ -323,7 +323,7 @@ const CatalogView = {
         : card.categoria === 'psa'
         ? `<span class="px-2.5 py-0.5 text-[10px] font-black bg-[#FEF3C7] text-[#D97706] rounded">GRADO INVERSIÓN • OFICIAL PSA</span>`
         : card.categoria === 'sealed'
-          ? `<span class="px-2.5 py-0.5 text-[10px] font-black bg-[#0F172A] text-[#FEF3C7] rounded">SELLADO WOTC</span>`
+          ? `<span class="px-2.5 py-0.5 text-[10px] font-black bg-[#0F172A] text-[#FEF3C7] rounded">${card.era === 'vintage' ? 'SELLADO WOTC' : 'SELLADO DE FÁBRICA'}</span>`
           : `<span class="px-2.5 py-0.5 text-[10px] font-black bg-slate-100 text-[#0F172A] rounded">SINGLE RAW NM</span>`;
 
       return `

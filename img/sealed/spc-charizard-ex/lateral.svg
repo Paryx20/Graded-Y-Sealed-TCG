@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EA580C"/><stop offset="1" stop-color="#FACC15"/></linearGradient>
+  <linearGradient id="gs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9A3412"/><stop offset="1" stop-color="#EA580C"/></linearGradient>
+  <linearGradient id="brillo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <radialGradient id="sombra"><stop offset="0" stop-color="#0F172A" stop-opacity=".35"/><stop offset="1" stop-color="#0F172A" stop-opacity="0"/></radialGradient>
+</defs>
+<ellipse cx="400" cy="720" rx="131.75000000000003" ry="24" fill="url(#sombra)"/>
+<g transform="translate(280.2 70.0) scale(2.818)">
+  <svg width="85" height="220" overflow="hidden"><rect width="85" height="220" fill="url(#gs)"/>
+  <rect width="85" height="220" fill="url(#brillo)"/>
+  <circle cx="42.5" cy="30.800000000000004" r="17" fill="#fff" fill-opacity=".92" stroke="#0F172A" stroke-width="2"/>
+  <path d="M42.5 18.050000000000004 C51.85 27.400000000000006 52.7 36.75 42.5 42.7 C32.3 36.75 34.85 29.100000000000005 40.8 25.700000000000003 C40.8 30.800000000000004 43.35 32.50000000000001 42.5 18.050000000000004Z" fill="#EA580C" stroke="#0F172A" stroke-width="1.4"/>
+  <path d="M42.5 31.650000000000006 C46.75 35.050000000000004 45.9 40.150000000000006 42.5 40.660000000000004 C39.1 40.150000000000006 38.25 35.900000000000006 42.5 31.650000000000006Z" fill="#FACC15"/>
+  <text transform="translate(42.5 110) rotate(-90)" text-anchor="middle" dominant-baseline="central" font-family="Arial, Helvetica, sans-serif" font-size="10.266666666666666" font-weight="900" fill="#fff" stroke="#0F172A" stroke-width="1">CHARIZARD ex</text>
+  <text x="42.5" y="176" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10.2" font-weight="900" fill="#fff">10 SOBRES</text>
+  <rect x="12.75" y="184.79999999999998" width="59.49999999999999" height="24.2" fill="#fff"/><rect x="16.3" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="17.7" y="187.70399999999998" width="1.4" height="18.392" fill="#0F172A"/><rect x="20.6" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="22.0" y="187.70399999999998" width="2.1" height="18.392" fill="#0F172A"/><rect x="26.3" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="27.7" y="187.70399999999998" width="1.4" height="18.392" fill="#0F172A"/><rect x="30.6" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="32.0" y="187.70399999999998" width="1.4" height="18.392" fill="#0F172A"/><rect x="34.9" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="36.3" y="187.70399999999998" width="2.1" height="18.392" fill="#0F172A"/><rect x="40.6" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="42.0" y="187.70399999999998" width="1.4" height="18.392" fill="#0F172A"/><rect x="44.9" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="46.3" y="187.70399999999998" width="1.4" height="18.392" fill="#0F172A"/><rect x="49.2" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="50.6" y="187.70399999999998" width="2.1" height="18.392" fill="#0F172A"/><rect x="54.9" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="56.3" y="187.70399999999998" width="1.4" height="18.392" fill="#0F172A"/><rect x="59.2" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="60.6" y="187.70399999999998" width="1.4" height="18.392" fill="#0F172A"/><rect x="63.4" y="187.70399999999998" width="0.7" height="18.392" fill="#0F172A"/><rect x="64.9" y="187.70399999999998" width="2.1" height="18.392" fill="#0F172A"/>
+  <rect width="85" height="220" fill="none" stroke="#0F172A" stroke-width="1.7"/></svg>
+</g>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C3AED"/><stop offset="1" stop-color="#F472B6"/></linearGradient>
+  <linearGradient id="gs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5B21B6"/><stop offset="1" stop-color="#7C3AED"/></linearGradient>
+  <linearGradient id="brillo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <radialGradient id="sombra"><stop offset="0" stop-color="#0F172A" stop-opacity=".35"/><stop offset="1" stop-color="#0F172A" stop-opacity="0"/></radialGradient>
+</defs>
+<ellipse cx="400" cy="502.03125" rx="341" ry="24" fill="url(#sombra)"/>
+<g transform="translate(90.0 288.0) scale(1.938)">
+  <svg width="320" height="95" overflow="hidden"><rect width="320" height="95" fill="url(#g)"/>
+  <rect width="320" height="95" fill="#fff" fill-opacity=".12"/>
+  <circle cx="51.2" cy="47.5" r="24.7" fill="#fff" stroke="#0F172A" stroke-width="2.223"/>
+  <path d="M26.500000000000004 47.5a24.7 24.7 0 0 1 49.4 0z" fill="#E11D48"/>
+  <path d="M26.500000000000004 47.5h49.4" stroke="#0F172A" stroke-width="2.223"/>
+  <circle cx="51.2" cy="47.5" r="24.7" fill="none" stroke="#0F172A" stroke-width="2.223"/>
+  <circle cx="51.2" cy="47.5" r="6.916" fill="#fff" stroke="#0F172A" stroke-width="2.223"/>
+  <text x="192" y="44.65" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="19.393939393939394" font-weight="900" fill="#fff" stroke="#0F172A" stroke-width="1">POKÉMON 151</text>
+  <text x="192" y="58.9" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13.3" font-weight="900" fill="#fff" stroke="#0F172A" stroke-width=".7">ULTRA-PREMIUM</text>
+  <text x="192" y="83.6" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="6.65" font-weight="900" fill="#0F172A">▲ ESTE LADO ARRIBA ▲</text>
+  <rect width="320" height="95" fill="none" stroke="#0F172A" stroke-width="1.9000000000000001"/></svg>
+</g>
+</svg>

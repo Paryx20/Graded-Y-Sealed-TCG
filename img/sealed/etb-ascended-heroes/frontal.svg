@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0F766E"/><stop offset="1" stop-color="#A3E635"/></linearGradient>
+  <linearGradient id="gs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#134E4A"/><stop offset="1" stop-color="#0F766E"/></linearGradient>
+  <linearGradient id="brillo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <radialGradient id="sombra"><stop offset="0" stop-color="#0F172A" stop-opacity=".35"/><stop offset="1" stop-color="#0F172A" stop-opacity="0"/></radialGradient>
+</defs>
+<ellipse cx="400" cy="720" rx="327.8846153846154" ry="24" fill="url(#sombra)"/>
+<g transform="translate(101.9 70.0) scale(2.385)">
+  <svg width="250" height="260" overflow="hidden"><rect width="250" height="260" fill="url(#g)"/>
+  <rect width="250" height="260" fill="url(#brillo)"/>
+  <rect y="18.200000000000003" width="250" height="26" fill="#E11D48"/>
+  <text x="125" y="36.400000000000006" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14.3" font-weight="900" fill="#fff" letter-spacing="3.12">EDICIÓN ESPECIAL</text>
+  <circle cx="125" cy="104" r="50" fill="#fff" stroke="#0F172A" stroke-width="4.5"/>
+  <path d="M75 104a50 50 0 0 1 100 0z" fill="#E11D48"/>
+  <path d="M75 104h100" stroke="#0F172A" stroke-width="4.5"/>
+  <circle cx="125" cy="104" r="50" fill="none" stroke="#0F172A" stroke-width="4.5"/>
+  <circle cx="125" cy="104" r="14.000000000000002" fill="#fff" stroke="#0F172A" stroke-width="4.5"/>
+  <text x="125" y="171.6" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32.5" font-weight="900" fill="#fff" stroke="#0F172A" stroke-width="1">ASCENDED</text>
+  <text x="125" y="196.6" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18.75" font-weight="900" fill="#fff" stroke="#0F172A" stroke-width="0.75">HEROES</text>
+  <text x="125" y="214.1" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12.5" font-weight="700" fill="#0F172A">Elite Trainer Box</text>
+  <rect y="234" width="250" height="26" fill="#0F172A" fill-opacity=".85"/>
+  <text x="125" y="250.9" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" fill="#fff">9 sobres • Mega Evolution</text>
+  <rect width="250" height="260" fill="none" stroke="#0F172A" stroke-width="3.75"/></svg>
+</g>
+</svg>

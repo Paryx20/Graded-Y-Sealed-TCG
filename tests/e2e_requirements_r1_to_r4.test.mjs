@@ -667,9 +667,10 @@ test('TC-T3-R3-04 [R3 Boundary]: Sealed product multi-angle gallery specifies va
   const fossilProduct = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999');
 
   if (fossilProduct && fossilProduct.galeria_sellada) {
-    assert.equal(fossilProduct.galeria_sellada.frontal, 'img/sealed/Paquete fossil.png');
+    assert.equal(fossilProduct.galeria_sellada.frontal, 'img/sealed/booster-box-fossil-1999/frontal.svg');
     assert.equal(fossilProduct.galeria_sellada.perspectiva, 'img/sealed/Paquete fossil.png');
-    assert.equal(fossilProduct.galeria_sellada.lateral, 'img/sealed/Paquete fossil.png');
+    assert.equal(fossilProduct.galeria_sellada.lateral, 'img/sealed/booster-box-fossil-1999/lateral.svg');
+    assert.equal(fossilProduct.galeria_sellada.superior, 'img/sealed/booster-box-fossil-1999/superior.svg');
   }
 });
 
