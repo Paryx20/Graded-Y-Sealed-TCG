@@ -6,8 +6,31 @@ const APP_CONFIG = {
 };
 
 /**
- * Catálogo Principal de 10 Cartas Pokémon a Precios Normales de Mercado Real ($5.00 a $80.00 USD)
- * Requisito R6 / Fase 8: Eliminación de precios especulativos inflados.
+ * Precios de cartas: el Raw es el precio de mercado real de TCGplayer (consultado en la API
+ * de TCGdex el día PRECIOS_FECHA y fijado aquí, igual que en Supabase, para que el checkout cuadre).
+ * Los grados PSA son estimaciones a partir del Raw.
+ */
+const PRECIOS_FECHA = '2026-11-03';
+const PRECIOS_FUENTE = 'TCGplayer';
+const MULTIPLICADORES_PSA = { psa8: 1.6, psa9: 2.4, psa10: 4.5 };
+
+// Cálculo en centavos enteros con redondeo half-up, idéntico a round() de PostgreSQL
+function precioPorMultiplicador(raw, multiplicador) {
+  const centavos = Math.round(raw * 100);
+  return Math.round(centavos * Math.round(multiplicador * 10) / 10) / 100;
+}
+
+function preciosDesdeRaw(raw) {
+  return {
+    raw,
+    psa8: precioPorMultiplicador(raw, MULTIPLICADORES_PSA.psa8),
+    psa9: precioPorMultiplicador(raw, MULTIPLICADORES_PSA.psa9),
+    psa10: precioPorMultiplicador(raw, MULTIPLICADORES_PSA.psa10)
+  };
+}
+
+/**
+ * Catálogo principal: 10 cartas Pokémon con precio real de mercado
  */
 const POKEMON_CARDS_CATALOG_10 = [
   {
@@ -25,12 +48,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     certNumber: '84920111',
     imagenLocal: 'https://images.pokemontcg.io/swsh12pt5/160.png',
     imagenFallbackUrl: 'assets/img/cards/pikachu-crown-zenith.webp',
-    precios: {
-      raw: 12.00,
-      psa8: 18.00,
-      psa9: 24.00,
-      psa10: 48.00
-    },
+    precios: preciosDesdeRaw(36.88),
     descripcion: 'Pikachu Secret Rare #160/159 • Zenit Supremo 2023 • Certificación Bóveda PSA',
     tendencia12m: '+11.5%',
     rendimientoAnual: 11.5,
@@ -50,12 +68,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     certNumber: '84920112',
     imagenLocal: 'https://images.pokemontcg.io/sv4pt5/54.png',
     imagenFallbackUrl: 'assets/img/cards/charizard-ex-paldean.webp',
-    precios: {
-      raw: 10.00,
-      psa8: 16.00,
-      psa9: 22.00,
-      psa10: 45.00
-    },
+    precios: preciosDesdeRaw(4.60),
     descripcion: 'Charizard ex Doble Rara • Destinos de Paldea 2024 • Certificación Bóveda PSA',
     tendencia12m: '+13.2%',
     rendimientoAnual: 13.2,
@@ -75,12 +88,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     certNumber: '84920113',
     imagenLocal: 'https://images.pokemontcg.io/sv6/188.png',
     imagenFallbackUrl: 'assets/img/cards/eevee-twilight.webp',
-    precios: {
-      raw: 38.00,
-      psa8: 45.00,
-      psa9: 55.00,
-      psa10: 78.00
-    },
+    precios: preciosDesdeRaw(70.68),
     descripcion: 'Eevee Arte Especial • Mascarada Crepuscular • Near Mint Verificado',
     tendencia12m: '+15.8%',
     rendimientoAnual: 15.8,
@@ -100,12 +108,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     certNumber: '84920114',
     imagenLocal: 'https://images.pokemontcg.io/sv3pt5/94.png',
     imagenFallbackUrl: 'assets/img/cards/gengar-scarlet-violet.webp',
-    precios: {
-      raw: 5.00,
-      psa8: 9.00,
-      psa9: 14.00,
-      psa10: 28.00
-    },
+    precios: preciosDesdeRaw(2.94),
     descripcion: 'Gengar Holo Rare #094/165 • Colección Pokémon 151 • Funda Protectora',
     tendencia12m: '+8.4%',
     rendimientoAnual: 8.4,
@@ -125,12 +128,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     certNumber: '84920115',
     imagenLocal: 'https://images.pokemontcg.io/sv6/106.png',
     imagenFallbackUrl: 'assets/img/cards/greninja-ex-twilight.webp',
-    precios: {
-      raw: 8.50,
-      psa8: 14.00,
-      psa9: 20.00,
-      psa10: 38.00
-    },
+    precios: preciosDesdeRaw(1.75),
     descripcion: 'Greninja ex Mascarada Crepuscular 2024 • Certificación PSA 10 GEM MT',
     tendencia12m: '+16.2%',
     rendimientoAnual: 16.2,
@@ -150,12 +148,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     certNumber: '84920116',
     imagenLocal: 'https://images.pokemontcg.io/sv4pt5/160.png',
     imagenFallbackUrl: 'assets/img/cards/mimikyu-paldean.webp',
-    precios: {
-      raw: 14.00,
-      psa8: 20.00,
-      psa9: 28.00,
-      psa10: 52.00
-    },
+    precios: preciosDesdeRaw(45.30),
     descripcion: 'Mimikyu Shiny Holo • Destinos de Paldea • Estado Near Mint',
     tendencia12m: '+12.7%',
     rendimientoAnual: 12.7,
@@ -175,12 +168,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     certNumber: '84920117',
     imagenLocal: 'https://images.pokemontcg.io/sv3pt5/150.png',
     imagenFallbackUrl: 'assets/img/cards/mewtwo-151.webp',
-    precios: {
-      raw: 6.00,
-      psa8: 11.00,
-      psa9: 16.00,
-      psa10: 32.00
-    },
+    precios: preciosDesdeRaw(2.33),
     descripcion: 'Mewtwo Holo Rare • Colección Pokémon 151 • Grado PSA 10 Gem Mint',
     tendencia12m: '+10.4%',
     rendimientoAnual: 10.4,
@@ -201,12 +189,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     certNumber: '84920118',
     imagenLocal: 'https://images.pokemontcg.io/swshp/SWSH291.png',
     imagenFallbackUrl: 'assets/img/cards/lucario-vstar-zenith.webp',
-    precios: {
-      raw: 7.00,
-      psa8: 12.00,
-      psa9: 18.00,
-      psa10: 36.00
-    },
+    precios: preciosDesdeRaw(8.15),
     descripcion: 'Lucario VSTAR Arte Especial Promo • Grado Inversión Bóveda PSA',
     tendencia12m: '+11.1%',
     rendimientoAnual: 11.1,
@@ -226,12 +209,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     certNumber: '48291077',
     imagenLocal: 'https://images.pokemontcg.io/sm35/29.png',
     imagenFallbackUrl: 'assets/img/cards/raichu-gx.webp',
-    precios: {
-      raw: 6.50,
-      psa8: 12.00,
-      psa9: 18.00,
-      psa10: 35.00
-    },
+    precios: preciosDesdeRaw(5.47),
     descripcion: 'Carta oficial Raichu GX • PS 210 • Chispa Poderosa • Bóveda PSA oficial',
     tendencia12m: '+14.8%',
     rendimientoAnual: 14.8,
@@ -251,18 +229,65 @@ const POKEMON_CARDS_CATALOG_10 = [
     certNumber: '84920120',
     imagenLocal: 'https://images.pokemontcg.io/sv3pt5/9.png',
     imagenFallbackUrl: 'assets/img/cards/blastoise-ex-151.webp',
-    precios: {
-      raw: 8.00,
-      psa8: 14.00,
-      psa9: 20.00,
-      psa10: 42.00
-    },
+    precios: preciosDesdeRaw(2.27),
     descripcion: 'Blastoise ex #009/165 • Pokémon 151 • Bóveda PSA oficial',
     tendencia12m: '+12.3%',
     rendimientoAnual: 12.3,
     historialBase: [0.88, 0.89, 0.91, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00, 1.00]
   }
 ];
+
+/**
+ * 25 cartas más del catálogo (precio Raw real de TCGplayer al PRECIOS_FECHA)
+ * imagen: ruta en images.pokemontcg.io · respaldo local en assets/img/cards/<id>.png
+ */
+const POKEMON_CARDS_EXTRA = [
+  ['alakazam-ex-151', 'Alakazam ex', 'Alakazam ex Special Illustration Rare #201/165', 'Pokemon 151 2023', 'Special Illustration Rare', 'Psíquico', 'psa', 'sv3pt5/201', 56.97, 14.6],
+  ['bulbasaur-151', 'Bulbasaur', 'Bulbasaur Illustration Rare #166/165', 'Pokemon 151 2023', 'Illustration Rare', 'Planta', 'raw', 'sv3pt5/166', 53.60, 12.9],
+  ['caterpie-151', 'Caterpie', 'Caterpie Illustration Rare #172/165', 'Pokemon 151 2023', 'Illustration Rare', 'Planta', 'raw', 'sv3pt5/172', 15.57, 7.8],
+  ['charmander-151', 'Charmander', 'Charmander Illustration Rare #168/165', 'Pokemon 151 2023', 'Illustration Rare', 'Fuego', 'psa', 'sv3pt5/168', 80.89, 17.4],
+  ['dragonair-151', 'Dragonair', 'Dragonair Illustration Rare #181/165', 'Pokemon 151 2023', 'Illustration Rare', 'Dragón', 'raw', 'sv3pt5/181', 37.25, 10.2],
+  ['gardevoir-ex-escarlata-purpura', 'Gardevoir ex', 'Gardevoir ex Special Illustration Rare #245/198', 'Scarlet & Violet 2023', 'Special Illustration Rare', 'Psíquico', 'psa', 'sv1/245', 64.05, 11.7],
+  ['giratina-vstar-lost-origin', 'Giratina VSTAR', 'Giratina VSTAR Secret Rare #201/196', 'Lost Origin 2022', 'Secret Rare', 'Dragón', 'psa', 'swsh11/201', 24.73, 9.1],
+  ['iron-valiant-ex-paradox-rift', 'Iron Valiant ex', 'Iron Valiant ex Special Illustration Rare #249/182', 'Paradox Rift 2023', 'Special Illustration Rare', 'Psíquico', 'raw', 'sv4/249', 19.37, 6.4],
+  ['koraidon-ex-escarlata-purpura', 'Koraidon ex', 'Koraidon ex Special Illustration Rare #247/198', 'Scarlet & Violet 2023', 'Special Illustration Rare', 'Lucha', 'raw', 'sv1/247', 18.44, 5.9],
+  ['lugia-v-silver-tempest', 'Lugia V', 'Lugia V Holo Rare #138/195', 'Silver Tempest 2022', 'Holo Rare V', 'Incoloro', 'psa', 'swsh12/138', 14.19, 8.8],
+  ['machoke-151', 'Machoke', 'Machoke Illustration Rare #177/165', 'Pokemon 151 2023', 'Illustration Rare', 'Lucha', 'raw', 'sv3pt5/177', 19.69, 7.2],
+  ['mew-ex-151', 'Mew ex', 'Mew ex Hyper Rare Gold #205/165', 'Pokemon 151 2023', 'Hyper Rare', 'Psíquico', 'psa', 'sv3pt5/205', 23.78, 10.6],
+  ['miraidon-ex-escarlata-purpura', 'Miraidon ex', 'Miraidon ex Special Illustration Rare #244/198', 'Scarlet & Violet 2023', 'Special Illustration Rare', 'Eléctrico', 'raw', 'sv1/244', 18.60, 6.1],
+  ['nidoking-151', 'Nidoking', 'Nidoking Illustration Rare #174/165', 'Pokemon 151 2023', 'Illustration Rare', 'Oscuridad', 'raw', 'sv3pt5/174', 15.80, 7.5],
+  ['omanyte-151', 'Omanyte', 'Omanyte Illustration Rare #180/165', 'Pokemon 151 2023', 'Illustration Rare', 'Agua', 'raw', 'sv3pt5/180', 10.80, 6.8],
+  ['poliwhirl-151', 'Poliwhirl', 'Poliwhirl Illustration Rare #176/165', 'Pokemon 151 2023', 'Illustration Rare', 'Agua', 'raw', 'sv3pt5/176', 34.59, 11.3],
+  ['psyduck-151', 'Psyduck', 'Psyduck Illustration Rare #175/165', 'Pokemon 151 2023', 'Illustration Rare', 'Agua', 'psa', 'sv3pt5/175', 49.44, 13.5],
+  ['rayquaza-vmax-evolving-skies', 'Rayquaza VMAX', 'Rayquaza VMAX Holo Rare #111/203', 'Evolving Skies 2021', 'Holo Rare VMAX', 'Dragón', 'psa', 'swsh7/111', 13.26, 9.7],
+  ['roaring-moon-ex-paradox-rift', 'Roaring Moon ex', 'Roaring Moon ex Special Illustration Rare #251/182', 'Paradox Rift 2023', 'Special Illustration Rare', 'Oscuridad', 'raw', 'sv4/251', 28.54, 8.3],
+  ['squirtle-151', 'Squirtle', 'Squirtle Illustration Rare #170/165', 'Pokemon 151 2023', 'Illustration Rare', 'Agua', 'psa', 'sv3pt5/170', 82.17, 16.9],
+  ['sylveon-vmax-evolving-skies', 'Sylveon VMAX', 'Sylveon VMAX Holo Rare #075/203', 'Evolving Skies 2021', 'Holo Rare VMAX', 'Psíquico', 'psa', 'swsh7/75', 19.08, 10.1],
+  ['tangela-151', 'Tangela', 'Tangela Illustration Rare #178/165', 'Pokemon 151 2023', 'Illustration Rare', 'Planta', 'raw', 'sv3pt5/178', 13.96, 6.5],
+  ['umbreon-vmax-evolving-skies', 'Umbreon VMAX', 'Umbreon VMAX Holo Rare #095/203', 'Evolving Skies 2021', 'Holo Rare VMAX', 'Oscuridad', 'psa', 'swsh7/95', 28.83, 15.2],
+  ['venusaur-ex-151', 'Venusaur ex', 'Venusaur ex Special Illustration Rare #198/165', 'Pokemon 151 2023', 'Special Illustration Rare', 'Planta', 'psa', 'sv3pt5/198', 86.23, 15.8],
+  ['zapdos-ex-151', 'Zapdos ex', 'Zapdos ex Special Illustration Rare #202/165', 'Pokemon 151 2023', 'Special Illustration Rare', 'Eléctrico', 'psa', 'sv3pt5/202', 70.67, 13.1]
+].map(([id, pokemon, nombre, set, rareza, tipo, categoria, imagen, raw, rendimiento], i) => ({
+  id,
+  pokemon,
+  nombre,
+  set,
+  rareza,
+  tipo,
+  categoria,
+  tipo_discriminador: 'CARTA_INDIVIDUAL',
+  tipo_item: 'CARTA_INDIVIDUAL',
+  era: 'modern',
+  condicionPrincipal: categoria === 'psa' ? 'psa10' : 'raw',
+  certNumber: String(84921000 + i + 1),
+  imagenLocal: `https://images.pokemontcg.io/${imagen}.png`,
+  imagenFallbackUrl: `assets/img/cards/${id}.png`,
+  precios: preciosDesdeRaw(raw),
+  descripcion: `${nombre} • ${set} • ${categoria === 'psa' ? 'Disponible en Bóveda PSA' : 'Estado Near Mint verificado'}`,
+  tendencia12m: `+${rendimiento.toFixed(1)}%`,
+  rendimientoAnual: rendimiento,
+  historialBase: [0.88, 0.89, 0.90, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]
+}));
 
 /**
  * Productos Sellados Vintage WotC
@@ -883,6 +908,7 @@ const LEGACY_FIXTURE_PRODUCTS = {
  */
 const PRODUCTS = [
   ...POKEMON_CARDS_CATALOG_10,
+  ...POKEMON_CARDS_EXTRA,
   ...SEALED_PRODUCTS
 ];
 
@@ -928,6 +954,10 @@ PRODUCTS.forEach(p => {
 if (typeof globalThis !== 'undefined') {
   globalThis.APP_CONFIG = APP_CONFIG;
   globalThis.POKEMON_CARDS_CATALOG_10 = POKEMON_CARDS_CATALOG_10;
+  globalThis.POKEMON_CARDS_EXTRA = POKEMON_CARDS_EXTRA;
+  globalThis.PRECIOS_FECHA = PRECIOS_FECHA;
+  globalThis.PRECIOS_FUENTE = PRECIOS_FUENTE;
+  globalThis.MULTIPLICADORES_PSA = MULTIPLICADORES_PSA;
   globalThis.SEALED_PRODUCTS = SEALED_PRODUCTS;
   globalThis.LEGACY_FIXTURE_PRODUCTS = LEGACY_FIXTURE_PRODUCTS;
   globalThis.PRODUCTS = PRODUCTS;
@@ -935,6 +965,10 @@ if (typeof globalThis !== 'undefined') {
 if (typeof window !== 'undefined') {
   window.APP_CONFIG = APP_CONFIG;
   window.POKEMON_CARDS_CATALOG_10 = POKEMON_CARDS_CATALOG_10;
+  window.POKEMON_CARDS_EXTRA = POKEMON_CARDS_EXTRA;
+  window.PRECIOS_FECHA = PRECIOS_FECHA;
+  window.PRECIOS_FUENTE = PRECIOS_FUENTE;
+  window.MULTIPLICADORES_PSA = MULTIPLICADORES_PSA;
   window.SEALED_PRODUCTS = SEALED_PRODUCTS;
   window.LEGACY_FIXTURE_PRODUCTS = LEGACY_FIXTURE_PRODUCTS;
   window.PRODUCTS = PRODUCTS;
@@ -943,6 +977,10 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     APP_CONFIG,
     POKEMON_CARDS_CATALOG_10,
+    POKEMON_CARDS_EXTRA,
+    PRECIOS_FECHA,
+    PRECIOS_FUENTE,
+    MULTIPLICADORES_PSA,
     SEALED_PRODUCTS,
     LEGACY_FIXTURE_PRODUCTS,
     PRODUCTS

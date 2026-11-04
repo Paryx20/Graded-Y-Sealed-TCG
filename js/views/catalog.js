@@ -21,6 +21,28 @@ const CatalogView = {
     return card.categoria === category;
   },
 
+  LETTERS: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+
+  isSealedItem(card) {
+    return card.categoria === 'sealed' || card.tipo_discriminador === 'PRODUCTO_SELLADO';
+  },
+
+  // Primera letra del nombre del Pokémon (los sellados no tienen)
+  initialOf(card) {
+    if (!card || this.isSealedItem(card)) return '';
+    const name = (card.pokemon || card.nombre || '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+    return name.charAt(0).toUpperCase();
+  },
+
+  availableLetters() {
+    return new Set(PRODUCTS.map(card => this.initialOf(card)).filter(Boolean));
+  },
+
+  // Tipos de energía presentes en el inventario, en orden alfabético
+  availableTypes() {
+    return [...new Set(PRODUCTS.map(card => card.tipo).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+  },
+
   getFilteredProducts() {
     const f = Store.data.catalogFilters;
     const condKey = 'raw';
@@ -34,6 +56,8 @@ const CatalogView = {
       if (f.onlyFavorites && !Store.isFavorite(card.id)) return false;
 
       if (f.type !== 'all' && card.tipo !== f.type) return false;
+
+      if (f.letter && f.letter !== 'all' && this.initialOf(card) !== f.letter) return false;
 
       const refPrice = card.precios.raw;
 
@@ -82,6 +106,7 @@ const CatalogView = {
 
   getActiveTitle() {
     const f = Store.data.catalogFilters;
+    if (f.letter && f.letter !== 'all') return `Pokémon que empiezan por «${f.letter}»`;
     if (f.category === 'psa') return 'Slabs Certificados PSA';
     if (f.category === 'raw') return 'Cartas Sueltas / Raw';
     if (f.category === 'sealed') return 'Cajas y Sobres Sellados Vintage';
@@ -228,11 +253,7 @@ const CatalogView = {
                 class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A] focus:bg-white"
               >
                 <option value="all" ${f.type === 'all' ? 'selected' : ''}>Todos los Tipos</option>
-                <option value="Fuego" ${f.type === 'Fuego' ? 'selected' : ''}>Fuego</option>
-                <option value="Oscuridad" ${f.type === 'Oscuridad' ? 'selected' : ''}>Oscuridad</option>
-                <option value="Psíquico" ${f.type === 'Psíquico' ? 'selected' : ''}>Psíquico</option>
-                <option value="Agua" ${f.type === 'Agua' ? 'selected' : ''}>Agua</option>
-                <option value="Incoloro" ${f.type === 'Incoloro' ? 'selected' : ''}>Incoloro</option>
+                ${this.availableTypes().map(t => `<option value="${t}" ${f.type === t ? 'selected' : ''}>${t}</option>`).join('')}
               </select>
             </div>
 
@@ -305,6 +326,8 @@ const CatalogView = {
               </div>
             </div>
 
+            ${this.renderLetterFilter()}
+
             <div id="catalog-results-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
               ${this.renderCardsGrid(filtered)}
             </div>
@@ -312,6 +335,75 @@ const CatalogView = {
         </div>
       </div>
     `;
+  },
+
+  letterButtonState(letter, available) {
+    const f = Store.data.catalogFilters;
+    const current = f.letter || 'all';
+    const pressed = current === letter;
+    if (letter === 'all') {
+      return { pressed, disabled: false, label: 'Mostrar todas las letras' };
+    }
+    const disabled = !available.has(letter);
+    return {
+      pressed,
+      disabled,
+      label: disabled ? `Letra ${letter}: sin cartas` : `Pokémon que empiezan por ${letter}`
+    };
+  },
+
+  renderLetterFilter() {
+    const available = this.availableLetters();
+    const button = (letter, text) => {
+      const s = this.letterButtonState(letter, available);
+      return `
+        <button
+          type="button"
+          class="letter-btn${letter === 'all' ? ' letter-btn-all' : ''}"
+          data-letter="${letter}"
+          aria-pressed="${s.pressed ? 'true' : 'false'}"
+          aria-label="${s.label}"
+          ${s.disabled ? 'disabled' : ''}
+          onclick="CatalogView.setLetter('${letter}')"
+        >${text}</button>`;
+    };
+
+    return `
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+        <p id="catalog-letter-label" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-2.5">
+          <i data-lucide="a-large-small" class="w-4 h-4 text-slate-500"></i>
+          Filtrar por letra del Pokémon
+        </p>
+        <div id="catalog-letter-filter" role="group" aria-labelledby="catalog-letter-label" class="flex flex-wrap gap-1.5">
+          ${button('all', 'Todas')}
+          ${this.LETTERS.map(l => button(l, l)).join('')}
+        </div>
+      </div>
+    `;
+  },
+
+  setLetter(letter) {
+    const value = letter === 'all' || !/^[A-Z]$/.test(letter) ? 'all' : letter;
+    Store.data.catalogFilters.letter = value;
+    if (typeof history !== 'undefined' && typeof location !== 'undefined') {
+      const params = new URLSearchParams(location.search);
+      if (value === 'all') params.delete('letra'); else params.set('letra', value);
+      const qs = params.toString();
+      history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : ''));
+    }
+    this.refreshGridOnly();
+  },
+
+  // Actualiza los botones sin volver a pintarlos, para no perder el foco del teclado
+  syncLetterButtons() {
+    if (typeof document === 'undefined') return;
+    const available = this.availableLetters();
+    document.querySelectorAll('#catalog-letter-filter [data-letter]').forEach(btn => {
+      const s = this.letterButtonState(btn.getAttribute('data-letter'), available);
+      btn.setAttribute('aria-pressed', s.pressed ? 'true' : 'false');
+      btn.setAttribute('aria-label', s.label);
+      btn.disabled = s.disabled;
+    });
   },
 
   renderCardsGrid(items) {
@@ -393,6 +485,7 @@ const CatalogView = {
                 <span class="truncate">${gradeInfo.label}</span>
               </span>
               <span class="font-display text-lg font-bold text-[#0F172A]">$${Number(price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              ${grade === 'raw' && typeof PRECIOS_FUENTE !== 'undefined' ? `<span class="block text-xs text-slate-500">Precio ${PRECIOS_FUENTE}</span>` : ''}
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
               <button
@@ -462,7 +555,8 @@ const CatalogView = {
       maxPrice: '',
       sortBy: 'featured',
       searchQuery: '',
-      onlyFavorites: false
+      onlyFavorites: false,
+      letter: 'all'
     };
     const searchInput = document.getElementById('global-search');
     if (searchInput) searchInput.value = '';
@@ -500,6 +594,8 @@ const CatalogView = {
     if (grid) grid.innerHTML = this.renderCardsGrid(filtered);
     if (countBadge) countBadge.innerText = filtered.length;
     if (inlineCount) inlineCount.innerText = filtered.length;
+    if (titleEl) titleEl.textContent = this.getActiveTitle();
+    this.syncLetterButtons();
     app.refreshIcons();
   }
 };

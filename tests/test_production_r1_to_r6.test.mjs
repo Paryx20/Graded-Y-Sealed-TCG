@@ -514,7 +514,7 @@ test('R6 Hybrid DB [6.5]: db-client.js provides transparent failover to Dexie/Lo
   assert.ok(dbClientCode.includes('LocalStorageFallbackDB'), 'db-client.js must maintain LocalStorageFallbackDB');
 });
 
-test('R6 Catalog [6.6]: 10 Pokémon cards strictly bounded between $5.00 and $80.00 USD across all grades', () => {
+test('R6 Catalog [6.6]: 10 Pokémon cards with real positive prices ordered raw ≤ psa8 ≤ psa9 ≤ psa10', () => {
   const { sandbox } = createTestRuntime();
   const { POKEMON_CARDS_CATALOG_10 } = sandbox;
 
@@ -526,9 +526,10 @@ test('R6 Catalog [6.6]: 10 Pokémon cards strictly bounded between $5.00 and $80
     grades.forEach(g => {
       const p = card.precios[g];
       assert.ok(typeof p === 'number', `Price for ${card.nombre} grade ${g} must be a number`);
-      assert.ok(p >= 5.00, `Price $${p} for ${card.nombre} (${g}) is below minimum $5.00 USD`);
-      assert.ok(p <= 80.00, `Price $${p} for ${card.nombre} (${g}) exceeds maximum $80.00 USD`);
+      assert.ok(p > 0, `Price $${p} for ${card.nombre} (${g}) must be positive`);
     });
+    assert.ok(card.precios.raw <= card.precios.psa8 && card.precios.psa8 <= card.precios.psa9 && card.precios.psa9 <= card.precios.psa10,
+      `Grade prices for ${card.nombre} must be ordered`);
   });
 });
 

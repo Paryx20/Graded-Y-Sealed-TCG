@@ -402,7 +402,7 @@ test('R6 Adversarial [6.1]: schema.sql defines all 12 entities, composite PK, in
   assert.ok(sql.includes('PRIMARY KEY (numero_orden, sku, grado)'), 'items_orden must declare composite PK');
 });
 
-test('R6 Adversarial [6.2]: 10 Pokémon cards strictly bounded between $5.00 and $80.00 USD across all grades', () => {
+test('R6 Adversarial [6.2]: 10 Pokémon cards with real positive prices ordered by grade', () => {
   const dataCode = fs.readFileSync(path.join(ROOT_DIR, 'js/data.js'), 'utf8');
   const context = vm.createContext({});
   vm.runInContext(dataCode + '\n; globalThis.catalog = POKEMON_CARDS_CATALOG_10;', context);
@@ -415,8 +415,10 @@ test('R6 Adversarial [6.2]: 10 Pokémon cards strictly bounded between $5.00 and
     ['raw', 'psa8', 'psa9', 'psa10'].forEach(grade => {
       const p = card.precios[grade];
       assert.ok(typeof p === 'number', `Price for ${card.id} ${grade} must be a number`);
-      assert.ok(p >= 5.00 && p <= 80.00, `Price for ${card.id} ${grade} ($${p}) must be strictly between $5.00 and $80.00 USD`);
+      assert.ok(p > 0, `Price for ${card.id} ${grade} ($${p}) must be positive`);
     });
+    assert.ok(card.precios.raw <= card.precios.psa8 && card.precios.psa8 <= card.precios.psa9 && card.precios.psa9 <= card.precios.psa10,
+      `Grade prices for ${card.id} must be ordered`);
   });
 });
 

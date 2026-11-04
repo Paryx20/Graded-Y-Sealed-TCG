@@ -26,7 +26,7 @@ que debe verse y funcionar como un e-commerce profesional real.
 - `pages/*.html` — una página HTML por sección (catálogo, producto, carrito, checkout, login, perfil, seguimiento)
 - `js/app.js` — lógica común a todas las páginas (sesión, navbar, carrito)
 - `js/views/` o `js/pages/` — un script por página con su lógica específica (ej. `pdp.js` visor 3D + slab PSA)
-- `js/data.js` — catálogo (10 cartas, precios $5–$80 USD)
+- `js/data.js` — catálogo: 35 cartas (`POKEMON_CARDS_CATALOG_10` + `POKEMON_CARDS_EXTRA`) con precio Raw real de TCGplayer fijado en `PRECIOS_FECHA` (PSA 8/9/10 = Raw × 1.6 / 2.4 / 4.5) + sellados. Los mismos precios deben estar en Supabase (`certificaciones_psa`), o el checkout falla con `PRECIO_CAMBIO`
 - `js/db/` — `schema.sql` (12 tablas + RLS), `supabase-config.js`, `db-client.js` (capa híbrida)
 - `css/styles.css` — estilos propios (slab PSA, drawer, etc.)
 - `tests/` — suites de unit/integración

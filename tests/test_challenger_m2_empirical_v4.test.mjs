@@ -391,24 +391,24 @@ test('R4 Challenger [2.5]: Multi-criteria price range filter combined with text 
   const { sandbox } = createTestRuntime();
   const { CatalogView, Store } = sandbox;
 
-  // Search "charizard" with minPrice $8 and maxPrice $12 (Charizard ex raw is $10)
+  // Search "charizard" with minPrice $3 and maxPrice $6 (Charizard ex raw real TCGplayer: $4.60)
   Store.data.catalogFilters.category = 'all';
   Store.data.catalogFilters.condition = 'raw';
   Store.data.catalogFilters.searchQuery = 'charizard';
-  Store.data.catalogFilters.minPrice = '8';
-  Store.data.catalogFilters.maxPrice = '12';
+  Store.data.catalogFilters.minPrice = '3';
+  Store.data.catalogFilters.maxPrice = '6';
 
   const results = CatalogView.getFilteredProducts();
-  assert.ok(results.length > 0, 'Should find Charizard within $8-$12 raw range');
+  assert.ok(results.length > 0, 'Should find Charizard within $3-$6 raw range');
   results.forEach(c => {
-    assert.ok(c.precios.raw >= 8 && c.precios.raw <= 12, `Price $${c.precios.raw} must be within $8-$12`);
+    assert.ok(c.precios.raw >= 3 && c.precios.raw <= 6, `Price $${c.precios.raw} must be within $3-$6`);
   });
 
   // Now set price range too high for Charizard raw ($50 - $100)
   Store.data.catalogFilters.minPrice = '50';
   Store.data.catalogFilters.maxPrice = '100';
   const emptyResults = CatalogView.getFilteredProducts();
-  assert.equal(emptyResults.length, 0, 'Charizard raw ($10) must not match $50-$100 range');
+  assert.equal(emptyResults.length, 0, 'Charizard raw ($4.60) must not match $50-$100 range');
 });
 
 test('R4 Challenger [2.6]: Router hash navigation synchronizes search query and category filters without locking', () => {
@@ -644,7 +644,7 @@ test('R6 Challenger [4.2]: Hybrid failover in js/db/db-client.js handles unconfi
   GradedSealedDB.supabaseClient = originalSupabase;
 });
 
-test('R6 Challenger [4.3]: Mathematical verification of price invariants for all 10 Pokémon cards ($5.00 to $80.00 USD)', () => {
+test('R6 Challenger [4.3]: Mathematical verification of price invariants for all 10 Pokémon cards (precio real > $0)', () => {
   const dataCode = fs.readFileSync(path.join(ROOT_DIR, 'js/data.js'), 'utf8');
   const context = vm.createContext({});
   vm.runInContext(dataCode + '\n; globalThis.cards = POKEMON_CARDS_CATALOG_10;', context);
@@ -667,11 +667,9 @@ test('R6 Challenger [4.3]: Mathematical verification of price invariants for all
       assert.ok(Number.isFinite(price), `${card.id} [${grade}] price must be finite`);
       assert.ok(!Number.isNaN(price), `${card.id} [${grade}] price must not be NaN`);
 
-      // Mathematical boundary check: price strictly between $5.00 and $80.00 USD
-      assert.ok(
-        price >= 5.00 && price <= 80.00,
-        `PRICE INVARIANT VIOLATION: Card ${card.id} grade ${grade} price ($${price}) outside normal market bounds [$5.00, $80.00]`
-      );
+      // Precio real de mercado (TCGplayer): positivo y con 2 decimales como máximo
+      assert.ok(price > 0, `PRICE INVARIANT VIOLATION: Card ${card.id} grade ${grade} price ($${price}) must be > 0`);
+      assert.equal(Math.round(price * 100) / 100, price, `${card.id} [${grade}] price must have at most 2 decimals`);
     }
 
     // Monotonic grading hierarchy check: raw <= psa8 <= psa9 <= psa10

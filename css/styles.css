@@ -546,6 +546,42 @@ svg.lucide {
   fill: currentColor;
 }
 
+/* Filtro por letra inicial del Pokémon (objetivo táctil ≥ 32 px, WCAG 2.5.8) */
+.letter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #CBD5E1;
+  background: #F8FAFC;
+  color: #0F172A;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+.letter-btn-all {
+  padding: 0 0.75rem;
+}
+.letter-btn:hover:not(:disabled) {
+  border-color: #BE123C;
+  color: #BE123C;
+  background: #ffffff;
+}
+.letter-btn[aria-pressed="true"] {
+  background: #0F172A;
+  border-color: #0F172A;
+  color: #ffffff;
+}
+.letter-btn:disabled {
+  color: #94A3B8;
+  background: #ffffff;
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
 /* Esqueleto de carga mientras llega el catálogo */
 .skeleton {
   border-radius: var(--radius-card);

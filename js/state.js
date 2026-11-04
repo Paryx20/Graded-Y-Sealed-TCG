@@ -23,7 +23,8 @@ const Store = {
       maxPrice: '',
       sortBy: 'featured',
       searchQuery: '',
-      onlyFavorites: false
+      onlyFavorites: false,
+      letter: 'all'
     },
     favorites: [],
     profileActiveTab: 'personal',

@@ -483,6 +483,7 @@ const PDPView = {
                     }).join('');
                   })()}
                 </div>
+                ${this.renderPriceSourceNote(product)}
               </div>
             `}
 
@@ -566,6 +567,20 @@ const PDPView = {
       this.bindChartEvents();
     }
     this.bindCard3DController();
+  },
+
+  // Origen del precio: solo para las cartas de la bóveda (data.js), no para las traídas por la búsqueda
+  renderPriceSourceNote(product) {
+    if (!product || typeof PRECIOS_FECHA === 'undefined' || typeof PRODUCTS === 'undefined') return '';
+    if (!PRODUCTS.some(p => p.id === product.id && p.tipo_discriminador === 'CARTA_INDIVIDUAL')) return '';
+    const [y, m, d] = PRECIOS_FECHA.split('-').map(Number);
+    const fecha = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('es-EC', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+    return `
+      <p id="pdp-price-source" class="text-xs text-slate-500 mt-2.5 flex items-start gap-1.5">
+        <i data-lucide="info" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0"></i>
+        <span>Raw: precio de mercado ${PRECIOS_FUENTE} actualizado el ${fecha}. PSA 8, 9 y 10: precios estimados a partir del Raw.</span>
+      </p>
+    `;
   },
 
   getConditionPrices(product) {
