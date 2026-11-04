@@ -227,6 +227,8 @@ const app = {
 
     if (view === 'pdp') {
       PDPView.afterRender();
+    } else if ((view === 'home' || !view) && typeof HomeView.afterRender === 'function') {
+      HomeView.afterRender();
     } else if (view === 'search-results' && typeof SearchResultsView !== 'undefined' && SearchResultsView.afterRender) {
       SearchResultsView.afterRender();
     } else if (view === 'profile' && typeof ProfileView !== 'undefined' && ProfileView.afterRender) {

@@ -13,9 +13,36 @@ const HomeView = {
              1. HERO SECTION COMERCIAL: BÓVEDA DE INVERSIÓN
              ========================================== -->
         <section aria-labelledby="hero-heading" class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] text-white shadow-2xl border border-slate-800">
+          <!-- Video de fondo decorativo: se reproduce desde afterRender (respeta prefers-reduced-motion) -->
+          <video
+            id="hero-video"
+            class="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            poster="assets/video/hero-sobres-poster.webp"
+            aria-hidden="true"
+            tabindex="-1"
+          >
+            <source src="assets/video/hero-sobres.mp4" type="video/mp4">
+          </video>
+          <!-- Capa oscura para mantener el contraste del texto sobre el video -->
+          <div class="absolute inset-0 bg-gradient-to-r from-[#0F172A]/95 via-[#0F172A]/80 to-[#0F172A]/45 pointer-events-none" aria-hidden="true"></div>
+
           <!-- Brillos ambientales en paleta 60-30-10 -->
           <div class="absolute -top-24 -right-24 w-96 h-96 bg-[#E11D48]/15 rounded-full blur-3xl pointer-events-none"></div>
           <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-[#D97706]/15 rounded-full blur-3xl pointer-events-none"></div>
+
+          <button
+            type="button"
+            id="hero-video-toggle"
+            class="absolute bottom-2 right-2 z-20 w-8 h-8 inline-flex items-center justify-center rounded-full bg-[#0F172A]/80 hover:bg-[#0F172A] text-white border border-white/30 backdrop-blur-sm transition"
+            aria-label="Pausar video de fondo"
+          >
+            <span data-video-icon="pause" aria-hidden="true"><i data-lucide="pause" class="w-4 h-4"></i></span>
+            <span data-video-icon="play" class="hidden" aria-hidden="true"><i data-lucide="play" class="w-4 h-4"></i></span>
+          </button>
 
           <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-6 sm:p-10 lg:p-12">
             <!-- Columna Izquierda: Mensaje Comercial y Propuesta de Valor -->
@@ -521,5 +548,60 @@ const HomeView = {
         </section>
       </div>
     `;
+  },
+
+  // null = el usuario aún no ha elegido; se conserva entre re-renderizados del home
+  videoPausedByUser: null,
+  visibilityListenerAdded: false,
+
+  afterRender() {
+    if (typeof document === 'undefined' || typeof document.getElementById !== 'function') return;
+    const video = document.getElementById('hero-video');
+    const toggle = document.getElementById('hero-video-toggle');
+    if (!video || !toggle || typeof video.play !== 'function') return;
+
+    const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (this.videoPausedByUser === null && reduceMotion) this.videoPausedByUser = true;
+
+    const syncButton = () => {
+      const paused = video.paused;
+      toggle.setAttribute('aria-label', paused ? 'Reproducir video de fondo' : 'Pausar video de fondo');
+      toggle.querySelector('[data-video-icon="pause"]').classList.toggle('hidden', paused);
+      toggle.querySelector('[data-video-icon="play"]').classList.toggle('hidden', !paused);
+    };
+
+    const play = () => {
+      const result = video.play();
+      if (result && typeof result.catch === 'function') result.catch(syncButton);
+    };
+
+    video.addEventListener('play', syncButton);
+    video.addEventListener('pause', syncButton);
+    // Si el video no carga, queda el póster/gradiente y el botón deja de tener sentido
+    video.querySelector('source').addEventListener('error', () => { toggle.hidden = true; });
+
+    toggle.addEventListener('click', () => {
+      if (video.paused) {
+        this.videoPausedByUser = false;
+        play();
+      } else {
+        this.videoPausedByUser = true;
+        video.pause();
+      }
+    });
+
+    if (!this.visibilityListenerAdded) {
+      this.visibilityListenerAdded = true;
+      document.addEventListener('visibilitychange', () => {
+        const current = document.getElementById('hero-video');
+        if (!current) return;
+        if (document.hidden) current.pause();
+        else if (this.videoPausedByUser !== true) current.play().catch(() => {});
+      });
+    }
+
+    syncButton();
+    if (this.videoPausedByUser !== true) play();
   }
 };
