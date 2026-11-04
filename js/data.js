@@ -313,7 +313,7 @@ const SEALED_PRODUCTS = [
   },
   {
     id: 'booster-box-fossil-1999',
-    nombre: 'Caja Sellada Booster Box Fossil 1999 (36 Packs)',
+    nombre: 'Booster Box Fossil 1999 1st Edition (36 sobres)',
     set: 'Fossil WotC 1999',
     rareza: 'Sellado de Fábrica',
     tipo: 'Incoloro',
@@ -323,13 +323,13 @@ const SEALED_PRODUCTS = [
     era: 'vintage',
     condicionPrincipal: 'sealed',
     certNumber: '48291955',
-    imagenLocal: 'assets/img/sealed/paquete-fossil.png',
-    imagenFallbackUrl: 'assets/img/sealed/paquete-fossil.png',
+    imagenLocal: 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp',
+    imagenFallbackUrl: 'assets/img/sealed/booster-box-fossil-1999/frontal.webp',
     galeria_sellada: {
-      perspectiva: 'assets/img/sealed/paquete-fossil.png',
-      frontal: 'assets/img/sealed/booster-box-fossil-1999/frontal.svg',
-      lateral: 'assets/img/sealed/booster-box-fossil-1999/lateral.svg',
-      superior: 'assets/img/sealed/booster-box-fossil-1999/superior.svg'
+      perspectiva: 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp',
+      frontal: 'assets/img/sealed/booster-box-fossil-1999/frontal.webp',
+      lateral: 'assets/img/sealed/booster-box-fossil-1999/lateral.webp',
+      superior: 'assets/img/sealed/booster-box-fossil-1999/superior.webp'
     },
     detalles_sellados: {
       gramaje: '745g (Caja Completa)',
@@ -343,19 +343,99 @@ const SEALED_PRODUCTS = [
       conservacion: 'Bóveda climatizada a 19°C y 45% HR'
     },
     precios: {
-      raw: 8400.00,
-      psa8: 8900.00,
-      psa9: 9600.00,
-      psa10: 12500.00,
-      sealed: 8400.00
+      raw: 15000.00,
+      sealed: 15000.00
     },
-    precioUnitario: 8400.00,
-    descripcion: 'Display original de 36 sobres con celofán de fábrica Wizards of the Coast',
-    tendencia12m: '+24.1%',
-    rendimientoAnual: 24.1,
-    historialBase: [0.80, 0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96, 0.97, 0.99, 1.00]
+    precioUnitario: 15000.00,
+    descripcion: 'Display 1st Edition de Fossil (Wizards of the Coast, octubre de 1999): 36 sobres de 11 cartas de una expansión de 62 cartas, con celofán original de fábrica',
+    tendencia12m: '+21.8%',
+    rendimientoAnual: 21.8,
+    historialBase: [0.82, 0.83, 0.85, 0.86, 0.88, 0.90, 0.91, 0.93, 0.95, 0.97, 0.98, 1.00]
   },
-  // Sobres individuales: fotos de producto generadas con IA (docs/prompts-sobres-gemini.md)
+  // Booster Box con fotos de producto generadas con IA (docs/prompts-gemini-booster-box.md)
+  {
+    id: 'booster-box-base-1999',
+    nombre: 'Booster Box Base Set 1999 1st Edition (36 sobres)',
+    set: 'Base Set 1999',
+    rareza: 'Sellado de Fábrica',
+    tipo: 'Fuego',
+    categoria: 'sealed',
+    tipo_discriminador: 'PRODUCTO_SELLADO',
+    tipo_item: 'PRODUCTO_SELLADO',
+    era: 'vintage',
+    condicionPrincipal: 'sealed',
+    certNumber: '48291960',
+    imagenLocal: 'assets/img/sealed/booster-box-base-1999/perspectiva.webp',
+    imagenFallbackUrl: 'assets/img/sealed/booster-box-base-1999/frontal.webp',
+    galeria_sellada: {
+      perspectiva: 'assets/img/sealed/booster-box-base-1999/perspectiva.webp',
+      frontal: 'assets/img/sealed/booster-box-base-1999/frontal.webp',
+      lateral: 'assets/img/sealed/booster-box-base-1999/lateral.webp',
+      superior: 'assets/img/sealed/booster-box-base-1999/superior.webp'
+    },
+    detalles_sellados: {
+      gramaje: '750g (Caja Completa)',
+      gramaje_gramos: 750,
+      cantidad_sobres_interior: 36,
+      es_pesado_verificado: true,
+      sellos: 'Sello oficial Wizards of the Coast termo-sellado con logo blanco',
+      sello_fabrica: 'Wizards of the Coast Authentic Shrinkwrap with White Logo',
+      packs: '36 Sobres de 11 Cartas c/u',
+      estado: 'Sin pesar / Unweighed • Primera tirada 1st Edition',
+      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+    },
+    precios: {
+      raw: 187500.00,
+      sealed: 187500.00
+    },
+    precioUnitario: 187500.00,
+    descripcion: 'Display 1st Edition del Base Set original (Wizards of the Coast, enero de 1999): 36 sobres de 11 cartas de la primera expansión de 102 cartas, con Charizard, Blastoise y Venusaur holográficos',
+    tendencia12m: '+12.5%',
+    rendimientoAnual: 12.5,
+    historialBase: [0.89, 0.90, 0.90, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.99, 1.00]
+  },
+  {
+    id: 'booster-bundle-151-2023',
+    nombre: 'Pokémon 151 Booster Bundle (6 sobres)',
+    set: 'Pokemon 151 2023',
+    rareza: 'Sellado de Fábrica',
+    tipo: 'Psíquico',
+    categoria: 'sealed',
+    tipo_discriminador: 'PRODUCTO_SELLADO',
+    tipo_item: 'PRODUCTO_SELLADO',
+    era: 'modern',
+    condicionPrincipal: 'sealed',
+    certNumber: '48292153',
+    imagenLocal: 'assets/img/sealed/booster-box-151-2023/perspectiva.webp',
+    imagenFallbackUrl: 'assets/img/sealed/booster-box-151-2023/frontal.webp',
+    galeria_sellada: {
+      perspectiva: 'assets/img/sealed/booster-box-151-2023/perspectiva.webp',
+      frontal: 'assets/img/sealed/booster-box-151-2023/frontal.webp',
+      lateral: 'assets/img/sealed/booster-box-151-2023/lateral.webp',
+      superior: 'assets/img/sealed/booster-box-151-2023/superior.webp'
+    },
+    detalles_sellados: {
+      gramaje: '135g (Bundle Completo)',
+      gramaje_gramos: 135,
+      cantidad_sobres_interior: 6,
+      es_pesado_verificado: true,
+      sellos: 'Celofán original de The Pokémon Company International',
+      sello_fabrica: 'The Pokémon Company International Factory Shrinkwrap',
+      packs: '6 Sobres de 10 Cartas c/u',
+      estado: 'Sellado de Fábrica Intacto',
+      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+    },
+    precios: {
+      raw: 185.00,
+      sealed: 185.00
+    },
+    precioUnitario: 185.00,
+    descripcion: 'Booster Bundle de Escarlata y Púrpura 151 (The Pokémon Company, 22 de septiembre de 2023): 6 sobres de 10 cartas de la expansión de los 151 Pokémon originales (165 cartas + 42 secretas); PVP original $26.94',
+    tendencia12m: '+78.4%',
+    rendimientoAnual: 78.4,
+    historialBase: [0.56, 0.57, 0.58, 0.60, 0.62, 0.64, 0.68, 0.72, 0.79, 0.88, 0.96, 1.00]
+  },
+  // Sobres individuales: fotos de producto generadas con IA
   ...[
     {
       id: 'booster-pack-base-1999',

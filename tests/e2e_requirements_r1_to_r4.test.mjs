@@ -361,13 +361,13 @@ test('TC-T1-R3-03 [R3]: Product mimikyu-paldean specifies its pokemontcg.io imag
   );
 });
 
-test('TC-T1-R3-04 [R3]: Product booster-box-fossil-1999 specifies assets/img/sealed/paquete-fossil.png in js/data.js', () => {
+test('TC-T1-R3-04 [R3]: Product booster-box-fossil-1999 specifies assets/img/sealed/booster-box-fossil-1999/perspectiva.webp in js/data.js', () => {
   const dataPath = path.join(ROOT_DIR, 'js/data.js');
   const code = fs.readFileSync(dataPath, 'utf8');
 
   assert.ok(
-    code.includes('assets/img/sealed/paquete-fossil.png'),
-    'js/data.js must reference assets/img/sealed/paquete-fossil.png'
+    code.includes('assets/img/sealed/booster-box-fossil-1999/perspectiva.webp'),
+    'js/data.js must reference assets/img/sealed/booster-box-fossil-1999/perspectiva.webp'
   );
   assert.ok(
     !code.includes('assets/img/sealed/team-rocket-box-front.png'),
@@ -378,7 +378,7 @@ test('TC-T1-R3-04 [R3]: Product booster-box-fossil-1999 specifies assets/img/sea
 test('TC-T1-R3-05 [R3]: Local image fallbacks exist physically on disk with non-zero byte size', () => {
   const requiredAssets = [
     'assets/img/cards/card-back.png',
-    'assets/img/sealed/paquete-fossil.png'
+    'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp'
   ];
 
   for (const assetRelPath of requiredAssets) {
@@ -626,13 +626,13 @@ test('TC-T3-R3-01 [R3 Boundary]: Asset path containing spaces renders valid HTML
   const fossilProduct = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999') || {
     id: 'booster-box-fossil-1999',
     nombre: 'Booster Pack Fossil 1999',
-    imagenLocal: 'assets/img/sealed/paquete-fossil.png',
+    imagenLocal: 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp',
     categoria: 'sealed'
   };
 
   const cardHtml = CatalogView.renderProductCard(fossilProduct);
-  assert.ok(cardHtml.includes('paquete-fossil.png'), 'Card HTML must include asset path with space');
-  assert.ok(cardHtml.includes('src="assets/img/sealed/paquete-fossil.png"') || cardHtml.includes("src='assets/img/sealed/paquete-fossil.png'"),
+  assert.ok(cardHtml.includes('booster-box-fossil-1999/perspectiva.webp'), 'Card HTML must include asset path with space');
+  assert.ok(cardHtml.includes('src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"') || cardHtml.includes("src='assets/img/sealed/booster-box-fossil-1999/perspectiva.webp'"),
     'src attribute must be properly quoted');
 });
 
@@ -665,10 +665,10 @@ test('TC-T3-R3-04 [R3 Boundary]: Sealed product multi-angle gallery specifies va
   const fossilProduct = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999');
 
   if (fossilProduct && fossilProduct.galeria_sellada) {
-    assert.equal(fossilProduct.galeria_sellada.frontal, 'assets/img/sealed/booster-box-fossil-1999/frontal.svg');
-    assert.equal(fossilProduct.galeria_sellada.perspectiva, 'assets/img/sealed/paquete-fossil.png');
-    assert.equal(fossilProduct.galeria_sellada.lateral, 'assets/img/sealed/booster-box-fossil-1999/lateral.svg');
-    assert.equal(fossilProduct.galeria_sellada.superior, 'assets/img/sealed/booster-box-fossil-1999/superior.svg');
+    assert.equal(fossilProduct.galeria_sellada.frontal, 'assets/img/sealed/booster-box-fossil-1999/frontal.webp');
+    assert.equal(fossilProduct.galeria_sellada.perspectiva, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
+    assert.equal(fossilProduct.galeria_sellada.lateral, 'assets/img/sealed/booster-box-fossil-1999/lateral.webp');
+    assert.equal(fossilProduct.galeria_sellada.superior, 'assets/img/sealed/booster-box-fossil-1999/superior.webp');
   }
 });
 
@@ -788,7 +788,7 @@ test('TC-T3-02 [Cross-Feature]: Catalog Image Assets + PDP Multi-Angle Gallery +
   // 1. Find Fossil sealed item and verify updated image
   const fossil = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999');
   assert.ok(fossil, 'Fossil booster must exist in catalog');
-  assert.equal(fossil.imagenLocal, 'assets/img/sealed/paquete-fossil.png', 'Catalog must link new Fossil asset');
+  assert.equal(fossil.imagenLocal, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp', 'Catalog must link new Fossil asset');
 
   // 2. Add item to cart
   Store.data.cart = [{

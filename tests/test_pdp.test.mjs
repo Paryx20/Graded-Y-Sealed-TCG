@@ -756,3 +756,32 @@ test('Feature 5 [Tier 2 Boundary]: Slab PSA View - Unknown grading condition def
   assert.equal(PDPView.getGradeLabel('psa9'), 'MINT 9');
   assert.equal(PDPView.getGradeLabel('psa10'), 'GEM MT 10');
 });
+
+// Cartas Raw: sin gradear, así que no se muestran slab PSA ni número de certificado
+test('Raw sin slab: la ficha en condición Raw no ofrece el modo slab ni muestra certificado', () => {
+  const { Store, PRODUCTS, PDPView } = setupPDPRenderer();
+  const card = PRODUCTS.find(p => p.categoria === 'raw');
+  Store.data.currentPdpProduct = card;
+  Store.data.pdpSelectedCondition = 'raw';
+  Store.data.pdpInspectorMode = 'slab';
+
+  const html = PDPView.render();
+  assert.equal(Store.data.pdpInspectorMode, 'front', 'el modo slab cae a frontal en Raw');
+  assert.match(html, /id="pdp-mode-slab"\s+onclick="PDPView\.setInspectorMode\('slab'\)"\s+class="hidden /, 'botón Slab & Empaque oculto');
+  assert.ok(!html.includes('psa-acrylic-slab'), 'sin slab PSA');
+  assert.ok(!html.includes(`#${card.certNumber}`), 'sin número de certificado');
+  assert.ok(html.includes('CARTA SIN GRADEAR'));
+});
+
+test('Raw sin slab: al elegir un grado PSA vuelven el modo slab y el certificado', () => {
+  const { Store, PRODUCTS, PDPView } = setupPDPRenderer();
+  const card = PRODUCTS.find(p => p.categoria === 'raw');
+  Store.data.currentPdpProduct = card;
+  Store.data.pdpSelectedCondition = 'psa10';
+  Store.data.pdpInspectorMode = 'front';
+
+  const html = PDPView.render();
+  assert.match(html, /id="pdp-mode-slab"\s+onclick="PDPView\.setInspectorMode\('slab'\)"\s+class="p-3 /, 'botón Slab & Empaque visible');
+  assert.ok(html.includes(`PSA 10 GEM MT • #${card.certNumber}`));
+  assert.equal(PDPView.getCertBadgeText(card, 'raw'), 'Sin Gradear (Raw NM) • Near Mint');
+});

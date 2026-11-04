@@ -19,6 +19,12 @@ const PDPView = {
     return map[condition] || 'PSA 10 GEM MT';
   },
 
+  // Una carta Raw no está gradeada: no lleva número de certificado PSA
+  getCertBadgeText(product, condition) {
+    if (condition === 'raw') return `${this.getConditionFullTitle('raw')} • Near Mint`;
+    return `${this.getConditionFullTitle(condition)} • #${product.certNumber || '48291034'}`;
+  },
+
   // La ficha usa la versión grande de pokemontcg.io; la cuadrícula carga la pequeña
   hiresImage(url) {
     return /^https:\/\/images\.pokemontcg\.io\/.+(?<!_hires)\.png$/.test(url || '')
@@ -145,8 +151,8 @@ const PDPView = {
         </div>
 
         <div class="absolute top-3 left-3 bg-[#0F172A] text-white border border-slate-700 px-3 py-1 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 z-10 pointer-events-none">
-          <i data-lucide="shield-check" class="w-4 h-4 text-[#047857]"></i>
-          <span id="pdp-cert-badge">${this.getConditionFullTitle(condition)} • #${certCode}</span>
+          <span id="pdp-cert-badge-icon" class="inline-flex">${this.renderGradeIcon(condition === 'raw' ? 'layers' : 'shield-check', 'w-4 h-4 text-[#047857]')}</span>
+          <span id="pdp-cert-badge">${this.getCertBadgeText(product, condition)}</span>
         </div>
       </div>
     `;
@@ -314,6 +320,9 @@ const PDPView = {
     const product = Store.data.currentPdpProduct || PRODUCTS[0];
     const isSealed = product.tipo_discriminador === 'PRODUCTO_SELLADO' || product.categoria === 'sealed' || product.tipo_item === 'PRODUCTO_SELLADO';
     const condition = Store.data.pdpSelectedCondition || 'psa10';
+    const isRaw = !isSealed && condition === 'raw';
+    // Una carta Raw no viene encapsulada: sin vista de slab PSA
+    if (isRaw && Store.data.pdpInspectorMode === 'slab') Store.data.pdpInspectorMode = 'front';
     const mode = Store.data.pdpInspectorMode || 'front';
     const activeAngle = Store.data.pdpSealedAngle || 'perspectiva';
     const qty = Store.data.pdpQuantity || 1;
@@ -372,7 +381,7 @@ const PDPView = {
                     </button>
                   </div>
                 ` : ''}
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4" role="group" aria-label="Modos del inspector de carta">
+                <div id="pdp-inspector-modes" class="grid grid-cols-1 ${isRaw ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-3 mt-4" role="group" aria-label="Modos del inspector de carta">
                   <button 
                     type="button" 
                     onclick="PDPView.setInspectorMode('front')" 
@@ -398,11 +407,11 @@ const PDPView = {
                     </div>
                     <span class="text-xs text-slate-500 mt-0.5">Reverso oficial (Giro 3D Y)</span>
                   </button>
-
-                  <button 
-                    type="button" 
-                    onclick="PDPView.setInspectorMode('slab')" 
-                    class="p-3 rounded-xl border-2 text-left transition flex flex-col justify-between ${mode === 'slab' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
+                  <button
+                    type="button"
+                    id="pdp-mode-slab"
+                    onclick="PDPView.setInspectorMode('slab')"
+                    class="${isRaw ? 'hidden ' : ''}p-3 rounded-xl border-2 text-left transition flex flex-col justify-between ${mode === 'slab' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
                     aria-pressed="${mode === 'slab'}"
                   >
                     <div class="flex items-center justify-between">
@@ -417,12 +426,14 @@ const PDPView = {
 
           <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col gap-5">
             <div>
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#FEF3C7] text-[#B45309] border border-[#D97706]/30">
-                <i data-lucide="${isSealed ? 'package-check' : 'award'}" class="w-3.5 h-3.5"></i>
-                <span>${isSealed ? (product.era === 'vintage' ? 'PRODUCTO SELLADO DE COLECCIÓN • WOTC' : 'PRODUCTO SELLADO DE COLECCIÓN') : 'GRADO INVERSIÓN • OFICIAL PSA'}</span>
+              <div id="pdp-grade-chip" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#FEF3C7] text-[#B45309] border border-[#D97706]/30">
+                ${isSealed
+                  ? `${this.renderGradeIcon('package-check', 'w-3.5 h-3.5')}
+                <span>${product.era === 'vintage' ? 'PRODUCTO SELLADO DE COLECCIÓN • WOTC' : 'PRODUCTO SELLADO DE COLECCIÓN'}</span>`
+                  : this.renderGradeChip(product, condition)}
               </div>
               <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] mt-2 tracking-tight">${product.nombre}</h1>
-              <p class="text-xs sm:text-sm text-slate-500 mt-1">${product.rareza || 'Coleccionable'} • ${product.set || 'EXP'} • ${isSealed ? `Era ${(product.era || 'vintage').toUpperCase()} • Display Sellado` : `${product.tipo || 'Carta'} • Cert #${product.certNumber || '00000000'}`}</p>
+              <p class="text-xs sm:text-sm text-slate-500 mt-1">${product.rareza || 'Coleccionable'} • ${product.set || 'EXP'} • ${isSealed ? `Era ${(product.era || 'vintage').toUpperCase()} • Display Sellado` : `${product.tipo || 'Carta'} • <span id="pdp-cert-line">${isRaw ? 'Condición Near Mint' : `Cert #${product.certNumber || '00000000'}`}</span>`}</p>
             </div>
 
             ${isSealed ? this.renderFactorySpecs(product) : `
@@ -820,7 +831,45 @@ const PDPView = {
     app.renderCurrentView();
   },
 
+  // Raw ⇄ PSA sin re-renderizar la vista (el visor 3D se conserva)
+  applyGradedState(product, condKey) {
+    const isRaw = condKey === 'raw';
+    if (isRaw && Store.data.pdpInspectorMode === 'slab') {
+      // El slab no aplica a una carta sin gradear: el visor vuelve a la vista frontal
+      this.setInspectorMode('front');
+      return;
+    }
+    const setHtml = (id, html) => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = html;
+    };
+    setHtml('pdp-cert-badge-icon', this.renderGradeIcon(isRaw ? 'layers' : 'shield-check', 'w-4 h-4 text-[#047857]'));
+    setHtml('pdp-grade-chip', this.renderGradeChip(product, condKey));
+    const certLine = document.getElementById('pdp-cert-line');
+    if (certLine) certLine.textContent = isRaw ? 'Condición Near Mint' : `Cert #${product.certNumber || '00000000'}`;
+    const slabBtn = document.getElementById('pdp-mode-slab');
+    if (slabBtn) slabBtn.classList.toggle('hidden', isRaw);
+    const modes = document.getElementById('pdp-inspector-modes');
+    if (modes) {
+      modes.classList.toggle('sm:grid-cols-2', isRaw);
+      modes.classList.toggle('sm:grid-cols-3', !isRaw);
+    }
+    if (typeof app !== 'undefined' && typeof app.refreshIcons === 'function') app.refreshIcons();
+  },
+
+  renderGradeIcon(name, cls) {
+    return `<i data-lucide="${name}" class="${cls}"></i>`;
+  },
+
+  renderGradeChip(product, condition) {
+    const isRaw = condition === 'raw';
+    return `${this.renderGradeIcon(isRaw ? 'layers' : 'award', 'w-3.5 h-3.5')}
+                <span>${isRaw ? 'CARTA SIN GRADEAR • NEAR MINT' : 'GRADO INVERSIÓN • OFICIAL PSA'}</span>`;
+  },
+
   selectCondition(condKey) {
+    // Pasar entre Raw (sin gradear) y un grado PSA cambia el inspector: sin slab ni certificado en Raw
+    const crossesRaw = (Store.data.pdpSelectedCondition === 'raw') !== (condKey === 'raw');
     Store.data.pdpSelectedCondition = condKey;
     const product = Store.data.currentPdpProduct || PRODUCTS[0];
     const prices = this.getConditionPrices(product);
@@ -835,8 +884,7 @@ const PDPView = {
     // 2. Update certification badge in 3D scene (without touching 3D object/transform)
     const certBadge = document.getElementById('pdp-cert-badge');
     if (certBadge) {
-      const certCode = product.certNumber || '48291034';
-      certBadge.innerText = `${this.getConditionFullTitle(condKey)} • #${certCode}`;
+      certBadge.innerText = this.getCertBadgeText(product, condKey);
     }
 
     const stockBadge = document.getElementById('pdp-stock-badge');
@@ -897,6 +945,9 @@ const PDPView = {
     if (document.getElementById('pdp-interactive-chart') && typeof this.drawChart === 'function') {
       this.drawChart();
     }
+
+    // Cabecera, insignia y modos del inspector dependen de si la carta está gradeada
+    if (crossesRaw) this.applyGradedState(product, condKey);
 
     // 5. User feedback toast
     if (typeof app !== 'undefined' && app.showToast) {

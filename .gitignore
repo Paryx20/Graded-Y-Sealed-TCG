@@ -21,3 +21,6 @@ npm-debug.log*
 
 # Originales de los sobres generados con IA (se suben solo los WebP optimizados)
 assets/img/packs/_originales/
+
+# Originales de las Booster Box generadas con IA
+assets/img/sealed/_originales/

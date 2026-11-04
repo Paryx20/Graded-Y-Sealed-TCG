@@ -4,7 +4,7 @@
  * File: tests/test_challenger_m1_2_empirical.test.mjs
  * 
  * Challenge Scope:
- * 1. File path with space: `assets/img/sealed/paquete-fossil.png` URI encoding & HTML quotes
+ * 1. File path with space: `assets/img/sealed/booster-box-fossil-1999/perspectiva.webp` URI encoding & HTML quotes
  * 2. Spelling of Mewtwo file: `mewto-holo-rare.png` exact disk match vs codebase
  * 3. Fallback simulation: `onerror` execution, recursion immunity, and fallback paths
  * 4. Cart addition & removal: thumbnail path preservation across lifecycles
@@ -123,25 +123,26 @@ function createSandbox() {
 }
 
 // ============================================================================
-// CHALLENGE 1: File path with space (`assets/img/sealed/paquete-fossil.png`)
+// CHALLENGE 1: File path with space (`assets/img/sealed/booster-box-fossil-1999/perspectiva.webp`)
 // ============================================================================
 
-test('CH-01: Asset file `assets/img/sealed/paquete-fossil.png` exists with correct casing and non-zero bytes', () => {
-  const filePath = path.join(ROOT_DIR, 'assets/img/sealed/paquete-fossil.png');
-  assert.ok(fs.existsSync(filePath), 'File `assets/img/sealed/paquete-fossil.png` must exist physically on disk');
+test('CH-01: Asset file `assets/img/sealed/booster-box-fossil-1999/perspectiva.webp` exists with correct casing and non-zero bytes', () => {
+  const filePath = path.join(ROOT_DIR, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
+  assert.ok(fs.existsSync(filePath), 'File `assets/img/sealed/booster-box-fossil-1999/perspectiva.webp` must exist physically on disk');
   
   const stats = fs.statSync(filePath);
-  assert.ok(stats.size > 500000, `File size (${stats.size} bytes) must be substantial for a high-res image`);
+  // WebP optimizado: con contenido real pero ligero para la web
+  assert.ok(stats.size > 20000 && stats.size < 400000, `File size (${stats.size} bytes) must be a real, optimized image`);
 
   // Verify exact casing in directory listing
-  const dirFiles = fs.readdirSync(path.join(ROOT_DIR, 'assets/img/sealed'));
-  assert.ok(dirFiles.includes('paquete-fossil.png'), 'Directory must contain exact casing `Paquete fossil.png`');
+  const dirFiles = fs.readdirSync(path.join(ROOT_DIR, 'assets/img/sealed/booster-box-fossil-1999'));
+  assert.ok(dirFiles.includes('perspectiva.webp'), 'Directory must contain exact casing `perspectiva.webp`');
 });
 
-test('CH-02: `assets/img/sealed/paquete-fossil.png` URL round-trip encoding does not corrupt disk resolution', () => {
-  const relPath = 'assets/img/sealed/paquete-fossil.png';
+test('CH-02: `assets/img/sealed/booster-box-fossil-1999/perspectiva.webp` URL round-trip encoding does not corrupt disk resolution', () => {
+  const relPath = 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp';
   const encoded = encodeURI(relPath);
-  assert.equal(encoded, 'assets/img/sealed/paquete-fossil.png', 'Space must encode to %20');
+  assert.equal(encoded, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp', 'Space must encode to %20');
 
   const decoded = decodeURIComponent(encoded);
   assert.equal(decoded, relPath, 'Decoded URI must match original disk path exactly');
@@ -155,16 +156,16 @@ test('CH-03: `js/data.js` product `booster-box-fossil-1999` specifies space path
   const fossil = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999');
   assert.ok(fossil, 'Product booster-box-fossil-1999 must exist in catalog');
 
-  assert.equal(fossil.imagenLocal, 'assets/img/sealed/paquete-fossil.png');
-  assert.equal(fossil.imagenFallbackUrl, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(fossil.imagenLocal, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
+  assert.equal(fossil.imagenFallbackUrl, 'assets/img/sealed/booster-box-fossil-1999/frontal.webp');
   assert.ok(fossil.galeria_sellada, 'Must have galeria_sellada');
-  assert.equal(fossil.galeria_sellada.frontal, 'assets/img/sealed/booster-box-fossil-1999/frontal.svg');
-  assert.equal(fossil.galeria_sellada.perspectiva, 'assets/img/sealed/paquete-fossil.png');
-  assert.equal(fossil.galeria_sellada.lateral, 'assets/img/sealed/booster-box-fossil-1999/lateral.svg');
-  assert.equal(fossil.galeria_sellada.superior, 'assets/img/sealed/booster-box-fossil-1999/superior.svg');
+  assert.equal(fossil.galeria_sellada.frontal, 'assets/img/sealed/booster-box-fossil-1999/frontal.webp');
+  assert.equal(fossil.galeria_sellada.perspectiva, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
+  assert.equal(fossil.galeria_sellada.lateral, 'assets/img/sealed/booster-box-fossil-1999/lateral.webp');
+  assert.equal(fossil.galeria_sellada.superior, 'assets/img/sealed/booster-box-fossil-1999/superior.webp');
 });
 
-test('CH-04: `CatalogView.render()` quotes `src="assets/img/sealed/paquete-fossil.png"` preventing attribute truncation', () => {
+test('CH-04: `CatalogView.render()` quotes `src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"` preventing attribute truncation', () => {
   const { CatalogView, Store } = createSandbox();
   Store.data.catalogFilters = {
     category: 'all',
@@ -178,17 +179,17 @@ test('CH-04: `CatalogView.render()` quotes `src="assets/img/sealed/paquete-fossi
   };
 
   const html = CatalogView.render();
-  assert.ok(html.includes('paquete-fossil.png'), 'CatalogView output must include Paquete fossil.png');
+  assert.ok(html.includes('booster-box-fossil-1999/perspectiva.webp'), 'CatalogView output must include Paquete fossil.png');
 
   // Verify that the src attribute is strictly quoted with double quotes
   assert.ok(
-    html.includes('src="assets/img/sealed/paquete-fossil.png"'),
+    html.includes('src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"'),
     'src attribute must be strictly double-quoted to prevent space from terminating attribute'
   );
 
-  // Verify no unquoted space truncation occurred (e.g. src=assets/img/sealed/paquete-fossil.png)
+  // Verify no unquoted space truncation occurred (e.g. src=assets/img/sealed/booster-box-fossil-1999/perspectiva.webp)
   assert.ok(
-    !html.includes('src=assets/img/sealed/paquete-fossil.png'),
+    !html.includes('src=assets/img/sealed/booster-box-fossil-1999/perspectiva.webp'),
     'Must NOT contain unquoted attribute with space'
   );
 });
@@ -202,11 +203,11 @@ test('CH-05: `PDPView.renderSealedGalleryStage()` quotes image src across all ga
   for (const angle of angles) {
     const html = PDPView.renderSealedGalleryStage(fossil, angle);
     assert.ok(
-      html.includes('src="assets/img/sealed/paquete-fossil.png"'),
-      `Angle ${angle} must render double-quoted src="assets/img/sealed/paquete-fossil.png"`
+      html.includes('src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"'),
+      `Angle ${angle} must render double-quoted src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"`
     );
     assert.ok(
-      html.includes("onerror=\"this.onerror=null; this.src='assets/img/sealed/paquete-fossil.png'\""),
+      html.includes("onerror=\"this.onerror=null; this.src='assets/img/sealed/booster-box-fossil-1999/frontal.webp'\""),
       `Angle ${angle} onerror handler must be properly quoted without syntax errors`
     );
   }
@@ -407,7 +408,7 @@ test('CH-15: Adding Fossil to cart via PDP retains space path and sealed frontal
   assert.equal(Store.data.cart.length, 1);
   const item = Store.data.cart[0];
   assert.equal(item.id, 'booster-box-fossil-1999-sealed');
-  assert.equal(item.imageLocal, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(item.imageLocal, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
   assert.ok(fs.existsSync(path.join(ROOT_DIR, item.imageLocal)), 'Cart item imageLocal must exist on disk');
 });
 
@@ -436,7 +437,7 @@ test('CH-16: `CartView.render()` renders all 4 items with valid image paths and 
   assert.ok(cartHtml.includes('src="assets/img/cards/gengar-holo-scarlet.png"'), 'Gengar thumbnail rendered');
   assert.ok(cartHtml.includes('src="assets/img/cards/mewto-holo-rare.png"'), 'Mewtwo thumbnail rendered');
   assert.ok(cartHtml.includes('src="assets/img/cards/mimikyu-rare.png"'), 'Mimikyu thumbnail rendered');
-  assert.ok(cartHtml.includes('src="assets/img/sealed/paquete-fossil.png"'), 'Fossil thumbnail rendered with space');
+  assert.ok(cartHtml.includes('src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"'), 'Fossil thumbnail rendered with space');
 
   // Verify none of the src attributes are broken or unquoted
   const srcMatches = cartHtml.match(/src="[^"]+"/g) || [];
@@ -468,7 +469,7 @@ test('CH-17: Cart quantity adjustments and item removals preserve remaining thum
   // Remaining items still retain correct paths
   assert.equal(Store.data.cart.find(c => c.id === 'gengar-scarlet-violet-psa10').imageLocal, 'assets/img/cards/gengar-holo-scarlet.png');
   assert.equal(Store.data.cart.find(c => c.id === 'mimikyu-paldean-psa10').imageLocal, 'assets/img/cards/mimikyu-rare.png');
-  assert.equal(Store.data.cart.find(c => c.id === 'booster-box-fossil-1999-sealed').imageLocal, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(Store.data.cart.find(c => c.id === 'booster-box-fossil-1999-sealed').imageLocal, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
 
   // Remove Fossil
   app.removeFromCart('booster-box-fossil-1999-sealed');
@@ -491,7 +492,7 @@ test('CH-18: Cart serialization to localStorage preserves spaces and special pat
   Store.saveCart();
   const serialized = sandbox1.localStorage.getItem('gstcg_cart');
   assert.ok(serialized, 'Cart data must be serialized in localStorage');
-  assert.ok(serialized.includes('assets/img/sealed/paquete-fossil.png'), 'Serialized JSON must preserve space in path');
+  assert.ok(serialized.includes('assets/img/sealed/booster-box-fossil-1999/perspectiva.webp'), 'Serialized JSON must preserve space in path');
 
   // Simulate new page load with saved cart
   const sandbox2 = createSandbox();
@@ -501,6 +502,6 @@ test('CH-18: Cart serialization to localStorage preserves spaces and special pat
   assert.equal(sandbox2.Store.data.cart.length, 2);
   const reloadedFossil = sandbox2.Store.data.cart.find(c => c.id === 'booster-box-fossil-1999-sealed');
   assert.ok(reloadedFossil, 'Fossil item reloaded from localStorage');
-  assert.equal(reloadedFossil.imageLocal, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(reloadedFossil.imageLocal, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
   assert.ok(fs.existsSync(path.join(ROOT_DIR, reloadedFossil.imageLocal)), 'Reloaded path must exist on disk');
 });

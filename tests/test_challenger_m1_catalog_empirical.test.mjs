@@ -161,7 +161,7 @@ function createChallengeSandbox() {
 test('CHALLENGE-1.1 [Assets]: Local fallback image files physically exist on disk', () => {
   const assets = [
     'assets/img/cards/card-back.png',
-    'assets/img/sealed/paquete-fossil.png'
+    'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp'
   ];
 
   for (const relPath of assets) {
@@ -172,8 +172,8 @@ test('CHALLENGE-1.1 [Assets]: Local fallback image files physically exist on dis
 
 test('CHALLENGE-1.2 [Assets]: Local fallback image files exceed 100KB minimum size threshold', () => {
   const assets = [
-    { relPath: 'assets/img/cards/card-back.png', minBytes: 100 * 1024 },
-    { relPath: 'assets/img/sealed/paquete-fossil.png', minBytes: 100 * 1024 }
+    // La caja Fossil ahora es WebP optimizado (ver tests/test_sealed_packs.test.mjs)
+    { relPath: 'assets/img/cards/card-back.png', minBytes: 100 * 1024 }
   ];
 
   for (const { relPath, minBytes } of assets) {
@@ -188,8 +188,7 @@ test('CHALLENGE-1.2 [Assets]: Local fallback image files exceed 100KB minimum si
 
 test('CHALLENGE-1.3 [Assets]: Local fallback image files are authentic valid PNGs with magic header', () => {
   const assets = [
-    'assets/img/cards/card-back.png',
-    'assets/img/sealed/paquete-fossil.png'
+    'assets/img/cards/card-back.png'
   ];
 
   for (const relPath of assets) {
@@ -223,12 +222,12 @@ test('CHALLENGE-2.1 [Data]: Gengar, Mewtwo, Mimikyu, Fossil specify exact asset 
 
   const fossil = PRODUCTS.find(p => p.id === 'booster-box-fossil-1999');
   assert.ok(fossil, 'booster-box-fossil-1999 must exist in PRODUCTS');
-  assert.equal(fossil.imagenLocal, 'assets/img/sealed/paquete-fossil.png');
-  assert.equal(fossil.imagenFallbackUrl, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(fossil.imagenLocal, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
+  assert.equal(fossil.imagenFallbackUrl, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
   assert.ok(fossil.galeria_sellada, 'fossil must have galeria_sellada object');
-  assert.equal(fossil.galeria_sellada.frontal, 'assets/img/sealed/paquete-fossil.png');
-  assert.equal(fossil.galeria_sellada.perspectiva, 'assets/img/sealed/paquete-fossil.png');
-  assert.equal(fossil.galeria_sellada.lateral, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(fossil.galeria_sellada.frontal, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
+  assert.equal(fossil.galeria_sellada.perspectiva, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
+  assert.equal(fossil.galeria_sellada.lateral, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
 });
 
 test('CHALLENGE-2.2 [Data]: js/db/db-client.js synchronizes initial seed records with updated images', () => {
@@ -261,7 +260,7 @@ test('CHALLENGE-3.1 [DOM - Catalog Grid]: CatalogView.renderCardsGrid renders al
   assert.ok(gridHtml.includes('src="assets/img/cards/gengar-holo-scarlet.png"'), 'Must render Gengar card image');
   assert.ok(gridHtml.includes('src="assets/img/cards/mewto-holo-rare.png"'), 'Must render Mewtwo card image');
   assert.ok(gridHtml.includes('src="assets/img/cards/mimikyu-rare.png"'), 'Must render Mimikyu card image');
-  assert.ok(gridHtml.includes('src="assets/img/sealed/paquete-fossil.png"'), 'Must render Fossil booster pack image with space');
+  assert.ok(gridHtml.includes('src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"'), 'Must render Fossil booster pack image with space');
 });
 
 test('CHALLENGE-3.2 [DOM - PDP Single Card 3D Inspector]: Raw condition renders 3D card front and authentic back', () => {
@@ -296,14 +295,14 @@ test('CHALLENGE-3.4 [DOM - PDP Sealed Gallery]: Multi-angle gallery renders fron
   const angles = ['frontal', 'perspectiva', 'lateral'];
   for (const angle of angles) {
     const galleryHtml = PDPView.renderSealedGalleryStage(fossil, angle);
-    assert.ok(galleryHtml.includes('src="assets/img/sealed/paquete-fossil.png"'), `Gallery angle ${angle} must render image`);
+    assert.ok(galleryHtml.includes('src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"'), `Gallery angle ${angle} must render image`);
     assert.ok(!galleryHtml.includes('undefined'), `Gallery angle ${angle} must contain zero undefined strings`);
     assert.ok(!galleryHtml.includes('src=""'), `Gallery angle ${angle} must not have empty src`);
   }
 
   // Boundary check: invalid angle falls back safely to frontal image
   const fallbackHtml = PDPView.renderSealedGalleryStage(fossil, 'unknown_angle');
-  assert.ok(fallbackHtml.includes('src="assets/img/sealed/paquete-fossil.png"'), 'Invalid angle must fallback to frontal asset');
+  assert.ok(fallbackHtml.includes('src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"'), 'Invalid angle must fallback to frontal asset');
 });
 
 test('CHALLENGE-3.5 [DOM - Spotlight Search]: renderLiveSearchDropdown renders thumbnails for all 4 products', () => {
@@ -314,7 +313,7 @@ test('CHALLENGE-3.5 [DOM - Spotlight Search]: renderLiveSearchDropdown renders t
     { query: 'gengar', expectedSrc: 'assets/img/cards/gengar-holo-scarlet.png' },
     { query: 'mewtwo', expectedSrc: 'assets/img/cards/mewto-holo-rare.png' },
     { query: 'mimikyu', expectedSrc: 'assets/img/cards/mimikyu-rare.png' },
-    { query: 'fossil', expectedSrc: 'assets/img/sealed/paquete-fossil.png' }
+    { query: 'fossil', expectedSrc: 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp' }
   ];
 
   for (const { query, expectedSrc } of searchCases) {
@@ -358,7 +357,7 @@ test('CHALLENGE-3.6 [DOM - Cart]: CartView.render accurately renders added items
   assert.ok(cartHtml.includes('src="assets/img/cards/gengar-holo-scarlet.png"'), 'Cart must render Gengar image');
   assert.ok(cartHtml.includes('src="assets/img/cards/mewto-holo-rare.png"'), 'Cart must render Mewtwo image');
   assert.ok(cartHtml.includes('src="assets/img/cards/mimikyu-rare.png"'), 'Cart must render Mimikyu image');
-  assert.ok(cartHtml.includes('src="assets/img/sealed/paquete-fossil.png"'), 'Cart must render Fossil image');
+  assert.ok(cartHtml.includes('src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"'), 'Cart must render Fossil image');
 
   assert.ok(!cartHtml.includes('src="undefined"'), 'Cart must not contain src="undefined"');
   assert.ok(!cartHtml.includes('alt="undefined"'), 'Cart must not contain alt="undefined"');
@@ -380,10 +379,10 @@ test('CHALLENGE-4.1 [Stress - Space in Filename]: Space in "Paquete fossil.png" 
   const srcRegex = /src="([^"]+)"/g;
   
   const gridMatches = [...gridHtml.matchAll(srcRegex)].map(m => m[1]);
-  assert.ok(gridMatches.some(s => s === 'assets/img/sealed/paquete-fossil.png'), 'Grid must contain exactly quoted path');
+  assert.ok(gridMatches.some(s => s === 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp'), 'Grid must contain exactly quoted path');
 
   const pdpMatches = [...pdpHtml.matchAll(srcRegex)].map(m => m[1]);
-  assert.ok(pdpMatches.some(s => s === 'assets/img/sealed/paquete-fossil.png'), 'PDP gallery must contain exactly quoted path');
+  assert.ok(pdpMatches.some(s => s === 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp'), 'PDP gallery must contain exactly quoted path');
 });
 
 test('CHALLENGE-4.2 [Stress - onerror Recursion Defense]: All img elements have onerror nullification to prevent infinite loops', () => {
@@ -437,9 +436,9 @@ test('CHALLENGE-4.3 [Stress - Extreme Cart Operations]: Rapid addition, quantity
   assert.equal(gengarCart.quantity, 50);
   assert.equal(fossilCart.quantity, 100);
   assert.equal(gengarCart.imageLocal, 'assets/img/cards/gengar-holo-scarlet.png');
-  assert.equal(fossilCart.imageLocal, 'assets/img/sealed/paquete-fossil.png');
+  assert.equal(fossilCart.imageLocal, 'assets/img/sealed/booster-box-fossil-1999/perspectiva.webp');
 
   const renderedCart = CartView.render();
   assert.ok(renderedCart.includes('src="assets/img/cards/gengar-holo-scarlet.png"'));
-  assert.ok(renderedCart.includes('src="assets/img/sealed/paquete-fossil.png"'));
+  assert.ok(renderedCart.includes('src="assets/img/sealed/booster-box-fossil-1999/perspectiva.webp"'));
 });

@@ -382,7 +382,7 @@ const CatalogView = {
             <div class="mt-3">
               <span class="inline-block text-xs font-medium text-slate-500 uppercase tracking-wider">${card.set} • ${card.tipo}</span>
               <h3 class="font-bold text-sm sm:text-base text-[#0F172A] group-hover:text-[#BE123C] transition mt-0.5 line-clamp-1">${card.nombre}</h3>
-              <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">${card.rareza} • Cert #${card.certNumber}</p>
+              <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">${card.rareza} • ${card.categoria === 'raw' ? 'Sin gradear' : `Cert #${card.certNumber}`}</p>
             </div>
           </a>
 

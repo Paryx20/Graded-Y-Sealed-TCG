@@ -117,7 +117,7 @@ const app = {
       const found = prodId && Store.getProduct ? Store.getProduct(prodId) : null;
       if (found) {
         Store.data.currentPdpProduct = found;
-        Store.data.pdpSelectedCondition = found.condicionPrincipal === 'psa9' ? 'psa9' : 'psa10';
+        Store.data.pdpSelectedCondition = ['raw', 'psa9'].includes(found.condicionPrincipal) ? found.condicionPrincipal : 'psa10';
         Store.data.pdpQuantity = 1;
         Store.data.pdpInspectorMode = 'front';
       }

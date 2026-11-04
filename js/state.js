@@ -308,7 +308,6 @@ const Store = {
         } else if (row.imagen_url) {
           // Filas antiguas guardan la ruta previa a assets/ (img/...)
           const imageUrl = row.imagen_url
-            .replace(/^img\/sealed\/Paquete fossil\.png$/, 'img/sealed/paquete-fossil.png')
             .replace(/^(assets\/)?img\/(packs\/)?booster-team-rocket\.png$/, 'img/packs/booster-pack-base-1999-frontal.webp')
             .replace(/^img\//, 'assets/img/');
           product.imagenLocal = imageUrl;
