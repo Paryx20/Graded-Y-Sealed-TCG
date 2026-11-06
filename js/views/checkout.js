@@ -15,21 +15,21 @@ const CheckoutView = {
         <div class="bg-[#0F172A] text-white rounded-md px-4 py-3 flex items-center justify-between mb-6 shadow-sm">
           <div class="flex items-center gap-2 text-xs font-bold">
             <i data-lucide="lock" class="w-4 h-4 text-[#047857]"></i>
-            <span>Checkout Seguro TLS 256-bit • Graded &amp; Sealed TCG</span>
+            <span>Pago Seguro y Protegido</span>
           </div>
-          <span class="text-xs text-slate-300">Conexión cifrada HTTPS</span>
+          <span class="text-xs text-slate-300">Tus datos viajan cifrados</span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div class="lg:col-span-4 bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-              <h2 class="text-base font-bold text-[#0F172A]">${user ? 'Sesión Activa' : 'Cuenta de Coleccionista'}</h2>
-              <span class="text-xs font-bold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded">${user ? 'Verificado' : 'Obligatorio'}</span>
+              <h2 class="text-base font-bold text-[#0F172A]">${user ? 'Tu cuenta' : 'Inicia sesión'}</h2>
+              <span class="text-xs font-bold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded">${user ? 'Sesión iniciada' : 'Necesaria'}</span>
             </div>
 
             ${user ? `
               <div class="mt-4 space-y-3">
-                <p class="text-xs text-slate-600">Tus datos de perfil se han precargado automáticamente para esta orden.</p>
+                <p class="text-xs text-slate-600">Usamos los datos de tu perfil para este pedido.</p>
                 <div class="p-3.5 rounded-md bg-[#F8FAFC] border border-slate-200 text-xs space-y-1">
                   <div class="font-bold text-[#0F172A]">${user.name}</div>
                   <div class="text-slate-500">${user.email}</div>
@@ -38,15 +38,15 @@ const CheckoutView = {
                 </div>
                 <a href="pages/perfil.html" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-md transition flex items-center justify-center gap-1.5">
                   <i data-lucide="user-check" class="w-4 h-4"></i>
-                  <span>Ver Mi Perfil e Historial</span>
+                  <span>Ver mi perfil</span>
                 </a>
               </div>
             ` : `
               <div class="mt-3 space-y-3">
-                <p class="text-xs text-slate-600">Para garantizar la autenticidad y custodia certificada, <strong>toda compra requiere registro obligatorio</strong>. Si ya tienes cuenta, inicia sesión aquí:</p>
+                <p class="text-xs text-slate-600">Para comprar necesitas una cuenta: así puedes seguir tu pedido y recibir tu factura. Si ya tienes una, inicia sesión:</p>
                 <form onsubmit="event.preventDefault(); CheckoutView.handleQuickLogin();" class="mt-2 space-y-3" novalidate>
                   <div>
-                    <label for="login-email-checkout" class="block text-xs font-bold text-[#0F172A] mb-1">Correo Electrónico:</label>
+                    <label for="login-email-checkout" class="block text-xs font-bold text-[#0F172A] mb-1">Correo electrónico:</label>
                     <input type="email" id="login-email-checkout" autocomplete="email" placeholder="tu.correo@ejemplo.com" class="w-full px-3 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                   </div>
                   <div>
@@ -55,10 +55,10 @@ const CheckoutView = {
                   </div>
                   <p data-form-error role="alert" class="hidden text-xs text-[#BE123C] font-semibold"></p>
                   <button type="submit" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-lg transition touch-target">
-                    Iniciar Sesión y Precargar
+                    Iniciar sesión
                   </button>
                 </form>
-                <p class="text-xs text-slate-500">¿Primera compra? Completa el formulario de la derecha y tu cuenta se crea automáticamente.</p>
+                <p class="text-xs text-slate-500">¿Primera compra? Completa el formulario y creamos tu cuenta al confirmar el pedido.</p>
               </div>
             `}
           </div>
@@ -66,17 +66,17 @@ const CheckoutView = {
           <div class="lg:col-span-8 bg-white border border-slate-200 rounded-lg p-6 shadow-sm space-y-6">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
-                <h2 class="text-lg font-bold text-[#0F172A]">Datos de Facturación y Creación de Cuenta</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Completa los datos para emitir tu factura electrónica y orden de custodia</p>
+                <h2 class="text-lg font-bold text-[#0F172A]">Datos de facturación y entrega</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Los usamos para tu factura electrónica y para el envío.</p>
               </div>
-              <span class="text-xs font-bold text-[#B45309] bg-[#FEF3C7] px-2 py-0.5 rounded">Custodia Asegurada</span>
+              
             </div>
 
             <fieldset class="space-y-4">
-              <legend class="text-sm font-semibold text-[#0F172A]">1. Datos Personales y Facturación</legend>
+              <legend class="text-sm font-semibold text-[#0F172A]">1. Datos personales</legend>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label for="guest-name" class="block text-xs font-bold text-[#0F172A] mb-1">Nombre Completo: *</label>
+                  <label for="guest-name" class="block text-xs font-bold text-[#0F172A] mb-1">Nombre completo: *</label>
                   <input type="text" id="guest-name" value="${user ? user.name : ''}" autocomplete="name" placeholder="Ej. Carlos Mendoza" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                 </div>
 
@@ -96,12 +96,12 @@ const CheckoutView = {
                 </div>
 
                 <div>
-                  <label for="guest-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo Electrónico: *</label>
+                  <label for="guest-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo electrónico: *</label>
                   <input type="email" id="guest-email" value="${user ? user.email : ''}" autocomplete="email" placeholder="carlos@correo.com" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                 </div>
 
                 <div>
-                  <label for="guest-phone" class="block text-xs font-bold text-[#0F172A] mb-1">Teléfono Celular: *</label>
+                  <label for="guest-phone" class="block text-xs font-bold text-[#0F172A] mb-1">Celular: *</label>
                   <div data-field class="flex rounded-lg overflow-hidden border border-slate-300 bg-white">
                     <span class="inline-flex items-center px-3.5 bg-slate-100 text-slate-700 text-sm font-bold border-r border-slate-200 select-none">
                       +593
@@ -120,7 +120,7 @@ const CheckoutView = {
                 </div>
 
                 <div>
-                  <label for="guest-address" class="block text-xs font-bold text-[#0F172A] mb-1">Dirección de Entrega: *</label>
+                  <label for="guest-address" class="block text-xs font-bold text-[#0F172A] mb-1">Dirección de entrega: *</label>
                   <input type="text" id="guest-address" value="${user ? (user.address || user.direccion_principal || '') : ''}" autocomplete="street-address" placeholder="Av. República del Salvador N34-183" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
                 </div>
 
@@ -132,20 +132,20 @@ const CheckoutView = {
                 ${user ? `
                   <div class="sm:col-span-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 flex items-center gap-2">
                     <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
-                    <span>Sesión activa verificada como <strong>${user.name}</strong>. Esta compra quedará registrada en tu historial.</span>
+                    <span>Compras como <strong>${user.name}</strong>. El pedido quedará en tu historial.</span>
                   </div>
                 ` : `
                   <div class="sm:col-span-2">
-                    <label for="checkout-password" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña para tu cuenta Graded &amp; Sealed: *</label>
+                    <label for="checkout-password" class="block text-xs font-bold text-[#0F172A] mb-1">Crea una contraseña para tu cuenta: *</label>
                     <input type="password" id="checkout-password" autocomplete="new-password" placeholder="Mínimo 8 caracteres, con letras y números" minlength="8" class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white" required />
-                    <span class="text-xs text-slate-500 mt-1 block">El checkout requiere cuenta registrada para emisión de comprobante fiscal y custodia certificada.</span>
+                    <span class="text-xs text-slate-500 mt-1 block">Con ella podrás ver tus pedidos y seguir el envío.</span>
                   </div>
                 `}
               </div>
             </fieldset>
 
             <fieldset class="space-y-3">
-              <legend class="text-sm font-semibold text-[#0F172A]">2. Método de Entrega (Tarifa Plana Ecuador)</legend>
+              <legend class="text-sm font-semibold text-[#0F172A]">2. Entrega</legend>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <label class="p-3.5 rounded-md cursor-pointer flex flex-col justify-between transition ${isCourier ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
                   <div class="flex items-start gap-2.5">
@@ -153,7 +153,7 @@ const CheckoutView = {
                     <div>
                       <div class="text-xs font-bold text-[#0F172A]">Envío nacional</div>
                       <span class="text-xs font-bold text-[#BE123C]">$5.00</span>
-                      <p class="text-xs text-slate-500 mt-0.5">Todo el Ecuador con empaque rígido y UV.</p>
+                      <p class="text-xs text-slate-500 mt-0.5">A todo Ecuador, con empaque protegido.</p>
                     </div>
                   </div>
                 </label>
@@ -164,7 +164,7 @@ const CheckoutView = {
                     <div>
                       <div class="text-xs font-bold text-[#0F172A]">Local Express (Quito)</div>
                       <span class="text-xs font-bold text-[#BE123C]">$3.00</span>
-                      <p class="text-xs text-slate-500 mt-0.5">Entrega express en el DMQ (24h).</p>
+                      <p class="text-xs text-slate-500 mt-0.5">Entrega en Quito en 24 horas.</p>
                     </div>
                   </div>
                 </label>
@@ -173,9 +173,9 @@ const CheckoutView = {
                   <div class="flex items-start gap-2.5">
                     <input type="radio" name="delivery-method" value="pickup" ${isPickup ? 'checked' : ''} onchange="CheckoutView.setDelivery('pickup')" class="mt-0.5 text-[#BE123C]" />
                     <div>
-                      <div class="text-xs font-bold text-[#0F172A]">Retiro en Local Físico</div>
+                      <div class="text-xs font-bold text-[#0F172A]">Retiro en tienda</div>
                       <span class="text-xs font-bold text-[#047857]">$0.00 (Gratis)</span>
-                      <p class="text-xs text-slate-500 mt-0.5">Sucursal Central Quito. Pago en efectivo disponible.</p>
+                      <p class="text-xs text-slate-500 mt-0.5">En nuestra tienda de Quito. Puedes pagar en efectivo.</p>
                     </div>
                   </div>
                 </label>
@@ -183,14 +183,14 @@ const CheckoutView = {
             </fieldset>
 
             <fieldset class="space-y-3">
-              <legend class="text-sm font-semibold text-[#0F172A]">3. Método de Pago</legend>
+              <legend class="text-sm font-semibold text-[#0F172A]">3. Pago</legend>
               <div class="space-y-3">
                 <div class="p-4 rounded-md border border-[#0F172A] bg-[#F8FAFC] space-y-3">
                   <label class="flex items-center justify-between cursor-pointer">
                     <div class="flex items-center gap-3">
                       <input type="radio" name="payment-method" value="card" checked class="text-[#BE123C]" />
                       <div>
-                        <span class="text-sm font-bold text-[#0F172A]">Tarjeta de Crédito / Débito</span>
+                        <span class="text-sm font-bold text-[#0F172A]">Tarjeta de crédito o débito</span>
                         <span class="text-xs text-slate-500 block">Visa, Mastercard</span>
                       </div>
                     </div>
@@ -224,8 +224,8 @@ const CheckoutView = {
                   <div class="flex items-center gap-3">
                     <input type="radio" name="payment-method" id="payment-cash-input" value="cash" ${isPickup ? '' : 'disabled'} class="text-[#BE123C]" />
                     <div>
-                      <span class="text-sm font-bold ${isPickup ? 'text-[#0F172A]' : 'text-slate-600'}">Efectivo al retirar en tienda (Cash)</span>
-                      <span class="text-xs text-slate-600 block">${isPickup ? 'Pagas en la tienda al retirar' : 'Solo disponible seleccionando "Retiro en Local Físico"'}</span>
+                      <span class="text-sm font-bold ${isPickup ? 'text-[#0F172A]' : 'text-slate-600'}">Efectivo al retirar en tienda</span>
+                      <span class="text-xs text-slate-600 block">${isPickup ? 'Pagas en la tienda al retirar' : 'Solo disponible seleccionando "Retiro en tienda"'}</span>
                     </div>
                   </div>
                   <i data-lucide="banknote" class="w-5 h-5 text-slate-500"></i>
@@ -260,7 +260,7 @@ const CheckoutView = {
         <div class="max-w-3xl mx-auto px-4 pt-10 text-center">
           <h1 class="text-lg font-bold text-[#0F172A]">No hay una orden recién procesada</h1>
           <p class="text-sm text-slate-600 mt-1">Cuando completes una compra verás aquí su resumen.</p>
-          <a href="pages/catalogo.html" class="mt-4 inline-block px-5 py-2.5 bg-[#E11D48] text-white text-xs font-bold rounded-md">Ir al Catálogo</a>
+          <a href="pages/catalogo.html" class="mt-4 inline-block px-5 py-2.5 bg-[#E11D48] text-white text-xs font-bold rounded-md">Ir al catálogo</a>
         </div>
       `;
     }
@@ -274,7 +274,7 @@ const CheckoutView = {
             <i data-lucide="check-circle-2" class="w-10 h-10"></i>
           </div>
 
-          <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">¡Orden confirmada con éxito!</h1>
+          <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">¡Gracias! Tu pedido está confirmado</h1>
           <div class="inline-block px-3 py-1 bg-[#FEF3C7] text-[#B45309] font-mono font-bold text-sm rounded-md mt-2">
             Número de Orden: ${order.orderId}
           </div>
@@ -282,17 +282,17 @@ const CheckoutView = {
           ${isCash ? `
             <div class="my-4 p-4 bg-[#FEF3C7]/60 border border-[#D97706]/40 rounded-md text-[#0F172A] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2">
               <i data-lucide="store" class="w-5 h-5 text-[#B45309] flex-shrink-0"></i>
-              <span>Orden reservada. Realiza el pago en ventanilla al retirar en Sucursal Central Quito.</span>
+              <span>Pedido reservado. Pagas en efectivo al retirarlo en nuestra tienda de Quito.</span>
             </div>
           ` : ''}
 
           <p class="text-sm text-slate-600 mt-3 max-w-lg mx-auto">
-            Comprobante electrónico y registro de custodia enviados a: 
+            Enviamos la factura electrónica a: 
             <strong class="text-[#0F172A]">${order.buyerEmail}</strong>
           </p>
 
           <div class="mt-6 text-left bg-[#F8FAFC] border border-slate-200 rounded-md p-5 max-w-2xl mx-auto space-y-2.5 text-xs sm:text-sm">
-            <h2 class="font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-2">Desglose de la Transacción</h2>
+            <h2 class="font-bold text-[#0F172A] text-sm mb-2">Resumen del pago</h2>
             ${order.items.map(item => `
               <div class="flex justify-between text-slate-600">
                 <span>${item.quantity}x ${item.name} (${item.condition})</span>
@@ -320,14 +320,14 @@ const CheckoutView = {
               class="px-6 py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs sm:text-sm font-bold rounded-md transition flex items-center gap-2 touch-target"
             >
               <i data-lucide="truck" class="w-4 h-4"></i>
-              <span>Ver Seguimiento del Pedido</span>
+              <span>Seguir mi pedido</span>
             </button>
             <a 
               href="pages/perfil.html" 
               class="px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-[#0F172A] text-xs sm:text-sm font-bold rounded-md transition flex items-center gap-2 touch-target"
             >
               <i data-lucide="history" class="w-4 h-4"></i>
-              <span>Ver Historial en Mi Perfil</span>
+              <span>Ver mis pedidos</span>
             </a>
           </div>
         </div>
@@ -378,7 +378,7 @@ const CheckoutView = {
               class="px-6 py-3.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs sm:text-sm font-bold rounded-md transition flex items-center justify-center gap-2 touch-target"
             >
               <i data-lucide="store" class="w-4 h-4"></i>
-              <span>Cambiar a Retiro en Tienda y Efectivo</span>
+              <span>Retirar en tienda y pagar en efectivo</span>
             </button>
           </div>
         </div>
@@ -392,8 +392,8 @@ const CheckoutView = {
     return `
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div class="text-center mb-6">
-          <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Portal de Coleccionistas • Graded &amp; Sealed</h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">Inicia sesión o registra tu cuenta para gestionar perfil, custodia y seguimiento</p>
+          <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Tu cuenta</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">Inicia sesión o crea una cuenta para comprar y seguir tus pedidos.</p>
         </div>
 
         <div class="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm max-w-lg mx-auto">
@@ -419,7 +419,7 @@ const CheckoutView = {
           ${isLogin ? `
             <form onsubmit="event.preventDefault(); CheckoutView.submitLogin();" class="space-y-4" novalidate>
               <div>
-                <label for="auth-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo Electrónico: *</label>
+                <label for="auth-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo electrónico: *</label>
                 <input type="email" id="auth-email" autocomplete="email" placeholder="tu.correo@ejemplo.com" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
               <div>
@@ -439,7 +439,7 @@ const CheckoutView = {
             <form onsubmit="event.preventDefault(); CheckoutView.submitRegister();" class="space-y-3.5" novalidate>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label for="reg-name" class="block text-xs font-bold text-[#0F172A] mb-1">Nombre Completo: *</label>
+                  <label for="reg-name" class="block text-xs font-bold text-[#0F172A] mb-1">Nombre completo: *</label>
                   <input type="text" id="reg-name" autocomplete="name" placeholder="Ej. Ana Lucía Pérez" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
                 </div>
                 <div>
@@ -448,7 +448,7 @@ const CheckoutView = {
                 </div>
               </div>
               <div>
-                <label for="reg-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo Electrónico: *</label>
+                <label for="reg-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo electrónico: *</label>
                 <input type="email" id="reg-email" autocomplete="email" placeholder="coleccionista@ejemplo.com" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -560,7 +560,7 @@ const CheckoutView = {
     Store.saveDelivery();
     if (method === 'pickup' || method === 'retiro') {
       Store.data.shippingFee = APP_CONFIG.PICKUP_SHIPPING_FEE;
-      app.showToast('Entrega: Retiro en Local Físico ($0.00). Efectivo habilitado.', 'info');
+      app.showToast('Entrega: Retiro en tienda ($0.00). Efectivo habilitado.', 'info');
     } else if (method === 'quito' || method === 'local' || method === 'local_express') {
       Store.data.shippingFee = APP_CONFIG.QUITO_SHIPPING_FEE;
       app.showToast('Entrega: Local Express Quito ($3.00).', 'info');
@@ -833,6 +833,6 @@ const CheckoutView = {
       return;
     }
 
-    await finalizeOrder('Tarjeta de Crédito / Débito');
+    await finalizeOrder('Tarjeta de crédito o débito');
   }
 };

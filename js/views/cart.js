@@ -7,15 +7,15 @@ const CartView = {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div class="flex items-center justify-between pb-4 border-b border-slate-200">
           <div>
-            <h1 class="text-2xl font-bold text-[#0F172A] tracking-tight">Tu Bolsa de Compras</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Revisa tus piezas certificadas antes de proceder al pago</p>
+            <h1 class="text-2xl font-bold text-[#0F172A] tracking-tight">Tu bolsa</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Revisa los productos y las cantidades antes de pagar.</p>
           </div>
           <a 
             href="pages/catalogo.html" 
             class="text-xs font-semibold text-[#BE123C] hover:text-[#9F1239] flex items-center gap-1"
           >
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
-            <span>Continuar explorando</span>
+            <span>Seguir comprando</span>
           </a>
         </div>
 
@@ -25,11 +25,11 @@ const CartView = {
               ${items.length === 0 ? `
                 <div class="bg-white border border-slate-200 rounded-lg p-10 text-center text-slate-500 shadow-sm">
                   <i data-lucide="shopping-bag" class="w-14 h-14 mx-auto mb-3 text-slate-300"></i>
-                  <h2 class="font-semibold text-base text-[#0F172A]">Tu bolsa de compras está vacía</h2>
-                  <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Añade cartas coleccionables, slabs PSA o booster packs para iniciar tu orden.</p>
+                  <h2 class="font-semibold text-base text-[#0F172A]">Tu bolsa está vacía</h2>
+                  <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Agrega cartas, slabs PSA o producto sellado desde el catálogo.</p>
                   <a href="pages/catalogo.html" class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold rounded-md shadow-sm transition">
                     <i data-lucide="compass" class="w-4 h-4"></i>
-                    <span>Explorar Catálogo</span>
+                    <span>Ir al catálogo</span>
                   </a>
                 </div>
               ` : items.map(item => `
@@ -91,14 +91,14 @@ const CartView = {
                 <i data-lucide="package" class="w-6 h-6"></i>
               </div>
               <div>
-                <h2 class="text-sm font-semibold text-[#0F172A]">Empaque de Coleccionista Especial Gratuito</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Todas las piezas se despachan en estuche rígido, precintos de seguridad y protección con filtro ultravioleta (UV).</p>
+                <h2 class="text-sm font-semibold text-[#0F172A]">Empaque protegido incluido</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Las cartas van en funda y toploader; los slabs y el sellado, en caja rígida con relleno.</p>
               </div>
             </div>
           </div>
 
           <div class="lg:col-span-4 bg-white border border-slate-200 rounded-lg p-6 shadow-sm sticky top-28">
-            <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">Resumen del Pedido</h2>
+            <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">Resumen del pedido</h2>
 
             <div class="mt-4 space-y-3 text-sm border-t border-slate-200 pt-4">
               <div class="flex justify-between text-slate-600">
@@ -118,11 +118,11 @@ const CartView = {
 
               <div class="flex justify-between text-[#047857] text-xs font-semibold">
                 <span>Seguro de envío:</span>
-                <span>GRATIS</span>
+                <span>Incluido</span>
               </div>
 
               <div class="border-t border-slate-200 pt-3 flex justify-between items-baseline">
-                <span class="text-base font-semibold text-[#0F172A]">Total a Pagar:</span>
+                <span class="text-base font-semibold text-[#0F172A]">Total:</span>
                 <span class="text-2xl font-bold text-[#0F172A]">$${total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
               </div>
             </div>
@@ -131,13 +131,13 @@ const CartView = {
               href="pages/checkout.html" 
               class="w-full mt-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-md transition shadow flex items-center justify-center gap-2 touch-target"
             >
-              <span>Proceder al Pago</span>
+              <span>Ir a pagar</span>
               <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
 
             <p class="text-xs text-slate-500 text-center mt-3 flex items-center justify-center gap-1">
               <i data-lucide="lock" class="w-3 h-3"></i>
-              <span>Transacción encriptada TLS 256-bit</span>
+              <span>Pago seguro · Puedes revisar todo antes de confirmar</span>
             </p>
           </div>
         </div>
