@@ -23,16 +23,18 @@ python tools/optimizar_sobres.py                # fotos de Gemini -> WebP 800x12
 No hay build, bundler ni linter: Tailwind, Lucide y `@supabase/supabase-js` se cargan por CDN.
 
 Base de datos desde cero (editor SQL de Supabase), en este orden:
-`js/db/schema.sql` → `js/db/funciones_rpc.sql` → `js/db/seed_catalogo.sql`.
+`js/db/schema.sql` → `js/db/funciones_rpc.sql` → `js/db/admin_rpc.sql` → `js/db/seed_catalogo.sql`.
 
 ## Estado de los tests
 
-Hoy pasan 393 de 528. Los ~135 fallos están en suites heredadas que prueban funciones ya descartadas
-(Google Sign-In/GIS, `decodeJwtResponse`, rutas hash `#tracking`, persistencia Dexie, sesión simulada):
+Hoy pasan 398 de 539. Los 141 fallos están en suites heredadas que prueban funciones ya descartadas
+(Google Sign-In/GIS, `decodeJwtResponse`, rutas hash `#tracking`, persistencia Dexie, sesión simulada,
+y la compra de cartas de la API con precio estimado):
 `challenger_*`, `e2e_requirements_*`, `test_production_*`, `test_reviewer_*`, `test_adversarial_*`, entre otras.
 Un cambio no debe aumentar el número de fallos ni romper las suites que hoy están en verde
-(`test_pdp_3d_drag`, `test_keyboard_nav`, `test_filtro_letra`, `test_catalogo_ampliado`, `test_card_images`,
-`test_sealed_packs`, `test_condition_pricing`, `test_validations`, `test_cart_toast`, `test_e2e_suite`, …).
+(`test_pdp_3d_drag`, `test_keyboard_nav`, `test_catalog_stock`, `test_admin`, `test_catalogo_ampliado`,
+`test_card_images`, `test_sealed_packs`, `test_condition_pricing`, `test_validations`, `test_cart_toast`,
+`test_e2e_suite`, …).
 Antes de borrar o reescribir una suite heredada, consultar al usuario.
 
 `tests/test_harness.mjs` no usa navegador: `createMockEnvironment()` simula DOM/localStorage y
@@ -45,7 +47,7 @@ mantener esos selectores.
 **Multipágina con renderizado por JS.** Cada sección es un HTML propio (`index.html` en la raíz y el resto
 en `pages/`), pero todos tienen la misma estructura: navbar y footer estáticos, `<body data-page="…">` y un
 `<main id="app-view">` vacío. Al cargar, `app.handleRoute()` (`js/app.js`) lee `data-page` y los parámetros
-de la URL (`?id=`, `?cat=`, `?era=`, `?letra=`, `?q=`, `?order=`, `?tab=`), los vuelca en `Store.data` y
+de la URL (`?id=`, `?cat=`, `?era=`, `?q=`, `?order=`, `?tab=`), los vuelca en `Store.data` y
 `app.renderCurrentView()` inyecta el HTML de la vista (`HomeView.render()`, `CatalogView.render()`,
 `PDPView.render()`…) y luego llama a su `afterRender()`. Cada interacción que cambia el estado vuelve a
 renderizar la vista (se guarda y restaura el foco con `getFocusKey/restoreFocus`).
@@ -74,10 +76,28 @@ Si no hay conexión, `app.showOfflineNotice()` avisa y la web sigue con el catá
 Solo la publishable/anon key va en `js/db/supabase-config.js`; nunca la service_role.
 
 **Catálogo y precios.** `js/data.js` define `POKEMON_CARDS_CATALOG_10` + `POKEMON_CARDS_EXTRA` (35 cartas),
-`SEALED_PRODUCTS` y el array final `PRODUCTS`. El precio Raw es el real de TCGplayer a `PRECIOS_FECHA`;
-los grados PSA salen de `MULTIPLICADORES_PSA` (8/9/10 = Raw × 1.6 / 2.4 / 4.5). La función RPC de la orden
-revalida precios contra `certificaciones_psa`, así que **al tocar productos o precios en `data.js` hay que
-ejecutar `node tools/generar_seed.js` y aplicar el seed en Supabase**, o el checkout falla con `PRECIO_CAMBIO`.
+`SEALED_PRODUCTS` y el array final `PRODUCTS` (nombres, fotos, descripciones). Con conexión, precio y stock
+vienen de Supabase (`v_catalogo`, fusionado en `Store.loadCatalogFromServer`): **la BD es la fuente de verdad**
+y los precios de `data.js` (Raw real de TCGplayer a `PRECIOS_FECHA`, PSA = Raw × 1.6 / 2.4 / 4.5 según
+`MULTIPLICADORES_PSA`) son solo el respaldo sin conexión y la base del seed. `guardar_orden` revalida el precio
+contra `certificaciones_psa` y rechaza SKU que no estén activos en el inventario (`PRODUCTO_NO_DISPONIBLE`);
+`Store.repriceCart()` ajusta la bolsa al precio vigente al cargar. `node tools/generar_seed.js` solo sirve para
+crear la BD desde cero: aplicarlo sobre una BD con datos pisaría los cambios hechos en el panel de inventario.
+
+**Stock por grado.** `CatalogView.inStock / availableGrades / matchesCategory / getDisplayOption`
+(`js/views/catalog.js`) deciden qué se muestra: Slabs PSA = stock en psa8/9/10, Raw = stock raw,
+Sellados = stock sealed, Todo = stock en algún grado. Stock desconocido (sin conexión) cuenta como disponible.
+Inicio, buscador de la navbar y ficha (grados "Agotado") usan los mismos helpers. Ya no hay filtro por letra.
+
+**Dos buscadores.** El de la navbar (`app.renderLiveSearchDropdown` / `executeGlobalSearch`) busca solo en el
+inventario y lleva a `pages/catalogo.html?q=`. "Explorar cartas" (`pages/busqueda.html`, `SearchResultsView`)
+consulta la API pública vía `PokemonAPI` (pokemontcg.io → TCGdex) solo como referencia: sin precios ni compra;
+enlaza a la ficha si la carta coincide (nombre + número o set) con un producto en stock.
+
+**Panel de inventario.** `pages/admin.html` + `js/views/admin.js` (no enlazado desde la tienda, `noindex`,
+no carga `app.js`). Usa las RPC de `js/db/admin_rpc.sql`, que exigen `usuarios.rol = 'ADMIN'` en el servidor
+(`_exigir_admin`, sesión de 8 h). El rol solo se asigna a mano en el SQL Editor; nunca escribir correos reales
+en el repositorio.
 
 **Imágenes.** Cartas en `assets/img/cards/` (con URL externa de `images.pokemontcg.io` como fallback),
 sellados en `assets/img/sealed/<id>/` (vistas frontal/lateral/superior/perspectiva para el visor 3D),
@@ -85,7 +105,11 @@ sobres generados con IA (Gemini, fuera de Claude) en `assets/img/packs/` como We
 
 **Documentación.** `docs/PROJECT.md` (histórico, desactualizado en Google Sign-In y router hash),
 `docs/PLAN_DE_TRABAJO.md`, `docs/tarjetas-de-prueba.md` (tarjetas para el checkout),
-`docs/guia-inventario.md` (reponer stock), capturas en `docs/capturas/`.
+`docs/guia-inventario.md` (panel de inventario y SQL de stock), `docs/plan-panel-admin-y-rediseno.md`,
+capturas en `docs/capturas/`.
+
+**Estilo visual.** Paleta navy/carmesí sin degradados ni brillos decorativos, esquinas `rounded-lg` (tarjetas)
+y `rounded-md` (botones/inputs), sombras suaves, textos de tienda (sin "bóveda/inversión"). El footer no se toca.
 
 ## Decisiones vigentes
 

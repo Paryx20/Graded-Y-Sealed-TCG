@@ -7,9 +7,9 @@
  *   1. El cliente rastrea su pedido con número de orden (o guía) + cédula del titular.
  *      Si la cédula no coincide con la registrada en la orden, no se muestra nada.
  *   2. Las etapas avanzan solas: Preparación → En camino → Llegó a destino.
- *   3. En la entrega, el courier (o la ventanilla de bóveda) pide la cédula.
+ *   3. En la entrega, el courier (o la tienda) pide la cédula.
  *      Solo si coincide con el titular se marca como Entregado; tras 3 intentos
- *      fallidos la entrega queda retenida y la pieza regresa a bóveda.
+ *      fallidos la entrega queda retenida y el pedido regresa a la tienda.
  * ==============================================================================
  */
 
@@ -60,13 +60,13 @@ const TrackingView = {
     const held = step === -1;
     const tpl = pickup ? [
       { title: 'Orden recibida', subtitle: 'Pago verificado', detail: 'Orden registrada en la cadena de custodia.' },
-      { title: 'En preparación', subtitle: 'Sellado UV en bóveda', detail: 'Revisión de hologramas, microimpresión y encapsulado.' },
-      { title: 'Listo para retiro', subtitle: 'Bóveda Central Quito', detail: 'Disponible en ventanilla de seguridad.' },
+      { title: 'En preparación', subtitle: 'Revisión y empaque', detail: 'Revisamos la carta y la protegemos para el envío.' },
+      { title: 'Listo para retiro', subtitle: 'Tienda en Quito', detail: 'Retíralo presentando tu cédula.' },
       { title: 'Retirado', subtitle: 'Entrega contra cédula', detail: 'El titular presenta su cédula original en ventanilla.' }
     ] : [
       { title: 'Orden recibida', subtitle: 'Pago verificado', detail: 'Orden registrada en la cadena de custodia.' },
-      { title: 'En preparación', subtitle: 'Sellado UV en bóveda', detail: 'Revisión de hologramas, microimpresión y encapsulado.' },
-      { title: 'En camino', subtitle: order.courierName || 'Transporte blindado', detail: 'Valija con precinto tamper-evident y GPS activo.' },
+      { title: 'En preparación', subtitle: 'Revisión y empaque', detail: 'Revisamos la carta y la protegemos para el envío.' },
+      { title: 'En camino', subtitle: order.courierName || 'Courier', detail: 'Paquete sellado con número de guía.' },
       { title: 'Entregado', subtitle: 'Entrega contra cédula', detail: 'El courier verifica la cédula del titular antes de entregar.' }
     ];
 
@@ -92,8 +92,8 @@ const TrackingView = {
   statusLabel(order) {
     const step = this.getStep(order);
     const pickup = this.isPickup(order);
-    if (step === -1) return 'Entrega retenida • Regresa a bóveda';
-    if (step === 4) return pickup ? 'Retirado en bóveda' : 'Entregado';
+    if (step === -1) return 'Entrega retenida • Regresa a la tienda';
+    if (step === 4) return pickup ? 'Retirado en tienda' : 'Entregado';
     if (step === 3) return pickup ? 'En ventanilla • Verificando identidad' : 'En destino • Verificando identidad';
     if (step === 2) return pickup ? 'Listo para retiro' : 'En camino';
     return 'En preparación';
@@ -192,7 +192,7 @@ const TrackingView = {
       this.setStep(order, step + 1);
       const pickup = this.isPickup(order);
       const msg = step + 1 === 2
-        ? (pickup ? 'Tu pieza está lista para retiro en Bóveda Central.' : 'Tu pedido salió de la bóveda en transporte blindado.')
+        ? (pickup ? 'Tu pedido está listo para retiro en la tienda.' : 'Tu pedido ya salió y va en camino.')
         : (pickup ? 'Estás en ventanilla: presenta tu cédula para retirar.' : 'El courier llegó a destino y solicita la cédula del titular.');
       app.showToast(msg, 'info');
       this.refreshDetail();
@@ -238,7 +238,7 @@ const TrackingView = {
       order.deliveredTo = order.buyerName;
       order.idAttempts = 0;
       this.setStep(order, 4);
-      app.showToast(pickup ? 'Identidad verificada. Pieza retirada en bóveda.' : 'Identidad verificada. Pedido entregado.', 'success');
+      app.showToast(pickup ? 'Identidad verificada. Pedido retirado en la tienda.' : 'Identidad verificada. Pedido entregado.', 'success');
     } else {
       order.idAttempts = (order.idAttempts || 0) + 1;
       if (order.idAttempts >= this.MAX_ID_ATTEMPTS) {
@@ -256,9 +256,9 @@ const TrackingView = {
 
   renderLookupForm(compact) {
     return `
-      <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm ${compact ? '' : 'max-w-2xl mx-auto'}">
+      <section class="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm ${compact ? '' : 'max-w-2xl mx-auto'}">
         <div class="flex items-start gap-3 mb-5">
-          <div class="w-10 h-10 rounded-xl bg-[#0F172A] text-[#FEF3C7] flex items-center justify-center flex-shrink-0">
+          <div class="w-10 h-10 rounded-md bg-[#0F172A] text-[#FEF3C7] flex items-center justify-center flex-shrink-0">
             <i data-lucide="package-search" class="w-5 h-5"></i>
           </div>
           <div>
@@ -300,7 +300,7 @@ const TrackingView = {
     const orders = Store.data.orders || [];
     if (!user || orders.length === 0) return '';
     return `
-      <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+      <section class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <span class="text-xs font-semibold text-[#0F172A]">Tus órdenes (${orders.length}):</span>
         <div class="flex flex-wrap gap-2">
           ${orders.map(o => `
@@ -327,7 +327,7 @@ const TrackingView = {
         iconContent = '<i data-lucide="check" class="w-5 h-5"></i>';
       } else if (isActive) {
         iconClass = 'bg-[#0F172A] text-[#FEF3C7] shadow ring-4 ring-slate-200';
-        iconContent = `<i data-lucide="${idx === 3 ? 'id-card' : 'package'}" class="w-5 h-5 animate-pulse"></i>`;
+        iconContent = `<i data-lucide="${idx === 3 ? 'id-card' : 'package'}" class="w-5 h-5 motion-safe:animate-pulse"></i>`;
       } else if (isFailed) {
         iconClass = 'bg-[#E11D48] text-white shadow';
         iconContent = '<i data-lucide="x" class="w-5 h-5"></i>';
@@ -339,7 +339,7 @@ const TrackingView = {
       const subClass = isActive ? 'text-[#B45309] font-bold' : (isCompleted ? 'text-[#047857] font-semibold' : (isFailed ? 'text-[#BE123C] font-bold' : 'text-slate-500'));
 
       return `
-        <div class="flex sm:flex-col items-center sm:text-center gap-3 p-3 rounded-xl transition-all ${boxClass}">
+        <div class="flex sm:flex-col items-center sm:text-center gap-3 p-3 rounded-md transition-all ${boxClass}">
           <div class="w-10 h-10 rounded-full ${iconClass} flex items-center justify-center font-bold text-sm flex-shrink-0">${iconContent}</div>
           <div>
             <span class="text-xs font-semibold text-[#0F172A] block">${stg.title}</span>
@@ -355,29 +355,29 @@ const TrackingView = {
   renderTransitCard(order) {
     const step = this.getStep(order);
     const progress = { 1: '15%', 2: '60%', 3: '95%', 4: '100%', '-1': '95%' }[step] || '15%';
-    const label = { 1: 'Preparando despacho', 2: 'En ruta de entrega', 3: 'En la dirección de entrega', 4: 'Entregado', '-1': 'Regresando a bóveda' }[step];
+    const label = { 1: 'Preparando despacho', 2: 'En ruta de entrega', 3: 'En la dirección de entrega', 4: 'Entregado', '-1': 'Regresando a la tienda' }[step];
     return `
-      <div class="mt-6 p-5 sm:p-6 bg-[#0F172A] text-white rounded-2xl shadow-md border border-slate-800">
+      <div class="mt-6 p-5 sm:p-6 bg-[#0F172A] text-white rounded-lg shadow-md border border-slate-800">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
           <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center">
-              <i data-lucide="truck" class="w-5 h-5 ${step === 2 ? 'animate-pulse' : ''}"></i>
+            <div class="w-9 h-9 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center">
+              <i data-lucide="truck" class="w-5 h-5 ${step === 2 ? 'motion-safe:animate-pulse' : ''}"></i>
             </div>
             <div>
-              <h3 class="text-sm font-bold text-[#FEF3C7]">Transporte blindado</h3>
-              <span class="text-xs text-slate-400">${order.courierName || 'Servientrega Blindado • Bóveda G&S'}</span>
+              <h3 class="text-sm font-bold text-[#FEF3C7]">Envío</h3>
+              <span class="text-xs text-slate-400">${order.courierName || 'Servientrega'}</span>
             </div>
           </div>
           <span class="text-xs font-mono text-emerald-400 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-lg self-start sm:self-center">GPS activo</span>
         </div>
         <div class="pt-4 space-y-2">
           <div class="flex items-center justify-between text-xs text-slate-300">
-            <span>Bóveda Central Quito</span>
+            <span>Tienda Graded &amp; Sealed, Quito</span>
             <span class="font-mono text-amber-400 font-bold">${label}</span>
             <span>${order.buyerName || 'Destinatario'}</span>
           </div>
           <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-            <div class="bg-gradient-to-r from-amber-500 via-emerald-500 to-amber-400 h-full rounded-full transition-all duration-700" style="width: ${progress}"></div>
+            <div class="bg-[#047857] h-full rounded-full transition-all duration-700" style="width: ${progress}"></div>
           </div>
         </div>
       </div>
@@ -386,14 +386,14 @@ const TrackingView = {
 
   renderPickupCard(order) {
     return `
-      <div class="mt-6 p-5 sm:p-6 bg-emerald-50/70 border border-emerald-200 rounded-2xl">
+      <div class="mt-6 p-5 sm:p-6 bg-emerald-50/70 border border-emerald-200 rounded-lg">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <div class="p-3 bg-white border border-emerald-100 rounded-xl">
+          <div class="p-3 bg-white border border-emerald-100 rounded-md">
             <span class="text-slate-500 block text-xs uppercase font-bold">Dirección de retiro</span>
             <strong class="text-[#0F172A] block mt-0.5">Av. República del Salvador N34-183 y Moscú</strong>
-            <span class="text-slate-500 text-xs block">Edificio Bóveda Central, Piso 2, Quito</span>
+            <span class="text-slate-500 text-xs block">Av. Amazonas y Naciones Unidas, Quito</span>
           </div>
-          <div class="p-3 bg-white border border-emerald-100 rounded-xl">
+          <div class="p-3 bg-white border border-emerald-100 rounded-md">
             <span class="text-slate-500 block text-xs uppercase font-bold">Horario</span>
             <strong class="text-[#0F172A] block mt-0.5">Lunes a sábado: 09:00 - 18:00</strong>
             <span class="text-slate-500 text-xs block">Titular: ${order.buyerName || 'Coleccionista'}</span>
@@ -410,9 +410,9 @@ const TrackingView = {
     if (step === 3) {
       const attemptsLeft = this.MAX_ID_ATTEMPTS - (order.idAttempts || 0);
       return `
-        <div class="mt-6 p-5 sm:p-6 border-2 border-[#D97706]/50 bg-[#FEF3C7]/40 rounded-2xl">
+        <div class="mt-6 p-5 sm:p-6 border-2 border-[#D97706]/50 bg-[#FEF3C7]/40 rounded-lg">
           <div class="flex items-start gap-3">
-            <div class="w-10 h-10 rounded-xl bg-[#D97706] text-white flex items-center justify-center flex-shrink-0">
+            <div class="w-10 h-10 rounded-md bg-[#D97706] text-white flex items-center justify-center flex-shrink-0">
               <i data-lucide="id-card" class="w-5 h-5"></i>
             </div>
             <div class="flex-1">
@@ -437,10 +437,10 @@ const TrackingView = {
 
     if (step === 4) {
       return `
-        <div class="mt-6 p-5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3">
+        <div class="mt-6 p-5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start gap-3">
           <i data-lucide="badge-check" class="w-6 h-6 text-[#047857] flex-shrink-0"></i>
           <div class="text-xs text-emerald-900">
-            <strong class="block text-sm">${pickup ? 'Retirado en bóveda' : 'Entregado'} a ${order.deliveredTo || order.buyerName}</strong>
+            <strong class="block text-sm">${pickup ? 'Retirado en tienda' : 'Entregado'} a ${order.deliveredTo || order.buyerName}</strong>
             Identidad verificada con cédula ${this.maskId(order.buyerId)} • ${(order.stepDates || {})[4] || ''}
           </div>
         </div>
@@ -449,11 +449,11 @@ const TrackingView = {
 
     if (step === -1) {
       return `
-        <div class="mt-6 p-5 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-3" role="alert">
+        <div class="mt-6 p-5 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-3" role="alert">
           <i data-lucide="shield-x" class="w-6 h-6 text-[#BE123C] flex-shrink-0"></i>
           <div class="text-xs text-rose-900">
             <strong class="block text-sm">Entrega retenida por seguridad</strong>
-            Se presentaron ${this.MAX_ID_ATTEMPTS} cédulas que no coinciden con el titular. La pieza regresa a Bóveda Central Quito;
+            Se presentaron ${this.MAX_ID_ATTEMPTS} cédulas que no coinciden con el titular. El pedido regresa a la tienda en Quito;
             el titular debe retirarla en persona con su cédula original.
           </div>
         </div>
@@ -480,7 +480,7 @@ const TrackingView = {
           </p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <button type="button" onclick="TrackingView.resetLookup()" class="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-[#0F172A] rounded-xl transition flex items-center gap-1.5 touch-target">
+          <button type="button" onclick="TrackingView.resetLookup()" class="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-[#0F172A] rounded-md transition flex items-center gap-1.5 touch-target">
             <i data-lucide="search" class="w-4 h-4"></i>
             <span>Rastrear otro pedido</span>
           </button>
@@ -495,7 +495,7 @@ const TrackingView = {
           </h2>
           ${[1, 2].includes(this.getStep(order)) ? `
             <span class="text-xs font-bold text-slate-500 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-[#059669] animate-pulse"></span>Simulación en vivo
+              <span class="w-2 h-2 rounded-full bg-[#059669] motion-safe:animate-pulse"></span>Simulación en vivo
             </span>` : ''}
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">${this.renderTimelineStages(stages)}</div>
@@ -510,7 +510,7 @@ const TrackingView = {
         </div>
         <div class="space-y-3">
           ${(order.items || []).map(item => `
-            <div class="flex items-center justify-between p-3.5 bg-[#F8FAFC] border border-slate-200 rounded-xl">
+            <div class="flex items-center justify-between p-3.5 bg-[#F8FAFC] border border-slate-200 rounded-md">
               <div class="flex items-center gap-3">
                 <img src="${item.imageLocal || 'assets/img/cards/card-back.png'}" alt="${item.name}" width="48" height="64" loading="lazy" decoding="async" class="w-12 h-16 object-contain bg-white rounded-lg border border-slate-200 p-0.5"
                   onerror="this.onerror=null; this.src='${item.imageFallback || 'assets/img/cards/card-back.png'}'" />
@@ -533,7 +533,7 @@ const TrackingView = {
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-5">
         ${this.renderUserOrders()}
         ${order ? `
-          <div id="tracking-detail" class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div id="tracking-detail" class="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm">
             ${this.renderDetail(order)}
           </div>
         ` : this.renderLookupForm(false)}

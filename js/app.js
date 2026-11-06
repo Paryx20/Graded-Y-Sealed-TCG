@@ -56,6 +56,13 @@ const app = {
       .finally(() => {
         if (container) container.removeAttribute('aria-busy');
         this.handleRoute();
+        const repriced = Store.data.repricedCartItems || [];
+        if (repriced.length) {
+          this.showToast(repriced.length === 1
+            ? `El precio de "${repriced[0]}" se actualizó en tu bolsa.`
+            : `Se actualizó el precio de ${repriced.length} productos de tu bolsa.`, 'info');
+          Store.data.repricedCartItems = [];
+        }
       });
   },
 
@@ -118,6 +125,13 @@ const app = {
       if (found) {
         Store.data.currentPdpProduct = found;
         Store.data.pdpSelectedCondition = ['raw', 'psa9'].includes(found.condicionPrincipal) ? found.condicionPrincipal : 'psa10';
+        // Si ese grado está agotado se abre la ficha en el primero que tenga stock
+        if (typeof CatalogView !== 'undefined' && CatalogView.availableGrades && !CatalogView.isSealedItem(found)) {
+          const inStock = CatalogView.availableGrades(found);
+          if (inStock.length && !inStock.includes(Store.data.pdpSelectedCondition)) {
+            Store.data.pdpSelectedCondition = inStock[inStock.length - 1];
+          }
+        }
         Store.data.pdpQuantity = 1;
         Store.data.pdpInspectorMode = 'front';
       }
@@ -129,8 +143,6 @@ const app = {
       const qParam = (params.get('q') || '').trim();
       Store.data.catalogFilters.category = catParam || 'all';
       Store.data.catalogFilters.era = catParam ? 'all' : (eraParam || 'all');
-      const letterParam = (params.get('letra') || '').trim().toUpperCase();
-      Store.data.catalogFilters.letter = /^[A-Z]$/.test(letterParam) ? letterParam : 'all';
       // La búsqueda solo se aplica cuando viene en la URL (?q=)
       Store.data.catalogFilters.searchQuery = qParam;
       Store.data.searchQuery = qParam;
@@ -554,7 +566,7 @@ const app = {
       const user = await SupabaseAPI.login(email, password);
       this.showFormError('');
       this.startSession(user);
-      this.showToast(`¡Bienvenido a la bóveda, ${user.name}!`, 'success');
+      this.showToast(`¡Hola, ${user.name}! Sesión iniciada.`, 'success');
       if (redirectHome) {
         this.go('profile');
       }
@@ -711,63 +723,76 @@ const app = {
     const dropdown = document.getElementById('search-live-dropdown');
     if (!dropdown) return;
 
+    const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     const q = (rawQuery || '').toLowerCase().trim();
-    const matches = PRODUCTS.filter(p =>
-      p.nombre.toLowerCase().includes(q) ||
-      p.set.toLowerCase().includes(q) ||
-      p.tipo.toLowerCase().includes(q)
-    ).slice(0, 5);
+    // Buscador de la tienda: solo inventario con stock
+    const inStock = p => typeof CatalogView === 'undefined' || !CatalogView.matchesCategory || CatalogView.matchesCategory(p, 'all');
+    const matches = PRODUCTS.filter(p => inStock(p) && (
+      (p.nombre || '').toLowerCase().includes(q) ||
+      (p.set || '').toLowerCase().includes(q) ||
+      (p.tipo || '').toLowerCase().includes(q)
+    )).slice(0, 5);
+
+    const footer = `
+      <div class="p-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <a href="${this.url('catalog', { q })}" class="font-semibold text-[#BE123C] hover:text-[#9F1239] inline-flex items-center gap-1 px-1 py-1">
+          Ver todos los resultados en la tienda →
+        </a>
+        <a href="${this.url('search-results', q ? { q } : null)}" class="text-slate-600 hover:text-slate-900 inline-flex items-center gap-1 px-1 py-1">
+          <i data-lucide="database" class="w-3.5 h-3.5" aria-hidden="true"></i>
+          Buscar en la base de cartas Pokémon (API)
+        </a>
+      </div>`;
 
     if (matches.length === 0) {
       dropdown.innerHTML = `
-        <div class="p-4 text-center text-xs text-slate-500">
-          No se encontraron piezas para "${rawQuery}".
+        <div class="p-4 text-center text-xs text-slate-600">
+          No tenemos productos disponibles para "${esc(rawQuery)}".
         </div>
+        ${footer}
       `;
       dropdown.classList.remove('hidden');
+      this.refreshIcons();
       return;
     }
 
     dropdown.innerHTML = `
-      <div class="p-2 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider flex justify-between items-center">
-        <span>Resultados en Bóveda</span>
-        <span>${matches.length} coincidencias</span>
+      <div class="px-3 py-2 border-b border-slate-100 text-xs font-semibold text-slate-600 flex justify-between items-center">
+        <span>En la tienda</span>
+        <span>${matches.length} ${matches.length === 1 ? 'producto' : 'productos'}</span>
       </div>
       <div class="divide-y divide-slate-100">
-        ${matches.map(card => `
-          <button type="button" onclick="app.selectSpotlightProduct('${card.id}')" class="w-full text-left p-2.5 flex items-center justify-between hover:bg-slate-50 cursor-pointer rounded-lg transition group">
+        ${matches.map(card => {
+          const opt = typeof CatalogView !== 'undefined' && CatalogView.getDisplayOption
+            ? CatalogView.getDisplayOption(card, 'all')
+            : { grade: 'raw', price: card.precios && card.precios.raw };
+          const gradeLabel = typeof CatalogView !== 'undefined' && CatalogView.GRADE_LABELS ? CatalogView.GRADE_LABELS[opt.grade] : '';
+          return `
+          <button type="button" onclick="app.selectSpotlightProduct('${card.id}')" class="w-full text-left p-2.5 flex items-center justify-between hover:bg-slate-50 cursor-pointer rounded-md transition group">
             <span class="flex items-center gap-3">
-              <img 
-                src="${card.imagenLocal}" 
+              <img
+                src="${card.imagenLocal}"
                 alt=""
                 width="36"
                 height="48"
                 loading="lazy"
                 decoding="async"
-                class="w-9 h-12 object-contain bg-[#F8FAFC] border border-slate-200 rounded p-0.5" 
+                class="w-9 h-12 object-contain bg-[#F8FAFC] border border-slate-200 rounded p-0.5"
                 onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
               />
               <span class="block">
                 <span class="block text-xs font-semibold text-[#0F172A] group-hover:text-[#BE123C] transition">${card.nombre}</span>
-                <span class="text-xs text-slate-500">${card.set} • ${card.rareza}</span>
+                <span class="text-xs text-slate-600">${card.set} · ${card.rareza}</span>
               </span>
             </span>
             <span class="block text-right">
-              <span class="text-xs font-bold text-[#0F172A]">$${Number((card.precios && (card.precios.psa10 || card.precios.raw)) || card.precioEstimado || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-              <span class="block text-xs text-[#B45309] font-bold">PSA 10</span>
+              <span class="text-xs font-bold text-[#0F172A]">$${Number(opt.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span class="block text-xs text-slate-600">${gradeLabel}</span>
             </span>
-          </button>
-        `).join('')}
+          </button>`;
+        }).join('')}
       </div>
-      <div class="p-2 border-t border-slate-100 flex items-center justify-between text-xs">
-        <button type="button" onclick="app.executeGlobalSearch('${q.replace(/'/g, '')}')" class="font-semibold text-[#BE123C] hover:text-[#9F1239] flex items-center gap-1">
-          <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
-          <span>Búsqueda Multifuente en Tiempo Real →</span>
-        </button>
-        <a href="${this.url('catalog', { q })}" class="text-slate-500 hover:text-slate-800 font-semibold text-xs">
-          Catálogo Tradicional
-        </a>
-      </div>
+      ${footer}
     `;
     dropdown.classList.remove('hidden');
     this.refreshIcons();
@@ -781,6 +806,7 @@ const app = {
     this.openProductPDP(cardId);
   },
 
+  // Enter en el buscador de la navbar: busca en el inventario de la tienda (catálogo)
   executeGlobalSearch(query) {
     const backdrop = document.getElementById('search-spotlight-backdrop');
     const dropdown = document.getElementById('search-live-dropdown');
@@ -790,7 +816,7 @@ const app = {
     const cleanQ = (query || '').trim();
     Store.data.searchQuery = cleanQ;
     Store.data.catalogFilters.searchQuery = cleanQ;
-    this.go('search-results', { q: cleanQ });
+    this.go('catalog', cleanQ ? { q: cleanQ } : null);
   },
 
   _activeToastTimeout: null,
@@ -808,7 +834,7 @@ const app = {
 
     const toast = document.createElement('div');
     toast.setAttribute('data-type', type);
-    toast.className = 'pointer-events-auto bg-[#0F172A] text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl border-l-4 flex items-center gap-2.5 transition-all transform translate-y-2 opacity-0';
+    toast.className = 'pointer-events-auto bg-[#0F172A] text-white text-xs font-semibold px-4 py-3 rounded-md shadow-md border-l-4 flex items-center gap-2.5 transition-all transform translate-y-2 opacity-0';
 
     let icon = 'info';
     if (type === 'success') {

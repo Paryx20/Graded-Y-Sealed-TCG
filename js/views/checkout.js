@@ -12,7 +12,7 @@ const CheckoutView = {
     return `
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <h1 class="sr-only">Finalizar compra</h1>
-        <div class="bg-[#0F172A] text-white rounded-xl px-4 py-3 flex items-center justify-between mb-6 shadow-sm">
+        <div class="bg-[#0F172A] text-white rounded-md px-4 py-3 flex items-center justify-between mb-6 shadow-sm">
           <div class="flex items-center gap-2 text-xs font-bold">
             <i data-lucide="lock" class="w-4 h-4 text-[#047857]"></i>
             <span>Checkout Seguro TLS 256-bit • Graded &amp; Sealed TCG</span>
@@ -21,7 +21,7 @@ const CheckoutView = {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div class="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <div class="lg:col-span-4 bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
               <h2 class="text-base font-bold text-[#0F172A]">${user ? 'Sesión Activa' : 'Cuenta de Coleccionista'}</h2>
               <span class="text-xs font-bold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded">${user ? 'Verificado' : 'Obligatorio'}</span>
@@ -30,13 +30,13 @@ const CheckoutView = {
             ${user ? `
               <div class="mt-4 space-y-3">
                 <p class="text-xs text-slate-600">Tus datos de perfil se han precargado automáticamente para esta orden.</p>
-                <div class="p-3.5 rounded-xl bg-[#F8FAFC] border border-slate-200 text-xs space-y-1">
+                <div class="p-3.5 rounded-md bg-[#F8FAFC] border border-slate-200 text-xs space-y-1">
                   <div class="font-bold text-[#0F172A]">${user.name}</div>
                   <div class="text-slate-500">${user.email}</div>
                   <div class="text-slate-500">Cédula/RUC: ${user.idCard || user.cedula_ruc || 'No registrada'}</div>
                   <div class="text-slate-500">Tel: ${user.phone || user.telefono || 'No registrado'}</div>
                 </div>
-                <a href="pages/perfil.html" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
+                <a href="pages/perfil.html" class="w-full py-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold rounded-md transition flex items-center justify-center gap-1.5">
                   <i data-lucide="user-check" class="w-4 h-4"></i>
                   <span>Ver Mi Perfil e Historial</span>
                 </a>
@@ -63,7 +63,7 @@ const CheckoutView = {
             `}
           </div>
 
-          <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+          <div class="lg:col-span-8 bg-white border border-slate-200 rounded-lg p-6 shadow-sm space-y-6">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
                 <h2 class="text-lg font-bold text-[#0F172A]">Datos de Facturación y Creación de Cuenta</h2>
@@ -147,18 +147,18 @@ const CheckoutView = {
             <fieldset class="space-y-3">
               <legend class="text-sm font-semibold text-[#0F172A]">2. Método de Entrega (Tarifa Plana Ecuador)</legend>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <label class="p-3.5 rounded-xl cursor-pointer flex flex-col justify-between transition ${isCourier ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
+                <label class="p-3.5 rounded-md cursor-pointer flex flex-col justify-between transition ${isCourier ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
                   <div class="flex items-start gap-2.5">
                     <input type="radio" name="delivery-method" value="courier" ${isCourier ? 'checked' : ''} onchange="CheckoutView.setDelivery('courier')" class="mt-0.5 text-[#BE123C]" />
                     <div>
-                      <div class="text-xs font-bold text-[#0F172A]">Envío Nacional Blindado</div>
+                      <div class="text-xs font-bold text-[#0F172A]">Envío nacional</div>
                       <span class="text-xs font-bold text-[#BE123C]">$5.00</span>
                       <p class="text-xs text-slate-500 mt-0.5">Todo el Ecuador con empaque rígido y UV.</p>
                     </div>
                   </div>
                 </label>
 
-                <label class="p-3.5 rounded-xl cursor-pointer flex flex-col justify-between transition ${isQuito ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
+                <label class="p-3.5 rounded-md cursor-pointer flex flex-col justify-between transition ${isQuito ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
                   <div class="flex items-start gap-2.5">
                     <input type="radio" name="delivery-method" value="quito" ${isQuito ? 'checked' : ''} onchange="CheckoutView.setDelivery('quito')" class="mt-0.5 text-[#BE123C]" />
                     <div>
@@ -169,7 +169,7 @@ const CheckoutView = {
                   </div>
                 </label>
 
-                <label class="p-3.5 rounded-xl cursor-pointer flex flex-col justify-between transition ${isPickup ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
+                <label class="p-3.5 rounded-md cursor-pointer flex flex-col justify-between transition ${isPickup ? 'border-2 border-[#0F172A] bg-slate-50' : 'border border-slate-300 bg-white hover:bg-slate-50'}">
                   <div class="flex items-start gap-2.5">
                     <input type="radio" name="delivery-method" value="pickup" ${isPickup ? 'checked' : ''} onchange="CheckoutView.setDelivery('pickup')" class="mt-0.5 text-[#BE123C]" />
                     <div>
@@ -185,7 +185,7 @@ const CheckoutView = {
             <fieldset class="space-y-3">
               <legend class="text-sm font-semibold text-[#0F172A]">3. Método de Pago</legend>
               <div class="space-y-3">
-                <div class="p-4 rounded-xl border border-[#0F172A] bg-[#F8FAFC] space-y-3">
+                <div class="p-4 rounded-md border border-[#0F172A] bg-[#F8FAFC] space-y-3">
                   <label class="flex items-center justify-between cursor-pointer">
                     <div class="flex items-center gap-3">
                       <input type="radio" name="payment-method" value="card" checked class="text-[#BE123C]" />
@@ -220,12 +220,12 @@ const CheckoutView = {
                   </div>
                 </div>
 
-                <label class="p-3.5 rounded-xl border flex items-center justify-between transition ${isPickup ? 'border-slate-300 bg-white cursor-pointer hover:bg-slate-50' : 'border-slate-200 bg-slate-100 opacity-60 cursor-not-allowed'}">
+                <label class="p-3.5 rounded-md border flex items-center justify-between transition ${isPickup ? 'border-slate-300 bg-white cursor-pointer hover:bg-slate-50' : 'border-slate-200 bg-slate-100 opacity-60 cursor-not-allowed'}">
                   <div class="flex items-center gap-3">
                     <input type="radio" name="payment-method" id="payment-cash-input" value="cash" ${isPickup ? '' : 'disabled'} class="text-[#BE123C]" />
                     <div>
                       <span class="text-sm font-bold ${isPickup ? 'text-[#0F172A]' : 'text-slate-600'}">Efectivo al retirar en tienda (Cash)</span>
-                      <span class="text-xs text-slate-600 block">${isPickup ? 'Paga directamente en ventanilla de bóveda al retirar' : 'Solo disponible seleccionando "Retiro en Local Físico"'}</span>
+                      <span class="text-xs text-slate-600 block">${isPickup ? 'Pagas en la tienda al retirar' : 'Solo disponible seleccionando "Retiro en Local Físico"'}</span>
                     </div>
                   </div>
                   <i data-lucide="banknote" class="w-5 h-5 text-slate-500"></i>
@@ -237,7 +237,7 @@ const CheckoutView = {
               <button 
                 type="button" 
                 onclick="CheckoutView.processPayment()" 
-                class="w-full py-4 bg-[#E11D48] hover:bg-[#BE123C] text-white text-base font-semibold rounded-xl transition shadow-lg flex items-center justify-center gap-2 touch-target"
+                class="w-full py-4 bg-[#E11D48] hover:bg-[#BE123C] text-white text-base font-semibold rounded-md transition shadow-lg flex items-center justify-center gap-2 touch-target"
               >
                 <i data-lucide="lock" class="w-5 h-5"></i>
                 <span>Proceder al Pago ($${total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD)</span>
@@ -260,7 +260,7 @@ const CheckoutView = {
         <div class="max-w-3xl mx-auto px-4 pt-10 text-center">
           <h1 class="text-lg font-bold text-[#0F172A]">No hay una orden recién procesada</h1>
           <p class="text-sm text-slate-600 mt-1">Cuando completes una compra verás aquí su resumen.</p>
-          <a href="pages/catalogo.html" class="mt-4 inline-block px-5 py-2.5 bg-[#E11D48] text-white text-xs font-bold rounded-xl">Ir al Catálogo</a>
+          <a href="pages/catalogo.html" class="mt-4 inline-block px-5 py-2.5 bg-[#E11D48] text-white text-xs font-bold rounded-md">Ir al Catálogo</a>
         </div>
       `;
     }
@@ -269,7 +269,7 @@ const CheckoutView = {
 
     return `
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm text-center">
+        <div class="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm text-center">
           <div class="w-16 h-16 rounded-full bg-[#D1FAE5] text-[#047857] flex items-center justify-center mx-auto mb-4">
             <i data-lucide="check-circle-2" class="w-10 h-10"></i>
           </div>
@@ -280,7 +280,7 @@ const CheckoutView = {
           </div>
 
           ${isCash ? `
-            <div class="my-4 p-4 bg-[#FEF3C7]/60 border border-[#D97706]/40 rounded-xl text-[#0F172A] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2">
+            <div class="my-4 p-4 bg-[#FEF3C7]/60 border border-[#D97706]/40 rounded-md text-[#0F172A] text-xs sm:text-sm font-semibold flex items-center justify-center gap-2">
               <i data-lucide="store" class="w-5 h-5 text-[#B45309] flex-shrink-0"></i>
               <span>Orden reservada. Realiza el pago en ventanilla al retirar en Sucursal Central Quito.</span>
             </div>
@@ -291,7 +291,7 @@ const CheckoutView = {
             <strong class="text-[#0F172A]">${order.buyerEmail}</strong>
           </p>
 
-          <div class="mt-6 text-left bg-[#F8FAFC] border border-slate-200 rounded-xl p-5 max-w-2xl mx-auto space-y-2.5 text-xs sm:text-sm">
+          <div class="mt-6 text-left bg-[#F8FAFC] border border-slate-200 rounded-md p-5 max-w-2xl mx-auto space-y-2.5 text-xs sm:text-sm">
             <h2 class="font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-2">Desglose de la Transacción</h2>
             ${order.items.map(item => `
               <div class="flex justify-between text-slate-600">
@@ -317,14 +317,14 @@ const CheckoutView = {
             <button 
               type="button"
               onclick="app.openOrderTracking('${order.orderId}')" 
-              class="px-6 py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center gap-2 touch-target"
+              class="px-6 py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs sm:text-sm font-bold rounded-md transition flex items-center gap-2 touch-target"
             >
               <i data-lucide="truck" class="w-4 h-4"></i>
               <span>Ver Seguimiento del Pedido</span>
             </button>
             <a 
               href="pages/perfil.html" 
-              class="px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-[#0F172A] text-xs sm:text-sm font-bold rounded-xl transition flex items-center gap-2 touch-target"
+              class="px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-[#0F172A] text-xs sm:text-sm font-bold rounded-md transition flex items-center gap-2 touch-target"
             >
               <i data-lucide="history" class="w-4 h-4"></i>
               <span>Ver Historial en Mi Perfil</span>
@@ -343,7 +343,7 @@ const CheckoutView = {
     };
     return `
       <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm text-center">
+        <div class="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm text-center">
           <div class="w-16 h-16 rounded-full bg-rose-100 text-[#BE123C] flex items-center justify-center mx-auto mb-4">
             <i data-lucide="credit-card" class="w-9 h-9"></i>
           </div>
@@ -353,7 +353,7 @@ const CheckoutView = {
             Código bancario: ${err.code}
           </div>
 
-          <div class="mt-6 text-left bg-rose-50/70 border border-rose-200 rounded-xl p-5 space-y-2">
+          <div class="mt-6 text-left bg-rose-50/70 border border-rose-200 rounded-md p-5 space-y-2">
             <h2 class="text-xs font-bold text-rose-900 uppercase tracking-wider">${err.title}</h2>
             <p class="text-xs sm:text-sm text-rose-800 leading-relaxed">${err.message}</p>
             ${err.cardLast4 ? `<p class="text-xs text-rose-700">Tarjeta ${err.brand || ''} terminada en <strong>${err.cardLast4}</strong></p>` : ''}
@@ -366,7 +366,7 @@ const CheckoutView = {
           <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href="pages/checkout.html"
-              class="px-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
+              class="px-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs sm:text-sm font-bold rounded-md transition shadow flex items-center justify-center gap-2 touch-target"
             >
               <i data-lucide="credit-card" class="w-4 h-4"></i>
               <span>Reintentar con otra tarjeta</span>
@@ -375,7 +375,7 @@ const CheckoutView = {
             <button
               type="button"
               onclick="CheckoutView.switchToCashPickup()"
-              class="px-6 py-3.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 touch-target"
+              class="px-6 py-3.5 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs sm:text-sm font-bold rounded-md transition flex items-center justify-center gap-2 touch-target"
             >
               <i data-lucide="store" class="w-4 h-4"></i>
               <span>Cambiar a Retiro en Tienda y Efectivo</span>
@@ -396,7 +396,7 @@ const CheckoutView = {
           <p class="text-xs sm:text-sm text-slate-500 mt-1">Inicia sesión o registra tu cuenta para gestionar perfil, custodia y seguimiento</p>
         </div>
 
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm max-w-lg mx-auto">
+        <div class="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm max-w-lg mx-auto">
           <div class="flex border-b border-slate-200 mb-6" role="group" aria-label="Acceso a tu cuenta">
             <button 
               type="button" 
@@ -427,7 +427,7 @@ const CheckoutView = {
                 <input type="password" id="auth-password" autocomplete="current-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
               <p data-form-error role="alert" class="hidden text-xs text-[#BE123C] font-semibold"></p>
-              <button type="submit" class="w-full py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-xl transition shadow touch-target">
+              <button type="submit" class="w-full py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-md transition shadow touch-target">
                 Acceder a mi Cuenta
               </button>
             </form>
@@ -470,7 +470,7 @@ const CheckoutView = {
                 <input type="password" id="reg-pass" autocomplete="new-password" placeholder="Mínimo 8 caracteres, con letras y números" class="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
               </div>
               <p data-form-error role="alert" class="hidden text-xs text-[#BE123C] font-semibold"></p>
-              <button type="submit" class="w-full py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-semibold rounded-xl transition shadow touch-target">
+              <button type="submit" class="w-full py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-semibold rounded-md transition shadow touch-target">
                 Registrar mi Cuenta
               </button>
             </form>
@@ -567,7 +567,7 @@ const CheckoutView = {
     } else {
       Store.data.deliveryMethod = 'courier';
       Store.data.shippingFee = APP_CONFIG.COURIER_SHIPPING_FEE;
-      app.showToast('Entrega: Envío Nacional Blindado ($5.00).', 'info');
+      app.showToast('Entrega: Envío nacional ($5.00).', 'info');
     }
     app.renderCurrentView();
   },
@@ -711,7 +711,7 @@ const CheckoutView = {
         minute: '2-digit'
       });
 
-      let deliveryLabel = 'Envío Nacional Blindado ($5.00)';
+      let deliveryLabel = 'Envío nacional ($5.00)';
       if (Store.data.deliveryMethod === 'pickup') {
         deliveryLabel = 'Retiro en Local Central ($0.00)';
       } else if (Store.data.deliveryMethod === 'quito' || Store.data.deliveryMethod === 'local_express') {
@@ -723,10 +723,10 @@ const CheckoutView = {
         ? `RET-UIO-${Math.floor(100000 + Math.random() * 900000)}`
         : `GUI-EC-${Math.floor(100000 + Math.random() * 900000)}-PSA`;
       const courierName = isPickupOrder
-        ? 'Retiro Presencial en Bóveda Central Quito'
-        : 'Servientrega Blindado • Bóveda G&S';
+        ? 'Retiro en tienda (Quito)'
+        : 'Servientrega';
       const estimatedDelivery = isPickupOrder
-        ? 'Listo para retiro inmediato en Bóveda'
+        ? 'Listo para retiro en tienda'
         : '2 a 3 días hábiles (Entrega Garantizada)';
 
       const orderRecord = {
@@ -740,7 +740,7 @@ const CheckoutView = {
         buyerId: idCard,
         buyerEmail: email,
         buyerPhone: formattedPhone,
-        shippingAddress: isPickupOrder ? 'Bóveda Central Quito' : `${address}, ${city}`,
+        shippingAddress: isPickupOrder ? 'Tienda Graded & Sealed, Quito' : `${address}, ${city}`,
         shippingStreet: address,
         shippingCity: city,
         fecha_creacion: now.toISOString(),

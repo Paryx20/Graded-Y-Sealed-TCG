@@ -23,17 +23,17 @@ const CartView = {
           <div class="lg:col-span-8 flex flex-col gap-4">
             <div id="cart-items-container" class="flex flex-col gap-3">
               ${items.length === 0 ? `
-                <div class="bg-white border border-slate-200 rounded-2xl p-10 text-center text-slate-500 shadow-sm">
+                <div class="bg-white border border-slate-200 rounded-lg p-10 text-center text-slate-500 shadow-sm">
                   <i data-lucide="shopping-bag" class="w-14 h-14 mx-auto mb-3 text-slate-300"></i>
                   <h2 class="font-semibold text-base text-[#0F172A]">Tu bolsa de compras está vacía</h2>
                   <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Añade cartas coleccionables, slabs PSA o booster packs para iniciar tu orden.</p>
-                  <a href="pages/catalogo.html" class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold rounded-xl shadow-sm transition">
+                  <a href="pages/catalogo.html" class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold rounded-md shadow-sm transition">
                     <i data-lucide="compass" class="w-4 h-4"></i>
                     <span>Explorar Catálogo</span>
                   </a>
                 </div>
               ` : items.map(item => `
-                <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+                <div class="bg-white border border-slate-200 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                   <div class="flex items-center gap-3.5 flex-1">
                     <img 
                       src="${item.imageLocal}" 
@@ -42,7 +42,7 @@ const CartView = {
                       height="80"
                       loading="lazy"
                       decoding="async"
-                      class="w-16 h-20 object-contain bg-[#F8FAFC] border border-slate-200 rounded-xl p-1" 
+                      class="w-16 h-20 object-contain bg-[#F8FAFC] border border-slate-200 rounded-md p-1" 
                       onerror="this.onerror=null; this.src='${item.imageFallback}'"
                     />
                     <div>
@@ -53,7 +53,7 @@ const CartView = {
                   </div>
 
                   <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                    <div class="flex items-center border border-slate-300 rounded-xl bg-[#F8FAFC]">
+                    <div class="flex items-center border border-slate-300 rounded-md bg-[#F8FAFC]">
                       <button 
                         type="button" 
                         onclick="app.updateCartQuantity('${item.id}', -1)" 
@@ -76,7 +76,7 @@ const CartView = {
                     <button 
                       type="button" 
                       onclick="app.requestRemoveItem('${item.id}')" 
-                      class="p-2 text-[#BE123C] hover:text-[#9F1239] hover:bg-rose-50 rounded-xl transition"
+                      class="p-2 text-[#BE123C] hover:text-[#9F1239] hover:bg-rose-50 rounded-md transition"
                       aria-label="Eliminar ${item.name} de la bolsa"
                     >
                       <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -86,8 +86,8 @@ const CartView = {
               `).join('')}
             </div>
 
-            <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start gap-4 shadow-sm">
-              <div class="w-12 h-12 rounded-xl bg-[#FEF3C7] border border-[#D97706]/30 flex items-center justify-center flex-shrink-0 text-[#B45309]">
+            <div class="bg-white border border-slate-200 rounded-lg p-4 flex items-start gap-4 shadow-sm">
+              <div class="w-12 h-12 rounded-md bg-[#FEF3C7] border border-[#D97706]/30 flex items-center justify-center flex-shrink-0 text-[#B45309]">
                 <i data-lucide="package" class="w-6 h-6"></i>
               </div>
               <div>
@@ -97,7 +97,7 @@ const CartView = {
             </div>
           </div>
 
-          <div class="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm sticky top-28">
+          <div class="lg:col-span-4 bg-white border border-slate-200 rounded-lg p-6 shadow-sm sticky top-28">
             <h2 class="text-lg font-bold text-[#0F172A] tracking-tight">Resumen del Pedido</h2>
 
             <div class="mt-4 space-y-3 text-sm border-t border-slate-200 pt-4">
@@ -117,7 +117,7 @@ const CartView = {
               </div>
 
               <div class="flex justify-between text-[#047857] text-xs font-semibold">
-                <span>Seguro de custodia y bóveda:</span>
+                <span>Seguro de envío:</span>
                 <span>GRATIS</span>
               </div>
 
@@ -129,7 +129,7 @@ const CartView = {
 
             <a 
               href="pages/checkout.html" 
-              class="w-full mt-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-xl transition shadow flex items-center justify-center gap-2 touch-target"
+              class="w-full mt-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-md transition shadow flex items-center justify-center gap-2 touch-target"
             >
               <span>Proceder al Pago</span>
               <i data-lucide="arrow-right" class="w-4 h-4"></i>

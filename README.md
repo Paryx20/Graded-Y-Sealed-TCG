@@ -7,13 +7,13 @@ Proyecto académico de la materia Interacción Humano-Computador (PUCE). No tien
 
 ## Funcionalidades
 
-- Catálogo con filtros por categoría, era, grado PSA, energía y precio.
+- Catálogo con filtros por categoría, era, energía y precio; solo muestra lo que tiene stock en cada grado.
 - Ficha de producto con visor 3D de la carta o de la caja sellada.
 - Bolsa de compras con control de stock y opción de deshacer.
 - Checkout con validación de datos y tarjetas de prueba.
-- Registro e inicio de sesión con Supabase Auth.
+- Registro e inicio de sesión con funciones RPC de Supabase (contraseñas cifradas con bcrypt).
 - Perfil con historial de órdenes y seguimiento de pedidos.
-- Búsqueda en la bóveda y en la API pública de Pokémon TCG.
+- Buscador de la tienda (solo inventario) y página "Explorar cartas", que consulta la API pública de Pokémon TCG solo como referencia.
 
 ## Stack
 

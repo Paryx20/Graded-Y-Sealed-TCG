@@ -208,11 +208,10 @@ begin
   for v_item in select * from jsonb_array_elements(p_items) loop
     v_cant := (v_item->>'cantidad')::int;
 
-    -- Cartas traídas desde la API de búsqueda: se registran como producto bajo pedido (sin stock)
-    if not exists (select 1 from public.productos where sku = v_item->>'sku') then
-      insert into public.productos (sku, nombre, tipo_discriminador, slug_categoria, imagen_url, origen)
-      values (v_item->>'sku', v_item->>'nombre', 'CARTA_INDIVIDUAL',
-              case when v_item->>'grado' = 'raw' then 'raw' else 'psa' end, v_item->>'imagen', 'API_TCG');
+    -- Solo se venden productos del inventario que estén activos
+    if not exists (select 1 from public.productos
+                    where sku = v_item->>'sku' and activo and origen = 'BOVEDA') then
+      raise exception 'PRODUCTO_NO_DISPONIBLE:%', v_item->>'nombre';
     end if;
 
     update public.certificaciones_psa
@@ -220,15 +219,12 @@ begin
      where producto_sku = v_item->>'sku' and grado = v_item->>'grado'
     returning precio into v_precio;
 
-    if found then
-      -- Pieza de la bóveda: el precio lo define la base de datos, no el navegador
-      if abs(v_precio - (v_item->>'precio')::numeric) > 0.009 then
-        raise exception 'PRECIO_CAMBIO:%', v_item->>'nombre';
-      end if;
-    elsif exists (select 1 from public.productos where sku = v_item->>'sku' and origen = 'BOVEDA') then
+    if not found then
       raise exception 'GRADO_NO_DISPONIBLE:%', v_item->>'nombre';
-    else
-      v_precio := (v_item->>'precio')::numeric;
+    end if;
+    -- El precio lo define la base de datos, no el navegador
+    if abs(v_precio - (v_item->>'precio')::numeric) > 0.009 then
+      raise exception 'PRECIO_CAMBIO:%', v_item->>'nombre';
     end if;
 
     insert into public.items_orden (numero_orden, sku, grado, cantidad, precio_unitario)

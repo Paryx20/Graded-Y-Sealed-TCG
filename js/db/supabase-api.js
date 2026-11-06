@@ -17,7 +17,11 @@ const SupabaseAPI = {
     ORDEN_VACIA: 'Tu bolsa está vacía.',
     SIN_STOCK: pieza => `No hay stock suficiente de "${pieza}". Ajusta la cantidad en tu bolsa.`,
     PRECIO_CAMBIO: pieza => `El precio de "${pieza}" cambió. Revisa tu bolsa antes de pagar.`,
-    GRADO_NO_DISPONIBLE: pieza => `El grado elegido de "${pieza}" ya no está disponible.`
+    GRADO_NO_DISPONIBLE: pieza => `El grado elegido de "${pieza}" ya no está disponible.`,
+    PRODUCTO_NO_DISPONIBLE: pieza => `"${pieza}" ya no está disponible en la tienda. Quítalo de tu bolsa.`,
+    NO_AUTORIZADO: 'Acceso no autorizado.',
+    PRECIO_INVALIDO: 'El precio debe ser mayor que 0.',
+    STOCK_INVALIDO: 'El stock debe ser un número entero mayor o igual a 0.'
   },
 
   client() {
@@ -117,6 +121,25 @@ const SupabaseAPI = {
       p_cedula: idCard,
       p_orden: order
     });
+  },
+
+  // ---- Panel de inventario (js/db/admin_rpc.sql): el servidor exige rol ADMIN
+  async adminListProducts(token) {
+    return (await this.rpc('admin_listar_productos', { p_token: token })) || [];
+  },
+
+  async adminUpdateGrade(token, sku, grade, price, stock) {
+    return this.rpc('admin_actualizar_grado', {
+      p_token: token,
+      p_sku: sku,
+      p_grado: grade,
+      p_precio: price,
+      p_stock: stock
+    });
+  },
+
+  async adminSetActive(token, sku, active) {
+    return this.rpc('admin_cambiar_activo', { p_token: token, p_sku: sku, p_activo: active });
   }
 };
 

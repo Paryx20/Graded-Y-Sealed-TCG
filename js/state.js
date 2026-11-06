@@ -23,8 +23,7 @@ const Store = {
       maxPrice: '',
       sortBy: 'featured',
       searchQuery: '',
-      onlyFavorites: false,
-      letter: 'all'
+      onlyFavorites: false
     },
     favorites: [],
     profileActiveTab: 'personal',
@@ -207,11 +206,11 @@ const Store = {
       buyerName: 'Patricio Mora',
       buyerId: '1710034065',
       buyerEmail: 'coleccionista.paryx@bovedatcg.ec',
-      deliveryMethod: 'Courier Nacional Blindado Especializado',
+      deliveryMethod: 'Envío nacional por courier',
       trackingNumber: 'GUI-EC-948102-PSA',
-      courierName: 'Servientrega Blindado • Bóveda G&S',
+      courierName: 'Servientrega',
       estimatedDelivery: '04 Nov 2026 (Entrega Garantizada en Mano)',
-      status: 'En Custodia • Autenticación PSA Bóveda',
+      status: 'En preparación',
       isDemo: true,
       currentStageIndex: 1,
       subtotal: 18500.00,
@@ -235,7 +234,7 @@ const Store = {
           detail: 'Validación de microimpresión, hologramas y encapsulado acrílico.'
         },
         {
-          title: '3. Despacho Blindado',
+          title: '3. Despacho',
           subtitle: 'Asignado a Transporte Especial',
           date: '03 Nov 2026, 10:00 (Est.)',
           status: 'pending',
@@ -324,12 +323,29 @@ const Store = {
         }
       }
       this.data.catalogSource = 'supabase';
+      this.data.repricedCartItems = this.repriceCart();
       return true;
     } catch (err) {
       console.warn('[Store] Catálogo local en uso; no se pudo leer Supabase:', err.message);
       this.data.catalogSource = 'local';
       return false;
     }
+  },
+
+  // Ajusta la bolsa al precio vigente de la base de datos; devuelve los nombres que cambiaron
+  repriceCart() {
+    const changed = [];
+    (this.data.cart || []).forEach(item => {
+      const { sku, grade } = this.parseCartItemId(item.id);
+      const product = this.getProduct(sku);
+      const current = product && product.precios ? Number(product.precios[grade]) : NaN;
+      if (Number.isFinite(current) && current > 0 && Math.abs(current - Number(item.price)) > 0.009) {
+        item.price = current;
+        changed.push(item.name);
+      }
+    });
+    if (changed.length) this.saveCart();
+    return changed;
   },
 
   // Stock de un producto en un grado; null si no se conoce (cartas de la API o sin conexión)
@@ -447,7 +463,7 @@ const Store = {
         psa9: Math.round(basePrice * 2.10),
         psa10: Math.round(basePrice * 5.20)
       },
-      descripcion: `${card.rareza || 'Coleccionable'} • Expansión ${setStr} • Verificación PSA Bóveda`,
+      descripcion: `${card.rareza || 'Coleccionable'} • Expansión ${setStr} • Carta de referencia`,
       tendencia12m: '+16.5%',
       rendimientoAnual: 16.5,
       historialBase: [0.85, 0.86, 0.88, 0.89, 0.91, 0.93, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]

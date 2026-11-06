@@ -1,18 +1,32 @@
 const HomeView = {
   render() {
     const featuredIds = ['charizard-ex-paldean', 'pikachu-crown-zenith', 'greninja-ex-twilight', 'blastoise-ex-151'];
+    // Solo se destaca lo que tiene stock; si un destacado se agota, entra otra carta disponible
+    const available = p => typeof CatalogView === 'undefined' || !CatalogView.matchesCategory || CatalogView.matchesCategory(p, 'all');
     const featuredCards = featuredIds
       .map(id => PRODUCTS.find(p => p.id === id))
-      .filter(Boolean);
+      .filter(p => p && available(p));
+    PRODUCTS
+      .filter(p => featuredCards.length < featuredIds.length && p.categoria !== 'sealed' && !featuredCards.includes(p) && available(p))
+      .slice(0, featuredIds.length - featuredCards.length)
+      .forEach(p => featuredCards.push(p));
 
-    const sealedProducts = PRODUCTS.filter(p => p.categoria === 'sealed').slice(0, 3);
+    const sealedProducts = PRODUCTS.filter(p => p.categoria === 'sealed' && available(p)).slice(0, 3);
+
+    // Carta del hero: el slab PSA 10 más caro con stock (no repite los destacados)
+    const priceOf = p => Number((p.precios && p.precios.psa10) || 0);
+    const heroCard = PRODUCTS
+      .filter(p => p.categoria !== 'sealed' && !featuredCards.includes(p) &&
+        (typeof CatalogView === 'undefined' || !CatalogView.inStock || CatalogView.inStock(p, 'psa10')))
+      .sort((a, b) => priceOf(b) - priceOf(a))[0] || null;
+    const heroOption = heroCard ? { label: 'PSA 10', price: priceOf(heroCard) } : null;
 
     return `
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-12">
         <!-- ==========================================
-             1. HERO SECTION COMERCIAL: BÓVEDA DE INVERSIÓN
+             1. HERO
              ========================================== -->
-        <section aria-labelledby="hero-heading" class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] text-white shadow-2xl border border-slate-800">
+        <section aria-labelledby="hero-heading" class="relative rounded-lg overflow-hidden bg-[#0F172A] text-white border border-slate-800">
           <!-- Video de fondo decorativo: se reproduce desde afterRender (respeta prefers-reduced-motion) -->
           <video
             id="hero-video"
@@ -28,16 +42,12 @@ const HomeView = {
             <source src="assets/video/hero-sobres.mp4" type="video/mp4">
           </video>
           <!-- Capa oscura para mantener el contraste del texto sobre el video -->
-          <div class="absolute inset-0 bg-gradient-to-r from-[#0F172A]/95 via-[#0F172A]/80 to-[#0F172A]/45 pointer-events-none" aria-hidden="true"></div>
-
-          <!-- Brillos ambientales en paleta 60-30-10 -->
-          <div class="absolute -top-24 -right-24 w-96 h-96 bg-[#E11D48]/15 rounded-full blur-3xl pointer-events-none"></div>
-          <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-[#D97706]/15 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute inset-0 bg-[#0F172A]/80 pointer-events-none" aria-hidden="true"></div>
 
           <button
             type="button"
             id="hero-video-toggle"
-            class="absolute bottom-2 right-2 z-20 w-8 h-8 inline-flex items-center justify-center rounded-full bg-[#0F172A]/80 hover:bg-[#0F172A] text-white border border-white/30 backdrop-blur-sm transition"
+            class="absolute bottom-2 right-2 z-20 w-8 h-8 inline-flex items-center justify-center rounded-full bg-[#0F172A] text-white border border-white/30 hover:border-white transition"
             aria-label="Pausar video de fondo"
           >
             <span data-video-icon="pause" aria-hidden="true"><i data-lucide="pause" class="w-4 h-4"></i></span>
@@ -45,505 +55,322 @@ const HomeView = {
           </button>
 
           <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-6 sm:p-10 lg:p-12">
-            <!-- Columna Izquierda: Mensaje Comercial y Propuesta de Valor -->
             <div class="lg:col-span-7 space-y-5">
-              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FEF3C7]/15 border border-[#D97706]/50 text-[#FEF3C7] text-xs font-bold tracking-wide uppercase">
-                <i data-lucide="award" class="w-4 h-4 text-[#B45309]"></i>
-                <span>BÓVEDA DE INVERSIÓN • OFICIAL PSA &amp; SELLADOS VINTAGE</span>
-              </div>
+              <p class="text-sm font-medium text-[#FEF3C7]">Tienda de cartas Pokémon en Quito</p>
 
               <h1 id="hero-heading" class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-white">
-                Bóveda de Coleccionismo Certificado &amp; Slabs PSA
+                Slabs PSA, cartas raw y producto sellado
               </h1>
 
-              <p class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl font-medium">
-                Primera plataforma especializada en Ecuador para la adquisición, custodia física y comercialización de cartas Pokémon graduadas por PSA/BGS y producto sellado de época WotC 1999. Autenticidad garantizada, trazabilidad auditable y resguardo en bóveda de alta seguridad.
+              <p class="text-slate-200 text-sm sm:text-base leading-relaxed max-w-xl">
+                Cartas certificadas por PSA con su número verificable, singles en Near Mint y cajas selladas de fábrica.
+                Enviamos a todo Ecuador o puedes retirar en Quito sin costo.
               </p>
 
-              <!-- CTAs Principales con paleta carmesí / dorado -->
-              <div class="pt-2 flex flex-wrap items-center gap-3.5">
-                <a 
-                  href="pages/catalogo.html?cat=psa" 
-                  class="px-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-xl transition shadow-lg flex items-center gap-2 touch-target"
+              <div class="pt-2 flex flex-wrap items-center gap-3">
+                <a
+                  href="pages/catalogo.html?cat=psa"
+                  class="px-6 py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-md transition flex items-center gap-2 touch-target"
                 >
                   <i data-lucide="shield-check" class="w-4 h-4"></i>
-                  <span>Explorar Bóveda PSA</span>
+                  <span>Ver slabs PSA</span>
                 </a>
 
-                <a 
-                  href="pages/catalogo.html?cat=sealed" 
-                  class="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 text-sm font-bold rounded-xl transition flex items-center gap-2 touch-target"
+                <a
+                  href="pages/catalogo.html?cat=sealed"
+                  class="px-6 py-3 bg-white text-[#0F172A] hover:bg-slate-100 text-sm font-semibold rounded-md transition flex items-center gap-2 touch-target"
                 >
-                  <i data-lucide="package" class="w-4 h-4 text-[#FEF3C7]"></i>
-                  <span>Ver Cajas Selladas</span>
+                  <i data-lucide="package" class="w-4 h-4"></i>
+                  <span>Producto sellado</span>
                 </a>
 
-                <a 
-                  href="pages/catalogo.html" 
-                  class="px-5 py-3.5 bg-transparent hover:bg-white/10 text-slate-200 text-sm font-bold rounded-xl transition flex items-center gap-1.5 touch-target"
+                <a
+                  href="pages/catalogo.html"
+                  class="px-4 py-3 text-slate-100 hover:text-white hover:underline underline-offset-4 text-sm font-semibold transition flex items-center gap-1.5 touch-target"
                 >
-                  <span>Catálogo Completo</span>
+                  <span>Todo el catálogo</span>
                   <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
               </div>
 
-              <!-- Barra de Métricas y KPIs Comerciales en Bóveda -->
-              <div class="pt-4 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div>
-                  <span class="block text-xl sm:text-2xl font-bold text-[#FEF3C7]">+$280K</span>
-                  <span class="text-xs font-semibold text-slate-400">Activos en Bóveda</span>
-                </div>
-                <div>
-                  <span class="block text-xl sm:text-2xl font-bold text-[#D1FAE5]">100%</span>
-                  <span class="text-xs font-semibold text-slate-400">Auténtico PSA Card</span>
-                </div>
-                <div>
-                  <span class="block text-xl sm:text-2xl font-bold text-[#FEF3C7]">+18.4%</span>
-                  <span class="text-xs font-semibold text-slate-400">Rendimiento Promedio</span>
-                </div>
-                <div>
-                  <span class="block text-xl sm:text-2xl font-bold text-white">48h</span>
-                  <span class="text-xs font-semibold text-slate-400">Envíos a Todo Ecuador</span>
-                </div>
-              </div>
+              <ul class="pt-4 border-t border-white/15 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-200">
+                <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-[#D1FAE5]"></i>Envío a todo Ecuador por $5</li>
+                <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-[#D1FAE5]"></i>Retiro gratis en Quito</li>
+                <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-[#D1FAE5]"></i>Certificados PSA verificables</li>
+              </ul>
             </div>
 
-            <!-- Columna Derecha: Pieza Estelar de Inversión con Holograma y Badge -->
+            ${heroCard ? `
             <div class="lg:col-span-5 flex items-center justify-center">
-              <div class="max-w-xs w-full">
               <a
-                href="${app.url('pdp', { id: 'charizard-base' })}"
-                aria-label="Inspeccionar pieza estelar Charizard Base Set 1999 PSA 10"
-                class="block h-full group relative bg-[#1E293B]/95 backdrop-blur-md border border-slate-700/80 hover:border-[#D97706] rounded-2xl p-5 shadow-2xl max-w-xs w-full transition-all duration-300 motion-safe:hover:-translate-y-1.5"
+                href="${app.url('pdp', { id: heroCard.id })}"
+                aria-label="Ver ficha de ${heroCard.nombre}"
+                class="block group bg-[#1E293B] border border-slate-700 hover:border-slate-400 rounded-lg p-5 max-w-xs w-full transition"
               >
                 <div class="flex items-center justify-between mb-3">
-                  <span class="px-2.5 py-0.5 rounded text-xs font-bold bg-[#FEF3C7] text-[#B45309] border border-[#D97706]/40">
-                    PIEZA ESTELAR PSA 10
-                  </span>
-                  <span class="text-xs font-bold text-[#D1FAE5] bg-[#059669]/30 border border-[#059669]/40 px-2 py-0.5 rounded flex items-center gap-1">
-                    <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +21.7% (12m)
-                  </span>
+                  <span class="px-2 py-0.5 rounded text-xs font-semibold bg-[#FEF3C7] text-[#92400E]">Destacado · ${heroOption.label}</span>
                 </div>
 
-                <div class="aspect-square bg-[#0F172A] rounded-xl border border-slate-700 flex items-center justify-center p-4 overflow-hidden relative">
-                  <div class="holo-sheen-layer"></div>
-                  <img 
-                    src="https://images.pokemontcg.io/base1/4.png"
-                    alt="Charizard Base Set 1999 #4/102 PSA 10"
+                <div class="aspect-square bg-[#0F172A] rounded-md flex items-center justify-center p-4 overflow-hidden relative">
+                  <img
+                    src="${heroCard.imagenLocal}"
+                    alt="${heroCard.nombre}"
                     width="245"
                     height="342"
                     fetchpriority="high"
                     decoding="async"
-                    class="max-h-52 w-auto object-contain transition-transform duration-300 motion-safe:group-hover:scale-105 filter drop-shadow-2xl"
-                    onerror="this.onerror=null; this.src='assets/img/cards/card-back.png'"
+                    class="max-h-52 w-auto object-contain transition-transform duration-300 motion-safe:group-hover:scale-105"
+                    onerror="this.onerror=null; this.src='${heroCard.imagenFallbackUrl || 'assets/img/cards/card-back.png'}'"
                   />
                 </div>
 
-                <div class="mt-3.5 flex items-center justify-between">
-                  <div>
-                    <h2 class="text-sm font-semibold text-white group-hover:text-[#FEF3C7] transition">Charizard Base Set 1999</h2>
-                    <p class="text-xs text-slate-400">Cert #48291034 • GEM MT 10</p>
+                <div class="mt-3.5 flex items-end justify-between gap-3">
+                  <div class="min-w-0">
+                    <h2 class="text-sm font-semibold text-white group-hover:underline underline-offset-2 line-clamp-2">${heroCard.nombre}</h2>
+                    <p class="text-xs text-slate-300 mt-0.5">${heroCard.set}</p>
                   </div>
-                  <div class="text-right">
-                    <span class="text-xs text-slate-400 block font-semibold">Valor de Mercado</span>
-                    <span class="text-base font-bold text-[#FEF3C7]">$18,500.00</span>
-                  </div>
+                  <span class="text-base font-bold text-white whitespace-nowrap">$${Number(heroOption.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                 </div>
-
-                <div class="mt-3 pt-3 border-t border-slate-700/80 flex items-center justify-between text-xs text-slate-300">
-                  <span class="text-xs text-slate-400 flex items-center gap-1">
-                    <i data-lucide="shield" class="w-3.5 h-3.5 text-[#047857]"></i>
-                    Bóveda Climatizada
-                  </span>
-                  <span class="font-semibold text-[#FEF3C7] group-hover:text-white transition flex items-center gap-1">
-                    Inspeccionar Slab
-                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                  </span>
-                </div>
-              </a></div>
-            </div>
+              </a>
+            </div>` : ''}
           </div>
         </section>
 
         <!-- ==========================================
-             2. BARRA DE GARANTÍAS DE BÓVEDA
-             (Envío blindado $5.00, Certificación PSA, Retiro en Quito)
+             2. ENVÍOS, GARANTÍAS Y PAGOS
              ========================================== -->
-        <section aria-label="Garantías oficiales de compra y seguridad" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
-            <!-- Garantía 1: Envío Blindado $5.00 -->
-            <div class="flex items-start gap-4 pt-4 sm:pt-0 first:pt-0 sm:px-3 first:pl-0">
-              <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center flex-shrink-0 text-[#BE123C] shadow-xs">
-                <i data-lucide="truck" class="w-6 h-6"></i>
-              </div>
-              <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                  <h2 class="text-xs sm:text-sm font-bold text-[#0F172A]">Envío Blindado ($5.00)</h2>
-                </div>
-                <p class="text-xs text-slate-600 leading-relaxed font-normal">
-                  Tarifa plana a todo el Ecuador. Empaque rígido en estuche acrílico con protección UV y precinto de inviolabilidad.
-                </p>
-                <span class="inline-block text-xs font-bold text-[#BE123C] uppercase tracking-wider">Courier Especializado</span>
+        <section aria-label="Envíos, garantías y pagos" class="bg-white border border-slate-200 rounded-lg p-5 sm:p-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="flex items-start gap-3">
+              <i data-lucide="truck" class="w-6 h-6 text-[#BE123C] flex-shrink-0 mt-0.5"></i>
+              <div>
+                <h2 class="text-sm font-semibold text-[#0F172A]">Envío a todo Ecuador · $5</h2>
+                <p class="text-sm text-slate-600 mt-0.5">Tarifa plana. Cada carta va en funda, toploader o caja rígida.</p>
               </div>
             </div>
-
-            <!-- Garantía 2: Certificación Oficial PSA -->
-            <div class="flex items-start gap-4 pt-4 sm:pt-0 sm:px-4">
-              <div class="w-12 h-12 rounded-xl bg-[#D1FAE5] border border-[#059669]/30 flex items-center justify-center flex-shrink-0 text-[#047857] shadow-xs">
-                <i data-lucide="shield-check" class="w-6 h-6"></i>
-              </div>
-              <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                  <h2 class="text-xs sm:text-sm font-bold text-[#0F172A]">Certificación PSA Oficial</h2>
-                </div>
-                <p class="text-xs text-slate-600 leading-relaxed font-normal">
-                  100% cartas y slabs genuinos con número de certificación auditable directamente en la base de datos de PSA Card.
-                </p>
-                <span class="inline-block text-xs font-bold text-[#047857] uppercase tracking-wider">Cero Réplicas • 100% Auténtico</span>
+            <div class="flex items-start gap-3">
+              <i data-lucide="shield-check" class="w-6 h-6 text-[#047857] flex-shrink-0 mt-0.5"></i>
+              <div>
+                <h2 class="text-sm font-semibold text-[#0F172A]">Slabs PSA originales</h2>
+                <p class="text-sm text-slate-600 mt-0.5">Cada slab trae su número de certificado para verificarlo en psacard.com.</p>
               </div>
             </div>
-
-            <!-- Garantía 3: Retiro en Quito $0.00 -->
-            <div class="flex items-start gap-4 pt-4 sm:pt-0 sm:px-4">
-              <div class="w-12 h-12 rounded-xl bg-[#FEF3C7] border border-[#D97706]/30 flex items-center justify-center flex-shrink-0 text-[#B45309] shadow-xs">
-                <i data-lucide="store" class="w-6 h-6"></i>
-              </div>
-              <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                  <h2 class="text-xs sm:text-sm font-bold text-[#0F172A]">Retiro en Quito ($0.00)</h2>
-                </div>
-                <p class="text-xs text-slate-600 leading-relaxed font-normal">
-                  Retiro presencial sin recargo en nuestra Bóveda Central (Quito) en 2 horas previa cita y verificación de identidad.
-                </p>
-                <span class="inline-block text-xs font-bold text-[#B45309] uppercase tracking-wider">Sin Costo • Inmediato</span>
+            <div class="flex items-start gap-3">
+              <i data-lucide="store" class="w-6 h-6 text-[#B45309] flex-shrink-0 mt-0.5"></i>
+              <div>
+                <h2 class="text-sm font-semibold text-[#0F172A]">Retiro gratis en Quito</h2>
+                <p class="text-sm text-slate-600 mt-0.5">Elige “Retiro en tienda” al pagar y te avisamos cuando esté listo.</p>
               </div>
             </div>
-
-            <!-- Garantía 4: Custodia en Bóveda Térmica -->
-            <div class="flex items-start gap-4 pt-4 sm:pt-0 sm:px-4">
-              <div class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-300 flex items-center justify-center flex-shrink-0 text-[#0F172A] shadow-xs">
-                <i data-lucide="lock" class="w-6 h-6"></i>
-              </div>
-              <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                  <h2 class="text-xs sm:text-sm font-bold text-[#0F172A]">Bóveda Térmica (20°C / 50%)</h2>
-                </div>
-                <p class="text-xs text-slate-600 leading-relaxed font-normal">
-                  Preservación contra humedad y pandeo con póliza de seguro y pasarela de pago bancaria encriptada TLS 256 bits.
-                </p>
-                <span class="inline-block text-xs font-bold text-[#0F172A] uppercase tracking-wider">Custodia Institucional</span>
+            <div class="flex items-start gap-3">
+              <i data-lucide="credit-card" class="w-6 h-6 text-[#0F172A] flex-shrink-0 mt-0.5"></i>
+              <div>
+                <h2 class="text-sm font-semibold text-[#0F172A]">Pago con tarjeta o efectivo</h2>
+                <p class="text-sm text-slate-600 mt-0.5">Visa, Mastercard o efectivo al retirar. Puedes seguir tu pedido en línea.</p>
               </div>
             </div>
           </div>
         </section>
 
         <!-- ==========================================
-             3. TESOROS DESTACADOS DE LA BÓVEDA
+             3. DESTACADOS
              ========================================== -->
-        <section aria-labelledby="vault-highlights-heading" class="space-y-5">
+        <section aria-labelledby="vault-highlights-heading" class="space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200 pb-3">
-            <div>
-              <span class="text-xs font-semibold uppercase tracking-wider text-[#B45309]">GRADO INVERSIÓN • OFICIAL PSA</span>
-              <h2 id="vault-highlights-heading" class="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
-                Tesoros Destacados de la Bóveda
-              </h2>
-            </div>
-            <a 
-              href="pages/catalogo.html?cat=psa" 
-              class="text-xs font-semibold text-[#BE123C] hover:text-[#9F1239] inline-flex items-center gap-1 self-start sm:self-auto transition"
+            <h2 id="vault-highlights-heading" class="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
+              Destacados
+            </h2>
+            <a
+              href="pages/catalogo.html"
+              class="text-sm font-semibold text-[#BE123C] hover:text-[#9F1239] hover:underline underline-offset-2 inline-flex items-center gap-1 self-start sm:self-auto"
             >
-              <span>Ver todos los Slabs PSA</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              <span>Ver todo el catálogo</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            ${featuredCards.map(card => `
+            ${featuredCards.map(card => {
+              const opt = typeof CatalogView !== 'undefined' && CatalogView.getDisplayOption
+                ? CatalogView.getDisplayOption(card, 'psa')
+                : { grade: 'psa10', price: card.precios.psa10 };
+              const option = opt.price ? opt : (typeof CatalogView !== 'undefined' ? CatalogView.getDisplayOption(card, 'all') : opt);
+              const label = typeof CatalogView !== 'undefined' && CatalogView.GRADE_LABELS ? CatalogView.GRADE_LABELS[option.grade] : 'PSA 10';
+              return `
               <article class="h-full">
               <a
                 href="${app.url('pdp', { id: card.id })}"
                 aria-label="Ver detalles de ${card.nombre}"
-                class="block h-full bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-[#0F172A] transition-all duration-200 flex flex-col justify-between group"
+                class="block h-full bg-white border border-slate-200 rounded-lg p-3.5 hover:shadow-md hover:border-slate-400 transition flex flex-col justify-between group"
               >
                 <div>
-                  <div class="flex items-center justify-between mb-2.5">
-                    <span class="px-2.5 py-0.5 text-xs font-bold bg-[#FEF3C7] text-[#B45309] rounded border border-[#D97706]/30">
-                      GRADO INVERSIÓN • PSA 10
-                    </span>
-                    <span class="text-xs font-bold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded border border-[#059669]/30">
-                      ${card.tendencia12m}
-                    </span>
-                  </div>
-                  <div class="aspect-[3/4] bg-[#F8FAFC] rounded-xl border border-slate-200 overflow-hidden flex items-center justify-center p-3 relative">
-                    <img 
+                  <div class="aspect-[3/4] bg-[#F8FAFC] rounded-md overflow-hidden flex items-center justify-center p-3 relative">
+                    <img
                       src="${card.imagenLocal}"
                       alt="${card.nombre}"
                       width="245"
                       height="342"
                       loading="lazy"
                       decoding="async"
-                      class="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 motion-safe:group-hover:scale-105" 
+                      class="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 motion-safe:group-hover:scale-105"
                       onerror="this.onerror=null; this.src='${card.imagenFallbackUrl}'"
                     />
                   </div>
                   <div class="mt-3">
-                    <span class="inline-block text-xs font-bold text-slate-500 uppercase tracking-wider">${card.set} • ${card.tipo}</span>
+                    <span class="inline-block text-xs font-medium text-slate-600">${card.set}</span>
                     <h3 class="font-semibold text-sm sm:text-base text-[#0F172A] group-hover:text-[#BE123C] transition mt-0.5 line-clamp-1">${card.nombre}</h3>
                   </div>
                 </div>
 
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div class="mt-3 pt-3 border-t border-slate-100 flex items-end justify-between">
                   <div>
-                    <span class="text-xs text-slate-500 block">PSA 10 GEM MT</span>
-                    <span class="text-base font-bold text-[#0F172A]">$${card.precios.psa10.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    <span class="text-xs text-slate-600 block">${option.grade.startsWith('psa') ? 'Desde ' : ''}${label}</span>
+                    <span class="text-base font-bold text-[#0F172A]">$${Number(option.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <span class="px-3 py-1.5 text-xs font-semibold text-white bg-[#0F172A] group-hover:bg-[#E11D48] rounded-lg transition inline-flex items-center gap-1 shadow-xs">
-                    <span>Inspeccionar</span>
-                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                  <span class="text-xs font-semibold text-[#0F172A] group-hover:text-[#BE123C] inline-flex items-center gap-1">
+                    Ver ficha
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                   </span>
                 </div>
               </a></article>
-            `).join('')}
+            `;
+            }).join('')}
           </div>
         </section>
 
         <!-- ==========================================
-             4. CAJAS Y SOBRES VINTAGE SELLADOS
+             4. PRODUCTO SELLADO
              ========================================== -->
-        <section aria-labelledby="sealed-vintage-heading" class="bg-gradient-to-r from-[#0F172A] to-[#1E293B] rounded-2xl p-6 sm:p-8 text-white shadow-xl border border-slate-800">
-          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div class="space-y-2 max-w-xl">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-[#FEF3C7] text-[#B45309] border border-[#D97706]/40">
-                <i data-lucide="flame" class="w-3.5 h-3.5"></i>
-                <span>EXPANSIONES CLÁSICAS WOTC 1999</span>
-              </span>
-              <h2 id="sealed-vintage-heading" class="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                Cajas y Sobres Vintage Sellados
+        ${sealedProducts.length ? `
+        <section aria-labelledby="sealed-vintage-heading" class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200 pb-3">
+            <div>
+              <h2 id="sealed-vintage-heading" class="text-xl sm:text-2xl font-bold tracking-tight text-[#0F172A]">
+                Producto sellado
               </h2>
-              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
-                Sobres originales pesados en báscula de precisión (Heavy Packs calibrados) y Booster Boxes selladas de fábrica conservadas en bóveda con control de humedad para evitar micro-grietas en el celofán original.
-              </p>
+              <p class="text-sm text-slate-600 mt-0.5">Booster boxes, Elite Trainer Boxes y colecciones especiales, selladas de fábrica.</p>
             </div>
-            <a 
-              href="pages/catalogo.html?cat=sealed" 
-              class="px-5 py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow flex items-center gap-2 self-start lg:self-center flex-shrink-0 touch-target"
+            <a
+              href="pages/catalogo.html?cat=sealed"
+              class="text-sm font-semibold text-[#BE123C] hover:text-[#9F1239] hover:underline underline-offset-2 inline-flex items-center gap-1 self-start sm:self-auto"
             >
-              <i data-lucide="package-open" class="w-4 h-4"></i>
-              <span>Explorar Sellados Vintage</span>
+              <span>Ver todo el sellado</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             ${sealedProducts.map(pack => `
               <article class="h-full">
               <a
                 href="${app.url('pdp', { id: pack.id })}"
                 aria-label="Ver producto sellado ${pack.nombre}"
-                class="block h-full bg-slate-800/90 hover:bg-slate-800 border border-slate-700 hover:border-[#D97706] rounded-2xl p-4 flex flex-col justify-between transition-all group shadow-md"
+                class="block h-full bg-white border border-slate-200 hover:border-slate-400 hover:shadow-md rounded-lg p-4 flex flex-col justify-between transition group"
               >
                 <div>
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="px-2 py-0.5 rounded text-xs font-bold bg-[#D1FAE5] text-[#047857]">
-                      SELLADO DE FÁBRICA
-                    </span>
-                    <span class="text-xs font-bold text-[#FEF3C7]">${pack.tendencia12m}</span>
-                  </div>
-                  <div class="h-44 bg-[#0F172A] rounded-xl border border-slate-700 flex items-center justify-center p-3 overflow-hidden">
-                    <img 
+                  <div class="h-44 bg-[#F8FAFC] rounded-md flex items-center justify-center p-3 overflow-hidden">
+                    <img
                       src="${pack.imagenLocal}"
                       alt="${pack.nombre}"
                       loading="lazy"
                       decoding="async"
-                      class="max-h-full max-w-full object-contain transition-transform duration-300 motion-safe:group-hover:scale-105" 
+                      class="max-h-full max-w-full object-contain transition-transform duration-300 motion-safe:group-hover:scale-105"
                       onerror="this.onerror=null; this.src='${pack.imagenFallbackUrl}'"
                     />
                   </div>
-                  <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-[#FEF3C7] transition mt-3 line-clamp-1">${pack.nombre}</h3>
-                  <p class="text-xs text-slate-300 mt-1 line-clamp-2">${pack.descripcion}</p>
+                  <span class="inline-block mt-3 text-xs font-medium text-slate-600">${pack.era === 'vintage' ? 'Vintage WotC' : 'Sellado de fábrica'}</span>
+                  <h3 class="text-sm sm:text-base font-semibold text-[#0F172A] group-hover:text-[#BE123C] transition mt-0.5 line-clamp-1">${pack.nombre}</h3>
                 </div>
-                <div class="pt-3 mt-4 flex items-center justify-between border-t border-slate-700">
-                  <div>
-                    <span class="text-xs text-slate-400 block">Desde (Sellado)</span>
-                    <span class="text-base font-bold text-[#FEF3C7]">$${pack.precios.raw.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                  </div>
-                  <span class="px-3 py-1.5 rounded-lg bg-white/10 group-hover:bg-[#E11D48] text-white text-xs font-semibold transition inline-flex items-center gap-1">
-                    <span>Ver Ficha</span>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                <div class="pt-3 mt-3 flex items-end justify-between border-t border-slate-100">
+                  <span class="text-base font-bold text-[#0F172A]">$${Number(pack.precioUnitario || (pack.precios && (pack.precios.sealed || pack.precios.raw)) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                  <span class="text-xs font-semibold text-[#0F172A] group-hover:text-[#BE123C] inline-flex items-center gap-1">
+                    Ver ficha
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                   </span>
                 </div>
               </a></article>
             `).join('')}
           </div>
-        </section>
+        </section>` : ''}
 
         <!-- ==========================================
-             5. SECCIÓN PEDAGÓGICA Y DE CONFIANZA:
-             ¿POR QUÉ INVERTIR EN GRADED & SEALED TCG?
+             5. GUÍA RÁPIDA: RAW, PSA Y SELLADO
              ========================================== -->
-        <section aria-labelledby="why-invest-heading" class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <section aria-labelledby="why-invest-heading" class="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 space-y-5">
           <div class="max-w-2xl">
-            <span class="text-xs font-semibold uppercase tracking-wider text-[#B45309]">Estándar de Bóveda &amp; Coleccionismo</span>
-            <h2 id="why-invest-heading" class="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight mt-1">
-              ¿Por qué invertir en Graded &amp; Sealed TCG?
+            <h2 id="why-invest-heading" class="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
+              ¿Raw, PSA o sellado?
             </h2>
-            <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed font-normal">
-              El coleccionismo de alta gama ha evolucionado hacia una clase de activo alternativa respaldada por escasez comprobada, auditoría técnica independiente y liquidez global en dólares.
-            </p>
+            <p class="text-sm text-slate-600 mt-1">Una guía corta para elegir qué comprar.</p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 space-y-2.5">
-              <div class="w-10 h-10 rounded-xl bg-[#FEF3C7] border border-[#D97706]/30 flex items-center justify-center text-[#B45309]">
-                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-              </div>
-              <h3 class="text-sm font-bold text-[#0F172A]">1. Escasez y Población PSA</h3>
-              <p class="text-xs text-slate-600 leading-relaxed font-normal">
-                El informe oficial de población (PSA Population Report) audita con exactitud cuántas piezas existen en el mundo con grado 10 Gem Mint, eliminando el riesgo de sobreoferta.
+            <div class="space-y-1.5">
+              <h3 class="text-sm font-semibold text-[#0F172A] flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-slate-600"></i>Carta raw</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                La carta tal cual, sin calificar. Revisamos cada una y solo vendemos Near Mint. Es la opción más económica para jugar o completar un set.
               </p>
             </div>
-
-            <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 space-y-2.5">
-              <div class="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-[#BE123C]">
-                <i data-lucide="shield" class="w-5 h-5"></i>
-              </div>
-              <h3 class="text-sm font-bold text-[#0F172A]">2. Protección Grado Museo</h3>
-              <p class="text-xs text-slate-600 leading-relaxed font-normal">
-                Las cápsulas acrílicas soldadas por ultrasonido aíslan la carta de la humedad, polvo ambiental y radiación ultravioleta, preservando su estado Near Mint para siempre.
+            <div class="space-y-1.5">
+              <h3 class="text-sm font-semibold text-[#0F172A] flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-slate-600"></i>Slab PSA</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                PSA califica la carta del 1 al 10 y la sella en una cápsula con número de certificado. Un PSA 10 es una carta prácticamente perfecta.
               </p>
+              <button type="button" onclick="app.openPSAGuideModal()" class="text-sm font-semibold text-[#BE123C] hover:underline underline-offset-2">Ver la guía de grados</button>
             </div>
-
-            <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 space-y-2.5">
-              <div class="w-10 h-10 rounded-xl bg-[#D1FAE5] border border-[#059669]/30 flex items-center justify-center text-[#047857]">
-                <i data-lucide="coins" class="w-5 h-5"></i>
-              </div>
-              <h3 class="text-sm font-bold text-[#0F172A]">3. Liquidez Internacional</h3>
-              <p class="text-xs text-slate-600 leading-relaxed font-normal">
-                Las piezas graduadas cuentan con cotizaciones verificables en tiempo real en subastas de Estados Unidos y Japón (PWCC, Goldin, eBay Sold), transables directamente en USD.
+            <div class="space-y-1.5">
+              <h3 class="text-sm font-semibold text-[#0F172A] flex items-center gap-2"><i data-lucide="package" class="w-4 h-4 text-slate-600"></i>Producto sellado</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Cajas y sobres con su plástico de fábrica intacto. Ideal para abrir o para guardar en la colección.
               </p>
             </div>
           </div>
         </section>
 
         <!-- ==========================================
-             6. EXPLORADOR POR CATEGORÍA O ERA
+             6. CATEGORÍAS
              ========================================== -->
         <section aria-labelledby="collections-nav-heading" class="space-y-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Navegación por Colecciones</span>
-              <h2 id="collections-nav-heading" class="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
-                Explora el Catálogo por Categoría o Era
-              </h2>
-            </div>
-            <a href="pages/catalogo.html" class="text-xs font-semibold text-[#BE123C] hover:text-[#9F1239] inline-flex items-center gap-1 transition">
-              <span>Abrir Catálogo Avanzado</span>
-              <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
-            </a>
-          </div>
+          <h2 id="collections-nav-heading" class="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-3">
+            Comprar por categoría
+          </h2>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a href="pages/catalogo.html?cat=psa" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
-              <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-xl bg-[#0F172A] text-[#FEF3C7] flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="award" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h3 class="text-sm font-bold text-[#0F172A] group-hover:text-[#BE123C] transition">Slabs Certificados PSA</h3>
-                  <p class="text-xs text-slate-500">Grados oficiales PSA 8, 9 y 10 Gem Mint</p>
-                </div>
-              </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            ${[
+              { href: 'pages/catalogo.html?cat=psa', icon: 'award', title: 'Slabs PSA', text: 'PSA 8, 9 y 10' },
+              { href: 'pages/catalogo.html?cat=raw', icon: 'layers', title: 'Cartas raw', text: 'Singles en Near Mint' },
+              { href: 'pages/catalogo.html?cat=sealed', icon: 'package', title: 'Producto sellado', text: 'Booster boxes y ETB' },
+              { href: 'pages/catalogo.html?era=vintage', icon: 'history', title: 'Vintage', text: 'Base Set, Jungle, Fossil (1999-2002)' },
+              { href: 'pages/catalogo.html?era=modern', icon: 'zap', title: 'Moderno', text: 'Espada y Escudo, Escarlata y Púrpura' },
+              { href: 'pages/catalogo.html', icon: 'layout-grid', title: 'Todo el catálogo', text: 'Con filtros por precio y tipo' }
+            ].map(c => `
+            <a href="${c.href}" class="group px-4 py-3.5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-lg flex items-center justify-between transition">
+              <span class="flex items-center gap-3">
+                <i data-lucide="${c.icon}" class="w-5 h-5 text-slate-600 group-hover:text-[#0F172A]"></i>
+                <span>
+                  <span class="block text-sm font-semibold text-[#0F172A] group-hover:text-[#BE123C] transition">${c.title}</span>
+                  <span class="block text-xs text-slate-600">${c.text}</span>
+                </span>
+              </span>
               <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F172A] transition"></i>
-            </a>
-
-            <a href="pages/catalogo.html?cat=raw" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
-              <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-xl bg-[#D1FAE5] text-[#047857] flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="sparkles" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h3 class="text-sm font-bold text-[#0F172A] group-hover:text-[#BE123C] transition">Cartas Sueltas / Raw</h3>
-                  <p class="text-xs text-slate-500">Piezas Near Mint listas para graduar</p>
-                </div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F172A] transition"></i>
-            </a>
-
-            <a href="pages/catalogo.html?cat=sealed" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
-              <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-xl bg-[#FEF3C7] text-[#B45309] flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="package" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h3 class="text-sm font-bold text-[#0F172A] group-hover:text-[#BE123C] transition">Cajas y Sobres Sellados</h3>
-                  <p class="text-xs text-slate-500">Heavy Packs y Booster Boxes 1999</p>
-                </div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F172A] transition"></i>
-            </a>
-
-            <a href="pages/catalogo.html?era=vintage" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
-              <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-xl bg-rose-50 text-[#BE123C] flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="history" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h3 class="text-sm font-bold text-[#0F172A] group-hover:text-[#BE123C] transition">Era Clásica WotC 1999-2002</h3>
-                  <p class="text-xs text-slate-500">Base Set, Neo Genesis, Team Rocket y Fossil</p>
-                </div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F172A] transition"></i>
-            </a>
-
-            <a href="pages/catalogo.html?era=modern" class="group p-5 bg-white border border-slate-200 hover:border-[#0F172A] rounded-2xl shadow-sm flex items-center justify-between transition">
-              <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-xl bg-slate-100 text-[#0F172A] flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="zap" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h3 class="text-sm font-bold text-[#0F172A] group-hover:text-[#BE123C] transition">Era Moderna &amp; Alt Arts</h3>
-                  <p class="text-xs text-slate-500">Evolving Skies, Fusion Strike y Lost Origin</p>
-                </div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F172A] transition"></i>
-            </a>
-
-            <a href="pages/catalogo.html" class="group p-5 bg-[#0F172A] hover:bg-[#1E293B] text-white rounded-2xl shadow-sm flex items-center justify-between transition">
-              <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-xl bg-white/10 text-[#FEF3C7] flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="layout-grid" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h3 class="text-sm font-bold text-white">Ver Todo el Catálogo</h3>
-                  <p class="text-xs text-slate-300">Filtros combinables en tiempo real</p>
-                </div>
-              </div>
-              <i data-lucide="arrow-right" class="w-4 h-4 text-[#FEF3C7]"></i>
-            </a>
+            </a>`).join('')}
           </div>
         </section>
 
         <!-- ==========================================
-             7. BANNER FINAL: INVITACIÓN AL CATÁLOGO COMPLETO
+             7. EXPLORAR CARTAS (base de datos pública)
              ========================================== -->
-        <section class="bg-gradient-to-r from-slate-900 via-[#0F172A] to-[#1E293B] rounded-3xl p-8 sm:p-10 text-white border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
-          <div class="space-y-2 max-w-xl text-center md:text-left">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FEF3C7]/15 text-[#FEF3C7] border border-[#D97706]/40 uppercase">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#B45309]"></i>
-              <span>Inventario Dinámico en Tiempo Real</span>
-            </span>
-            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-              ¿Buscas una carta específica o un grado exacto?
-            </h2>
-            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
-              Accede al Catálogo Avanzado con filtros por era, tipo de energía, grado PSA y cotización para localizar tu próxima pieza de inversión.
-            </p>
+        <section class="border border-slate-200 bg-[#F1F5F9] rounded-lg px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-base font-semibold text-[#0F172A]">¿Buscas una carta que no tenemos?</h2>
+            <p class="text-sm text-slate-600 mt-0.5">Consúltala en Explorar cartas: set, número y rareza de cualquier carta del juego.</p>
           </div>
-          <a 
-            href="pages/catalogo.html" 
-            class="px-6 py-4 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-xl transition shadow-lg flex items-center gap-2 flex-shrink-0 touch-target"
+          <a
+            href="pages/busqueda.html"
+            class="px-5 py-2.5 bg-white border border-slate-300 hover:border-[#0F172A] text-[#0F172A] text-sm font-semibold rounded-md transition flex items-center gap-2 flex-shrink-0 self-start sm:self-auto touch-target"
           >
-            <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-            <span>Abrir Catálogo Avanzado</span>
+            <i data-lucide="database" class="w-4 h-4"></i>
+            <span>Explorar cartas</span>
           </a>
         </section>
       </div>

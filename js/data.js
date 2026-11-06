@@ -49,7 +49,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     imagenLocal: 'https://images.pokemontcg.io/swsh12pt5/160.png',
     imagenFallbackUrl: 'assets/img/cards/pikachu-crown-zenith.webp',
     precios: preciosDesdeRaw(36.88),
-    descripcion: 'Pikachu Secret Rare #160/159 • Zenit Supremo 2023 • Certificación Bóveda PSA',
+    descripcion: 'Pikachu Secret Rare #160/159 • Zenit Supremo 2023',
     tendencia12m: '+11.5%',
     rendimientoAnual: 11.5,
     historialBase: [0.89, 0.90, 0.91, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00, 1.00]
@@ -69,7 +69,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     imagenLocal: 'https://images.pokemontcg.io/sv4pt5/54.png',
     imagenFallbackUrl: 'assets/img/cards/charizard-ex-paldean.webp',
     precios: preciosDesdeRaw(4.60),
-    descripcion: 'Charizard ex Doble Rara • Destinos de Paldea 2024 • Certificación Bóveda PSA',
+    descripcion: 'Charizard ex Doble Rara • Destinos de Paldea 2024',
     tendencia12m: '+13.2%',
     rendimientoAnual: 13.2,
     historialBase: [0.88, 0.89, 0.90, 0.92, 0.93, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00, 1.00]
@@ -190,7 +190,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     imagenLocal: 'https://images.pokemontcg.io/swshp/SWSH291.png',
     imagenFallbackUrl: 'assets/img/cards/lucario-vstar-zenith.webp',
     precios: preciosDesdeRaw(8.15),
-    descripcion: 'Lucario VSTAR Arte Especial Promo • Grado Inversión Bóveda PSA',
+    descripcion: 'Lucario VSTAR Arte Especial Promo',
     tendencia12m: '+11.1%',
     rendimientoAnual: 11.1,
     historialBase: [0.89, 0.90, 0.92, 0.93, 0.94, 0.96, 0.97, 0.98, 0.99, 0.99, 1.00, 1.00]
@@ -210,7 +210,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     imagenLocal: 'https://images.pokemontcg.io/sm35/29.png',
     imagenFallbackUrl: 'assets/img/cards/raichu-gx.webp',
     precios: preciosDesdeRaw(5.47),
-    descripcion: 'Carta oficial Raichu GX • PS 210 • Chispa Poderosa • Bóveda PSA oficial',
+    descripcion: 'Carta oficial Raichu GX • PS 210 • Chispa Poderosa',
     tendencia12m: '+14.8%',
     rendimientoAnual: 14.8,
     historialBase: [0.86, 0.88, 0.89, 0.91, 0.92, 0.93, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]
@@ -230,7 +230,7 @@ const POKEMON_CARDS_CATALOG_10 = [
     imagenLocal: 'https://images.pokemontcg.io/sv3pt5/9.png',
     imagenFallbackUrl: 'assets/img/cards/blastoise-ex-151.webp',
     precios: preciosDesdeRaw(2.27),
-    descripcion: 'Blastoise ex #009/165 • Pokémon 151 • Bóveda PSA oficial',
+    descripcion: 'Blastoise ex #009/165 • Pokémon 151',
     tendencia12m: '+12.3%',
     rendimientoAnual: 12.3,
     historialBase: [0.88, 0.89, 0.91, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00, 1.00]
@@ -283,7 +283,7 @@ const POKEMON_CARDS_EXTRA = [
   imagenLocal: `https://images.pokemontcg.io/${imagen}.png`,
   imagenFallbackUrl: `assets/img/cards/${id}.png`,
   precios: preciosDesdeRaw(raw),
-  descripcion: `${nombre} • ${set} • ${categoria === 'psa' ? 'Disponible en Bóveda PSA' : 'Estado Near Mint verificado'}`,
+  descripcion: `${nombre} • ${set} • ${categoria === 'psa' ? 'Slab certificado por PSA' : 'Estado Near Mint verificado'}`,
   tendencia12m: `+${rendimiento.toFixed(1)}%`,
   rendimientoAnual: rendimiento,
   historialBase: [0.88, 0.89, 0.90, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00]
@@ -321,7 +321,7 @@ const SEALED_PRODUCTS = [
       sello_fabrica: 'Wizards of the Coast Authentic Shrinkwrap with White Logo',
       packs: '36 Sobres de 11 Cartas c/u',
       estado: 'Sin pesar / Unweighed • Sellado de Fábrica Intacto',
-      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+      conservacion: 'Almacenado a 19 °C y 45 % de humedad'
     },
     precios: {
       raw: 3500.00,
@@ -365,7 +365,7 @@ const SEALED_PRODUCTS = [
       sello_fabrica: 'Wizards of the Coast Authentic Shrinkwrap with White Logo',
       packs: '36 Sobres de 11 Cartas c/u',
       estado: 'Sin pesar / Unweighed • Sellado de Fábrica Intacto',
-      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+      conservacion: 'Almacenado a 19 °C y 45 % de humedad'
     },
     precios: {
       raw: 15000.00,
@@ -407,7 +407,7 @@ const SEALED_PRODUCTS = [
       sello_fabrica: 'Wizards of the Coast Authentic Shrinkwrap with White Logo',
       packs: '36 Sobres de 11 Cartas c/u',
       estado: 'Sin pesar / Unweighed • Primera tirada 1st Edition',
-      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+      conservacion: 'Almacenado a 19 °C y 45 % de humedad'
     },
     precios: {
       raw: 187500.00,
@@ -448,7 +448,7 @@ const SEALED_PRODUCTS = [
       sello_fabrica: 'The Pokémon Company International Factory Shrinkwrap',
       packs: '6 Sobres de 10 Cartas c/u',
       estado: 'Sellado de Fábrica Intacto',
-      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+      conservacion: 'Almacenado a 19 °C y 45 % de humedad'
     },
     precios: {
       raw: 185.00,
@@ -471,7 +471,7 @@ const SEALED_PRODUCTS = [
       certNumber: '48291999',
       gramos: 21.2,
       cartas: 11,
-      estado: 'Sin pesar / Heavy Pack Candidate • Bóveda UV',
+      estado: 'Sin pesar / Heavy Pack Candidate',
       sello: 'Wizards of the Coast 1st Edition Foil Crimping',
       precios: { raw: 1450.00, psa8: 1750.00, psa9: 2200.00, psa10: 3600.00, sealed: 1450.00 },
       descripcion: 'Sobre individual 1999 1st Edition • Estuche magnético UV incluido',
@@ -565,7 +565,7 @@ const SEALED_PRODUCTS = [
       sello_fabrica: p.sello,
       packs: `1 Sobre de ${p.cartas} Cartas`,
       estado: p.estado,
-      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+      conservacion: 'Almacenado a 19 °C y 45 % de humedad'
     },
     precios: p.precios.raw ? p.precios : { raw: p.precios.sealed, sealed: p.precios.sealed },
     precioUnitario: p.precios.sealed,
@@ -679,7 +679,7 @@ const SEALED_PRODUCTS = [
       sello_fabrica: 'Factory Sealed Shrinkwrap',
       packs: p.packs,
       estado: 'Sellado de Fábrica Intacto',
-      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+      conservacion: 'Almacenado a 19 °C y 45 % de humedad'
     },
     precios: { raw: p.precio, sealed: p.precio },
     precioUnitario: p.precio,
@@ -712,7 +712,7 @@ const LEGACY_FIXTURE_PRODUCTS = {
       psa9: 4850.00,
       psa10: 18500.00
     },
-    descripcion: 'Holo Rare 1st Edition • Idioma: Inglés • Certificación Bóveda PSA',
+    descripcion: 'Holo Rare 1st Edition • Idioma: Inglés',
     tendencia12m: '+21.7%',
     rendimientoAnual: 21.7,
     historialBase: [0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00]
@@ -758,7 +758,7 @@ const LEGACY_FIXTURE_PRODUCTS = {
       psa9: 1450.00,
       psa10: 4200.00
     },
-    descripcion: 'Holo Rare Neo Genesis • Grado Inversión • Bóveda PSA',
+    descripcion: 'Holo Rare Neo Genesis',
     tendencia12m: '+15.4%',
     rendimientoAnual: 15.4,
     historialBase: [0.86, 0.87, 0.89, 0.90, 0.91, 0.93, 0.94, 0.95, 0.97, 0.98, 0.99, 1.00]
@@ -781,7 +781,7 @@ const LEGACY_FIXTURE_PRODUCTS = {
       psa9: 460.00,
       psa10: 620.00
     },
-    descripcion: 'Alt Art Secret Rare #271/264 • Idioma: Inglés • Bóveda PSA',
+    descripcion: 'Alt Art Secret Rare #271/264 • Idioma: Inglés',
     tendencia12m: '+14.2%',
     rendimientoAnual: 14.2,
     historialBase: [0.87, 0.88, 0.89, 0.91, 0.92, 0.93, 0.94, 0.96, 0.97, 0.98, 0.99, 1.00]
@@ -850,7 +850,7 @@ const LEGACY_FIXTURE_PRODUCTS = {
       psa9: 580.00,
       psa10: 1950.00
     },
-    descripcion: 'Clásico WotC 1999 • Superficie holográfica prístina • Bóveda PSA',
+    descripcion: 'Clásico WotC 1999 • Superficie holográfica prístina',
     tendencia12m: '+9.8%',
     rendimientoAnual: 9.8,
     historialBase: [0.91, 0.92, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.98, 0.99, 1.00]
@@ -938,7 +938,7 @@ PRODUCTS.forEach(p => {
         sello_fabrica: 'Wizards of the Coast Authentic Shrinkwrap with White Logo',
         packs: '36 Sobres de 11 Cartas c/u',
         estado: 'Sin pesar / Unweighed • Sellado de Fábrica Intacto',
-        conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+        conservacion: 'Almacenado a 19 °C y 45 % de humedad'
       };
     }
     if (!p.precios.sealed) {

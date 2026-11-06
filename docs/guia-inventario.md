@@ -7,6 +7,32 @@ psa10 o sealed), con su precio y su columna "stock_disponible".
 La pagina web lee esa tabla cada vez que se abre, asi que cualquier cambio
 se ve al recargar la pagina (F5). No hay que tocar el codigo.
 
+La base de datos es la que manda: con conexion, la tienda muestra el precio y
+el stock de Supabase. Los precios de js/data.js solo se usan sin conexion.
+Si un grado tiene stock 0, desaparece de su categoria en el catalogo (Slabs
+PSA, Raw o Sellados); si no queda stock en ningun grado, el producto deja de
+aparecer.
+
+
+0) PANEL DE INVENTARIO (la forma mas facil)
+-------------------------------------------
+Abre pages/admin.html directamente en la barra de direcciones (no esta
+enlazado desde la tienda). Inicia sesion con tu cuenta de la tienda: solo
+funciona si esa cuenta tiene el rol ADMIN. Desde ahi puedes:
+  - cambiar el precio y el stock de cada grado ("Guardar cambios"),
+  - recalcular los precios PSA desde el Raw (x1.6 / x2.4 / x4.5),
+  - ocultar o mostrar un producto en la tienda.
+La sesion del panel caduca a las 8 horas.
+
+Preparacion (una sola vez), en el SQL Editor de Supabase:
+  a) Ejecuta el archivo js/db/admin_rpc.sql completo.
+  b) Da el rol de administrador a tu cuenta (cambia el correo):
+         update usuarios set rol = 'ADMIN' where email = 'tu-correo@ejemplo.com';
+  c) Comprueba que solo tu cuenta es administradora:
+         select email, rol from usuarios where rol = 'ADMIN';
+
+Las secciones siguientes hacen lo mismo con SQL, por si prefieres hacerlo a mano.
+
 Entra a https://supabase.com/dashboard -> tu proyecto -> menu izquierdo.
 
 
@@ -74,6 +100,9 @@ en la base (precio y stock). Si solo esta en la web, la pagina lo oculta.
   c) En la terminal, desde la carpeta del proyecto:
          node tools/generar_seed.js
      Esto actualiza js/db/seed_catalogo.sql con el producto nuevo.
+     Ojo: el seed lleva los precios de data.js y un stock inicial fijo. No lo
+     ejecutes entero sobre una base que ya tiene datos: pisaria lo que cambiaste
+     en el panel. Solo sirve completo para crear la base desde cero.
   d) Copia de seed_catalogo.sql solo las lineas del producto nuevo (las
      que tienen su codigo) en el SQL Editor de Supabase y ejecutalas.
      Va en este orden: sets_expansiones (si el set es nuevo), productos,

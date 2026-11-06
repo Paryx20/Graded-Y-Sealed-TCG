@@ -141,7 +141,7 @@ const PDPView = {
             <div class="relative inline-flex items-center justify-center max-h-[350px]">
               <img 
                 src="assets/img/cards/card-back.png" 
-                class="w-full h-full object-cover rounded-xl max-h-[340px] max-w-[245px] shadow-2xl pointer-events-none select-none" 
+                class="w-full h-full object-cover rounded-md max-h-[340px] max-w-[245px] shadow-lg pointer-events-none select-none" 
                 draggable="false"
                 alt="Reverso de carta Pokémon" 
                 onerror="this.onerror=null; this.src='${product.imagenFallbackUrl}'"
@@ -187,7 +187,7 @@ const PDPView = {
     activeAngle = this.resolveSealedAngle(product, activeAngle);
     const currentImage = gallery[activeAngle] || product.imagenLocal;
     const currentLabel = (this.SEALED_ANGLES.find(a => a.key === activeAngle) || { title: 'Frontal' }).title;
-    const sealLabel = product.era === 'vintage' ? 'SELLADO ORIGINAL WOTC • BÓVEDA' : 'SELLADO DE FÁBRICA • BÓVEDA';
+    const sealLabel = product.era === 'vintage' ? 'SELLADO ORIGINAL WOTC' : 'SELLADO DE FÁBRICA';
 
     return `
       <div id="pdp-sealed-stage" class="w-full h-full min-h-[370px] flex items-center justify-center relative p-4 select-none">
@@ -196,7 +196,7 @@ const PDPView = {
             id="pdp-sealed-main-img"
             src="${currentImage}" 
             alt="${product.nombre}, vista ${currentLabel.toLowerCase()}" 
-            class="max-h-[340px] max-w-full object-contain filter drop-shadow-2xl rounded-xl sealed-stage-img"
+            class="max-h-[340px] max-w-full object-contain filter drop-shadow-2xl rounded-md sealed-stage-img"
             onerror="this.onerror=null; this.src='${product.imagenFallbackUrl}'"
           />
         </div>
@@ -204,7 +204,7 @@ const PDPView = {
           <i data-lucide="package-check" class="w-4 h-4 text-[#B45309]"></i>
           <span>${sealLabel}</span>
         </div>
-        <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur border border-slate-300 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-700 shadow-sm flex items-center gap-1">
+        <div class="absolute bottom-3 right-3 bg-white border border-slate-300 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-700 shadow-sm flex items-center gap-1">
           <i data-lucide="eye" class="w-3.5 h-3.5 text-[#0F172A]"></i>
           <span>Ángulo: <strong class="text-[#0F172A] uppercase">${currentLabel}</strong></span>
         </div>
@@ -226,7 +226,7 @@ const PDPView = {
             <button 
               type="button" 
               onclick="PDPView.setSealedAngle('${ang.key}')" 
-              class="p-3 rounded-xl border-2 text-left transition flex flex-col justify-between ${isActive ? 'border-[#D97706] bg-amber-50/50 shadow-sm' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
+              class="p-3 rounded-md border-2 text-left transition flex flex-col justify-between ${isActive ? 'border-[#D97706] bg-amber-50/50 shadow-sm' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
               aria-pressed="${isActive}"
             >
               <div class="flex items-center justify-between mb-1.5">
@@ -254,24 +254,24 @@ const PDPView = {
       sello_fabrica: 'Wizards of the Coast Authentic Shrinkwrap with White Logo',
       packs: '36 Sobres de 11 Cartas c/u',
       estado: 'Sin pesar / Unweighed • Sellado de Fábrica Intacto',
-      conservacion: 'Bóveda climatizada a 19°C y 45% HR'
+      conservacion: 'Almacenado a 19 °C y 45 % de humedad'
     };
 
     return `
-      <div id="sealed-factory-specs" class="bg-[#F8FAFC] border border-slate-200 rounded-xl p-4 sm:p-5 space-y-3.5">
+      <div id="sealed-factory-specs" class="bg-[#F8FAFC] border border-slate-200 rounded-md p-4 sm:p-5 space-y-3.5">
         <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-          <span class="text-xs font-bold text-[#0F172A] flex items-center gap-1.5 uppercase tracking-wide">
+          <span class="text-xs font-bold text-[#0F172A] flex items-center gap-1.5">
             <i data-lucide="file-check-2" class="w-4 h-4 text-[#B45309]"></i>
             <span>Especificaciones de Fábrica Sellada${product.era === 'vintage' ? ' WotC' : ''}</span>
           </span>
           <span class="text-xs font-semibold bg-[#D1FAE5] text-[#047857] px-2 py-0.5 rounded-full border border-[#059669]/20">
-            VERIFICADO BÓVEDA
+            VERIFICADO
           </span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div class="p-2.5 rounded-lg bg-white border border-slate-200">
-            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Gramaje Verificado</div>
+            <div class="text-xs font-bold text-slate-500">Gramaje Verificado</div>
             <div class="font-semibold text-[#0F172A] mt-0.5 flex items-center gap-1">
               <i data-lucide="scale" class="w-3.5 h-3.5 text-[#B45309]"></i>
               <span>${specs.gramaje}</span>
@@ -280,7 +280,7 @@ const PDPView = {
           </div>
 
           <div class="p-2.5 rounded-lg bg-white border border-slate-200">
-            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Contenido Interior</div>
+            <div class="text-xs font-bold text-slate-500">Contenido Interior</div>
             <div class="font-semibold text-[#0F172A] mt-0.5 flex items-center gap-1">
               <i data-lucide="boxes" class="w-3.5 h-3.5 text-[#B45309]"></i>
               <span>${specs.packs}</span>
@@ -289,7 +289,7 @@ const PDPView = {
           </div>
 
           <div class="p-2.5 rounded-lg bg-white border border-slate-200 sm:col-span-2">
-            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Sello de Fábrica y Celofán</div>
+            <div class="text-xs font-bold text-slate-500">Sello de Fábrica y Celofán</div>
             <div class="font-bold text-[#0F172A] mt-0.5 flex items-start gap-1">
               <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-[#047857] mt-0.5 flex-shrink-0"></i>
               <span>${specs.sellos} (${specs.sello_fabrica})</span>
@@ -297,7 +297,7 @@ const PDPView = {
           </div>
 
           <div class="p-2.5 rounded-lg bg-white border border-slate-200">
-            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Estado de Lote</div>
+            <div class="text-xs font-bold text-slate-500">Estado de Lote</div>
             <div class="font-bold text-[#0F172A] mt-0.5 flex items-center gap-1">
               <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
               <span>${specs.estado}</span>
@@ -305,7 +305,7 @@ const PDPView = {
           </div>
 
           <div class="p-2.5 rounded-lg bg-white border border-slate-200">
-            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Conservación</div>
+            <div class="text-xs font-bold text-slate-500">Conservación</div>
             <div class="font-bold text-[#0F172A] mt-0.5 flex items-center gap-1">
               <i data-lucide="thermometer" class="w-3.5 h-3.5 text-sky-500"></i>
               <span>${specs.conservacion}</span>
@@ -349,10 +349,10 @@ const PDPView = {
         </nav>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-          <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div class="lg:col-span-7 bg-white border border-slate-200 rounded-lg p-4 sm:p-6 shadow-sm">
             <div 
               id="pdp-inspector-viewport" 
-              class="w-full min-h-[410px] bg-[#F8FAFC] rounded-xl border border-slate-200 flex items-center justify-center relative p-4 overflow-hidden"
+              class="w-full min-h-[410px] bg-[#F8FAFC] rounded-md border border-slate-200 flex items-center justify-center relative p-4 overflow-hidden"
             >
               ${isSealed 
                 ? this.renderSealedGalleryStage(product, activeAngle) 
@@ -385,7 +385,7 @@ const PDPView = {
                   <button 
                     type="button" 
                     onclick="PDPView.setInspectorMode('front')" 
-                    class="p-3 rounded-xl border-2 text-left transition flex flex-col justify-between ${mode === 'front' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
+                    class="p-3 rounded-md border-2 text-left transition flex flex-col justify-between ${mode === 'front' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
                     aria-pressed="${mode === 'front'}"
                   >
                     <div class="flex items-center justify-between">
@@ -398,7 +398,7 @@ const PDPView = {
                   <button 
                     type="button" 
                     onclick="PDPView.setInspectorMode('back')" 
-                    class="p-3 rounded-xl border-2 text-left transition flex flex-col justify-between ${mode === 'back' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
+                    class="p-3 rounded-md border-2 text-left transition flex flex-col justify-between ${mode === 'back' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
                     aria-pressed="${mode === 'back'}"
                   >
                     <div class="flex items-center justify-between">
@@ -411,7 +411,7 @@ const PDPView = {
                     type="button"
                     id="pdp-mode-slab"
                     onclick="PDPView.setInspectorMode('slab')"
-                    class="${isRaw ? 'hidden ' : ''}p-3 rounded-xl border-2 text-left transition flex flex-col justify-between ${mode === 'slab' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
+                    class="${isRaw ? 'hidden ' : ''}p-3 rounded-md border-2 text-left transition flex flex-col justify-between ${mode === 'slab' ? 'border-[#E11D48] bg-rose-50/40' : 'border-slate-200 bg-[#F8FAFC] hover:border-slate-400'}"
                     aria-pressed="${mode === 'slab'}"
                   >
                     <div class="flex items-center justify-between">
@@ -424,7 +424,7 @@ const PDPView = {
               `}
           </div>
 
-          <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col gap-5">
+          <div class="lg:col-span-5 bg-white border border-slate-200 rounded-lg p-4 sm:p-6 shadow-sm flex flex-col gap-5">
             <div>
               <div id="pdp-grade-chip" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#FEF3C7] text-[#B45309] border border-[#D97706]/30">
                 ${isSealed
@@ -439,7 +439,7 @@ const PDPView = {
             ${isSealed ? this.renderFactorySpecs(product) : `
               <div>
                 <div class="flex items-center justify-between gap-2 mb-2">
-                  <label class="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider">
+                  <label class="block text-xs font-semibold text-[#0F172A]">
                     Seleccionar Condición / Grado PSA:
                   </label>
                   <button 
@@ -462,13 +462,15 @@ const PDPView = {
                       { key: 'psa10', title: 'PSA 10 GEM MT', price: condPrices.psa10 }
                     ].map(item => {
                       const isActive = condition === item.key;
+                      const soldOut = Store.getStock(product.id, item.key) === 0;
                       return `
-                        <button 
-                          type="button" 
-                          onclick="PDPView.selectCondition('${item.key}')" 
+                        <button
+                          type="button"
+                          onclick="PDPView.selectCondition('${item.key}')"
                           role="radio"
                           aria-checked="${isActive}"
-                          class="p-3 rounded-xl text-left transition ${isActive ? 'bg-[#0F172A] text-white shadow-md border-2 border-[#0F172A]' : 'bg-white border border-slate-200 hover:border-slate-400 text-[#0F172A]'}"
+                          ${soldOut && !isActive ? 'aria-disabled="true"' : ''}
+                          class="p-3 rounded-md text-left transition ${isActive ? 'bg-[#0F172A] text-white shadow-sm border-2 border-[#0F172A]' : soldOut ? 'bg-slate-50 border border-dashed border-slate-300 text-slate-500 cursor-not-allowed' : 'bg-white border border-slate-200 hover:border-slate-400 text-[#0F172A]'}"
                         >
                           <div class="text-xs font-bold flex items-center justify-between ${isActive ? 'text-white' : 'text-[#0F172A]'}">
                             <span>${item.title}</span>
@@ -477,7 +479,7 @@ const PDPView = {
                           <div class="text-sm font-bold mt-0.5 ${isActive ? 'text-[#FEF3C7]' : 'text-slate-600'}">
                             $${Number(item.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                           </div>
-                          ${Store.getStock(product.id, item.key) === 0 ? `<div class="text-xs font-semibold uppercase tracking-wide mt-0.5 ${isActive ? 'text-rose-300' : 'text-[#BE123C]'}">Agotado</div>` : ''}
+                          ${soldOut ? `<div class="text-xs font-semibold mt-0.5 ${isActive ? 'text-rose-300' : 'text-[#BE123C]'}">Agotado</div>` : ''}
                         </button>
                       `;
                     }).join('');
@@ -494,11 +496,11 @@ const PDPView = {
               </div>
               <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#047857]"></i>
-                <span>Envío blindado ($5.00) o retiro en tienda central con garantía oficial</span>
+                <span>Envío a todo Ecuador por $5.00 o retiro gratis en Quito</span>
               </p>
 
               <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <div class="flex items-center justify-between border-2 border-slate-300 rounded-xl bg-[#F8FAFC] px-2 py-1.5 sm:w-36" role="group" aria-label="Selector de cantidad de unidades">
+                <div class="flex items-center justify-between border-2 border-slate-300 rounded-md bg-[#F8FAFC] px-2 py-1.5 sm:w-36" role="group" aria-label="Selector de cantidad de unidades">
                   <button 
                     type="button" 
                     onclick="PDPView.updateQuantity(-1)" 
@@ -518,14 +520,20 @@ const PDPView = {
                   </button>
                 </div>
 
-                <button 
-                  type="button" 
-                  onclick="PDPView.addToCart()" 
-                  class="flex-1 py-3.5 px-6 bg-[#E11D48] hover:bg-[#BE123C] text-white text-base font-semibold rounded-xl transition shadow-md flex items-center justify-center gap-2 touch-target"
+                ${(() => {
+                  const soldOut = Store.getStock(product.id, isSealed ? 'sealed' : condition) === 0;
+                  return `
+                <button
+                  type="button"
+                  id="pdp-add-to-cart"
+                  onclick="PDPView.addToCart()"
+                  ${soldOut ? 'disabled' : ''}
+                  class="flex-1 py-3.5 px-6 bg-[#E11D48] hover:bg-[#BE123C] text-white text-base font-semibold rounded-md transition shadow-sm flex items-center justify-center gap-2 touch-target disabled:bg-slate-400 disabled:cursor-not-allowed"
                 >
-                  <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                  <span>Añadir a la bolsa</span>
-                </button>
+                  <i data-lucide="${soldOut ? 'ban' : 'shopping-bag'}" class="w-5 h-5"></i>
+                  <span>${soldOut ? 'Agotado' : 'Añadir a la bolsa'}</span>
+                </button>`;
+                })()}
 
                 <button
                   type="button"
@@ -555,7 +563,7 @@ const PDPView = {
       text = 'Agotado en este grado';
       tone = 'text-[#BE123C] bg-rose-100';
     } else if (stock !== null) {
-      text = stock === 1 ? 'Última unidad en bóveda' : `${stock} unidades en bóveda`;
+      text = stock === 1 ? 'Última unidad disponible' : `${stock} unidades disponibles`;
       tone = stock <= 2 ? 'text-[#92400E] bg-[#FEF3C7]' : 'text-[#047857] bg-[#D1FAE5]';
     }
     return `<span id="pdp-stock-badge" aria-live="polite" class="text-xs font-bold px-2.5 py-1 rounded-md ${tone}">${text}</span>`;
@@ -879,10 +887,15 @@ const PDPView = {
   renderGradeChip(product, condition) {
     const isRaw = condition === 'raw';
     return `${this.renderGradeIcon(isRaw ? 'layers' : 'award', 'w-3.5 h-3.5')}
-                <span>${isRaw ? 'CARTA SIN GRADEAR • NEAR MINT' : 'GRADO INVERSIÓN • OFICIAL PSA'}</span>`;
+                <span>${isRaw ? 'CARTA SIN GRADEAR • NEAR MINT' : 'SLAB CERTIFICADO PSA'}</span>`;
   },
 
   selectCondition(condKey) {
+    const target = Store.data.currentPdpProduct || PRODUCTS[0];
+    if (target && Store.getStock(target.id, condKey) === 0 && Store.data.pdpSelectedCondition !== condKey) {
+      if (typeof app !== 'undefined' && app.showToast) app.showToast('Este grado está agotado.', 'info');
+      return;
+    }
     // Pasar entre Raw (sin gradear) y un grado PSA cambia el inspector: sin slab ni certificado en Raw
     const crossesRaw = (Store.data.pdpSelectedCondition === 'raw') !== (condKey === 'raw');
     Store.data.pdpSelectedCondition = condKey;
@@ -908,6 +921,15 @@ const PDPView = {
     const qtyEl = document.getElementById('pdp-quantity-value');
     if (qtyEl) qtyEl.innerText = '1';
 
+    // El botón de compra refleja el stock del grado elegido
+    const addBtn = document.getElementById('pdp-add-to-cart');
+    if (addBtn) {
+      const soldOut = Store.getStock(product.id, condKey) === 0;
+      addBtn.disabled = soldOut;
+      const label = addBtn.querySelector('span');
+      if (label) label.textContent = soldOut ? 'Agotado' : 'Añadir a la bolsa';
+    }
+
     // 3. Update condition radiogroup button styles
     const radiogroup = document.querySelector('[role="radiogroup"][aria-label="Condición de la carta"]');
     if (radiogroup) {
@@ -916,10 +938,17 @@ const PDPView = {
       buttons.forEach((btn, idx) => {
         const key = keys[idx];
         const isActive = key === condKey;
+        const soldOut = Store.getStock(product.id, key) === 0;
         if (isActive) {
-          btn.className = 'p-3 rounded-xl text-left transition bg-[#0F172A] text-white shadow-md border-2 border-[#0F172A]';
+          btn.className = 'p-3 rounded-md text-left transition bg-[#0F172A] text-white shadow-sm border-2 border-[#0F172A]';
+        } else if (soldOut) {
+          btn.className = 'p-3 rounded-md text-left transition bg-slate-50 border border-dashed border-slate-300 text-slate-500 cursor-not-allowed';
         } else {
-          btn.className = 'p-3 rounded-xl text-left transition bg-white border border-slate-200 hover:border-slate-400 text-[#0F172A]';
+          btn.className = 'p-3 rounded-md text-left transition bg-white border border-slate-200 hover:border-slate-400 text-[#0F172A]';
+        }
+        if (typeof btn.setAttribute === 'function') {
+          if (soldOut && !isActive) btn.setAttribute('aria-disabled', 'true');
+          else if (typeof btn.removeAttribute === 'function') btn.removeAttribute('aria-disabled');
         }
         const headerDiv = btn.querySelector('div:first-child');
         if (headerDiv) {
@@ -1175,7 +1204,7 @@ const PDPView = {
 
       const isUp = !nearest.pt.trend.startsWith('-');
       tooltip.innerHTML = `
-        <div class="px-2.5 py-1.5 bg-[#0F172A] text-white rounded-lg shadow-xl text-xs border border-slate-700 whitespace-nowrap">
+        <div class="px-2.5 py-1.5 bg-[#0F172A] text-white rounded-lg shadow-md text-xs border border-slate-700 whitespace-nowrap">
           <div class="text-xs text-slate-300 font-bold">${nearest.pt.month}</div>
           <div class="font-bold text-xs text-white mt-0.5">$${nearest.pt.price.toLocaleString('en-US')} USD</div>
           <div class="text-xs font-bold ${isUp ? 'text-[#34D399]' : 'text-[#FB7185]'} flex items-center gap-1 mt-0.5">

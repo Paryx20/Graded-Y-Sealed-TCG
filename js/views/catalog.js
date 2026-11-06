@@ -1,51 +1,70 @@
 const CatalogView = {
   mobileFiltersOpen: false,
 
-  matchesCategory(card, category) {
-    if (!card) return false;
-    if (category === 'all') return true;
-    if (category === 'sealed') {
-      return card.categoria === 'sealed' || 
-             card.tipo_discriminador === 'PRODUCTO_SELLADO' || 
-             Boolean(card.set && card.set.toLowerCase().includes('sealed'));
-    }
-    // Slabs PSA y Cartas raw solo muestran cartas: las cajas y sobres van en Sellados
-    const isSealed = card.categoria === 'sealed' || card.tipo_discriminador === 'PRODUCTO_SELLADO';
-    if (category === 'psa') {
-      return !isSealed && (card.categoria === 'psa' ||
-             Boolean(card.precios && (card.precios.psa10 || card.precios.psa9 || card.precios.psa8)));
-    }
-    if (category === 'raw') {
-      return !isSealed && (card.categoria === 'raw' || Boolean(card.precios && card.precios.raw));
-    }
-    return card.categoria === category;
+  // Grados que cuenta cada categoría del catálogo
+  CATEGORY_GRADES: {
+    raw: ['raw'],
+    psa: ['psa8', 'psa9', 'psa10'],
+    sealed: ['sealed']
   },
 
-  LETTERS: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+  GRADE_LABELS: {
+    raw: 'Raw · Near Mint',
+    psa8: 'PSA 8',
+    psa9: 'PSA 9',
+    psa10: 'PSA 10',
+    sealed: 'Sellado de fábrica'
+  },
 
   isSealedItem(card) {
     return card.categoria === 'sealed' || card.tipo_discriminador === 'PRODUCTO_SELLADO';
   },
 
-  // Primera letra del nombre del Pokémon (los sellados no tienen)
-  initialOf(card) {
-    if (!card || this.isSealedItem(card)) return '';
-    const name = (card.pokemon || card.nombre || '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
-    return name.charAt(0).toUpperCase();
+  gradePrice(card, grade) {
+    if (grade === 'sealed') return Number(card.precioUnitario || (card.precios && card.precios.sealed) || 0);
+    return Number((card.precios && card.precios[grade]) || 0);
   },
 
-  availableLetters() {
-    return new Set(PRODUCTS.map(card => this.initialOf(card)).filter(Boolean));
+  // Hay stock si el grado tiene precio y la base de datos no lo marca en 0.
+  // Sin conexión el stock es desconocido (null) y el producto se muestra.
+  inStock(card, grade) {
+    if (!(this.gradePrice(card, grade) > 0)) return false;
+    const stock = Store.getStock(card.id, grade);
+    return stock === null || stock > 0;
   },
 
-  // Tipos de energía presentes en el inventario, en orden alfabético
+  // Grados con stock del producto, limitados a los de la categoría indicada
+  availableGrades(card, category = 'all') {
+    if (!card) return [];
+    const own = this.isSealedItem(card) ? ['sealed'] : ['raw', 'psa8', 'psa9', 'psa10'];
+    const allowed = category === 'all' ? own : own.filter(g => (this.CATEGORY_GRADES[category] || []).includes(g));
+    return allowed.filter(g => this.inStock(card, g));
+  },
+
+  matchesCategory(card, category) {
+    if (!card) return false;
+    // Slabs PSA y Raw solo muestran cartas; las cajas y sobres van en Sellados
+    if (category === 'sealed' && !this.isSealedItem(card)) return false;
+    if ((category === 'psa' || category === 'raw') && this.isSealedItem(card)) return false;
+    return this.availableGrades(card, category).length > 0;
+  },
+
+  // Grado y precio que muestra la tarjeta: el más barato con stock dentro de la categoría
+  getDisplayOption(card, category = Store.data.catalogFilters.category) {
+    const grades = this.availableGrades(card, category);
+    if (!grades.length) return { grade: this.isSealedItem(card) ? 'sealed' : 'raw', price: 0 };
+    const grade = grades.reduce((best, g) => (this.gradePrice(card, g) < this.gradePrice(card, best) ? g : best), grades[0]);
+    return { grade, price: this.gradePrice(card, grade) };
+  },
+
+  // Tipos de energía con al menos un producto en stock, en orden alfabético
   availableTypes() {
-    return [...new Set(PRODUCTS.map(card => card.tipo).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+    return [...new Set(PRODUCTS.filter(card => this.matchesCategory(card, 'all')).map(card => card.tipo).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, 'es'));
   },
 
   getFilteredProducts() {
     const f = Store.data.catalogFilters;
-    const condKey = 'raw';
 
     const testCard = (card, useCategoryFilter, useEraFilter) => {
       if (useCategoryFilter && !this.matchesCategory(card, f.category)) return false;
@@ -57,9 +76,10 @@ const CatalogView = {
 
       if (f.type !== 'all' && card.tipo !== f.type) return false;
 
-      if (f.letter && f.letter !== 'all' && this.initialOf(card) !== f.letter) return false;
+      // Sin el filtro de categoría (búsqueda ampliada) se exige igual que haya stock
+      if (!useCategoryFilter && !this.matchesCategory(card, 'all')) return false;
 
-      const refPrice = card.precios.raw;
+      const refPrice = this.getDisplayOption(card, useCategoryFilter ? f.category : 'all').price;
 
       const min = f.minPrice !== '' && f.minPrice !== null ? parseFloat(f.minPrice) : null;
       const max = f.maxPrice !== '' && f.maxPrice !== null ? parseFloat(f.maxPrice) : null;
@@ -93,10 +113,11 @@ const CatalogView = {
       }
     }
 
+    const priceOf = card => this.getDisplayOption(card, this.isVaultFallback ? 'all' : f.category).price;
     if (f.sortBy === 'price-asc') {
-      list.sort((a, b) => a.precios[condKey] - b.precios[condKey]);
+      list.sort((a, b) => priceOf(a) - priceOf(b));
     } else if (f.sortBy === 'price-desc') {
-      list.sort((a, b) => b.precios[condKey] - a.precios[condKey]);
+      list.sort((a, b) => priceOf(b) - priceOf(a));
     } else if (f.sortBy === 'yield-desc') {
       list.sort((a, b) => b.rendimientoAnual - a.rendimientoAnual);
     }
@@ -106,13 +127,12 @@ const CatalogView = {
 
   getActiveTitle() {
     const f = Store.data.catalogFilters;
-    if (f.letter && f.letter !== 'all') return `Pokémon que empiezan por «${f.letter}»`;
-    if (f.category === 'psa') return 'Slabs Certificados PSA';
-    if (f.category === 'raw') return 'Cartas Sueltas / Raw';
-    if (f.category === 'sealed') return 'Cajas y Sobres Sellados Vintage';
-    if (f.era === 'vintage') return 'Era Clásica WotC (1999 - 2002)';
-    if (f.era === 'modern') return 'Era Moderna & Alt Arts';
-    return 'Catálogo Completo de la Bóveda';
+    if (f.category === 'psa') return 'Slabs PSA';
+    if (f.category === 'raw') return 'Cartas raw';
+    if (f.category === 'sealed') return 'Producto sellado';
+    if (f.era === 'vintage') return 'Vintage (1999 - 2002)';
+    if (f.era === 'modern') return 'Moderno';
+    return 'Todo el catálogo';
   },
 
   render() {
@@ -121,45 +141,41 @@ const CatalogView = {
 
     return `
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div class="bg-[#0F172A] text-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-800 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="mb-6 pb-5 border-b border-slate-200 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <div class="inline-flex items-center gap-2 text-xs font-semibold text-[#FEF3C7] uppercase tracking-wider mb-1.5">
-              <i data-lucide="compass" class="w-4 h-4"></i>
-              <span>Exploración libre y filtrado multicriterio</span>
-            </div>
-            <h1 id="catalog-main-title" class="text-2xl sm:text-3xl font-bold">${this.getActiveTitle()}</h1>
-            <p class="text-sm text-slate-300 mt-1.5">
-              Filtra en tiempo real por edición, rango de precio, energía y rendimiento anual.
+            <nav aria-label="Ruta de navegación" class="text-xs text-slate-600 mb-1.5">
+              <a href="index.html" class="hover:text-[#BE123C] hover:underline">Inicio</a>
+              <span aria-hidden="true" class="mx-1">/</span>
+              <span aria-current="page">Catálogo</span>
+            </nav>
+            <h1 id="catalog-main-title" class="text-2xl sm:text-3xl font-bold text-[#0F172A]">${this.getActiveTitle()}</h1>
+            <p class="text-sm text-slate-600 mt-1">
+              <span id="catalog-count-badge" class="font-semibold text-[#0F172A]">${filtered.length}</span> productos disponibles
             </p>
           </div>
 
-          <div class="flex items-center gap-3 self-start md:self-center">
-            <button
-              type="button"
-              onclick="CatalogView.toggleMobileFilters()"
-              aria-controls="catalog-sidebar-filters"
-              aria-expanded="${this.mobileFiltersOpen ? 'true' : 'false'}"
-              class="lg:hidden px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold flex items-center gap-2 border border-white/15 touch-target"
-            >
-              <i data-lucide="sliders-horizontal" class="w-4 h-4 text-[#FEF3C7]"></i>
-              <span>Mostrar / Ocultar Filtros</span>
-            </button>
-            <div class="px-4 py-2.5 rounded-xl bg-[#1E293B] border border-slate-700 text-xs font-semibold text-slate-200">
-              <span id="catalog-count-badge" class="text-[#FEF3C7] font-bold">${filtered.length}</span> piezas encontradas
-            </div>
-          </div>
+          <button
+            type="button"
+            onclick="CatalogView.toggleMobileFilters()"
+            aria-controls="catalog-sidebar-filters"
+            aria-expanded="${this.mobileFiltersOpen ? 'true' : 'false'}"
+            class="lg:hidden self-start px-4 py-2.5 bg-white hover:bg-slate-50 text-[#0F172A] rounded-md text-sm font-semibold flex items-center gap-2 border border-slate-300 touch-target"
+          >
+            <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+            <span>Filtros</span>
+          </button>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <aside 
             id="catalog-sidebar-filters" 
-            class="${this.mobileFiltersOpen ? 'block' : 'hidden'} lg:block lg:col-span-3 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm lg:sticky lg:top-28 space-y-5"
+            class="${this.mobileFiltersOpen ? 'block' : 'hidden'} lg:block lg:col-span-3 bg-white border border-slate-200 rounded-lg p-5 shadow-sm lg:sticky lg:top-28 space-y-5"
             aria-label="Filtros avanzados del catálogo"
           >
             <div class="flex items-center justify-between pb-3 border-b border-slate-200">
               <div class="flex items-center gap-2">
                 <i data-lucide="filter" class="w-4 h-4 text-[#BE123C]"></i>
-                <h2 class="text-sm font-bold text-[#0F172A] uppercase tracking-wider">Filtros en vivo</h2>
+                <h2 class="text-sm font-bold text-[#0F172A]">Filtros</h2>
               </div>
               <button 
                 type="button" 
@@ -171,40 +187,40 @@ const CatalogView = {
             </div>
 
             <div>
-              <label for="cat-filter-collection" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+              <label for="cat-filter-collection" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] mb-1.5">
                 <i data-lucide="tag" class="w-4 h-4 text-slate-500"></i>
-                Categoría Principal
+                Categoría
               </label>
               <select 
                 id="cat-filter-collection" 
                 onchange="CatalogView.updateFilter('category', this.value)"
-                class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A] focus:bg-white"
+                class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-md text-[#0F172A] focus:bg-white"
               >
-                <option value="all" ${f.category === 'all' ? 'selected' : ''}>Todas las Categorías</option>
-                <option value="psa" ${f.category === 'psa' ? 'selected' : ''}>Slabs Certificados PSA</option>
-                <option value="raw" ${f.category === 'raw' ? 'selected' : ''}>Cartas Sueltas / Raw</option>
-                <option value="sealed" ${f.category === 'sealed' ? 'selected' : ''}>Cajas y Sobres Sellados</option>
+                <option value="all" ${f.category === 'all' ? 'selected' : ''}>Todas</option>
+                <option value="psa" ${f.category === 'psa' ? 'selected' : ''}>Slabs PSA</option>
+                <option value="raw" ${f.category === 'raw' ? 'selected' : ''}>Cartas raw</option>
+                <option value="sealed" ${f.category === 'sealed' ? 'selected' : ''}>Producto sellado</option>
               </select>
             </div>
 
             <div>
-              <label for="cat-filter-era" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+              <label for="cat-filter-era" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] mb-1.5">
                 <i data-lucide="calendar" class="w-4 h-4 text-slate-500"></i>
-                Era de Lanzamiento
+                Época
               </label>
               <select 
                 id="cat-filter-era" 
                 onchange="CatalogView.updateFilter('era', this.value)"
-                class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A] focus:bg-white"
+                class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-md text-[#0F172A] focus:bg-white"
               >
-                <option value="all" ${f.era === 'all' ? 'selected' : ''}>Todas las Eras</option>
-                <option value="vintage" ${f.era === 'vintage' ? 'selected' : ''}>Era Clásica WotC (1999-2002)</option>
-                <option value="modern" ${f.era === 'modern' ? 'selected' : ''}>Era Moderna &amp; Alt Arts</option>
+                <option value="all" ${f.era === 'all' ? 'selected' : ''}>Todas</option>
+                <option value="vintage" ${f.era === 'vintage' ? 'selected' : ''}>Vintage WotC (1999-2002)</option>
+                <option value="modern" ${f.era === 'modern' ? 'selected' : ''}>Moderno</option>
               </select>
             </div>
 
             <fieldset>
-              <legend class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-2">
+              <legend class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] mb-2">
                 <i data-lucide="star" class="w-4 h-4 text-slate-500"></i>
                 Edición
               </legend>
@@ -243,24 +259,24 @@ const CatalogView = {
             </div>
 
             <div>
-              <label for="cat-filter-type" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+              <label for="cat-filter-type" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] mb-1.5">
                 <i data-lucide="zap" class="w-4 h-4 text-slate-500"></i>
-                Tipo de Energía
+                Tipo de energía
               </label>
               <select 
                 id="cat-filter-type" 
                 onchange="CatalogView.updateFilter('type', this.value)"
-                class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A] focus:bg-white"
+                class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-md text-[#0F172A] focus:bg-white"
               >
-                <option value="all" ${f.type === 'all' ? 'selected' : ''}>Todos los Tipos</option>
+                <option value="all" ${f.type === 'all' ? 'selected' : ''}>Todos</option>
                 ${this.availableTypes().map(t => `<option value="${t}" ${f.type === t ? 'selected' : ''}>${t}</option>`).join('')}
               </select>
             </div>
 
             <fieldset>
-              <legend class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-1.5">
+              <legend class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] mb-1.5">
                 <i data-lucide="dollar-sign" class="w-4 h-4 text-slate-500"></i>
-                Rango de Precio (USD)
+                Precio (USD)
               </legend>
               <div class="grid grid-cols-2 gap-2">
                 <div>
@@ -291,17 +307,17 @@ const CatalogView = {
             <button 
               type="button" 
               onclick="CatalogView.resetFilters()" 
-              class="w-full py-2.5 border border-slate-300 hover:bg-slate-100 text-[#0F172A] text-xs font-semibold rounded-xl transition touch-target"
+              class="w-full py-2.5 border border-slate-300 hover:bg-slate-100 text-[#0F172A] text-xs font-semibold rounded-md transition touch-target"
             >
               Limpiar filtros
             </button>
           </aside>
 
           <div class="lg:col-span-9 space-y-5">
-            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+            <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
-                <span role="status" aria-atomic="true">Mostrando <strong id="catalog-inline-count" class="text-[#0F172A]">${filtered.length}</strong> de ${PRODUCTS.length} activos en bóveda</span>
-                ${this.isVaultFallback ? `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">Búsqueda en toda la Bóveda</span>` : ''}
+                <span role="status" aria-atomic="true">Mostrando <strong id="catalog-inline-count" class="text-[#0F172A]">${filtered.length}</strong> productos</span>
+                ${this.isVaultFallback ? `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">Resultados de todas las categorías</span>` : ''}
                 ${f.searchQuery ? `
                   <a href="${app.url('catalog', f.category !== 'all' ? { cat: f.category } : (f.era !== 'all' ? { era: f.era } : null))}"
                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#0F172A] text-white text-xs font-bold hover:bg-[#1E293B]"
@@ -316,17 +332,15 @@ const CatalogView = {
                 <select 
                   id="cat-sort-select" 
                   onchange="CatalogView.updateFilter('sortBy', this.value)"
-                  class="px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-xl text-[#0F172A]"
+                  class="px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-md text-[#0F172A]"
                 >
-                  <option value="featured" ${f.sortBy === 'featured' ? 'selected' : ''}>Destacados de Bóveda</option>
-                  <option value="price-asc" ${f.sortBy === 'price-asc' ? 'selected' : ''}>Precio: Menor a Mayor</option>
-                  <option value="price-desc" ${f.sortBy === 'price-desc' ? 'selected' : ''}>Precio: Mayor a Menor</option>
-                  <option value="yield-desc" ${f.sortBy === 'yield-desc' ? 'selected' : ''}>Mayor Rendimiento Anual (%)</option>
+                  <option value="featured" ${f.sortBy === 'featured' ? 'selected' : ''}>Destacados</option>
+                  <option value="price-asc" ${f.sortBy === 'price-asc' ? 'selected' : ''}>Precio: menor a mayor</option>
+                  <option value="price-desc" ${f.sortBy === 'price-desc' ? 'selected' : ''}>Precio: mayor a menor</option>
+                  <option value="yield-desc" ${f.sortBy === 'yield-desc' ? 'selected' : ''}>Mayor revalorización (12 meses)</option>
                 </select>
               </div>
             </div>
-
-            ${this.renderLetterFilter()}
 
             <div id="catalog-results-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
               ${this.renderCardsGrid(filtered)}
@@ -337,80 +351,11 @@ const CatalogView = {
     `;
   },
 
-  letterButtonState(letter, available) {
-    const f = Store.data.catalogFilters;
-    const current = f.letter || 'all';
-    const pressed = current === letter;
-    if (letter === 'all') {
-      return { pressed, disabled: false, label: 'Mostrar todas las letras' };
-    }
-    const disabled = !available.has(letter);
-    return {
-      pressed,
-      disabled,
-      label: disabled ? `Letra ${letter}: sin cartas` : `Pokémon que empiezan por ${letter}`
-    };
-  },
-
-  renderLetterFilter() {
-    const available = this.availableLetters();
-    const button = (letter, text) => {
-      const s = this.letterButtonState(letter, available);
-      return `
-        <button
-          type="button"
-          class="letter-btn${letter === 'all' ? ' letter-btn-all' : ''}"
-          data-letter="${letter}"
-          aria-pressed="${s.pressed ? 'true' : 'false'}"
-          aria-label="${s.label}"
-          ${s.disabled ? 'disabled' : ''}
-          onclick="CatalogView.setLetter('${letter}')"
-        >${text}</button>`;
-    };
-
-    return `
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-        <p id="catalog-letter-label" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-2.5">
-          <i data-lucide="a-large-small" class="w-4 h-4 text-slate-500"></i>
-          Filtrar por letra del Pokémon
-        </p>
-        <div id="catalog-letter-filter" role="group" aria-labelledby="catalog-letter-label" class="flex flex-wrap gap-1.5">
-          ${button('all', 'Todas')}
-          ${this.LETTERS.map(l => button(l, l)).join('')}
-        </div>
-      </div>
-    `;
-  },
-
-  setLetter(letter) {
-    const value = letter === 'all' || !/^[A-Z]$/.test(letter) ? 'all' : letter;
-    Store.data.catalogFilters.letter = value;
-    if (typeof history !== 'undefined' && typeof location !== 'undefined') {
-      const params = new URLSearchParams(location.search);
-      if (value === 'all') params.delete('letra'); else params.set('letra', value);
-      const qs = params.toString();
-      history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : ''));
-    }
-    this.refreshGridOnly();
-  },
-
-  // Actualiza los botones sin volver a pintarlos, para no perder el foco del teclado
-  syncLetterButtons() {
-    if (typeof document === 'undefined') return;
-    const available = this.availableLetters();
-    document.querySelectorAll('#catalog-letter-filter [data-letter]').forEach(btn => {
-      const s = this.letterButtonState(btn.getAttribute('data-letter'), available);
-      btn.setAttribute('aria-pressed', s.pressed ? 'true' : 'false');
-      btn.setAttribute('aria-label', s.label);
-      btn.disabled = s.disabled;
-    });
-  },
-
   renderCardsGrid(items) {
     const f = Store.data.catalogFilters;
     if (items.length === 0) {
       return `
-        <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3">
+        <div class="col-span-full bg-white border border-slate-200 rounded-lg p-12 text-center space-y-3">
           <div class="w-14 h-14 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
             <i data-lucide="${f.onlyFavorites ? 'heart-off' : 'search-x'}" class="w-7 h-7"></i>
           </div>
@@ -421,7 +366,7 @@ const CatalogView = {
           <button
             type="button"
             onclick="CatalogView.resetFilters()"
-            class="px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold rounded-xl transition shadow touch-target"
+            class="px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold rounded-md transition shadow touch-target"
           >
             Limpiar filtros
           </button>
@@ -429,36 +374,35 @@ const CatalogView = {
       `;
     }
 
+    const category = this.isVaultFallback ? 'all' : f.category;
     return items.map(card => {
-      const { grade, price } = this.getQuickAddOption(card);
-      const gradeInfo = card.categoria === 'sealed'
+      const { grade, price } = this.getDisplayOption(card, category);
+      const gradeCount = this.availableGrades(card, category).length;
+      const isPsaGrade = grade.startsWith('psa');
+      const gradeInfo = grade === 'sealed'
         ? { icon: 'package', label: 'Sellado de fábrica' }
-        : card.categoria === 'psa'
-          ? { icon: 'shield-check', label: 'Desde Raw NM' }
-          : { icon: 'layers', label: 'Raw Near Mint' };
+        : isPsaGrade
+          ? { icon: 'shield-check', label: gradeCount > 1 ? `Desde ${this.GRADE_LABELS[grade]}` : this.GRADE_LABELS[grade] }
+          : { icon: 'layers', label: gradeCount > 1 ? 'Desde Raw · NM' : 'Raw · Near Mint' };
 
       const badgeHtml = card.edicionEspecial
-        ? `<span class="px-2.5 py-0.5 text-xs font-bold bg-[#E11D48] text-white rounded">EDICIÓN ESPECIAL</span>`
-        : card.categoria === 'psa'
-        ? `<span class="px-2.5 py-0.5 text-xs font-bold bg-[#FEF3C7] text-[#B45309] rounded">GRADO INVERSIÓN • PSA</span>`
-        : card.categoria === 'sealed'
-          ? `<span class="px-2.5 py-0.5 text-xs font-bold bg-[#0F172A] text-[#FEF3C7] rounded">${card.era === 'vintage' ? 'SELLADO WOTC' : 'SELLADO DE FÁBRICA'}</span>`
-          : `<span class="px-2.5 py-0.5 text-xs font-bold bg-slate-100 text-[#0F172A] rounded">SINGLE RAW NM</span>`;
+        ? `<span class="px-2 py-0.5 text-xs font-semibold bg-[#E11D48] text-white rounded">Edición especial</span>`
+        : grade === 'sealed'
+          ? `<span class="px-2 py-0.5 text-xs font-semibold bg-[#0F172A] text-white rounded">${card.era === 'vintage' ? 'Sellado WotC' : 'Sellado'}</span>`
+          : isPsaGrade
+            ? `<span class="px-2 py-0.5 text-xs font-semibold bg-[#FEF3C7] text-[#92400E] rounded">Slab PSA</span>`
+            : `<span class="px-2 py-0.5 text-xs font-semibold bg-slate-100 text-[#0F172A] rounded">Raw</span>`;
 
       const isFav = Store.isFavorite(card.id);
 
       return `
-        <article class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-[#0F172A] transition-all flex flex-col justify-between group">
-          <a href="${app.url('pdp', { id: card.id })}" class="block rounded-xl" aria-label="Ver ficha de ${card.nombre}">
-            <div class="flex items-center justify-between gap-1 mb-2.5">
+        <article class="bg-white border border-slate-200 rounded-lg p-3.5 hover:shadow-md hover:border-slate-400 transition flex flex-col justify-between group">
+          <a href="${app.url('pdp', { id: card.id })}" class="block rounded-md" aria-label="Ver ficha de ${card.nombre}">
+            <div class="flex items-center gap-1 mb-2.5">
               ${badgeHtml}
-              <span class="text-xs font-semibold text-[#047857] bg-[#D1FAE5] px-2 py-0.5 rounded flex items-center gap-1">
-                <i data-lucide="trending-up" class="w-4 h-4"></i>
-                <span>${card.tendencia12m}</span>
-              </span>
             </div>
 
-            <div class="aspect-[3/4] bg-[#F8FAFC] rounded-xl border border-slate-200 overflow-hidden flex items-center justify-center p-4 relative">
+            <div class="aspect-[3/4] bg-[#F8FAFC] rounded-md overflow-hidden flex items-center justify-center p-4 relative">
               <img
                 src="${card.imagenLocal}"
                 alt="${card.nombre}"
@@ -472,15 +416,15 @@ const CatalogView = {
             </div>
 
             <div class="mt-3">
-              <span class="inline-block text-xs font-medium text-slate-500 uppercase tracking-wider">${card.set} • ${card.tipo}</span>
-              <h3 class="font-bold text-sm sm:text-base text-[#0F172A] group-hover:text-[#BE123C] transition mt-0.5 line-clamp-1">${card.nombre}</h3>
-              <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">${card.rareza} • ${card.categoria === 'raw' ? 'Sin gradear' : `Cert #${card.certNumber}`}</p>
+              <span class="inline-block text-xs font-medium text-slate-600">${card.set}${card.tipo ? ` · ${card.tipo}` : ''}</span>
+              <h3 class="font-semibold text-sm sm:text-base text-[#0F172A] group-hover:text-[#BE123C] transition mt-0.5 line-clamp-1">${card.nombre}</h3>
+              <p class="text-xs text-slate-600 mt-0.5 line-clamp-1">${card.rareza}${isPsaGrade && card.certNumber ? ` · Cert #${card.certNumber}` : ''}</p>
             </div>
           </a>
 
           <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
             <div class="min-w-0">
-              <span class="text-xs font-medium text-slate-500 flex items-center gap-1">
+              <span class="text-xs font-medium text-slate-600 flex items-center gap-1">
                 <i data-lucide="${gradeInfo.icon}" class="w-4 h-4"></i>
                 <span class="truncate">${gradeInfo.label}</span>
               </span>
@@ -501,8 +445,8 @@ const CatalogView = {
               <button
                 type="button"
                 onclick="CatalogView.quickAdd('${card.id}')"
-                class="h-10 px-3.5 text-xs font-semibold text-white bg-[#0F172A] hover:bg-[#E11D48] rounded-xl transition inline-flex items-center gap-1.5"
-                aria-label="Añadir ${card.nombre} (${grade === 'sealed' ? 'sellado' : 'raw'}) a la bolsa"
+                class="h-10 px-3.5 text-xs font-semibold text-white bg-[#0F172A] hover:bg-[#E11D48] rounded-md transition inline-flex items-center gap-1.5"
+                aria-label="Añadir ${card.nombre} (${this.GRADE_LABELS[grade]}) a la bolsa"
               >
                 <i data-lucide="shopping-bag" class="w-4 h-4"></i>
                 <span>Añadir</span>
@@ -516,18 +460,17 @@ const CatalogView = {
 
   // Grado y precio que se muestran en la tarjeta y que añade el botón rápido
   getQuickAddOption(card) {
-    const isSealed = card.categoria === 'sealed' || card.tipo_discriminador === 'PRODUCTO_SELLADO';
-    if (isSealed) {
-      return { grade: 'sealed', price: card.precioUnitario || card.precios.sealed || card.precios.raw };
-    }
-    return { grade: 'raw', price: card.precios.raw };
+    const f = Store.data.catalogFilters;
+    return this.getDisplayOption(card, this.isVaultFallback ? 'all' : f.category);
   },
 
   quickAdd(productId) {
     const card = PRODUCTS.find(p => p.id === productId);
     if (!card) return;
     const { grade, price } = this.getQuickAddOption(card);
-    const label = grade === 'sealed' ? 'Sellado de Fábrica (Caja Intacta)' : 'Sin Gradear (Raw NM)';
+    const label = grade === 'sealed'
+      ? 'Sellado de Fábrica (Caja Intacta)'
+      : (typeof PDPView !== 'undefined' && PDPView.getConditionFullTitle ? PDPView.getConditionFullTitle(grade) : this.GRADE_LABELS[grade]);
     const image = (grade === 'sealed' && card.galeria_sellada && card.galeria_sellada.frontal) || card.imagenLocal;
     app.addToCart(`${card.id}-${grade}`, card.nombre, label, price, image, card.imagenFallbackUrl, 1);
   },
@@ -555,8 +498,7 @@ const CatalogView = {
       maxPrice: '',
       sortBy: 'featured',
       searchQuery: '',
-      onlyFavorites: false,
-      letter: 'all'
+      onlyFavorites: false
     };
     const searchInput = document.getElementById('global-search');
     if (searchInput) searchInput.value = '';
@@ -595,7 +537,6 @@ const CatalogView = {
     if (countBadge) countBadge.innerText = filtered.length;
     if (inlineCount) inlineCount.innerText = filtered.length;
     if (titleEl) titleEl.textContent = this.getActiveTitle();
-    this.syncLetterButtons();
     app.refreshIcons();
   }
 };
