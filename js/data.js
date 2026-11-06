@@ -238,7 +238,7 @@ const POKEMON_CARDS_CATALOG_10 = [
 ];
 
 /**
- * 25 cartas más del catálogo (precio Raw real de TCGplayer al PRECIOS_FECHA)
+ * 30 cartas más del catálogo (precio Raw real de TCGplayer al PRECIOS_FECHA)
  * imagen: ruta en images.pokemontcg.io · respaldo local en assets/img/cards/<id>.png
  */
 const POKEMON_CARDS_EXTRA = [
@@ -266,7 +266,13 @@ const POKEMON_CARDS_EXTRA = [
   ['tangela-151', 'Tangela', 'Tangela Illustration Rare #178/165', 'Pokemon 151 2023', 'Illustration Rare', 'Planta', 'raw', 'sv3pt5/178', 13.96, 6.5],
   ['umbreon-vmax-evolving-skies', 'Umbreon VMAX', 'Umbreon VMAX Holo Rare #095/203', 'Evolving Skies 2021', 'Holo Rare VMAX', 'Oscuridad', 'psa', 'swsh7/95', 28.83, 15.2],
   ['venusaur-ex-151', 'Venusaur ex', 'Venusaur ex Special Illustration Rare #198/165', 'Pokemon 151 2023', 'Special Illustration Rare', 'Planta', 'psa', 'sv3pt5/198', 86.23, 15.8],
-  ['zapdos-ex-151', 'Zapdos ex', 'Zapdos ex Special Illustration Rare #202/165', 'Pokemon 151 2023', 'Special Illustration Rare', 'Eléctrico', 'psa', 'sv3pt5/202', 70.67, 13.1]
+  ['zapdos-ex-151', 'Zapdos ex', 'Zapdos ex Special Illustration Rare #202/165', 'Pokemon 151 2023', 'Special Illustration Rare', 'Eléctrico', 'psa', 'sv3pt5/202', 70.67, 13.1],
+  // v24: 5 cartas más buscadas (precio Raw de TCGplayer consultado el 2026-11-06)
+  ['charizard-ex-sir-151', 'Charizard ex', 'Charizard ex Special Illustration Rare #199/165', 'Pokemon 151 2023', 'Special Illustration Rare', 'Fuego', 'psa', 'sv3pt5/199', 323.37, 18.4],
+  ['lugia-v-alt-silver-tempest', 'Lugia V', 'Lugia V Alternate Art #186/195', 'Silver Tempest 2022', 'Alternate Art Ultra Rare', 'Incoloro', 'psa', 'swsh12/186', 488.36, 20.1],
+  ['charizard-ex-sir-paldean-fates', 'Charizard ex', 'Charizard ex Special Illustration Rare #234/091', 'Paldean Fates 2024', 'Special Illustration Rare', 'Oscuridad', 'raw', 'sv4pt5/234', 256.92, 14.7],
+  ['greninja-ex-sir-twilight-masquerade', 'Greninja ex', 'Greninja ex Special Illustration Rare #214/167', 'Twilight Masquerade 2024', 'Special Illustration Rare', 'Lucha', 'raw', 'sv6/214', 317.44, 12.3],
+  ['umbreon-ex-sir-prismatic-evolutions', 'Umbreon ex', 'Umbreon ex Special Illustration Rare #161/131', 'Prismatic Evolutions 2025', 'Special Illustration Rare', 'Oscuridad', 'psa', 'sv8pt5/161', 1269.69, 24.5]
 ].map(([id, pokemon, nombre, set, rareza, tipo, categoria, imagen, raw, rendimiento], i) => ({
   id,
   pokemon,
@@ -537,6 +543,128 @@ const SEALED_PRODUCTS = [
       precios: { sealed: 14.00 },
       descripcion: 'Sobre individual de Evoluciones Prismáticas con 10 cartas y posibilidad de Eeveelutions especiales',
       rendimientoAnual: 22.7
+    },
+    // Sobres de las expansiones que también tienen cartas sueltas en la tienda.
+    // fotoProvisional: se muestra una ilustración SVG (tools/generar_sobres.js) hasta tener la foto WebP.
+    {
+      id: 'booster-pack-evolving-skies-2021',
+      nombre: 'Booster Pack Evolving Skies',
+      set: 'Evolving Skies 2021',
+      tipo: 'Dragón',
+      era: 'modern',
+      certNumber: '48292121',
+      gramos: 16,
+      cartas: 10,
+      estado: 'Sellado de Fábrica Intacto',
+      sello: 'The Pokémon Company International Crimping',
+      precios: { sealed: 18.50 },
+      descripcion: 'Sobre de Evolving Skies (Cielos Evolutivos) con 10 cartas: la expansión de Rayquaza, Umbreon y Sylveon VMAX',
+      rendimientoAnual: 16.4
+    },
+    {
+      id: 'booster-pack-lost-origin-2022',
+      nombre: 'Booster Pack Lost Origin',
+      set: 'Lost Origin 2022',
+      tipo: 'Dragón',
+      era: 'modern',
+      certNumber: '48292122',
+      gramos: 16,
+      cartas: 10,
+      estado: 'Sellado de Fábrica Intacto',
+      sello: 'The Pokémon Company International Crimping',
+      precios: { sealed: 7.50 },
+      descripcion: 'Sobre de Lost Origin (Origen Perdido) con 10 cartas: la expansión de Giratina VSTAR',
+      rendimientoAnual: 8.2
+    },
+    {
+      id: 'booster-pack-silver-tempest-2022',
+      nombre: 'Booster Pack Silver Tempest',
+      set: 'Silver Tempest 2022',
+      tipo: 'Incoloro',
+      era: 'modern',
+      certNumber: '48292123',
+      gramos: 16,
+      cartas: 10,
+      estado: 'Sellado de Fábrica Intacto',
+      sello: 'The Pokémon Company International Crimping',
+      precios: { sealed: 6.00 },
+      descripcion: 'Sobre de Silver Tempest (Tempestad Plateada) con 10 cartas: la expansión de Lugia V',
+      rendimientoAnual: 6.9
+    },
+    {
+      id: 'booster-pack-crown-zenith-2023',
+      nombre: 'Booster Pack Crown Zenith',
+      set: 'Crown Zenith 2023',
+      tipo: 'Eléctrico',
+      era: 'modern',
+      certNumber: '48292124',
+      gramos: 16,
+      cartas: 10,
+      estado: 'Sellado de Fábrica Intacto',
+      sello: 'The Pokémon Company International Crimping',
+      precios: { sealed: 8.00 },
+      descripcion: 'Sobre de Crown Zenith (Cenit Supremo) con 10 cartas y la galería especial de cartas ilustradas',
+      rendimientoAnual: 9.8
+    },
+    {
+      id: 'booster-pack-scarlet-violet-2023',
+      nombre: 'Booster Pack Scarlet & Violet',
+      set: 'Scarlet & Violet 2023',
+      tipo: 'Lucha',
+      era: 'modern',
+      certNumber: '48292125',
+      gramos: 16,
+      cartas: 10,
+      estado: 'Sellado de Fábrica Intacto',
+      sello: 'The Pokémon Company International Crimping',
+      precios: { sealed: 5.00 },
+      descripcion: 'Sobre de Scarlet & Violet (Escarlata y Púrpura) con 10 cartas: la expansión de Koraidon, Miraidon y Gardevoir ex',
+      rendimientoAnual: 5.1
+    },
+    {
+      id: 'booster-pack-paradox-rift-2023',
+      nombre: 'Booster Pack Paradox Rift',
+      set: 'Paradox Rift 2023',
+      tipo: 'Oscuridad',
+      era: 'modern',
+      certNumber: '48292126',
+      gramos: 16,
+      cartas: 10,
+      estado: 'Sellado de Fábrica Intacto',
+      sello: 'The Pokémon Company International Crimping',
+      precios: { sealed: 5.50 },
+      descripcion: 'Sobre de Paradox Rift (Brecha Paradójica) con 10 cartas: la expansión de Roaring Moon e Iron Valiant ex',
+      rendimientoAnual: 5.6
+    },
+    {
+      id: 'booster-pack-paldean-fates-2024',
+      nombre: 'Booster Pack Paldean Fates',
+      set: 'Paldean Fates 2024',
+      tipo: 'Fuego',
+      era: 'modern',
+      certNumber: '48292127',
+      gramos: 16,
+      cartas: 10,
+      estado: 'Sellado de Fábrica Intacto',
+      sello: 'The Pokémon Company International Crimping',
+      precios: { sealed: 9.00 },
+      descripcion: 'Sobre de Paldean Fates (Destinos de Paldea) con 10 cartas y Pokémon variocolor (shiny)',
+      rendimientoAnual: 11.2
+    },
+    {
+      id: 'booster-pack-twilight-masquerade-2024',
+      nombre: 'Booster Pack Twilight Masquerade',
+      set: 'Twilight Masquerade 2024',
+      tipo: 'Planta',
+      era: 'modern',
+      certNumber: '48292128',
+      gramos: 16,
+      cartas: 10,
+      estado: 'Sellado de Fábrica Intacto',
+      sello: 'The Pokémon Company International Crimping',
+      precios: { sealed: 6.00 },
+      descripcion: 'Sobre de Twilight Masquerade (Mascarada Crepuscular) con 10 cartas: la expansión de Ogerpon y Greninja ex',
+      rendimientoAnual: 7.4
     }
   ].map(p => ({
     id: p.id,
@@ -551,11 +679,12 @@ const SEALED_PRODUCTS = [
     era: p.era,
     condicionPrincipal: 'sealed',
     certNumber: p.certNumber,
-    imagenLocal: `assets/img/packs/${p.id}-frontal.webp`,
+    imagenLocal: `assets/img/packs/${p.id}-frontal.${p.fotoProvisional ? 'svg' : 'webp'}`,
     imagenFallbackUrl: 'assets/img/packs/placeholder-sobre.svg',
     galeria_sellada: {
-      frontal: `assets/img/packs/${p.id}-frontal.webp`
+      frontal: `assets/img/packs/${p.id}-frontal.${p.fotoProvisional ? 'svg' : 'webp'}`
     },
+    esSobre: true,
     detalles_sellados: {
       gramaje: `${p.gramos}g (Sobre Individual)`,
       gramaje_gramos: p.gramos,
@@ -904,6 +1033,29 @@ const LEGACY_FIXTURE_PRODUCTS = {
 };
 
 /**
+ * Expansiones (colecciones) para el menú "Expansiones" y el filtro ?set= del catálogo.
+ * sets: valores exactos del campo `set` de los productos que pertenecen a cada una.
+ */
+const EXPANSIONES = [
+  { slug: 'base-set', nombre: 'Base Set', anio: 1999, serie: 'Vintage (Wizards of the Coast)', sets: ['Base Set 1999'] },
+  { slug: 'fossil', nombre: 'Fossil', anio: 1999, serie: 'Vintage (Wizards of the Coast)', sets: ['Fossil WotC 1999'] },
+  { slug: 'team-rocket', nombre: 'Team Rocket', anio: 1999, serie: 'Vintage (Wizards of the Coast)', sets: ['Team Rocket 1999'] },
+  { slug: 'leyendas-luminosas', nombre: 'Leyendas Luminosas', anio: 2017, serie: 'Sol y Luna', sets: ['Leyendas Luminosas 2017'] },
+  { slug: 'evolving-skies', nombre: 'Evolving Skies', anio: 2021, serie: 'Espada y Escudo', sets: ['Evolving Skies 2021'] },
+  { slug: 'lost-origin', nombre: 'Lost Origin', anio: 2022, serie: 'Espada y Escudo', sets: ['Lost Origin 2022'] },
+  { slug: 'silver-tempest', nombre: 'Silver Tempest', anio: 2022, serie: 'Espada y Escudo', sets: ['Silver Tempest 2022'] },
+  { slug: 'crown-zenith', nombre: 'Crown Zenith', anio: 2023, serie: 'Espada y Escudo', sets: ['Crown Zenith 2023', 'Crown Zenith Promos 2023'] },
+  { slug: 'scarlet-violet', nombre: 'Scarlet & Violet', anio: 2023, serie: 'Escarlata y Púrpura', sets: ['Scarlet & Violet 2023'] },
+  { slug: 'pokemon-151', nombre: 'Pokémon 151', anio: 2023, serie: 'Escarlata y Púrpura', sets: ['Pokemon 151 2023'] },
+  { slug: 'paradox-rift', nombre: 'Paradox Rift', anio: 2023, serie: 'Escarlata y Púrpura', sets: ['Paradox Rift 2023'] },
+  { slug: 'paldean-fates', nombre: 'Paldean Fates', anio: 2024, serie: 'Escarlata y Púrpura', sets: ['Paldean Fates 2024'] },
+  { slug: 'twilight-masquerade', nombre: 'Twilight Masquerade', anio: 2024, serie: 'Escarlata y Púrpura', sets: ['Twilight Masquerade 2024'] },
+  { slug: 'charizard-ex-collection', nombre: 'Colección Charizard ex', anio: 2024, serie: 'Escarlata y Púrpura', sets: ['Charizard ex Collection 2024'] },
+  { slug: 'prismatic-evolutions', nombre: 'Prismatic Evolutions', anio: 2025, serie: 'Escarlata y Púrpura', sets: ['Prismatic Evolutions 2025'] },
+  { slug: 'ascended-heroes', nombre: 'Ascended Heroes', anio: 2026, serie: 'Megaevolución', sets: ['Ascended Heroes 2026'] }
+];
+
+/**
  * Catálogo Oficial Integrado Graded & Sealed TCG
  */
 const PRODUCTS = [
@@ -914,6 +1066,8 @@ const PRODUCTS = [
 
 // Ensure all products have standardized discriminators
 PRODUCTS.forEach(p => {
+  const exp = EXPANSIONES.find(e => e.sets.includes(p.set));
+  if (exp) p.expansion = exp.slug;
   if (!p.tipo_discriminador) {
     p.tipo_discriminador = (p.categoria === 'sealed') ? 'PRODUCTO_SELLADO' : 'CARTA_INDIVIDUAL';
   }
@@ -961,6 +1115,7 @@ if (typeof globalThis !== 'undefined') {
   globalThis.SEALED_PRODUCTS = SEALED_PRODUCTS;
   globalThis.LEGACY_FIXTURE_PRODUCTS = LEGACY_FIXTURE_PRODUCTS;
   globalThis.PRODUCTS = PRODUCTS;
+  globalThis.EXPANSIONES = EXPANSIONES;
 }
 if (typeof window !== 'undefined') {
   window.APP_CONFIG = APP_CONFIG;
@@ -972,6 +1127,7 @@ if (typeof window !== 'undefined') {
   window.SEALED_PRODUCTS = SEALED_PRODUCTS;
   window.LEGACY_FIXTURE_PRODUCTS = LEGACY_FIXTURE_PRODUCTS;
   window.PRODUCTS = PRODUCTS;
+  window.EXPANSIONES = EXPANSIONES;
 }
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -983,6 +1139,7 @@ if (typeof module !== 'undefined' && module.exports) {
     MULTIPLICADORES_PSA,
     SEALED_PRODUCTS,
     LEGACY_FIXTURE_PRODUCTS,
-    PRODUCTS
+    PRODUCTS,
+    EXPANSIONES
   };
 }

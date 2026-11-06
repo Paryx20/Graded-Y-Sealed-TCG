@@ -62,8 +62,8 @@ create or replace function public._orden_json(o public.ordenes_compra)
 returns jsonb language sql stable set search_path = '' as $$
   select o.detalle || jsonb_build_object(
     'trackingStep', o.paso_tracking,
-    'idAttempts', o.intentos_verificacion,
-    'status', o.estado);
+    'status', o.estado,
+    'fecha_creacion', o.fecha_creacion);
 $$;
 
 -- ------------------------------------------------------------------ Cuentas
@@ -135,6 +135,43 @@ begin
    where cedula_ruc = u.cedula_ruc;
   perform public._guardar_direccion(u.cedula_ruc, p_direccion, p_ciudad);
   return public._usuario_json(u.cedula_ruc);
+end $$;
+
+-- Cambia la contraseña con la sesión iniciada; exige la contraseña actual
+create or replace function public.cambiar_password(p_token uuid, p_actual text, p_nueva text)
+returns boolean language plpgsql security definer set search_path = '' as $$
+declare u public.usuarios;
+begin
+  select * into u from public.usuarios where token_sesion = p_token;
+  if u.cedula_ruc is null then raise exception 'SESION_INVALIDA'; end if;
+  if p_actual is null or u.password_hash <> extensions.crypt(p_actual, u.password_hash) then
+    raise exception 'PASSWORD_ACTUAL_INCORRECTA';
+  end if;
+  if length(coalesce(p_nueva, '')) < 8 then raise exception 'PASSWORD_CORTA'; end if;
+  if u.password_hash = extensions.crypt(p_nueva, u.password_hash) then raise exception 'PASSWORD_IGUAL'; end if;
+  update public.usuarios
+     set password_hash = extensions.crypt(p_nueva, extensions.gen_salt('bf')), actualizado_en = now()
+   where cedula_ruc = u.cedula_ruc;
+  return true;
+end $$;
+
+/*
+  "Olvidé mi contraseña" sin servidor de correo (proyecto académico): se verifica
+  la identidad con el correo y la cédula de la cuenta. Cierra las sesiones abiertas.
+*/
+create or replace function public.restablecer_password(p_email text, p_cedula text, p_nueva text)
+returns boolean language plpgsql security definer set search_path = '' as $$
+declare u public.usuarios;
+begin
+  select * into u from public.usuarios
+   where lower(email) = lower(trim(p_email)) and cedula_ruc = trim(p_cedula);
+  if u.cedula_ruc is null then raise exception 'DATOS_NO_COINCIDEN'; end if;
+  if length(coalesce(p_nueva, '')) < 8 then raise exception 'PASSWORD_CORTA'; end if;
+  update public.usuarios
+     set password_hash = extensions.crypt(p_nueva, extensions.gen_salt('bf')),
+         token_sesion = gen_random_uuid(), actualizado_en = now()
+   where cedula_ruc = u.cedula_ruc;
+  return true;
 end $$;
 
 -- ------------------------------------------------------------- Inventario
@@ -234,7 +271,9 @@ begin
 
   update public.ordenes_compra set subtotal = v_subtotal where numero_orden = v_numero;
   insert into public.eventos_tracking (numero_orden, paso, descripcion)
-  values (v_numero, 1, 'Orden recibida y pago verificado');
+  values (v_numero, 1, case when p_tarjeta is null
+    then 'Pedido recibido: pago pendiente en efectivo al retirar'
+    else 'Pedido recibido y pago con tarjeta aprobado' end);
 
   return jsonb_build_object('numero_orden', v_numero, 'subtotal', v_subtotal);
 exception
@@ -267,35 +306,70 @@ returns jsonb language sql security definer set search_path = '' as $$
    limit 1;
 $$;
 
+/*
+  Guarda el avance simulado del seguimiento (lo calcula el navegador según el
+  tiempo desde la compra). Nunca retrocede ni modifica un pedido cancelado;
+  la cancelación solo se hace con cancelar_orden.
+*/
 create or replace function public.actualizar_estado_orden(p_codigo text, p_cedula text, p_orden jsonb)
 returns boolean language plpgsql security definer set search_path = '' as $$
 declare
-  o         public.ordenes_compra;
-  v_paso    smallint := coalesce((p_orden->>'trackingStep')::smallint, 1);
-  v_intento smallint := least(coalesce((p_orden->>'idAttempts')::smallint, 0), 3);
+  o      public.ordenes_compra;
+  v_paso smallint := coalesce((p_orden->>'trackingStep')::smallint, 1);
 begin
   select * into o from public.ordenes_compra where numero_orden = p_codigo and usuario_cedula = trim(p_cedula);
   if o.numero_orden is null then return false; end if;
+  if o.paso_tracking = 0 or v_paso not in (1, 2, 3, 4) or v_paso <= o.paso_tracking then return false; end if;
 
   update public.ordenes_compra
-     set paso_tracking = v_paso, intentos_verificacion = v_intento,
-         estado = coalesce(p_orden->>'status', estado), detalle = p_orden
+     set paso_tracking = v_paso,
+         estado = coalesce(p_orden->>'status', estado),
+         detalle = detalle || jsonb_build_object('trackingStep', v_paso, 'status', coalesce(p_orden->>'status', estado))
    where numero_orden = o.numero_orden;
 
-  if v_intento > o.intentos_verificacion then
-    insert into public.eventos_tracking (numero_orden, paso, descripcion)
-    values (o.numero_orden, v_paso, format('Cédula presentada no coincide con el titular (intento %s de 3)', v_intento));
-  end if;
-  if v_paso <> o.paso_tracking then
-    insert into public.eventos_tracking (numero_orden, paso, descripcion)
-    values (o.numero_orden, v_paso, case v_paso
-      when 2 then 'Despachado / listo para retiro'
-      when 3 then 'En destino: verificando identidad del titular'
-      when 4 then 'Entregado: identidad verificada con cédula'
-      when -1 then 'Entrega retenida por 3 verificaciones fallidas'
-      else coalesce(p_orden->>'status', 'Cambio de estado') end);
-  end if;
+  insert into public.eventos_tracking (numero_orden, paso, descripcion)
+  values (o.numero_orden, v_paso, case v_paso
+    when 2 then case when o.metodo_entrega = 'pickup' then 'Listo para retiro en tienda' else 'En camino' end
+    when 3 then case when o.metodo_entrega = 'pickup' then 'Listo para retiro en tienda' else 'En reparto' end
+    when 4 then case when o.metodo_entrega = 'pickup' then 'Retirado en tienda' else 'Entregado' end
+    else coalesce(p_orden->>'status', 'Cambio de estado') end);
   return true;
+end $$;
+
+-- Cancela un pedido propio que sigue en preparación y devuelve el stock al inventario
+create or replace function public.cancelar_orden(p_token uuid, p_codigo text)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+  v_cedula text;
+  o        public.ordenes_compra;
+begin
+  select cedula_ruc into v_cedula from public.usuarios where token_sesion = p_token;
+  if v_cedula is null then raise exception 'SESION_INVALIDA'; end if;
+
+  select * into o from public.ordenes_compra
+   where numero_orden = p_codigo and usuario_cedula = v_cedula
+   for update;
+  if o.numero_orden is null then raise exception 'ORDEN_NO_ENCONTRADA'; end if;
+  -- Solo mientras está en preparación (los 2 primeros minutos de la simulación)
+  if o.paso_tracking <> 1 or now() - o.fecha_creacion > interval '2 minutes' then
+    raise exception 'ORDEN_NO_CANCELABLE';
+  end if;
+
+  update public.certificaciones_psa c
+     set stock_disponible = c.stock_disponible + i.cantidad
+    from public.items_orden i
+   where i.numero_orden = o.numero_orden and c.producto_sku = i.sku and c.grado = i.grado;
+
+  update public.ordenes_compra
+     set paso_tracking = 0, estado = 'Cancelado',
+         detalle = detalle || jsonb_build_object('trackingStep', 0, 'status', 'Cancelado',
+                    'cancelledAt', to_char(now() at time zone 'America/Guayaquil', 'DD/MM/YYYY HH24:MI'))
+   where numero_orden = o.numero_orden;
+
+  insert into public.eventos_tracking (numero_orden, paso, descripcion)
+  values (o.numero_orden, 0, 'Pedido cancelado por el cliente; stock devuelto');
+
+  return jsonb_build_object('numero_orden', o.numero_orden, 'estado', 'Cancelado');
 end $$;
 
 -- ------------------------------------------------------------------ Permisos
@@ -313,3 +387,6 @@ grant execute on function public.guardar_orden(uuid, jsonb, jsonb, jsonb) to ano
 grant execute on function public.listar_mis_ordenes(uuid) to anon, authenticated;
 grant execute on function public.rastrear_orden(text, text) to anon, authenticated;
 grant execute on function public.actualizar_estado_orden(text, text, jsonb) to anon, authenticated;
+grant execute on function public.cancelar_orden(uuid, text) to anon, authenticated;
+grant execute on function public.cambiar_password(uuid, text, text) to anon, authenticated;
+grant execute on function public.restablecer_password(text, text, text) to anon, authenticated;

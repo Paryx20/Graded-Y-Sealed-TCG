@@ -28,6 +28,10 @@ const app = {
         }
         return;
       }
+      if (this.isExpansionsMenuOpen()) {
+        this.closeExpansionsMenu(true);
+        return;
+      }
       if (typeof CatalogView !== 'undefined' && CatalogView.mobileFiltersOpen && typeof CatalogView.toggleMobileFilters === 'function') {
         CatalogView.toggleMobileFilters();
         return;
@@ -56,6 +60,7 @@ const app = {
       .finally(() => {
         if (container) container.removeAttribute('aria-busy');
         this.handleRoute();
+        this.hideLoader();
         const repriced = Store.data.repricedCartItems || [];
         if (repriced.length) {
           this.showToast(repriced.length === 1
@@ -103,7 +108,117 @@ const app = {
     auth: 'pages/login.html',
     profile: 'pages/perfil.html',
     tracking: 'pages/seguimiento.html',
-    'search-results': 'pages/busqueda.html'
+    'search-results': 'pages/busqueda.html',
+    guide: 'pages/guia.html'
+  },
+
+  // Retira la pantalla de carga del home (si se mostró) con un fundido corto
+  hideLoader() {
+    if (typeof document === 'undefined' || typeof document.getElementById !== 'function') return;
+    const loader = document.getElementById('app-loader');
+    if (!loader || loader.dataset.hiding) return;
+    loader.dataset.hiding = '1';
+    setTimeout(() => {
+      loader.classList.add('is-hidden');
+      setTimeout(() => loader.remove(), 500);
+    }, 450);
+  },
+
+  // ------------------------------------------------ Menú desplegable "Expansiones"
+
+  isExpansionsMenuOpen() {
+    const menu = typeof document !== 'undefined' && document.getElementById('expansions-menu');
+    return !!(menu && !menu.classList.contains('hidden'));
+  },
+
+  renderExpansionsMenu() {
+    if (typeof EXPANSIONES === 'undefined') return '';
+    const available = p => (typeof CatalogView === 'undefined' || CatalogView.matchesCategory(p, 'all'));
+    const current = Store.data.currentView === 'catalog' ? Store.data.catalogFilters.set : null;
+    const series = [];
+    EXPANSIONES.forEach(exp => {
+      const count = PRODUCTS.filter(p => p.expansion === exp.slug && available(p)).length;
+      if (!count) return;
+      let group = series.find(g => g.name === exp.serie);
+      if (!group) series.push(group = { name: exp.serie, items: [] });
+      group.items.push({ ...exp, count });
+    });
+    return `
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-slate-200">
+          <p class="text-sm font-bold text-[#0F172A]">Compra por expansión</p>
+          <a href="pages/catalogo.html" class="text-xs font-semibold text-[#BE123C] hover:underline">Ver todo el catálogo</a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-5">
+          ${series.map(g => `
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">${g.name}</p>
+              <ul class="space-y-0.5">
+                ${g.items.map(e => `
+                  <li>
+                    <a href="${this.url('catalog', { set: e.slug })}" class="expansion-link ${current === e.slug ? 'is-active' : ''}" ${current === e.slug ? 'aria-current="page"' : ''}>
+                      <span class="font-semibold">${e.nombre}</span>
+                      <span class="text-xs text-slate-500">${e.anio} · ${e.count} ${e.count === 1 ? 'producto' : 'productos'}</span>
+                    </a>
+                  </li>`).join('')}
+              </ul>
+            </div>`).join('')}
+        </div>
+      </div>
+    `;
+  },
+
+  toggleExpansionsMenu() {
+    if (this.isExpansionsMenuOpen()) this.closeExpansionsMenu(true);
+    else this.openExpansionsMenu();
+  },
+
+  openExpansionsMenu() {
+    const menu = document.getElementById('expansions-menu');
+    const toggle = document.getElementById('expansions-toggle');
+    if (!menu || !toggle) return;
+    menu.innerHTML = this.renderExpansionsMenu();
+    menu.classList.remove('hidden');
+    toggle.setAttribute('aria-expanded', 'true');
+    const first = menu.querySelector('.expansion-link');
+    if (first) first.focus();
+
+    if (!this._expansionsBound) {
+      this._expansionsBound = true;
+      document.addEventListener('click', (e) => {
+        if (!this.isExpansionsMenuOpen()) return;
+        const t = document.getElementById('expansions-toggle');
+        if (menu.contains(e.target) || (t && t.contains(e.target))) return;
+        this.closeExpansionsMenu(false);
+      });
+      // Flechas arriba/abajo recorren las expansiones; Tab fuera del panel lo cierra
+      menu.addEventListener('keydown', (e) => {
+        if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
+        const links = Array.from(menu.querySelectorAll('.expansion-link'));
+        const idx = links.indexOf(document.activeElement);
+        let next = idx;
+        if (e.key === 'ArrowDown') next = Math.min(links.length - 1, idx + 1);
+        if (e.key === 'ArrowUp') next = Math.max(0, idx - 1);
+        if (e.key === 'Home') next = 0;
+        if (e.key === 'End') next = links.length - 1;
+        if (links[next]) { e.preventDefault(); links[next].focus(); }
+      });
+      menu.addEventListener('focusout', (e) => {
+        const t = document.getElementById('expansions-toggle');
+        if (e.relatedTarget && !menu.contains(e.relatedTarget) && e.relatedTarget !== t) this.closeExpansionsMenu(false);
+      });
+    }
+    this.refreshIcons();
+  },
+
+  closeExpansionsMenu(returnFocus) {
+    const menu = document.getElementById('expansions-menu');
+    const toggle = document.getElementById('expansions-toggle');
+    if (menu) menu.classList.add('hidden');
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', 'false');
+      if (returnFocus) toggle.focus();
+    }
   },
 
   url(route, params) {
@@ -141,8 +256,12 @@ const app = {
       const catParam = params.get('cat');
       const eraParam = params.get('era');
       const qParam = (params.get('q') || '').trim();
+      const setParam = params.get('set');
+      const pageParam = parseInt(params.get('page') || '1', 10);
       Store.data.catalogFilters.category = catParam || 'all';
       Store.data.catalogFilters.era = catParam ? 'all' : (eraParam || 'all');
+      Store.data.catalogFilters.set = setParam && typeof EXPANSIONES !== 'undefined' && EXPANSIONES.some(e => e.slug === setParam) ? setParam : 'all';
+      Store.data.catalogFilters.page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
       // La búsqueda solo se aplica cuando viene en la URL (?q=)
       Store.data.catalogFilters.searchQuery = qParam;
       Store.data.searchQuery = qParam;
@@ -159,14 +278,16 @@ const app = {
     if (route === 'tracking' || route === 'confirmation') {
       const orderParam = params.get('order');
       if (orderParam) Store.data.activeTrackingOrderId = orderParam;
+      // El seguimiento solo abre un pedido concreto si viene en la URL; si no, muestra la lista
+      if (route === 'tracking') Store.data.trackingRequestedOrder = orderParam || null;
     }
 
     if (route === 'profile' && params.get('tab') === 'orders') {
       Store.data.profileActiveTab = 'orders';
     }
 
-    if (route === 'auth' && params.get('tab') === 'register') {
-      CheckoutView.authTab = 'register';
+    if (route === 'auth' && ['register', 'recover'].includes(params.get('tab'))) {
+      CheckoutView.authTab = params.get('tab');
     }
 
     Store.data.currentView = route;
@@ -178,7 +299,8 @@ const app = {
     const f = Store.data.catalogFilters;
     let key = '';
     if (view === 'catalog' && !f.searchQuery) {
-      if (f.category !== 'all') key = `cat:${f.category}`;
+      if (f.set && f.set !== 'all') key = 'set';
+      else if (f.category !== 'all') key = `cat:${f.category}`;
       else if (f.era !== 'all') key = `era:${f.era}`;
       else key = 'all';
     }
@@ -225,6 +347,8 @@ const app = {
       html = ProfileView.render();
     } else if (view === 'tracking') {
       html = TrackingView.render();
+    } else if (view === 'guide' && typeof GuideView !== 'undefined') {
+      html = GuideView.render();
     } else if (view === 'search-results') {
       html = (typeof SearchResultsView !== 'undefined' && SearchResultsView.render)
         ? SearchResultsView.render(Store.data.searchQuery || '')
@@ -247,6 +371,8 @@ const app = {
       ProfileView.afterRender();
     } else if (view === 'tracking' && typeof TrackingView !== 'undefined' && TrackingView.afterRender) {
       TrackingView.afterRender();
+    } else if (view === 'guide' && typeof GuideView !== 'undefined' && GuideView.afterRender) {
+      GuideView.afterRender();
     } else if (view === 'auth' && typeof CheckoutView !== 'undefined') {
       if (typeof CheckoutView.afterAuthRender === 'function') {
         CheckoutView.afterAuthRender();

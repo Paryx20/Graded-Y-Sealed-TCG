@@ -127,13 +127,27 @@ const CartView = {
               </div>
             </div>
 
-            <a 
-              href="pages/checkout.html" 
+            ${items.length === 0 ? `
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              aria-describedby="cart-empty-checkout-hint"
+              class="w-full mt-6 py-3.5 bg-slate-200 text-slate-600 text-sm font-semibold rounded-md flex items-center justify-center gap-2 cursor-not-allowed touch-target"
+            >
+              <span>Ir a pagar</span>
+              <i data-lucide="arrow-right" class="w-4 h-4" aria-hidden="true"></i>
+            </button>
+            <p id="cart-empty-checkout-hint" class="text-xs text-slate-600 text-center mt-2">Agrega al menos un producto para continuar al pago.</p>
+            ` : `
+            <a
+              href="pages/checkout.html"
               class="w-full mt-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-md transition shadow flex items-center justify-center gap-2 touch-target"
             >
               <span>Ir a pagar</span>
               <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
+            `}
 
             <p class="text-xs text-slate-500 text-center mt-3 flex items-center justify-center gap-1">
               <i data-lucide="lock" class="w-3 h-3"></i>

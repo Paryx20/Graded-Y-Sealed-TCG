@@ -1,0 +1,232 @@
+/*
+  Migración v24 · aplicar UNA vez en el SQL Editor de Supabase sobre la base actual.
+  No borra datos ni toca precios o stock del inventario.
+  - Pedidos cancelados (paso_tracking = 0) y la RPC cancelar_orden
+  - Seguimiento sin verificación de cédula al entregar; el avance no retrocede
+  - Primer evento según el método de pago (efectivo = pago pendiente)
+  - Cambiar contraseña y "Olvidé mi contraseña" (correo + cédula)
+*/
+
+-- 1. Permitir el estado "cancelado" (0) en paso_tracking
+do $$
+declare c record;
+begin
+  for c in
+    select conname from pg_constraint
+     where conrelid = 'public.ordenes_compra'::regclass and contype = 'c'
+       and pg_get_constraintdef(oid) like '%paso_tracking%'
+  loop
+    execute format('alter table public.ordenes_compra drop constraint %I', c.conname);
+  end loop;
+end $$;
+alter table public.ordenes_compra
+  add constraint ordenes_compra_paso_tracking_check check (paso_tracking in (-1, 0, 1, 2, 3, 4));
+
+-- 2. Detalle de la orden con la fecha de creación del servidor
+-- Detalle de la orden para la interfaz, con el estado de tracking actualizado desde las columnas
+create or replace function public._orden_json(o public.ordenes_compra)
+returns jsonb language sql stable set search_path = '' as $$
+  select o.detalle || jsonb_build_object(
+    'trackingStep', o.paso_tracking,
+    'status', o.estado,
+    'fecha_creacion', o.fecha_creacion);
+$$;
+
+-- 3. Cuentas: cambiar y restablecer contraseña
+-- Cambia la contraseña con la sesión iniciada; exige la contraseña actual
+create or replace function public.cambiar_password(p_token uuid, p_actual text, p_nueva text)
+returns boolean language plpgsql security definer set search_path = '' as $$
+declare u public.usuarios;
+begin
+  select * into u from public.usuarios where token_sesion = p_token;
+  if u.cedula_ruc is null then raise exception 'SESION_INVALIDA'; end if;
+  if p_actual is null or u.password_hash <> extensions.crypt(p_actual, u.password_hash) then
+    raise exception 'PASSWORD_ACTUAL_INCORRECTA';
+  end if;
+  if length(coalesce(p_nueva, '')) < 8 then raise exception 'PASSWORD_CORTA'; end if;
+  if u.password_hash = extensions.crypt(p_nueva, u.password_hash) then raise exception 'PASSWORD_IGUAL'; end if;
+  update public.usuarios
+     set password_hash = extensions.crypt(p_nueva, extensions.gen_salt('bf')), actualizado_en = now()
+   where cedula_ruc = u.cedula_ruc;
+  return true;
+end $$;
+
+/*
+  "Olvidé mi contraseña" sin servidor de correo (proyecto académico): se verifica
+  la identidad con el correo y la cédula de la cuenta. Cierra las sesiones abiertas.
+*/
+create or replace function public.restablecer_password(p_email text, p_cedula text, p_nueva text)
+returns boolean language plpgsql security definer set search_path = '' as $$
+declare u public.usuarios;
+begin
+  select * into u from public.usuarios
+   where lower(email) = lower(trim(p_email)) and cedula_ruc = trim(p_cedula);
+  if u.cedula_ruc is null then raise exception 'DATOS_NO_COINCIDEN'; end if;
+  if length(coalesce(p_nueva, '')) < 8 then raise exception 'PASSWORD_CORTA'; end if;
+  update public.usuarios
+     set password_hash = extensions.crypt(p_nueva, extensions.gen_salt('bf')),
+         token_sesion = gen_random_uuid(), actualizado_en = now()
+   where cedula_ruc = u.cedula_ruc;
+  return true;
+end $$;
+
+-- 4. Órdenes y seguimiento
+/*
+  p_orden:   detalle de la orden (orderId, trackingNumber, totales, metodo_entrega, ...)
+  p_items:   [{ sku, grado, cantidad, precio, nombre, imagen }]
+  p_tarjeta: { marca, ultimos4, titular, mes, anio } o null si paga en efectivo
+  Descuenta el stock y valida que el precio coincida con la bóveda. Si algo
+  falla, la transacción completa se revierte y no se crea la orden.
+*/
+create or replace function public.guardar_orden(p_token uuid, p_orden jsonb, p_items jsonb, p_tarjeta jsonb default null)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+  v_cedula    text;
+  v_entrega   text := coalesce(p_orden->>'metodo_entrega', 'courier');
+  v_dir       integer;
+  v_token     text;
+  v_subtotal  numeric(10, 2) := 0;
+  v_precio    numeric(10, 2);
+  v_item      jsonb;
+  v_cant      int;
+  v_numero    text := p_orden->>'orderId';
+begin
+  select cedula_ruc into v_cedula from public.usuarios where token_sesion = p_token;
+  if v_cedula is null then raise exception 'SESION_INVALIDA'; end if;
+  if jsonb_array_length(coalesce(p_items, '[]'::jsonb)) = 0 then raise exception 'ORDEN_VACIA'; end if;
+
+  if v_entrega <> 'pickup' then
+    v_dir := public._guardar_direccion(v_cedula, p_orden->>'shippingStreet', p_orden->>'shippingCity');
+  end if;
+
+  if p_tarjeta is not null then
+    insert into public.metodos_pago_tokenizados
+      (token_tarjeta, usuario_cedula, marca_tarjeta, ultimos_4_digitos, titular, mes_expiracion, anio_expiracion)
+    values ('tok_' || replace(gen_random_uuid()::text, '-', ''), v_cedula, p_tarjeta->>'marca', p_tarjeta->>'ultimos4',
+            upper(p_tarjeta->>'titular'), (p_tarjeta->>'mes')::smallint, (p_tarjeta->>'anio')::smallint)
+    on conflict (usuario_cedula, marca_tarjeta, ultimos_4_digitos, mes_expiracion, anio_expiracion)
+      do update set titular = excluded.titular
+    returning token_tarjeta into v_token;
+  end if;
+
+  insert into public.ordenes_compra (numero_orden, usuario_cedula, estado, subtotal, impuesto_iva, tarifa_envio,
+    total, metodo_pago, token_tarjeta, metodo_entrega, direccion_envio_id, guia_tracking, detalle)
+  values (v_numero, v_cedula, 'En preparación', 0, (p_orden->>'tax')::numeric, (p_orden->>'shipping')::numeric,
+    (p_orden->>'total')::numeric, case when p_tarjeta is null then 'EFECTIVO' else 'TARJETA' end, v_token,
+    v_entrega, v_dir, p_orden->>'trackingNumber', p_orden);
+
+  for v_item in select * from jsonb_array_elements(p_items) loop
+    v_cant := (v_item->>'cantidad')::int;
+
+    -- Solo se venden productos del inventario que estén activos
+    if not exists (select 1 from public.productos
+                    where sku = v_item->>'sku' and activo and origen = 'BOVEDA') then
+      raise exception 'PRODUCTO_NO_DISPONIBLE:%', v_item->>'nombre';
+    end if;
+
+    update public.certificaciones_psa
+       set stock_disponible = stock_disponible - v_cant
+     where producto_sku = v_item->>'sku' and grado = v_item->>'grado'
+    returning precio into v_precio;
+
+    if not found then
+      raise exception 'GRADO_NO_DISPONIBLE:%', v_item->>'nombre';
+    end if;
+    -- El precio lo define la base de datos, no el navegador
+    if abs(v_precio - (v_item->>'precio')::numeric) > 0.009 then
+      raise exception 'PRECIO_CAMBIO:%', v_item->>'nombre';
+    end if;
+
+    insert into public.items_orden (numero_orden, sku, grado, cantidad, precio_unitario)
+    values (v_numero, v_item->>'sku', v_item->>'grado', v_cant, v_precio);
+    v_subtotal := v_subtotal + v_precio * v_cant;
+  end loop;
+
+  update public.ordenes_compra set subtotal = v_subtotal where numero_orden = v_numero;
+  insert into public.eventos_tracking (numero_orden, paso, descripcion)
+  values (v_numero, 1, case when p_tarjeta is null
+    then 'Pedido recibido: pago pendiente en efectivo al retirar'
+    else 'Pedido recibido y pago con tarjeta aprobado' end);
+
+  return jsonb_build_object('numero_orden', v_numero, 'subtotal', v_subtotal);
+exception
+  when check_violation then
+    if sqlerrm like '%stock_disponible%' then
+      raise exception 'SIN_STOCK:%', v_item->>'nombre';
+    end if;
+    raise;
+end $$;
+
+/*
+  Guarda el avance simulado del seguimiento (lo calcula el navegador según el
+  tiempo desde la compra). Nunca retrocede ni modifica un pedido cancelado;
+  la cancelación solo se hace con cancelar_orden.
+*/
+create or replace function public.actualizar_estado_orden(p_codigo text, p_cedula text, p_orden jsonb)
+returns boolean language plpgsql security definer set search_path = '' as $$
+declare
+  o      public.ordenes_compra;
+  v_paso smallint := coalesce((p_orden->>'trackingStep')::smallint, 1);
+begin
+  select * into o from public.ordenes_compra where numero_orden = p_codigo and usuario_cedula = trim(p_cedula);
+  if o.numero_orden is null then return false; end if;
+  if o.paso_tracking = 0 or v_paso not in (1, 2, 3, 4) or v_paso <= o.paso_tracking then return false; end if;
+
+  update public.ordenes_compra
+     set paso_tracking = v_paso,
+         estado = coalesce(p_orden->>'status', estado),
+         detalle = detalle || jsonb_build_object('trackingStep', v_paso, 'status', coalesce(p_orden->>'status', estado))
+   where numero_orden = o.numero_orden;
+
+  insert into public.eventos_tracking (numero_orden, paso, descripcion)
+  values (o.numero_orden, v_paso, case v_paso
+    when 2 then case when o.metodo_entrega = 'pickup' then 'Listo para retiro en tienda' else 'En camino' end
+    when 3 then case when o.metodo_entrega = 'pickup' then 'Listo para retiro en tienda' else 'En reparto' end
+    when 4 then case when o.metodo_entrega = 'pickup' then 'Retirado en tienda' else 'Entregado' end
+    else coalesce(p_orden->>'status', 'Cambio de estado') end);
+  return true;
+end $$;
+
+-- Cancela un pedido propio que sigue en preparación y devuelve el stock al inventario
+create or replace function public.cancelar_orden(p_token uuid, p_codigo text)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+  v_cedula text;
+  o        public.ordenes_compra;
+begin
+  select cedula_ruc into v_cedula from public.usuarios where token_sesion = p_token;
+  if v_cedula is null then raise exception 'SESION_INVALIDA'; end if;
+
+  select * into o from public.ordenes_compra
+   where numero_orden = p_codigo and usuario_cedula = v_cedula
+   for update;
+  if o.numero_orden is null then raise exception 'ORDEN_NO_ENCONTRADA'; end if;
+  -- Solo mientras está en preparación (los 2 primeros minutos de la simulación)
+  if o.paso_tracking <> 1 or now() - o.fecha_creacion > interval '2 minutes' then
+    raise exception 'ORDEN_NO_CANCELABLE';
+  end if;
+
+  update public.certificaciones_psa c
+     set stock_disponible = c.stock_disponible + i.cantidad
+    from public.items_orden i
+   where i.numero_orden = o.numero_orden and c.producto_sku = i.sku and c.grado = i.grado;
+
+  update public.ordenes_compra
+     set paso_tracking = 0, estado = 'Cancelado',
+         detalle = detalle || jsonb_build_object('trackingStep', 0, 'status', 'Cancelado',
+                    'cancelledAt', to_char(now() at time zone 'America/Guayaquil', 'DD/MM/YYYY HH24:MI'))
+   where numero_orden = o.numero_orden;
+
+  insert into public.eventos_tracking (numero_orden, paso, descripcion)
+  values (o.numero_orden, 0, 'Pedido cancelado por el cliente; stock devuelto');
+
+  return jsonb_build_object('numero_orden', o.numero_orden, 'estado', 'Cancelado');
+end $$;
+
+-- 5. Permisos
+revoke all on function public._orden_json(public.ordenes_compra) from public, anon, authenticated;
+grant execute on function public.guardar_orden(uuid, jsonb, jsonb, jsonb) to anon, authenticated;
+grant execute on function public.actualizar_estado_orden(text, text, jsonb) to anon, authenticated;
+grant execute on function public.cancelar_orden(uuid, text) to anon, authenticated;
+grant execute on function public.cambiar_password(uuid, text, text) to anon, authenticated;
+grant execute on function public.restablecer_password(text, text, text) to anon, authenticated;

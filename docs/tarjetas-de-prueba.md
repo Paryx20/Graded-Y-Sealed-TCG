@@ -25,11 +25,20 @@ TARJETAS RECHAZADAS (cada una muestra un error distinto)
 [ ] 4000 0000 0000 0127  -> CVV incorrecto                    (CVV-82)
 
 
+PAGOS CANCELADOS
+----------------
+[ ] 4000 0000 0000 0226  -> Cancelado por el titular desde su banco (CANCELADO-17)
+[ ] Cualquier tarjeta aprobada + boton "Cancelar pago" en la ventana de procesamiento
+    -> Pago cancelado, no se cobra y la bolsa se conserva
+[ ] Pedido "En preparacion" -> boton "Cancelar pedido" en Mis pedidos / seguimiento
+    -> El pedido queda Cancelado y el stock vuelve al inventario
+
+
 OTRAS VALIDACIONES PARA PROBAR
 ------------------------------
 [ ] Fecha pasada (ej. 09/24)           -> Error: tarjeta caducada
 [ ] Numero que no pasa Luhn (ej. 4111 1111 1111 1112) -> Error: numero invalido
-[ ] Retiro en Local Fisico + Efectivo   -> Orden reservada, pago en ventanilla
+[ ] Retiro en tienda + Efectivo        -> Orden reservada, "Pago pendiente" hasta retirarla
 
 
 Las reglas estan en js/validators.js (TEST_CARDS).

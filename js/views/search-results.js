@@ -2,8 +2,8 @@
  * Explorar cartas (pages/busqueda.html, ruta "search-results").
  *
  * Consulta la base pública de cartas Pokémon (pokemontcg.io y, si falla, TCGdex)
- * a través de PokemonAPI. Es una página de referencia: no muestra precios ni
- * permite comprar. Si una carta coincide con un producto en stock de la tienda,
+ * a través de PokemonAPI. Es una página de referencia: muestra el precio de mercado
+ * que informa la API (TCGplayer/Cardmarket) solo como dato, sin vender esas cartas. Si una carta coincide con un producto en stock de la tienda,
  * se enlaza a su ficha. El buscador de la tienda es otro: el de la navbar.
  */
 const SearchResultsView = {
@@ -36,16 +36,21 @@ const SearchResultsView = {
             <span aria-current="page">Explorar cartas</span>
           </nav>
           <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A]">Explorar cartas</h1>
-          <p class="text-sm text-slate-600 mt-1 max-w-2xl">
-            Consulta cualquier carta del juego en una base de datos pública: set, número, rareza e ilustración.
+          <p class="text-base text-slate-600 mt-1 max-w-2xl">
+            Busca <strong class="text-[#0F172A]">cualquier carta Pokémon</strong> para ver su información y su <strong class="text-[#0F172A]">precio de mercado</strong> de referencia. Útil para saber cuánto vale una carta que ya tienes.
           </p>
+          <ol class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm max-w-3xl">
+            <li class="flex items-start gap-2"><span class="w-6 h-6 rounded-full bg-[#0F172A] text-white text-xs font-bold flex items-center justify-center flex-shrink-0" aria-hidden="true">1</span><span class="text-slate-700">Escribe el nombre del Pokémon o de la carta.</span></li>
+            <li class="flex items-start gap-2"><span class="w-6 h-6 rounded-full bg-[#0F172A] text-white text-xs font-bold flex items-center justify-center flex-shrink-0" aria-hidden="true">2</span><span class="text-slate-700">Toca un resultado para ver la carta grande y su precio.</span></li>
+            <li class="flex items-start gap-2"><span class="w-6 h-6 rounded-full bg-[#0F172A] text-white text-xs font-bold flex items-center justify-center flex-shrink-0" aria-hidden="true">3</span><span class="text-slate-700">Si dice "En la tienda", puedes comprarla aquí.</span></li>
+          </ol>
         </div>
 
         <div class="flex items-start gap-3 rounded-md border border-[#B45309]/30 bg-[#FEF3C7]/50 px-4 py-3 mb-6 text-sm text-[#78350F]" role="note">
           <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true"></i>
           <p>
             Estas cartas vienen de una base de datos pública y <strong>no forman parte de nuestro inventario</strong>.
-            Para comprar, usa el buscador de la tienda o
+            El precio de mercado es una referencia de TCGplayer (en dólares) y puede variar. Para comprar, usa el buscador de la tienda o
             <a href="${app.url('catalog')}" class="font-semibold underline underline-offset-2 hover:text-[#BE123C]">revisa el catálogo</a>.
           </p>
         </div>
@@ -245,7 +250,7 @@ const SearchResultsView = {
       <div class="border border-dashed border-slate-300 rounded-lg p-10 text-center bg-white">
         <i data-lucide="database" class="w-8 h-8 text-slate-400 mx-auto mb-3" aria-hidden="true"></i>
         <h2 class="text-base font-semibold text-[#0F172A]">Comienza a escribir para buscar</h2>
-        <p class="text-sm text-slate-600 mt-1">Escribe el nombre de una carta o de un Pokémon. Los resultados son solo informativos.</p>
+        <p class="text-sm text-slate-600 mt-1">Escribe el nombre de una carta o de un Pokémon para ver su precio de mercado. Los resultados son solo informativos.</p>
       </div>
     `;
   },
@@ -307,7 +312,7 @@ const SearchResultsView = {
             <span class="block text-xs text-slate-600 truncate">${this._escapeHtml(this.setLabel(card))}${number ? ` · #${this._escapeHtml(number)}` : ''} · ${this._escapeHtml(card.rareza)}</span>
           </span>
         </button>
-        <span class="hidden sm:block text-[11px] text-slate-500 flex-shrink-0">${this._escapeHtml(this.SOURCE_LABELS[card.fuente] || card.fuente)}</span>
+        ${card.precioMercado ? `<span class="flex-shrink-0 text-right"><span class="block text-[11px] text-slate-600">Precio de mercado</span><span class="block text-sm font-bold text-[#0F172A]">${this.formatMarket(card.precioMercado)}</span></span>` : `<span class="hidden sm:block text-[11px] text-slate-500 flex-shrink-0">${card.fuente === 'tcgdex.net' ? 'Precio: ábrela para verlo' : 'Sin precio de mercado'}</span>`}
         ${match ? `
           <a href="${app.url('pdp', { id: match.id })}" class="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-[#047857] border border-[#047857]/40 bg-[#D1FAE5]/50 rounded-md px-2.5 py-1.5 hover:bg-[#D1FAE5]"
             aria-label="${name} está disponible en la tienda: ver ficha">
@@ -342,6 +347,7 @@ const SearchResultsView = {
             ${number ? `<div class="py-2 flex justify-between gap-3"><dt class="text-slate-600">Número</dt><dd class="font-medium">#${this._escapeHtml(number)}</dd></div>` : ''}
             <div class="py-2 flex justify-between gap-3"><dt class="text-slate-600">Rareza</dt><dd class="font-medium text-right">${this._escapeHtml(card.rareza)}</dd></div>
             ${card.tipo ? `<div class="py-2 flex justify-between gap-3"><dt class="text-slate-600">Tipo</dt><dd class="font-medium">${this._escapeHtml(card.tipo)}</dd></div>` : ''}
+            <div class="py-2 flex justify-between gap-3"><dt class="text-slate-600">Precio de mercado</dt><dd id="explore-card-price" class="font-bold text-[#0F172A] text-right">${card.precioMercado ? `${this.formatMarket(card.precioMercado)}<span class="block text-xs font-normal text-slate-600">Referencia de ${this._escapeHtml(card.precioMercado.fuente)}${card.precioMercado.fecha ? ` · ${this._escapeHtml(card.precioMercado.fecha)}` : ''}</span>` : '<span class="font-normal text-slate-600">No disponible</span>'}</dd></div>
             <div class="py-2 flex justify-between gap-3"><dt class="text-slate-600">Fuente</dt><dd class="font-medium">${this._escapeHtml(this.SOURCE_LABELS[card.fuente] || card.fuente)}</dd></div>
           </dl>
           ${match
@@ -356,6 +362,25 @@ const SearchResultsView = {
     // El botón que abrió el diálogo recibe el foco al cerrarlo (también con Esc)
     if (trigger && trigger.focus) trigger.focus();
     app.openDialog('explore-card-dialog');
+    // Si la API del listado no trajo precio, se consulta el detalle de la carta
+    if (!card.precioMercado && typeof PokemonAPI !== 'undefined' && PokemonAPI.fetchMarketPrice) {
+      const cell = document.getElementById('explore-card-price');
+      if (cell) cell.innerHTML = '<span class="font-normal text-slate-600">Consultando…</span>';
+      PokemonAPI.fetchMarketPrice(card).then(price => {
+        const target = document.getElementById('explore-card-price');
+        if (!target) return;
+        if (price) card.precioMercado = price;
+        target.innerHTML = price
+          ? `${this.formatMarket(price)}<span class="block text-xs font-normal text-slate-600">Referencia de ${this._escapeHtml(price.fuente)}${price.fecha ? ` · ${this._escapeHtml(price.fecha)}` : ''}</span>`
+          : '<span class="font-normal text-slate-600">No disponible</span>';
+      });
+    }
+  },
+
+  formatMarket(m) {
+    if (!m || !(Number(m.valor) > 0)) return '';
+    const symbol = m.moneda === 'EUR' ? '€' : '$';
+    return `${symbol}${Number(m.valor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   },
 
   closeCard() {

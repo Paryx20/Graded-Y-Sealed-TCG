@@ -316,6 +316,21 @@ const PDPView = {
     `;
   },
 
+  // "Volver": regresa a la página anterior de la tienda; si se llegó desde fuera, al catálogo
+  goBack() {
+    const product = Store.data.currentPdpProduct;
+    let sameOrigin = false;
+    try {
+      sameOrigin = !!document.referrer && new URL(document.referrer).origin === window.location.origin;
+    } catch (e) { sameOrigin = false; }
+    if (sameOrigin && window.history && window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+    const isSealed = product && (product.categoria === 'sealed' || product.tipo_discriminador === 'PRODUCTO_SELLADO');
+    app.go('catalog', isSealed ? { cat: 'sealed' } : null);
+  },
+
   render() {
     const product = Store.data.currentPdpProduct || PRODUCTS[0];
     const isSealed = product.tipo_discriminador === 'PRODUCTO_SELLADO' || product.categoria === 'sealed' || product.tipo_item === 'PRODUCTO_SELLADO';
@@ -338,15 +353,27 @@ const PDPView = {
 
     return `
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <nav aria-label="Ruta de navegación" class="flex flex-wrap items-center gap-2 text-xs text-slate-500 mb-6">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6">
+        <button
+          type="button"
+          id="pdp-back-btn"
+          onclick="PDPView.goBack()"
+          aria-label="Volver a la página anterior"
+          class="inline-flex items-center gap-1.5 h-9 px-3 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-[#0F172A] transition touch-target"
+        >
+          <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>
+          <span>Volver</span>
+        </button>
+        <nav aria-label="Ruta de navegación" class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
           <a href="index.html" class="hover:text-[#0F172A] font-semibold">Inicio</a>
-          <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5" aria-hidden="true"></i>
           <a href="pages/catalogo.html" class="hover:text-[#0F172A] font-semibold">Catálogo</a>
-          <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-          <span class="text-slate-600 font-semibold">${product.set || 'Colección TCG'}</span>
-          <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5" aria-hidden="true"></i>
+          ${product.expansion ? `<a href="pages/catalogo.html?set=${encodeURIComponent(product.expansion)}" class="hover:text-[#0F172A] font-semibold text-slate-600">${product.set}</a>` : `<span class="text-slate-600 font-semibold">${product.set || 'Colección TCG'}</span>`}
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5" aria-hidden="true"></i>
           <span class="text-[#0F172A] font-semibold" aria-current="page">${product.nombre}</span>
         </nav>
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           <div class="lg:col-span-7 bg-white border border-slate-200 rounded-lg p-4 sm:p-6 shadow-sm">
@@ -550,7 +577,49 @@ const PDPView = {
             </div>
           </div>
         </div>
+        ${this.renderRelated(product, isSealed)}
       </div>
+    `;
+  },
+
+  // Relación sobre ↔ cartas de la misma expansión
+  renderRelated(product, isSealed) {
+    if (!product.expansion || typeof PRODUCTS === 'undefined') return '';
+    const available = p => typeof CatalogView === 'undefined' || !CatalogView.matchesCategory || CatalogView.matchesCategory(p, 'all');
+    const sameSet = PRODUCTS.filter(p => p.id !== product.id && p.expansion === product.expansion && available(p));
+    const related = isSealed
+      ? sameSet.filter(p => p.categoria !== 'sealed').slice(0, 4)
+      : sameSet.filter(p => p.categoria === 'sealed').slice(0, 4);
+    if (!related.length) return '';
+    const exp = typeof EXPANSIONES !== 'undefined' ? EXPANSIONES.find(e => e.slug === product.expansion) : null;
+    const expName = exp ? exp.nombre : product.set;
+    const title = isSealed ? `Cartas de ${expName} en la tienda` : `Sobres y cajas de ${expName}`;
+    const intro = isSealed
+      ? 'Estas cartas pertenecen a la misma expansión: son de las que pueden salir en este producto.'
+      : 'Esta carta sale en los sobres de esta expansión. Si prefieres probar suerte, puedes abrir uno.';
+    return `
+      <section aria-labelledby="pdp-related-title" class="mt-10">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200 pb-3 mb-4">
+          <div>
+            <h2 id="pdp-related-title" class="text-xl font-bold text-[#0F172A] tracking-tight">${title}</h2>
+            <p class="text-sm text-slate-600 mt-0.5">${intro}</p>
+          </div>
+          <a href="pages/catalogo.html?set=${encodeURIComponent(product.expansion)}" class="text-sm font-semibold text-[#BE123C] hover:underline underline-offset-2 inline-flex items-center gap-1 self-start sm:self-auto">
+            <span>Ver toda la expansión</span>
+            <i data-lucide="arrow-right" class="w-4 h-4" aria-hidden="true"></i>
+          </a>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          ${related.map(p => `
+            <a href="pages/producto.html?id=${encodeURIComponent(p.id)}" class="group bg-white border border-slate-200 hover:border-slate-400 hover:shadow-md rounded-lg p-3 transition flex flex-col">
+              <div class="aspect-[3/4] bg-[#F8FAFC] rounded-md flex items-center justify-center p-2 overflow-hidden">
+                <img src="${p.imagenLocal}" alt="${p.nombre}" width="160" height="224" loading="lazy" decoding="async" class="max-h-full max-w-full object-contain"
+                  onerror="this.onerror=null; this.src='${p.imagenFallbackUrl || 'assets/img/cards/card-back.png'}'" />
+              </div>
+              <span class="mt-2 text-sm font-semibold text-[#0F172A] group-hover:text-[#BE123C] line-clamp-2">${p.nombre}</span>
+            </a>`).join('')}
+        </div>
+      </section>
     `;
   },
 

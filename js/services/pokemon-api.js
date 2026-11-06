@@ -126,6 +126,25 @@ class PokemonAPI {
     return this._searchLocalCatalog(q, options);
   }
 
+  // Precio de mercado real informado por la API (TCGplayer o Cardmarket); null si no hay dato
+  marketPriceOf(c) {
+    if (!c) return null;
+    const tp = (c.tcgplayer && c.tcgplayer.prices) || {};
+    const tcg = ['holofoil', 'normal', 'reverseHolofoil', '1stEditionHolofoil', 'unlimitedHolofoil']
+      .map(k => tp[k] && tp[k].market).find(v => Number(v) > 0);
+    if (tcg) return { valor: Math.round(Number(tcg) * 100) / 100, fuente: 'TCGplayer', fecha: (c.tcgplayer && c.tcgplayer.updatedAt) || null };
+    const cmPrices = c.cardmarket && c.cardmarket.prices;
+    const cm = cmPrices && (cmPrices.trendPrice || cmPrices.averageSellPrice);
+    if (Number(cm) > 0) return { valor: Math.round(Number(cm) * 100) / 100, fuente: 'Cardmarket', moneda: 'EUR', fecha: (c.cardmarket && c.cardmarket.updatedAt) || null };
+    const pr = c.pricing && c.pricing.tcgplayer;
+    const tcgdex = pr && ['holofoil', 'normal', 'reverse-holofoil', 'reverseHolofoil'].map(k => pr[k] && pr[k].marketPrice).find(v => Number(v) > 0);
+    if (Number(tcgdex) > 0) return { valor: Math.round(Number(tcgdex) * 100) / 100, fuente: 'TCGplayer', fecha: String(pr.updated || '').slice(0, 10) || null };
+    const cmx = c.pricing && c.pricing.cardmarket;
+    const cmv = cmx && (cmx.trend || cmx.avg);
+    if (Number(cmv) > 0) return { valor: Math.round(Number(cmv) * 100) / 100, fuente: 'Cardmarket', moneda: cmx.unit || 'EUR', fecha: String(cmx.updated || '').slice(0, 10) || null };
+    return null;
+  }
+
   calculateRealisticPrice(c) {
     if (!c) return 25.00;
 
@@ -214,6 +233,7 @@ class PokemonAPI {
       rareza: c.rarity || 'Coleccionable',
       imagen: c.images?.small || c.images?.large || 'assets/img/cards/card-back.png',
       precioEstimado: this.calculateRealisticPrice(c),
+      precioMercado: this.marketPriceOf(c),
       fuente: 'pokemontcg.io'
     }));
   }
@@ -244,6 +264,7 @@ class PokemonAPI {
         rareza: c.rarity || 'Rare',
         imagen: img,
         precioEstimado: this.calculateRealisticPrice(c),
+        precioMercado: this.marketPriceOf(c),
         fuente: 'tcgdex.net'
       };
     });
@@ -314,6 +335,25 @@ class PokemonAPI {
 
   static debounceSearch(query, callback, options) {
     return this.instance.debounceSearch(query, callback, options);
+  }
+
+  // El listado de TCGdex no trae precios: se piden al abrir el detalle de una carta
+  static async fetchMarketPrice(card) {
+    if (!card || card.fuente !== 'tcgdex.net' || !card.id || typeof fetch === 'undefined') return null;
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), 5000) : null;
+    try {
+      const res = await fetch(`${this.instance.secondaryUrl}/${encodeURIComponent(card.id)}`, {
+        signal: controller ? controller.signal : undefined,
+        headers: { Accept: 'application/json' }
+      });
+      if (!res.ok) return null;
+      return this.instance.marketPriceOf(await res.json());
+    } catch (err) {
+      return null;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
   }
 }
 

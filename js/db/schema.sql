@@ -142,8 +142,8 @@ create table ordenes_compra (
   metodo_entrega        varchar(10) not null check (metodo_entrega in ('courier', 'quito', 'pickup')),
   direccion_envio_id    integer references direcciones_envio (direccion_id),
   guia_tracking         varchar(30) unique,
-  -- 1 preparación · 2 en camino / listo · 3 verificando identidad · 4 entregado · -1 retenido
-  paso_tracking         smallint not null default 1 check (paso_tracking in (-1, 1, 2, 3, 4)),
+  -- 0 cancelado · 1 preparación · 2 en camino / listo para retiro · 3 en reparto · 4 entregado / retirado
+  paso_tracking         smallint not null default 1 check (paso_tracking in (-1, 0, 1, 2, 3, 4)),
   intentos_verificacion smallint not null default 0 check (intentos_verificacion between 0 and 3),
   detalle               jsonb not null,
   check (metodo_pago = 'TARJETA' or token_tarjeta is null),

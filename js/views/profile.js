@@ -209,6 +209,39 @@ const ProfileView = {
               </div>
             </form>
           </div>
+
+          <section class="mt-6 bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm max-w-3xl" aria-labelledby="pass-change-title">
+            <div class="pb-4 border-b border-slate-200 mb-6 flex items-start gap-3">
+              <div class="w-10 h-10 rounded-md bg-[#0F172A] text-[#FEF3C7] flex items-center justify-center flex-shrink-0">
+                <i data-lucide="key-round" class="w-5 h-5" aria-hidden="true"></i>
+              </div>
+              <div>
+                <h2 id="pass-change-title" class="text-lg font-bold text-[#0F172A]">Cambiar contraseña</h2>
+                <p class="text-xs text-slate-600 mt-0.5">Usa al menos 8 caracteres combinando letras y números.</p>
+              </div>
+            </div>
+            <form onsubmit="event.preventDefault(); ProfileView.changePassword();" class="grid grid-cols-1 sm:grid-cols-3 gap-4" novalidate>
+              <div>
+                <label for="pass-current" class="block text-xs font-semibold text-[#0F172A] mb-1">Contraseña actual: *</label>
+                <input type="password" id="pass-current" autocomplete="current-password" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-md focus:bg-white" required />
+              </div>
+              <div>
+                <label for="pass-new" class="block text-xs font-semibold text-[#0F172A] mb-1">Nueva contraseña: *</label>
+                <input type="password" id="pass-new" autocomplete="new-password" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-md focus:bg-white" required />
+              </div>
+              <div>
+                <label for="pass-confirm" class="block text-xs font-semibold text-[#0F172A] mb-1">Repite la nueva contraseña: *</label>
+                <input type="password" id="pass-confirm" autocomplete="new-password" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-md focus:bg-white" required />
+              </div>
+              <div class="sm:col-span-3 flex flex-wrap items-center gap-3">
+                <button type="submit" id="pass-change-submit" class="px-6 py-3 bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs sm:text-sm font-semibold rounded-md transition flex items-center gap-2 touch-target">
+                  <i data-lucide="lock" class="w-4 h-4" aria-hidden="true"></i>
+                  <span>Actualizar contraseña</span>
+                </button>
+                <p id="pass-change-status" class="text-xs font-semibold" aria-live="polite"></p>
+              </div>
+            </form>
+          </section>
         ` : `
           <div class="space-y-4">
             ${orders.length === 0 ? `
@@ -292,9 +325,51 @@ const ProfileView = {
     'prof-address': v => Validators.address(v)
   },
 
+  PASSWORD_RULES: {
+    'pass-current': v => (v ? '' : 'Ingresa tu contraseña actual.'),
+    'pass-new': v => Validators.password(v),
+    'pass-confirm': v => {
+      const nueva = document.getElementById('pass-new');
+      if (!v) return 'Repite la nueva contraseña.';
+      return nueva && nueva.value !== v ? 'Las contraseñas no coinciden.' : '';
+    }
+  },
+
   afterRender() {
     if (Store.data.currentUser) {
       Validators.attach(this.PROFILE_RULES);
+      Validators.attach(this.PASSWORD_RULES);
+    }
+  },
+
+  async changePassword() {
+    const user = Store.data.currentUser;
+    if (!user) return;
+    if (!Validators.validateAll(this.PASSWORD_RULES)) return;
+    const status = document.getElementById('pass-change-status');
+    const btn = document.getElementById('pass-change-submit');
+    const current = document.getElementById('pass-current');
+    const nueva = document.getElementById('pass-new');
+    const confirm = document.getElementById('pass-confirm');
+    if (btn) btn.disabled = true;
+    try {
+      await SupabaseAPI.changePassword(user.token, current.value, nueva.value);
+      [current, nueva, confirm].forEach(el => { el.value = ''; });
+      if (status) {
+        status.textContent = 'Contraseña actualizada. Úsala la próxima vez que inicies sesión.';
+        status.className = 'text-xs font-semibold text-[#047857]';
+      }
+      app.showToast('Contraseña actualizada correctamente.', 'success');
+    } catch (err) {
+      if (err.code === 'PASSWORD_ACTUAL_INCORRECTA') Validators.showError(current, err.message);
+      else if (err.code === 'PASSWORD_IGUAL' || err.code === 'PASSWORD_CORTA') Validators.showError(nueva, err.message);
+      if (status) {
+        status.textContent = err.message;
+        status.className = 'text-xs font-semibold text-[#BE123C]';
+      }
+      app.showToast(err.message, 'error');
+    } finally {
+      if (btn) btn.disabled = false;
     }
   },
 

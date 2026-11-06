@@ -20,12 +20,12 @@ function loadData() {
   return sandbox.__out;
 }
 
-test('Hay 25 cartas extra y 35 cartas en total, todas con ID único', () => {
+test('Hay 30 cartas extra y 40 cartas en total, todas con ID único', () => {
   const { POKEMON_CARDS_CATALOG_10, POKEMON_CARDS_EXTRA, PRODUCTS } = loadData();
   assert.equal(POKEMON_CARDS_CATALOG_10.length, 10);
-  assert.equal(POKEMON_CARDS_EXTRA.length, 25);
+  assert.equal(POKEMON_CARDS_EXTRA.length, 30);
   const cards = PRODUCTS.filter(p => p.tipo_discriminador === 'CARTA_INDIVIDUAL');
-  assert.equal(cards.length, 35);
+  assert.equal(cards.length, 40);
   const ids = PRODUCTS.map(p => p.id);
   assert.equal(new Set(ids).size, ids.length, 'los IDs del catálogo no se repiten');
   const certs = cards.map(p => p.certNumber);

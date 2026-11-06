@@ -23,7 +23,9 @@ const Store = {
       maxPrice: '',
       sortBy: 'featured',
       searchQuery: '',
-      onlyFavorites: false
+      onlyFavorites: false,
+      set: 'all',
+      page: 1
     },
     favorites: [],
     profileActiveTab: 'personal',
@@ -197,71 +199,6 @@ const Store = {
     }
   },
 
-  // Orden de demostración para el tracking: GS-2026-9481 + cédula 1710034065
-  getPreloadedSimulatedOrder() {
-    return {
-      orderId: '#GS-2026-9481',
-      numero_orden: '#GS-2026-9481',
-      date: '02 Nov 2026, 09:15',
-      buyerName: 'Patricio Mora',
-      buyerId: '1710034065',
-      buyerEmail: 'coleccionista.paryx@bovedatcg.ec',
-      deliveryMethod: 'Envío nacional por courier',
-      trackingNumber: 'GUI-EC-948102-PSA',
-      courierName: 'Servientrega',
-      estimatedDelivery: '04 Nov 2026 (Entrega Garantizada en Mano)',
-      status: 'En preparación',
-      isDemo: true,
-      currentStageIndex: 1,
-      subtotal: 18500.00,
-      tax: 2775.00,
-      shipping: 5.00,
-      total: 21280.00,
-      paymentMethod: 'Tarjeta de Crédito (3D Secure Verificado)',
-      stages: [
-        {
-          title: '1. Orden Recibida',
-          subtitle: 'Pago Verificado TLS 256-bit',
-          date: '02 Nov 2026, 08:30',
-          status: 'completed',
-          detail: 'Fondos verificados y orden registrada en la cadena de custodia.'
-        },
-        {
-          title: '2. Autenticación PSA',
-          subtitle: 'Sellado UV & Inspección Óptica',
-          date: '02 Nov 2026, 09:15',
-          status: 'active',
-          detail: 'Validación de microimpresión, hologramas y encapsulado acrílico.'
-        },
-        {
-          title: '3. Despacho',
-          subtitle: 'Asignado a Transporte Especial',
-          date: '03 Nov 2026, 10:00 (Est.)',
-          status: 'pending',
-          detail: 'Embalaje con precinto tamper-evident en valija de seguridad.'
-        },
-        {
-          title: '4. En Reparto / Entrega',
-          subtitle: 'Custodia contra Cédula y Firma',
-          date: '04 Nov 2026, 14:00 (Est.)',
-          status: 'pending',
-          detail: 'Recepción formal por el titular con documento de identidad.'
-        }
-      ],
-      items: [
-        {
-          id: 'charizard-base-psa10',
-          name: 'Charizard Base Set 1999 #4/102',
-          condition: 'PSA 10 GEM MT',
-          price: 18500.00,
-          quantity: 1,
-          imageLocal: 'https://images.pokemontcg.io/base1/4.png',
-          imageFallback: 'assets/img/cards/card-back.png'
-        }
-      ]
-    };
-  },
-
   updateProfile(updatedFields) {
     if (!this.data.currentUser) return null;
     // Se busca con el correo anterior: el usuario puede haberlo cambiado
@@ -305,7 +242,8 @@ const Store = {
         if (isCard) {
           // Cartas: solo imágenes externas de la API; el reverso local queda como respaldo
           if (/^https:\/\//.test(row.imagen_url || '')) product.imagenLocal = row.imagen_url;
-        } else if (row.imagen_url) {
+        } else if (row.imagen_url && !/^assets\//.test(product.imagenLocal || '')) {
+          // Sellados: manda la foto local de js/data.js; la de la base solo si no hay local
           // Filas antiguas guardan la ruta previa a assets/ (img/...)
           const imageUrl = row.imagen_url
             .replace(/^(assets\/)?img\/(packs\/)?booster-team-rocket\.png$/, 'img/packs/booster-pack-base-1999-frontal.webp')

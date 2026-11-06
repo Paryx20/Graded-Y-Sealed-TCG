@@ -1,5 +1,6 @@
 const CatalogView = {
   mobileFiltersOpen: false,
+  PAGE_SIZE: 12,
 
   // Grados que cuenta cada categoría del catálogo
   CATEGORY_GRADES: {
@@ -69,6 +70,7 @@ const CatalogView = {
     const testCard = (card, useCategoryFilter, useEraFilter) => {
       if (useCategoryFilter && !this.matchesCategory(card, f.category)) return false;
       if (useEraFilter && f.era !== 'all' && card.era !== f.era) return false;
+      if (useEraFilter && f.set && f.set !== 'all' && card.expansion !== f.set) return false;
 
       if (f.edition === 'special' && !card.edicionEspecial) return false;
 
@@ -118,15 +120,24 @@ const CatalogView = {
       list.sort((a, b) => priceOf(a) - priceOf(b));
     } else if (f.sortBy === 'price-desc') {
       list.sort((a, b) => priceOf(b) - priceOf(a));
-    } else if (f.sortBy === 'yield-desc') {
-      list.sort((a, b) => b.rendimientoAnual - a.rendimientoAnual);
+    } else if (f.sortBy === 'name-asc') {
+      list.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || '', 'es'));
     }
 
     return list;
   },
 
+  getExpansion(slug) {
+    return (typeof EXPANSIONES !== 'undefined' && EXPANSIONES.find(e => e.slug === slug)) || null;
+  },
+
   getActiveTitle() {
     const f = Store.data.catalogFilters;
+    const exp = f.set && f.set !== 'all' ? this.getExpansion(f.set) : null;
+    if (exp) {
+      const cat = { psa: ' · Slabs PSA', raw: ' · Cartas raw', sealed: ' · Sellados' }[f.category] || '';
+      return `${exp.nombre} (${exp.anio})${cat}`;
+    }
     if (f.category === 'psa') return 'Slabs PSA';
     if (f.category === 'raw') return 'Cartas raw';
     if (f.category === 'sealed') return 'Producto sellado';
@@ -135,9 +146,103 @@ const CatalogView = {
     return 'Todo el catálogo';
   },
 
+  // Parámetros de la URL que describen el listado actual
+  currentParams(extra) {
+    const f = Store.data.catalogFilters;
+    const params = {};
+    if (f.category && f.category !== 'all') params.cat = f.category;
+    else if (f.era && f.era !== 'all') params.era = f.era;
+    if (f.set && f.set !== 'all') params.set = f.set;
+    if (f.searchQuery) params.q = f.searchQuery;
+    Object.assign(params, extra || {});
+    if (params.page === 1) delete params.page;
+    return Object.keys(params).length ? params : null;
+  },
+
+  // Página actual (ajustada al total) y los productos que se muestran en ella
+  paginate(list) {
+    const f = Store.data.catalogFilters;
+    const pages = Math.max(1, Math.ceil(list.length / this.PAGE_SIZE));
+    const page = Math.min(Math.max(1, parseInt(f.page, 10) || 1), pages);
+    f.page = page;
+    const start = (page - 1) * this.PAGE_SIZE;
+    return { page, pages, start, items: list.slice(start, start + this.PAGE_SIZE), total: list.length };
+  },
+
+  rangeLabel(pg) {
+    if (!pg.total) return 'Sin productos';
+    return `Mostrando ${pg.start + 1}–${pg.start + pg.items.length} de ${pg.total} productos`;
+  },
+
+  // Números de página a mostrar: 1 … 4 5 6 … 10
+  pageNumbers(page, pages) {
+    const set = new Set([1, pages, page - 1, page, page + 1].filter(n => n >= 1 && n <= pages));
+    const nums = [...set].sort((a, b) => a - b);
+    const out = [];
+    nums.forEach((n, i) => {
+      if (i && n - nums[i - 1] > 1) out.push('…');
+      out.push(n);
+    });
+    return out;
+  },
+
+  renderPagination(pg) {
+    if (pg.pages <= 1) return '';
+    const btn = 'inline-flex items-center justify-center min-w-[40px] h-10 px-3 rounded-md text-sm font-semibold border transition';
+    const link = (n, label, content, disabled) => disabled
+      ? `<span class="${btn} border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed" aria-disabled="true">${content}</span>`
+      : `<a href="${app.url('catalog', this.currentParams({ page: n }))}" onclick="event.preventDefault(); CatalogView.goToPage(${n})" class="${btn} border-slate-300 text-[#0F172A] bg-white hover:bg-slate-50" aria-label="${label}">${content}</a>`;
+    return `
+      <nav id="catalog-pagination" aria-label="Paginación del catálogo" class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-xs text-slate-600">Página ${pg.page} de ${pg.pages}</p>
+        <ul class="flex flex-wrap items-center gap-1.5">
+          <li>${link(pg.page - 1, 'Página anterior', '<i data-lucide="chevron-left" class="w-4 h-4" aria-hidden="true"></i><span class="ml-1">Anterior</span>', pg.page === 1)}</li>
+          ${this.pageNumbers(pg.page, pg.pages).map(n => n === '…'
+            ? '<li><span class="px-1 text-slate-500" aria-hidden="true">…</span></li>'
+            : n === pg.page
+              ? `<li><span class="${btn} border-[#0F172A] bg-[#0F172A] text-white" aria-current="page" aria-label="Página ${n}, actual">${n}</span></li>`
+              : `<li>${link(n, `Ir a la página ${n}`, String(n), false)}</li>`).join('')}
+          <li>${link(pg.page + 1, 'Página siguiente', '<span class="mr-1">Siguiente</span><i data-lucide="chevron-right" class="w-4 h-4" aria-hidden="true"></i>', pg.page === pg.pages)}</li>
+        </ul>
+      </nav>
+    `;
+  },
+
+  goToPage(n) {
+    Store.data.catalogFilters.page = n;
+    if (typeof history !== 'undefined' && history.replaceState) {
+      history.replaceState(null, '', app.url('catalog', this.currentParams({ page: Store.data.catalogFilters.page })));
+    }
+    this.refreshGridOnly();
+    const heading = document.getElementById('catalog-results-heading');
+    if (heading) {
+      heading.scrollIntoView({ block: 'start', behavior: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      heading.focus({ preventScroll: true });
+    }
+  },
+
+  paramsWithoutQuery() {
+    const params = this.currentParams() || {};
+    delete params.q;
+    return Object.keys(params).length ? params : null;
+  },
+
+  renderExpansionOptions(f) {
+    if (typeof EXPANSIONES === 'undefined') return '';
+    const groups = [];
+    EXPANSIONES.forEach(e => {
+      if (!PRODUCTS.some(p => p.expansion === e.slug && this.matchesCategory(p, 'all'))) return;
+      let g = groups.find(x => x.name === e.serie);
+      if (!g) groups.push(g = { name: e.serie, items: [] });
+      g.items.push(e);
+    });
+    return groups.map(g => `<optgroup label="${g.name}">${g.items.map(e => `<option value="${e.slug}" ${f.set === e.slug ? 'selected' : ''}>${e.nombre} (${e.anio})</option>`).join('')}</optgroup>`).join('');
+  },
+
   render() {
     const f = Store.data.catalogFilters;
     const filtered = this.getFilteredProducts();
+    const pg = this.paginate(filtered);
 
     return `
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -200,6 +305,21 @@ const CatalogView = {
                 <option value="psa" ${f.category === 'psa' ? 'selected' : ''}>Slabs PSA</option>
                 <option value="raw" ${f.category === 'raw' ? 'selected' : ''}>Cartas raw</option>
                 <option value="sealed" ${f.category === 'sealed' ? 'selected' : ''}>Producto sellado</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="cat-filter-set" class="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A] mb-1.5">
+                <i data-lucide="library" class="w-4 h-4 text-slate-500" aria-hidden="true"></i>
+                Expansión
+              </label>
+              <select
+                id="cat-filter-set"
+                onchange="CatalogView.updateFilter('set', this.value)"
+                class="w-full px-3 py-2 text-xs font-medium bg-[#F8FAFC] border border-slate-300 rounded-md text-[#0F172A] focus:bg-white"
+              >
+                <option value="all" ${!f.set || f.set === 'all' ? 'selected' : ''}>Todas las expansiones</option>
+                ${this.renderExpansionOptions(f)}
               </select>
             </div>
 
@@ -316,10 +436,12 @@ const CatalogView = {
           <div class="lg:col-span-9 space-y-5">
             <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
-                <span role="status" aria-atomic="true">Mostrando <strong id="catalog-inline-count" class="text-[#0F172A]">${filtered.length}</strong> productos</span>
+                <h2 id="catalog-results-heading" tabindex="-1" class="sr-only">Resultados</h2>
+                <span role="status" aria-atomic="true" id="catalog-range-label">${this.rangeLabel(pg)}</span>
+                <strong id="catalog-inline-count" class="sr-only">${filtered.length}</strong>
                 ${this.isVaultFallback ? `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">Resultados de todas las categorías</span>` : ''}
                 ${f.searchQuery ? `
-                  <a href="${app.url('catalog', f.category !== 'all' ? { cat: f.category } : (f.era !== 'all' ? { era: f.era } : null))}"
+                  <a href="${app.url('catalog', this.paramsWithoutQuery())}"
                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#0F172A] text-white text-xs font-bold hover:bg-[#1E293B]"
                      aria-label="Quitar la búsqueda ${f.searchQuery} y ver todo el catálogo">
                     <span>Búsqueda: “${f.searchQuery}”</span>
@@ -337,14 +459,15 @@ const CatalogView = {
                   <option value="featured" ${f.sortBy === 'featured' ? 'selected' : ''}>Destacados</option>
                   <option value="price-asc" ${f.sortBy === 'price-asc' ? 'selected' : ''}>Precio: menor a mayor</option>
                   <option value="price-desc" ${f.sortBy === 'price-desc' ? 'selected' : ''}>Precio: mayor a menor</option>
-                  <option value="yield-desc" ${f.sortBy === 'yield-desc' ? 'selected' : ''}>Mayor revalorización (12 meses)</option>
+                  <option value="name-asc" ${f.sortBy === 'name-asc' ? 'selected' : ''}>Nombre: A a Z</option>
                 </select>
               </div>
             </div>
 
             <div id="catalog-results-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-              ${this.renderCardsGrid(filtered)}
+              ${this.renderCardsGrid(pg.items)}
             </div>
+            <div id="catalog-pagination-wrap">${this.renderPagination(pg)}</div>
           </div>
         </div>
       </div>
@@ -402,7 +525,8 @@ const CatalogView = {
               ${badgeHtml}
             </div>
 
-            <div class="aspect-[3/4] bg-[#F8FAFC] rounded-md overflow-hidden flex items-center justify-center p-4 relative">
+            <div class="aspect-[3/4] rounded-md overflow-hidden flex items-center justify-center relative ${isPsaGrade ? 'catalog-slab px-4 pb-4 pt-11' : 'bg-[#F8FAFC] p-4'}">
+              ${isPsaGrade ? `<span class="catalog-slab-label" aria-hidden="true"><span>PSA</span><span>Nota ${grade.slice(3)}</span></span>` : ''}
               <img
                 src="${card.imagenLocal}"
                 alt="${card.nombre}"
@@ -477,6 +601,10 @@ const CatalogView = {
 
   updateFilter(key, value) {
     Store.data.catalogFilters[key] = value;
+    Store.data.catalogFilters.page = 1;
+    if (typeof history !== 'undefined' && history.replaceState && ['category', 'set', 'era'].includes(key)) {
+      history.replaceState(null, '', app.url('catalog', this.currentParams()));
+    }
     this.refreshGridOnly();
   },
 
@@ -485,6 +613,7 @@ const CatalogView = {
     const maxEl = document.getElementById('cat-max-price');
     Store.data.catalogFilters.minPrice = minEl ? minEl.value : '';
     Store.data.catalogFilters.maxPrice = maxEl ? maxEl.value : '';
+    Store.data.catalogFilters.page = 1;
     this.refreshGridOnly();
   },
 
@@ -498,7 +627,9 @@ const CatalogView = {
       maxPrice: '',
       sortBy: 'featured',
       searchQuery: '',
-      onlyFavorites: false
+      onlyFavorites: false,
+      set: 'all',
+      page: 1
     };
     const searchInput = document.getElementById('global-search');
     if (searchInput) searchInput.value = '';
@@ -528,12 +659,17 @@ const CatalogView = {
 
   refreshGridOnly() {
     const filtered = this.getFilteredProducts();
+    const pg = this.paginate(filtered);
     const grid = document.getElementById('catalog-results-grid');
     const countBadge = document.getElementById('catalog-count-badge');
     const inlineCount = document.getElementById('catalog-inline-count');
     const titleEl = document.getElementById('catalog-main-title');
+    const rangeEl = document.getElementById('catalog-range-label');
+    const pagerEl = document.getElementById('catalog-pagination-wrap');
 
-    if (grid) grid.innerHTML = this.renderCardsGrid(filtered);
+    if (grid) grid.innerHTML = this.renderCardsGrid(pg.items);
+    if (rangeEl) rangeEl.textContent = this.rangeLabel(pg);
+    if (pagerEl) pagerEl.innerHTML = this.renderPagination(pg);
     if (countBadge) countBadge.innerText = filtered.length;
     if (inlineCount) inlineCount.innerText = filtered.length;
     if (titleEl) titleEl.textContent = this.getActiveTitle();

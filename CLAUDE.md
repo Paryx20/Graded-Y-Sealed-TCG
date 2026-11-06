@@ -16,18 +16,22 @@ node --test tests/*.test.mjs                    # todos los tests (Node 18+)
 node --test tests/test_pdp.test.mjs             # un solo archivo
 node --test --test-name-pattern="PSA" tests/test_pdp.test.mjs   # tests por nombre
 node tools/generar_seed.js                      # regenera js/db/seed_catalogo.sql desde js/data.js
+node tools/generar_seed.js --solo id1,id2 --salida js/db/seed-x.sql   # solo esos productos, con on conflict do nothing
 node tools/generar_cajas.js                     # regenera los SVG de las cajas en assets/img/sealed/<id>/
-python tools/optimizar_sobres.py                # fotos de Gemini -> WebP 800x1200 en assets/img/packs/
+node tools/generar_sobres.js                    # SVG provisionales de los sobres con fotoProvisional: true
+python tools/optimizar_sobres.py assets/img/packs/_originales   # fotos de Gemini -> WebP 800x1200 en assets/img/packs/
 ```
 
 No hay build, bundler ni linter: Tailwind, Lucide y `@supabase/supabase-js` se cargan por CDN.
 
 Base de datos desde cero (editor SQL de Supabase), en este orden:
 `js/db/schema.sql` → `js/db/funciones_rpc.sql` → `js/db/admin_rpc.sql` → `js/db/seed_catalogo.sql`.
+Sobre la BD que ya existía (v23) se aplicaron el 2026-11-06 `js/db/migracion-v24.sql` (cancelaciones, contraseñas,
+seguimiento) y `js/db/seed-sobres-v24.sql` (8 sobres + 5 cartas). Los sobres tienen 5 unidades de stock.
 
 ## Estado de los tests
 
-Hoy pasan 398 de 539. Los 141 fallos están en suites heredadas que prueban funciones ya descartadas
+Hoy pasan 399 de 539. Los 140 fallos están en suites heredadas que prueban funciones ya descartadas
 (Google Sign-In/GIS, `decodeJwtResponse`, rutas hash `#tracking`, persistencia Dexie, sesión simulada,
 y la compra de cartas de la API con precio estimado):
 `challenger_*`, `e2e_requirements_*`, `test_production_*`, `test_reviewer_*`, `test_adversarial_*`, entre otras.
@@ -47,21 +51,21 @@ mantener esos selectores.
 **Multipágina con renderizado por JS.** Cada sección es un HTML propio (`index.html` en la raíz y el resto
 en `pages/`), pero todos tienen la misma estructura: navbar y footer estáticos, `<body data-page="…">` y un
 `<main id="app-view">` vacío. Al cargar, `app.handleRoute()` (`js/app.js`) lee `data-page` y los parámetros
-de la URL (`?id=`, `?cat=`, `?era=`, `?q=`, `?order=`, `?tab=`), los vuelca en `Store.data` y
+de la URL (`?id=`, `?cat=`, `?era=`, `?set=`, `?page=`, `?q=`, `?order=`, `?tab=`), los vuelca en `Store.data` y
 `app.renderCurrentView()` inyecta el HTML de la vista (`HomeView.render()`, `CatalogView.render()`,
 `PDPView.render()`…) y luego llama a su `afterRender()`. Cada interacción que cambia el estado vuelve a
 renderizar la vista (se guarda y restaura el foco con `getFocusKey/restoreFocus`).
 
 - Para navegar entre páginas usar `app.url(route, params)` / `app.go(route, params)`; el mapa ruta → archivo
   está en `app.PAGES`. Los nombres de ruta internos (`home`, `catalog`, `pdp`, `cart`, `checkout`,
-  `confirmation`, `error`, `auth`, `profile`, `tracking`, `search-results`) son los valores de `data-page`.
+  `confirmation`, `error`, `auth`, `profile`, `tracking`, `search-results`, `guide`) son los valores de `data-page`.
 - **Todos los HTML de `pages/` tienen `<base href="../">`**: las rutas se escriben siempre relativas a la raíz
   (`js/app.js`, `pages/catalogo.html`, `assets/…`), nunca con `../`.
 - Hoy cada HTML carga el mismo conjunto completo de scripts (porque `renderCurrentView` referencia todas las
   vistas). El orden importa: config Supabase → `supabase-api.js` → `data.js` → `state.js` → `validators.js` →
   `services/pokemon-api.js` → `views/*.js` → `app.js` (último).
 - Cada HTML tiene una meta `Content-Security-Policy`: un dominio externo nuevo (CDN, API, imágenes) debe
-  añadirse en los 11 HTML.
+  añadirse en los 12 HTML (11 de la tienda + `pages/guia.html`; `admin.html` aparte).
 
 **Estado.** `js/state.js` define `Store` (`Store.data.currentUser`, `cart`, `catalogFilters`, `favorites`,
 `orders`…). La sesión se guarda en localStorage (`gstcg_user`) y una sesión sin `token` se descarta.
@@ -75,7 +79,7 @@ Si no hay conexión, `app.showOfflineNotice()` avisa y la web sigue con el catá
 `db-client.js` ni Dexie (aunque `docs/PROJECT.md` y el harness los mencionen).
 Solo la publishable/anon key va en `js/db/supabase-config.js`; nunca la service_role.
 
-**Catálogo y precios.** `js/data.js` define `POKEMON_CARDS_CATALOG_10` + `POKEMON_CARDS_EXTRA` (35 cartas),
+**Catálogo y precios.** `js/data.js` define `POKEMON_CARDS_CATALOG_10` + `POKEMON_CARDS_EXTRA` (40 cartas),
 `SEALED_PRODUCTS` y el array final `PRODUCTS` (nombres, fotos, descripciones). Con conexión, precio y stock
 vienen de Supabase (`v_catalogo`, fusionado en `Store.loadCatalogFromServer`): **la BD es la fuente de verdad**
 y los precios de `data.js` (Raw real de TCGplayer a `PRECIOS_FECHA`, PSA = Raw × 1.6 / 2.4 / 4.5 según
@@ -88,11 +92,29 @@ crear la BD desde cero: aplicarlo sobre una BD con datos pisaría los cambios he
 (`js/views/catalog.js`) deciden qué se muestra: Slabs PSA = stock en psa8/9/10, Raw = stock raw,
 Sellados = stock sealed, Todo = stock en algún grado. Stock desconocido (sin conexión) cuenta como disponible.
 Inicio, buscador de la navbar y ficha (grados "Agotado") usan los mismos helpers. Ya no hay filtro por letra.
+En "Slabs PSA" la tarjeta se dibuja como estuche (`.catalog-slab`).
+
+**Expansiones y paginación.** `EXPANSIONES` (`js/data.js`) agrupa los `set` en expansiones con `slug`; cada
+producto recibe `expansion`. El menú "Expansiones" de la navbar lo pinta `app.renderExpansionsMenu()` en
+`#expansions-menu` (fuera del contenedor con scroll) y lleva a `catalogo.html?set=<slug>`. El catálogo muestra
+`CatalogView.PAGE_SIZE` (12) productos por página con `?page=`; `getFilteredProducts()` sigue devolviendo la
+lista completa (los tests lo usan) y `paginate()` corta solo al renderizar.
 
 **Dos buscadores.** El de la navbar (`app.renderLiveSearchDropdown` / `executeGlobalSearch`) busca solo en el
 inventario y lleva a `pages/catalogo.html?q=`. "Explorar cartas" (`pages/busqueda.html`, `SearchResultsView`)
-consulta la API pública vía `PokemonAPI` (pokemontcg.io → TCGdex) solo como referencia: sin precios ni compra;
+consulta la API pública vía `PokemonAPI` (pokemontcg.io → TCGdex) solo como referencia, sin compra. Muestra el
+precio de mercado real de la API (`precioMercado`, TCGplayer/Cardmarket; con TCGdex se pide al abrir el detalle
+con `PokemonAPI.fetchMarketPrice`), nunca el `precioEstimado` calculado;
 enlaza a la ficha si la carta coincide (nombre + número o set) con un producto en stock.
+
+**Pedidos y seguimiento.** `pages/seguimiento.html` (`TrackingView`) muestra "Mis pedidos" con sesión y el
+detalle con `?order=`. El avance es simulado por tiempo desde `fecha_creacion` (`MILESTONES_MIN`: 2/5/10 min)
+y se guarda con `actualizar_estado_orden` (nunca retrocede). Paso 0 = cancelado (`cancelar_orden`, solo en
+preparación, devuelve stock). Ya no se pide la cédula al entregar: la cédula solo sirve para la factura y para
+buscar un pedido sin sesión. Efectivo + retiro muestra "Pago pendiente". El pago con tarjeta se puede
+cancelar desde el diálogo (`CheckoutView.cancelPayment`) y la tarjeta `4000 0000 0000 0226` simula una
+cancelación del banco. Contraseñas: `cambiar_password` (perfil) y `restablecer_password` (login `?tab=recover`,
+verifica correo + cédula, sin correo electrónico).
 
 **Panel de inventario.** `pages/admin.html` + `js/views/admin.js` (no enlazado desde la tienda, `noindex`,
 no carga `app.js`). Usa las RPC de `js/db/admin_rpc.sql`, que exigen `usuarios.rol = 'ADMIN'` en el servidor
@@ -101,7 +123,15 @@ en el repositorio.
 
 **Imágenes.** Cartas en `assets/img/cards/` (con URL externa de `images.pokemontcg.io` como fallback),
 sellados en `assets/img/sealed/<id>/` (vistas frontal/lateral/superior/perspectiva para el visor 3D),
-sobres generados con IA (Gemini, fuera de Claude) en `assets/img/packs/` como WebP.
+sobres generados con IA (Gemini, fuera de Claude) en `assets/img/packs/` como WebP; los sobres con
+`fotoProvisional: true` usan un SVG de `tools/generar_sobres.js` hasta tener foto (`docs/prompts-sobres.md`).
+La carta 3D explicativa (`js/views/card-explainer.js`, home y guía) usa `assets/img/cards/blastoise-ex-151.webp`.
+
+**Home y guía.** El home es corto: hero, ventajas, "¿Qué son las cartas Pokémon?" (lenguaje para público
+general), la carta 3D con puntos explicativos, destacados, sobres y expansiones; las secciones `.reveal` aparecen
+al hacer scroll (sin animación con reduced-motion). `#app-loader` (solo `index.html`) es la pantalla de carga de
+la primera visita de la sesión; la retira `app.hideLoader()`. `pages/guia.html` (`GuideView`) explica productos,
+partes de una carta, estados, notas PSA, cómo comprar y preguntas frecuentes.
 
 **Documentación.** `docs/PROJECT.md` (histórico, desactualizado en Google Sign-In y router hash),
 `docs/PLAN_DE_TRABAJO.md`, `docs/tarjetas-de-prueba.md` (tarjetas para el checkout),

@@ -9,6 +9,22 @@ const CheckoutView = {
     const { total } = Store.getCartTotals();
     const rawPhone = user && user.phone ? user.phone.replace(/^\+593\s*/, '').replace(/\D/g, '') : '';
 
+    if (!Store.data.cart || Store.data.cart.length === 0) {
+      return `
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+          <div class="bg-white border border-slate-200 rounded-lg p-10 text-center shadow-sm">
+            <i data-lucide="shopping-bag" class="w-14 h-14 mx-auto mb-3 text-slate-300" aria-hidden="true"></i>
+            <h1 id="checkout-empty-title" class="text-xl font-bold text-[#0F172A]">Tu bolsa está vacía</h1>
+            <p class="text-sm text-slate-600 mt-2 max-w-sm mx-auto">Para finalizar una compra primero agrega productos a tu bolsa.</p>
+            <a href="pages/catalogo.html" class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-md shadow-sm transition touch-target">
+              <i data-lucide="compass" class="w-4 h-4" aria-hidden="true"></i>
+              <span>Ver el catálogo</span>
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <h1 class="sr-only">Finalizar compra</h1>
@@ -81,7 +97,7 @@ const CheckoutView = {
                 </div>
 
                 <div>
-                  <label for="guest-id" class="block text-xs font-bold text-[#0F172A] mb-1">Cédula o RUC (Módulo 10): *</label>
+                  <label for="guest-id" class="block text-xs font-bold text-[#0F172A] mb-1">Cédula o RUC: *</label>
                   <input 
                     type="text" 
                     id="guest-id" 
@@ -91,8 +107,10 @@ const CheckoutView = {
                     inputmode="numeric"
                     oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 13)"
                     class="w-full px-3.5 py-2 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg focus:bg-white transition" 
-                    required 
+                    required
+                    aria-describedby="guest-id-help"
                   />
+                  <span id="guest-id-help" class="text-xs text-slate-500 mt-1 block">Solo para tu factura electrónica. También te sirve para buscar tu pedido sin iniciar sesión.</span>
                 </div>
 
                 <div>
@@ -308,7 +326,7 @@ const CheckoutView = {
               <span class="font-bold text-[#0F172A]">$${order.tax.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
             </div>
             <div class="flex justify-between font-bold text-base text-[#0F172A] border-t border-slate-300 pt-2">
-              <span>Total Pagado (${order.paymentMethod}):</span>
+              <span>${isCash ? 'Total a pagar al retirar (efectivo)' : `Total pagado (${order.paymentMethod})`}:</span>
               <span class="text-[#BE123C]">$${order.total.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
             </div>
           </div>
@@ -323,7 +341,7 @@ const CheckoutView = {
               <span>Seguir mi pedido</span>
             </button>
             <a 
-              href="pages/perfil.html" 
+              href="pages/seguimiento.html"
               class="px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-[#0F172A] text-xs sm:text-sm font-bold rounded-md transition flex items-center gap-2 touch-target"
             >
               <i data-lucide="history" class="w-4 h-4"></i>
@@ -341,16 +359,17 @@ const CheckoutView = {
       title: 'Transacción rechazada',
       message: 'La transacción fue rechazada por el banco emisor.'
     };
+    const isCancelled = !!err.cancelled || /^CANCELADO/.test(err.code || '');
     return `
       <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div class="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm text-center">
-          <div class="w-16 h-16 rounded-full bg-rose-100 text-[#BE123C] flex items-center justify-center mx-auto mb-4">
-            <i data-lucide="credit-card" class="w-9 h-9"></i>
+          <div class="w-16 h-16 rounded-full ${isCancelled ? 'bg-slate-100 text-slate-700' : 'bg-rose-100 text-[#BE123C]'} flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="${isCancelled ? 'circle-slash' : 'credit-card'}" class="w-9 h-9" aria-hidden="true"></i>
           </div>
 
-          <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">No pudimos procesar tu pago</h1>
-          <div class="inline-block px-3 py-1 bg-rose-100 text-[#BE123C] font-mono font-bold text-xs rounded-md mt-2">
-            Código bancario: ${err.code}
+          <h1 class="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">${isCancelled ? 'Pago cancelado' : 'No pudimos procesar tu pago'}</h1>
+          <div class="inline-block px-3 py-1 ${isCancelled ? 'bg-slate-100 text-slate-700' : 'bg-rose-100 text-[#BE123C]'} font-mono font-bold text-xs rounded-md mt-2">
+            ${isCancelled ? 'Estado' : 'Código bancario'}: ${err.code}
           </div>
 
           <div class="mt-6 text-left bg-rose-50/70 border border-rose-200 rounded-md p-5 space-y-2">
@@ -369,7 +388,15 @@ const CheckoutView = {
               class="px-6 py-3.5 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs sm:text-sm font-bold rounded-md transition shadow flex items-center justify-center gap-2 touch-target"
             >
               <i data-lucide="credit-card" class="w-4 h-4"></i>
-              <span>Reintentar con otra tarjeta</span>
+              <span>${isCancelled ? 'Volver a intentar el pago' : 'Reintentar con otra tarjeta'}</span>
+            </a>
+
+            <a
+              href="pages/carrito.html"
+              class="px-6 py-3.5 bg-white border border-slate-300 hover:bg-slate-50 text-[#0F172A] text-xs sm:text-sm font-bold rounded-md transition flex items-center justify-center gap-2 touch-target"
+            >
+              <i data-lucide="shopping-bag" class="w-4 h-4" aria-hidden="true"></i>
+              <span>Volver a la bolsa</span>
             </a>
 
             <button
@@ -388,6 +415,7 @@ const CheckoutView = {
 
   renderAuth(tab) {
     if (tab) this.authTab = tab;
+    if (this.authTab === 'recover') return this.renderRecover();
     const isLogin = this.authTab === 'login';
     return `
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -425,6 +453,9 @@ const CheckoutView = {
               <div>
                 <label for="auth-password" class="block text-xs font-bold text-[#0F172A] mb-1">Contraseña: *</label>
                 <input type="password" id="auth-password" autocomplete="current-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+                <div class="text-right mt-1.5">
+                  <button type="button" id="auth-forgot-link" onclick="CheckoutView.switchAuthTab('recover')" class="text-xs font-semibold text-[#BE123C] hover:underline">¿Olvidaste tu contraseña?</button>
+                </div>
               </div>
               <p data-form-error role="alert" class="hidden text-xs text-[#BE123C] font-semibold"></p>
               <button type="submit" class="w-full py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-md transition shadow touch-target">
@@ -480,6 +511,89 @@ const CheckoutView = {
     `;
   },
 
+  // "Olvidé mi contraseña": se verifica con el correo y la cédula de la cuenta
+  renderRecover() {
+    return `
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div class="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm max-w-lg mx-auto">
+          <div class="flex items-start gap-3 mb-5">
+            <div class="w-10 h-10 rounded-md bg-[#0F172A] text-[#FEF3C7] flex items-center justify-center flex-shrink-0">
+              <i data-lucide="key-round" class="w-5 h-5" aria-hidden="true"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-[#0F172A] tracking-tight">Recuperar contraseña</h1>
+              <p class="text-xs text-slate-600 mt-0.5">Para confirmar que la cuenta es tuya, escribe el correo y la cédula con los que te registraste. Luego elige una contraseña nueva.</p>
+            </div>
+          </div>
+          <form onsubmit="event.preventDefault(); CheckoutView.submitRecover();" class="space-y-4" novalidate>
+            <div>
+              <label for="rec-email" class="block text-xs font-bold text-[#0F172A] mb-1">Correo de tu cuenta: *</label>
+              <input type="email" id="rec-email" autocomplete="email" placeholder="tu.correo@ejemplo.com" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+            </div>
+            <div>
+              <label for="rec-id" class="block text-xs font-bold text-[#0F172A] mb-1">Cédula o RUC de tu cuenta: *</label>
+              <input type="text" id="rec-id" inputmode="numeric" maxlength="13" oninput="this.value = this.value.replace(/\\D/g, '').slice(0,13)" autocomplete="off" placeholder="1710034065" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="rec-pass" class="block text-xs font-bold text-[#0F172A] mb-1">Nueva contraseña: *</label>
+                <input type="password" id="rec-pass" autocomplete="new-password" placeholder="Letras y números" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+              </div>
+              <div>
+                <label for="rec-pass2" class="block text-xs font-bold text-[#0F172A] mb-1">Repítela: *</label>
+                <input type="password" id="rec-pass2" autocomplete="new-password" class="w-full px-3.5 py-2.5 text-sm bg-[#F8FAFC] border border-slate-300 rounded-lg" required />
+              </div>
+            </div>
+            <p data-form-error role="alert" class="hidden text-xs text-[#BE123C] font-semibold"></p>
+            <button type="submit" id="rec-submit" class="w-full py-3 bg-[#E11D48] hover:bg-[#BE123C] text-white text-sm font-semibold rounded-md transition shadow touch-target">
+              Guardar nueva contraseña
+            </button>
+          </form>
+          <p class="text-center text-xs text-slate-600 mt-4">
+            <button type="button" onclick="CheckoutView.switchAuthTab('login')" class="inline-flex items-center gap-1 font-semibold text-[#BE123C] hover:underline">
+              <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>
+              Volver a iniciar sesión
+            </button>
+          </p>
+        </div>
+      </div>
+    `;
+  },
+
+  RECOVER_RULES: {
+    'rec-email': v => Validators.email(v),
+    'rec-id': v => Validators.idCard(v),
+    'rec-pass': v => Validators.password(v),
+    'rec-pass2': v => {
+      const first = document.getElementById('rec-pass');
+      if (!v) return 'Repite la nueva contraseña.';
+      return first && first.value !== v ? 'Las contraseñas no coinciden.' : '';
+    }
+  },
+
+  async submitRecover() {
+    if (!Validators.validateAll(this.RECOVER_RULES)) return;
+    const val = id => document.getElementById(id).value.trim();
+    const email = val('rec-email');
+    const btn = document.getElementById('rec-submit');
+    if (btn) btn.disabled = true;
+    try {
+      await SupabaseAPI.resetPassword(email, val('rec-id'), document.getElementById('rec-pass').value);
+      app.showFormError('');
+      this.authTab = 'login';
+      app.renderCurrentView();
+      const emailInput = document.getElementById('auth-email');
+      if (emailInput) emailInput.value = email;
+      const passInput = document.getElementById('auth-password');
+      if (passInput) passInput.focus();
+      app.showToast('Listo: tu contraseña cambió. Inicia sesión con la nueva.', 'success');
+    } catch (err) {
+      app.showFormError(err.message);
+      app.showToast(err.message, 'error');
+      if (btn) btn.disabled = false;
+    }
+  },
+
   REGISTER_RULES: {
     'reg-name': v => Validators.name(v),
     'reg-id': v => Validators.idCard(v),
@@ -513,6 +627,8 @@ const CheckoutView = {
   afterAuthRender() {
     if (this.authTab === 'register') {
       Validators.attach(this.REGISTER_RULES);
+    } else if (this.authTab === 'recover') {
+      Validators.attach(this.RECOVER_RULES);
     } else {
       Validators.attach({ 'auth-email': v => Validators.email(v) });
     }
@@ -615,6 +731,13 @@ const CheckoutView = {
       app.showFormError(err.message);
       app.showToast(err.message, 'error');
     }
+  },
+
+  // Botón "Cancelar pago" del diálogo de procesamiento
+  cancelPayment() {
+    this._paymentCancelled = true;
+    const text = document.getElementById('payment-modal-text');
+    if (text) text.innerText = 'Cancelando el pago...';
   },
 
   async processPayment() {
@@ -801,24 +924,49 @@ const CheckoutView = {
     };
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+    this._paymentCancelled = false;
+    const cancelBtn = document.getElementById('payment-cancel-btn');
+    if (cancelBtn) cancelBtn.disabled = false;
     if (modal) {
       modal.dataset.locked = '1';
       app.openDialog('payment-modal', '.modal-content');
     }
+    const closeModal = () => {
+      if (modal) {
+        delete modal.dataset.locked;
+        app.closeDialog('payment-modal');
+      }
+    };
+    // Si el cliente pulsa "Cancelar pago" durante el proceso, no se cobra ni se crea la orden
+    const cancelled = () => {
+      if (!this._paymentCancelled) return false;
+      closeModal();
+      Store.data.lastPaymentError = {
+        code: 'CANCELADO',
+        cancelled: true,
+        title: 'Pago cancelado',
+        message: 'Cancelaste el pago antes de que el banco lo confirmara.',
+        brand: cardInfo.brand,
+        cardLast4: cardInfo.last4
+      };
+      Store.savePaymentError();
+      app.go('error');
+      return true;
+    };
     step('25%', 'Conectando con la pasarela bancaria...');
-    await wait(600);
+    await wait(900);
+    if (cancelled()) return;
     step('60%', `Consultando al banco emisor (${cardInfo.brand} •••• ${cardInfo.last4})...`);
-    await wait(700);
+    await wait(1100);
+    if (cancelled()) return;
 
     const bank = Validators.bankAuthorize(cardInfo.digits);
     if (bank.approved) {
+      if (cancelBtn) cancelBtn.disabled = true;
       step('100%', 'Pago autorizado. Registrando tu orden...');
       await wait(400);
     }
-    if (modal) {
-      delete modal.dataset.locked;
-      app.closeDialog('payment-modal');
-    }
+    closeModal();
 
     if (!bank.approved) {
       Store.data.lastPaymentError = {

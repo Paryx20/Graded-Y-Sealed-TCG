@@ -146,6 +146,7 @@ const Validators = {
     '4000000000000069': { code: 'EXPIRADA-54', title: 'Tarjeta caducada', message: 'El banco emisor reporta la tarjeta como caducada aunque la fecha ingresada sea futura.' },
     '4000000000009995': { code: 'FONDOS-51', title: 'Fondos insuficientes', message: 'La tarjeta no tiene saldo o cupo suficiente para cubrir el total.' },
     '4100000000000019': { code: 'BLOQUEADA-43', title: 'Tarjeta bloqueada', message: 'La tarjeta fue reportada como robada o extraviada y está bloqueada.' },
+    '4000000000000226': { code: 'CANCELADO-17', cancelled: true, title: 'Pago cancelado por el titular', message: 'El titular canceló la operación desde la aplicación de su banco. No se realizó ningún cobro.' },
     '4000000000000127': { code: 'CVV-82', title: 'CVV incorrecto', message: 'El código de seguridad no coincide con el registrado por el banco.' }
   },
 

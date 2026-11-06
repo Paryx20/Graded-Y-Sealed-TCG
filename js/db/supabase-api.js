@@ -21,7 +21,12 @@ const SupabaseAPI = {
     PRODUCTO_NO_DISPONIBLE: pieza => `"${pieza}" ya no está disponible en la tienda. Quítalo de tu bolsa.`,
     NO_AUTORIZADO: 'Acceso no autorizado.',
     PRECIO_INVALIDO: 'El precio debe ser mayor que 0.',
-    STOCK_INVALIDO: 'El stock debe ser un número entero mayor o igual a 0.'
+    STOCK_INVALIDO: 'El stock debe ser un número entero mayor o igual a 0.',
+    PASSWORD_ACTUAL_INCORRECTA: 'La contraseña actual no es correcta.',
+    PASSWORD_IGUAL: 'La nueva contraseña debe ser distinta de la actual.',
+    DATOS_NO_COINCIDEN: 'El correo y la cédula no corresponden a ninguna cuenta.',
+    ORDEN_NO_ENCONTRADA: 'No encontramos ese pedido en tu cuenta.',
+    ORDEN_NO_CANCELABLE: 'Este pedido ya salió de la tienda y no se puede cancelar.'
   },
 
   client() {
@@ -91,6 +96,21 @@ const SupabaseAPI = {
       p_password: currentPassword || null
     });
     return this.toUser(row);
+  },
+
+  // Cambia la contraseña con sesión iniciada (exige la actual)
+  async changePassword(token, currentPassword, newPassword) {
+    return this.rpc('cambiar_password', { p_token: token, p_actual: currentPassword, p_nueva: newPassword });
+  },
+
+  // Recuperación sin correo: se verifica con el correo y la cédula de la cuenta
+  async resetPassword(email, idCard, newPassword) {
+    return this.rpc('restablecer_password', { p_email: email, p_cedula: idCard, p_nueva: newPassword });
+  },
+
+  // Cancela un pedido en preparación y devuelve el stock al inventario
+  async cancelOrder(token, orderId) {
+    return this.rpc('cancelar_orden', { p_token: token, p_codigo: orderId });
   },
 
   // items: [{ sku, grado, cantidad, precio, nombre, imagen }] · card: { marca, ultimos4, titular, mes, anio } o null
