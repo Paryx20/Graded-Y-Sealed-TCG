@@ -42,3 +42,10 @@ OTRAS VALIDACIONES PARA PROBAR
 
 
 Las reglas estan en js/validators.js (TEST_CARDS).
+
+
+CUENTA DE PRUEBA (creada en la revisión de la v24)
+--------------------------------------------------
+Correo:     prueba.v24@example.com
+Cedula:     1712345675
+Contraseña: Prueba2026x

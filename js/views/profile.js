@@ -262,8 +262,8 @@ const ProfileView = {
                   <div>
                     <div class="flex items-center gap-2.5">
                       <span class="font-mono text-sm font-bold text-[#0F172A]">${order.orderId}</span>
-                      <span class="px-2.5 py-0.5 text-xs font-semibold bg-[#D1FAE5] text-[#047857] rounded-md">
-                        ${order.status || 'En Preparación / En Custodia'}
+                      <span class="px-2.5 py-0.5 text-xs font-semibold rounded-md ${/cancelad/i.test(order.status || '') ? 'bg-slate-200 text-slate-700' : /entregado|retirado/i.test(order.status || '') ? 'bg-[#D1FAE5] text-[#047857]' : 'bg-[#FEF3C7] text-[#B45309]'}">
+                        ${order.status || 'En preparación'}
                       </span>
                     </div>
                     <p class="text-xs text-slate-500 mt-1">

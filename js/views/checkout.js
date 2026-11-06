@@ -360,6 +360,7 @@ const CheckoutView = {
       message: 'La transacción fue rechazada por el banco emisor.'
     };
     const isCancelled = !!err.cancelled || /^CANCELADO/.test(err.code || '');
+    if (typeof document !== 'undefined' && isCancelled) document.title = 'Pago cancelado | Graded & Sealed TCG';
     return `
       <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div class="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm text-center">
